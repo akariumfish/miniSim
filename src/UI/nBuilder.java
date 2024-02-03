@@ -80,7 +80,7 @@ public class nBuilder { // base pour les class constructrice de nwidget basic
 	    widgets.clear(); 
 	    return this; 
 	  }
-	  nWidget customBuild(nWidget w) { return w; }
+	  protected nWidget customBuild(nWidget w) { return w; }
 	  
 	  public nBuilder(nGUI _g, float s) { gui = _g; ref_size = s; }
 	}

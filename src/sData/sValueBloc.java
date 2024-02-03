@@ -15,7 +15,7 @@ public class sValueBloc {
 	      sValue v = ((sValue)mev.getValue());
 	      i.run(v);
 	    }
-	    for (Map.Entry me : blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : blocs.entrySet()) {
 	      sValueBloc vb = ((sValueBloc)me.getValue());
 	      vb.runIterator(i);
 	    }
@@ -27,7 +27,7 @@ public class sValueBloc {
 	    }
 	  }
 	  public void runBlocIterator(nIterator<sValueBloc> i) { 
-	    for (Map.Entry me : blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : blocs.entrySet()) {
 	      sValueBloc vb = ((sValueBloc)me.getValue());
 	      i.run(vb); } }
 	  int runIterator_Counted(nIterator<sValue> i) { return runIterator_Counted(i, 0); }
@@ -36,7 +36,7 @@ public class sValueBloc {
 	      sValue v = ((sValue)mev.getValue());
 	      i.run(v, c); c++;
 	    }
-	    for (Map.Entry me : blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : blocs.entrySet()) {
 	      sValueBloc vb = ((sValueBloc)me.getValue());
 	      c = vb.runIterator_Counted(i, c);
 	    }
@@ -47,7 +47,7 @@ public class sValueBloc {
 	      sValue v = ((sValue)mev.getValue());
 	      if (v.type.equals(t)) i.run(v);
 	    }
-	    for (Map.Entry me : blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : blocs.entrySet()) {
 	      sValueBloc vb = ((sValueBloc)me.getValue());
 	      vb.runIterator_Filter(t, i);
 	    }
@@ -58,7 +58,7 @@ public class sValueBloc {
 	      sValue v = ((sValue)mev.getValue());
 	      if (v.type.equals(t)) { i.run(v, c); c++; }
 	    }
-	    for (Map.Entry me : blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : blocs.entrySet()) {
 	      sValueBloc vb = ((sValueBloc)me.getValue());
 	      c = vb.runIterator_Filter_Counted(t, i, c);
 	    }
@@ -67,7 +67,7 @@ public class sValueBloc {
 	  sValue searchValue(String t) { 
 	    sValue e = values.get(t);
 	    if (e != null) return e;
-	    for (Map.Entry me : blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : blocs.entrySet()) {
 	      e = ( (sValueBloc)(me.getValue()) ).searchValue(t);
 	      if (e != null) return e; }
 	    return null;
@@ -78,7 +78,7 @@ public class sValueBloc {
 	      sValue v = ((sValue)mev.getValue());
 	      if (v.type.equals(t)) c++;
 	    }
-	    for (Map.Entry me : blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : blocs.entrySet()) {
 	      sValueBloc vb = ((sValueBloc)me.getValue());
 	      c = vb.getCountOfType(t, c);
 	    }
@@ -152,7 +152,7 @@ public class sValueBloc {
 	    //for (Map.Entry b : blocs.entrySet()) { sValueBloc s = (sValueBloc)b.getValue(); s.frame(); } 
 	    
 	    tmpblc.clear();
-	    for (Map.Entry b : blocs.entrySet()) tmpblc.add((sValueBloc)b.getValue());
+	    for (Map.Entry<String, sValueBloc> b : blocs.entrySet()) tmpblc.add((sValueBloc)b.getValue());
 	    for (int i = tmpblc.size()-1 ; i >= 0 ; i--) tmpblc.get(i).frame();
 	    tmpblc.clear();
 	    tmpval.clear();
@@ -168,7 +168,7 @@ public class sValueBloc {
 	  ArrayList<sValueBloc> tmpblc = new ArrayList<sValueBloc>();
 	  public void clean() {
 	    //parent.blocs.remove(ref, this);
-	    for (Map.Entry b : blocs.entrySet()) { sValueBloc s = (sValueBloc)b.getValue(); s.clean(); } 
+	    for (Map.Entry<String, sValueBloc> b : blocs.entrySet()) { sValueBloc s = (sValueBloc)b.getValue(); s.clean(); } 
 	    
 	    tmpval.clear();
 	    for (Map.Entry b : values.entrySet()) tmpval.add((sValue)b.getValue());
@@ -195,59 +195,59 @@ public class sValueBloc {
 	  }
 	  
 	  void load_from_bloc(Save_Bloc sb) {
-	    vlogln("svb load " + ref + "  /svb " + sb.blocs.size() + " /sv " + sb.datas.size());
+	    data.app.vlogln("svb load " + ref + "  /svb " + sb.blocs.size() + " /sv " + sb.datas.size());
 	    
 	    for (Map.Entry b : blocs.entrySet()) { 
 	      sValueBloc s = (sValueBloc)b.getValue(); 
-	      vlogln("test vb "+ s.ref);
+	      data.app.vlogln("test vb "+ s.ref);
 	      Save_Bloc child_blocs = sb.getBloc(s.ref);
 	      if (child_blocs != null) {
-	        vlogln("got save bloc ");
+	        data.app.vlogln("got save bloc ");
 	        s.load_from_bloc(child_blocs);
 	      }
 	    }
 	    
 	    for (Map.Entry b : values.entrySet()) { 
 	      sValue s = (sValue)b.getValue(); 
-	      vlogln("test vb "+ s.ref);
+	      data.app.vlogln("test vb "+ s.ref);
 	      Save_Bloc child_blocs = sb.getBloc(s.ref);
 	      if (child_blocs != null) {
-	        vlogln("got save bloc ");
+	        data.app.vlogln("got save bloc ");
 	        s.load_from_bloc(child_blocs);
 	      }
 	    }
 	  }
 	  
 	  void load_values_from_bloc(Save_Bloc sb) {
-	    vlogln("svb load " + ref + "  /svb " + sb.blocs.size() + " /sv " + sb.datas.size());
+	    data.app.vlogln("svb load " + ref + "  /svb " + sb.blocs.size() + " /sv " + sb.datas.size());
 	    
 	    for (Map.Entry b : values.entrySet()) { 
 	      sValue s = (sValue)b.getValue(); 
-	      vlogln("test vb "+ s.ref);
+	      data.app.vlogln("test vb "+ s.ref);
 	      Save_Bloc child_blocs = sb.getBloc(s.ref);
 	      if (child_blocs != null) {
-	        vlogln("got save bloc ");
+	        data.app.vlogln("got save bloc ");
 	        s.load_from_bloc(child_blocs);
 	      }
 	    }
 	  }
 	  public void preset_value_to_save_bloc(Save_Bloc sb) {
-	    dlog("valuebloc " + ref + " saving to savebloc > clearing savebloc >");
+	    data.app.dlog("valuebloc " + ref + " saving to savebloc > clearing savebloc >");
 	    sb.clear();
-	    dlogln(" saving ref typ >");
+	    data.app.dlogln(" saving ref typ >");
 	    sb.newData("__bloc_type", type);
 	    sb.newData("__bloc_ref", ref);
 	    sb.newData("__bloc_bas", base_ref);
 	    sb.newData("__bloc_use", use);
 	    
-	    dlogln("saving under values >");
+	    data.app.dlogln("saving under values >");
 	    for (Map.Entry me : values.entrySet()) { 
 	      sValue s = (sValue)me.getValue(); 
 	      Save_Bloc sbv = sb.newBloc((String)me.getKey());
 	      sbv.newData("__bloc_type", "val");
 	      s.save_to_bloc(sbv); } 
 	    
-	    dlogln("done saving " + ref + " to savebloc");
+	    data.app.dlogln("done saving " + ref + " to savebloc");
 	  }
 	  
 	  public String getHierarchy(boolean print_ref) {
@@ -287,21 +287,21 @@ public class sValueBloc {
 	  
 	  public int preset_to_save_bloc(Save_Bloc sb) { return preset_to_save_bloc(sb, 0); }
 	  int preset_to_save_bloc(Save_Bloc sb, int cnt) {
-	    dlog("valuebloc " + ref + " saving to savebloc > val counter: " + cnt + " > clearing savebloc >");
+		  data.app.dlog("valuebloc " + ref + " saving to savebloc > val counter: " + cnt + " > clearing savebloc >");
 	    sb.clear();
-	    dlogln(" saving ref typ >");
+	    data.app.dlogln(" saving ref typ >");
 	    sb.newData("__bloc_type", type);
 	    sb.newData("__bloc_ref", ref);
 	    sb.newData("__bloc_bas", base_ref);
 	    sb.newData("__bloc_use", use);
 	    
-	    dlogln("saving under blocs >");
+	    data.app.dlogln("saving under blocs >");
 	    for (Map.Entry me : blocs.entrySet()) { 
 	      sValueBloc svb = (sValueBloc)me.getValue(); 
 	      Save_Bloc sb2 = sb.newBloc(svb.ref);
 	      cnt = svb.preset_to_save_bloc(sb2, cnt); 
 	    } 
-	    dlogln("saving under values >");
+	    data.app.dlogln("saving under values >");
 	    for (Map.Entry me : values.entrySet()) { 
 	      sValue s = (sValue)me.getValue(); 
 	      Save_Bloc sbv = sb.newBloc((String)me.getKey());
@@ -309,7 +309,7 @@ public class sValueBloc {
 	      cnt++;
 	      s.save_to_bloc(sbv); } 
 	    
-	    dlogln("done saving " + ref + " to savebloc");
+	    data.app.dlogln("done saving " + ref + " to savebloc");
 	    return cnt;
 	  }
 
@@ -327,7 +327,7 @@ public class sValueBloc {
 	      if (t.equals("boo")) { nv = new sBoo(this, false, n, s);  nv.load_from_bloc(sb); }
 	      if (t.equals("str")) { nv = new sStr(this, "", n, s);     nv.load_from_bloc(sb); }
 	      if (t.equals("vec")) { nv = new sVec(this, n, s);         nv.load_from_bloc(sb); }
-//	      if (t.equals("col")) { nv = new sCol(this, n, s);         nv.load_from_bloc(sb); }
+	      if (t.equals("col")) { nv = new sCol(this, n, s);         nv.load_from_bloc(sb); }
 	      if (t.equals("run")) { nv = new sRun(this, n, s, null);   nv.load_from_bloc(sb); }
 	      //if (t.equals("blc")) { nv = new sBlc(this, n, s);      nv.load_from_bloc(sb); }
 	      if (t.equals("obj")) { nv = new sObj(this, n, null);   nv.load_from_bloc(sb); }
@@ -336,11 +336,11 @@ public class sValueBloc {
 	  }
 	  
 	  sValueBloc newBloc(Save_Bloc sb) {
-	    dlogln("newbloc");
+	    data.app.dlogln("newbloc");
 	    if (sb.getData("__bloc_type") != null && sb.getData("__bloc_ref") != null && 
 	        sb.getData("__bloc_bas") != null && sb.getData("__bloc_use") != null && 
 	        sb.getData("__bloc_type").equals("def")) {
-	      dlogln("got it");
+	      data.app.dlogln("got it");
 	      String b = sb.getData("__bloc_bas");
 	      String u = sb.getData("__bloc_use");
 	      sValueBloc vb = new sValueBloc(this, b);
@@ -356,11 +356,11 @@ public class sValueBloc {
 	  }
 	  
 	  public sValueBloc newBloc(Save_Bloc sb, String n) {
-	    dlogln("newbloc");
+	    data.app.dlogln("newbloc");
 	    if (sb.getData("__bloc_type") != null && sb.getData("__bloc_ref") != null && 
 	        sb.getData("__bloc_bas") != null && sb.getData("__bloc_use") != null && 
 	        sb.getData("__bloc_type").equals("def")) {
-	      dlogln("got it");
+	      data.app.dlogln("got it");
 	      //String b = sb.getData("__bloc_bas");
 	      String u = sb.getData("__bloc_use");
 	      sValueBloc vb = new sValueBloc(this, n);
@@ -374,22 +374,4 @@ public class sValueBloc {
 	    }
 	    return null;
 	  }
-	  
-	boolean DEBUG_SVALUE = false;
-	void vlog(String s) {
-	//  if (DEBUG_SVALUE) print(s);
-	}
-	void vlogln(String s) {
-	//  if (DEBUG_SVALUE) println(s);
-	}
-	
-
-	boolean DEBUG_DATA = false;
-	void dlog(String s) {
-	//  if (DEBUG_DATA) print(s);
-	}
-	void dlogln(String s) {
-	//  if (DEBUG_DATA) println(s);
-	}
-	  
-	}
+} 

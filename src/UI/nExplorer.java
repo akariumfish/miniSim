@@ -3,7 +3,6 @@ package UI;
 import java.util.ArrayList;
 import java.util.Map;
 
-import RBase.RConst;
 import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sBoo;
@@ -197,7 +196,7 @@ public class nExplorer extends nDrawer {
 	  }
 	  public void selectEntry(String r) {
 	    int i = 0;
-	    for (Map.Entry me : explored_bloc.blocs.entrySet()) {
+	    for (Map.Entry<String, sValueBloc> me : explored_bloc.blocs.entrySet()) {
 	      if (me.getKey().equals(r)) break;
 	      i++; }
 	    if (i < explorer_list.listwidgets.size()) explorer_list.listwidgets.get(i).setOn();
@@ -240,24 +239,24 @@ public class nExplorer extends nDrawer {
 	               
 	      blc_tmp.clear();
 	      for (int i = 0; i < 10 ; i++) {
-	        for (Map.Entry me : explored_bloc.blocs.entrySet()) {
+	        for (Map.Entry<String, sValueBloc> me : explored_bloc.blocs.entrySet()) {
 	          sValueBloc tv = (sValueBloc)me.getValue();
 	          if (tv.base_ref.charAt(0) == alphNum[i]) blc_tmp.add(tv); 
 	        }
 	      }
 	      for (int i = 0; i < 26 ; i++) {
-	        for (Map.Entry me : explored_bloc.blocs.entrySet()) {
+	        for (Map.Entry<String, sValueBloc> me : explored_bloc.blocs.entrySet()) {
 	          sValueBloc tv = (sValueBloc)me.getValue();
 	          if (tv.base_ref.charAt(0) == alphabMag[i]) blc_tmp.add(tv); 
 	        }
 	      }
 	      for (int i = 0; i < 26 ; i++) {
-	        for (Map.Entry me : explored_bloc.blocs.entrySet()) {
+	        for (Map.Entry<String, sValueBloc> me : explored_bloc.blocs.entrySet()) {
 	          sValueBloc tv = (sValueBloc)me.getValue();
 	          if (tv.base_ref.charAt(0) == alphabMin[i]) blc_tmp.add(tv); 
 	        }
 	      }
-	      for (Map.Entry me : explored_bloc.blocs.entrySet()) {
+	      for (Map.Entry<String, sValueBloc> me : explored_bloc.blocs.entrySet()) {
 	        sValueBloc tv = (sValueBloc)me.getValue();
 	        if (!blc_tmp.contains(tv)) blc_tmp.add(tv); 
 	      }
@@ -269,24 +268,24 @@ public class nExplorer extends nDrawer {
 	               
 	      val_tmp.clear();
 	      for (int i = 0; i < 10 ; i++) {
-	        for (Map.Entry me : explored_bloc.values.entrySet()) {
+	        for (Map.Entry<String, sValue> me : explored_bloc.values.entrySet()) {
 	          sValue tv = (sValue)me.getValue();
 	          if (tv.ref.charAt(0) == alphNum[i]) val_tmp.add(tv); 
 	        }
 	      }
 	      for (int i = 0; i < 26 ; i++) {
-	        for (Map.Entry me : explored_bloc.values.entrySet()) {
+	        for (Map.Entry<String, sValue> me : explored_bloc.values.entrySet()) {
 	          sValue tv = (sValue)me.getValue();
 	          if (tv.ref.charAt(0) == alphabMag[i]) val_tmp.add(tv); 
 	        }
 	      }
 	      for (int i = 0; i < 26 ; i++) {
-	        for (Map.Entry me : explored_bloc.values.entrySet()) {
+	        for (Map.Entry<String, sValue> me : explored_bloc.values.entrySet()) {
 	          sValue tv = (sValue)me.getValue();
 	          if (tv.ref.charAt(0) == alphabMin[i]) val_tmp.add(tv); 
 	        }
 	      }
-	      for (Map.Entry me : explored_bloc.values.entrySet()) {
+	      for (Map.Entry<String, sValue> me : explored_bloc.values.entrySet()) {
 	        sValue tv = (sValue)me.getValue();
 	        if (!val_tmp.contains(tv)) val_tmp.add(tv); 
 	      }

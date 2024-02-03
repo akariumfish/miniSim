@@ -1,7 +1,5 @@
 package Specialize;
 
-import java.util.ArrayList;
-
 import Macro.Macro_Sheet;
 import Macro.Sheet_Specialize;
 import RApplet.Rapp;
@@ -10,6 +8,7 @@ import UI.nCursor;
 import UI.nDrawer;
 import UI.nFrontPanel;
 import UI.nWidget;
+import processing.core.PVector;
 import sData.nRunnable;
 import sData.sBoo;
 import sData.sCol;
@@ -28,7 +27,6 @@ public static class FacePrint extends Sheet_Specialize {
   public FacePrint(Canvas s) { super("Face"); sim = s; }
   public Face get_new(Macro_Sheet s, String n, sValueBloc b) { return new Face(sim, b); }
 }
-
   nWidget graph;
   Drawable g_draw;
   
@@ -42,6 +40,10 @@ public static class FacePrint extends Sheet_Specialize {
         .addDrawerFactValue(val_disp, 2, 10, 1)
         .addSeparator(0.125)
         .addDrawerDoubleButton(val_halo_type, val_halo_type2, 10, 1)
+        .addSeparator(0.125)
+        .addDrawerButton(val_mirage, 10, 1)
+        .addSeparator(0.125)
+        .addDrawerButton(val_transf, 10, 1)
         .addSeparator(0.125)
         .addDrawer(10.25, 6.25);
       
@@ -97,10 +99,10 @@ public static class FacePrint extends Sheet_Specialize {
   sFlt val_scale, vpax, vpay, vpbx, vpby, vpcx, vpcy, val_linew, val_dens, val_disp;
   sCol val_fill, val_stroke;
   sInt val_draw_layer;
-  sBoo val_halo_type, val_halo_type2;
+  sBoo val_halo_type, val_halo_type2, val_mirage, val_transf;
   
   
-  ArrayList<nCursor> duplication_cursors = new ArrayList<nCursor>();
+//  ArrayList<nCursor> duplication_cursors = new ArrayList<nCursor>();
   
   Face(Canvas m, sValueBloc b) { 
     super(m.mmain(), "Face", b);
@@ -116,6 +118,8 @@ public static class FacePrint extends Sheet_Specialize {
     val_disp = newFlt(5, "val_disp", "val_disp");
     val_halo_type = newBoo(false, "val_halo_type", "val_halo_type");
     val_halo_type2 = newBoo(false, "val_halo_type2", "val_halo_type2");
+    val_mirage = newBoo(false, "val_mirage", "val_mirage");
+    val_transf = newBoo(false, "val_transf", "val_transf");
     vpax = newFlt(shape.face.p1.x, "vpax", "vpax");
     vpay = newFlt(shape.face.p1.y, "vpay", "vpay");
     vpbx = newFlt(shape.face.p2.x, "vpbx", "vpbx");
@@ -148,19 +152,51 @@ public static class FacePrint extends Sheet_Specialize {
     }});
   }
   
+  
+  
   void tick() {
-    if (!val_halo_type.get()) {
-      if (!val_halo_type2.get()) {
-        can.draw_halo(shape.pos, val_scale.get()*val_disp.get(), val_dens.get(), val_fill.get());
-      } else { can.draw_halo(shape.pos, val_scale.get()*val_disp.get(), val_dens.get(), val_fill.get()); }
-    } else { 
-      if (!val_halo_type2.get()) {
-        can.draw_shape_line(shape, val_scale.get()*val_disp.get(), val_dens.get(), val_stroke.get());
-      } else { can.draw_shape_fill(shape, val_scale.get()*val_disp.get(), val_dens.get(), val_fill.get()); }
-    }
+	  if (val_transf.get()) {
+		  PixelTransform rn = new PixelTransform() { public int result(int v) {
+			  float r = gui.app.red(v);
+			  float g = gui.app.green(v);
+			  float b = gui.app.blue(v);
+			  if ( r > 10) r-=5;
+			  if ( g > 10) g-=5;
+			  if ( b > 10) b-=5;
+			  return gui.app.color(r, g, b);
+		  } };
+		  can.shape_transform(shape, rn);
+	  } else  {
+	    if (!val_halo_type.get()) {
+	      if (!val_halo_type2.get()) {
+	        can.draw_halo(shape.pos, val_scale.get()*val_disp.get(), val_dens.get(), val_fill.get());
+	      } else { can.draw_halo(shape.pos, val_scale.get()*val_disp.get(), val_dens.get(), val_fill.get()); }
+	    } else { 
+	      if (!val_halo_type2.get()) {
+	        can.draw_shape_line(shape, val_scale.get()*val_disp.get(), val_dens.get(), val_stroke.get());
+	      } else { can.draw_shape_fill(shape, val_scale.get()*val_disp.get(), val_dens.get(), val_fill.get()); }
+	    }
+	  }
   }
   
-  void draw(Rapp a) { shape.draw(a); }
+  void draw(Rapp a) { 	
+	  shape.draw(a); 
+	  if (val_mirage.get()) {
+		  PVector tp = new PVector();
+		  PVector td = new PVector();
+		  tp.set(shape.pos); td.set(shape.dir);
+		  for (nCursor c : sheet_cursors_list) if (c != ref_cursor) {
+			  shape.pos.set(c.pos()); 
+//			  if (c.dir().mag() > 0.01) { 
+				  shape.dir.set(1, 0);
+				  shape.dir.rotate(c.dir().heading());
+				  shape.dir.setMag(td.mag());
+//			  } //else shape.dir.set(td);
+			  shape.draw(a); 
+		  }
+		  shape.pos.set(tp); shape.dir.set(td);
+	  }
+  }
   
   public Face clear() {
     can.faces.remove(this);

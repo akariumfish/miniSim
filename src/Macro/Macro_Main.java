@@ -250,6 +250,13 @@ nExplorer sheet_explorer;
         ;
       //c++;
     }
+    build_tool.addShelf();
+    for (String t : bloc_types5) { build_tool.getShelf(2).addDrawer(2.5, 0.75)
+      .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
+        .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
+        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
+        ;
+    }
     //build_tool.addShelf();
     //int c = 0;
     //for (String t : bloc_types3) { build_tool.getShelf(0).addDrawer(2.5, 0.75)
@@ -299,7 +306,7 @@ nExplorer sheet_explorer;
     if (!show_sheet_tool.get()) sheet_tool.reduc();
     sheet_tool.addEventReduc(new nRunnable() { public void run() { 
       show_sheet_tool.set(!sheet_tool.hide); }});
-    sheet_tool.setPos(gui.app.window_head + ref_size*16);
+    sheet_tool.setPos(gui.app.window_head + ref_size*13);
   }
   public void build_custom_menu(nFrontPanel sheet_front) {
     nFrontTab tab = sheet_front.getTab(2);
@@ -897,6 +904,7 @@ public Macro_Main(sInterface _int) {
     add_bloc_builders(new MSheetView_Builder());
     add_bloc_builders(new MSheetObj_Builder());
     add_bloc_builders(new MValue_Builder());
+    add_bloc_builders(new MCursor_Builder());
     
     
     

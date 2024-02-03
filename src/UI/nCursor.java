@@ -70,7 +70,7 @@ public class nCursor extends nWidget {
 	      pointwidget.setPosition(dval.x()-ref_size/4, dval.y()-ref_size/4); 
 	      screenpoint_widget.setPosition(dval.x()-ref_size/4, dval.y()-ref_size/4); }});
 	  }
-	  nCursor(Macro_Main mm, sValueBloc blc, boolean sd) {
+	  public nCursor(Macro_Main mm, sValueBloc blc, boolean sd) {
 	    super(mm.gui);
 	    show_dir = sd;
 	    sheet = mm;
@@ -98,7 +98,7 @@ public class nCursor extends nWidget {
 	        if (dval.get().mag() > ref_size*2) dval.set(dval.get().setMag(ref_size*2));
 	        pointwidget.setPosition(dval.x()-ref_size/4, dval.y()-ref_size/4); 
 	        screenpoint_widget.setPosition(dval.x()-ref_size/4, dval.y()-ref_size/4); }});
-	    }
+	    } //else clear();
 	  }
 	  
 	  public nCursor(Macro_Sheet _sheet, String r, String s, boolean sd) {

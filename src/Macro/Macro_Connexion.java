@@ -40,7 +40,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     return this;
   }
   //ArrayList<nWidget> elem_widgets = new ArrayList<nWidget>();
-  nWidget customBuild(nWidget w) { 
+  protected nWidget customBuild(nWidget w) { 
     //if (elem_widgets != null) elem_widgets.add(w); 
     if ( (!is_sheet_co && sheet.openning.get() != DEPLOY) || 
     (is_sheet_co && (sheet.openning.get() != DEPLOY || elem.spot == null)) )w.hide();

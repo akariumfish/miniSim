@@ -3,6 +3,7 @@ package Specialize;
 import java.util.ArrayList;
 
 import Macro.Macro_Sheet;
+import RApplet.Rapp;
 import UI.nCursor;
 import UI.nFrontPanel;
 import UI.nFrontTab;
@@ -49,68 +50,69 @@ public abstract class Community extends Macro_Sheet {
 	      .addSeparator(0.125)
 	      ;
 	      
-	    selector_list = tab.getShelf(0)
-	      .addSeparator(0.25)
-	      .addList(4, 10, 1);
-	    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
-	      nList sl = ((nList)builder); 
-	      //logln("a "+sl.last_choice_index +"  "+ sim.list.size());
-	      if (sl.last_choice_index < sim.list.size()) 
-	        //selected_comu(sim.list.get(sl.last_choice_index));
-	        selected_com.set(sim.list.get(sl.last_choice_index).name);
-	        search_com();
-	    } } );
-	        
-	    selector_list.getShelf()
-	      .addSeparator(0.125)
-	      .addDrawer(10.25, 0.75)
-	      .addWatcherModel("Label-S4", "Selected: ").setLinkedValue(selected_com).getShelf()
-	      .addSeparator(0.125)
-	      ;
-	    
-	    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
-	    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
-	    
-	    update_com_selector_list();
+//	    selector_list = tab.getShelf(0)
+//	      .addSeparator(0.25)
+//	      .addList(4, 10, 1);
+//	    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
+//	      nList sl = ((nList)builder); 
+//	      //logln("a "+sl.last_choice_index +"  "+ sim.list.size());
+//	      if (sl.last_choice_index < sim.list.size()) 
+//	        //selected_comu(sim.list.get(sl.last_choice_index));
+//	        selected_com.set(sim.list.get(sl.last_choice_index).name);
+//	        search_com();
+//	    } } );
+//	        
+//	    selector_list.getShelf()
+//	      .addSeparator(0.125)
+//	      .addDrawer(10.25, 0.75)
+//	      .addWatcherModel("Label-S4", "Selected: ").setLinkedValue(selected_com).getShelf()
+//	      .addSeparator(0.125)
+//	      ;
+//	    
+//	    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
+//	    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
+//	    
+//	    update_com_selector_list();
 	    
 	    comPanelBuild(sheet_front);
 	    sheet_front.toLayerTop();
 	  }
-	  void update_com_selector_list() {
-	    selector_entry.clear();
-	    selector_value.clear();
-	    for (Community v : sim.list) { 
-	      selector_entry.add(v.name); 
-	      selector_value.add(v);
-	    }
-	    if (selector_list != null) selector_list.setEntrys(selector_entry);
-	  }
+//	  void update_com_selector_list() {
+//	    selector_entry.clear();
+//	    selector_value.clear();
+//	    for (Community v : sim.list) { 
+//	      selector_entry.add(v.name); 
+//	      selector_value.add(v);
+//	    }
+//	    if (selector_list != null) selector_list.setEntrys(selector_entry);
+//	  }
 	  
-	  void search_com() { 
-	    //sim.inter.addEventNextFrame(new nRunnable() {public void run() { 
-	    //sim.inter.addEventNextFrame(new nRunnable() {public void run() { 
-	      //logln(value_bloc.ref + " search " + selected_com.get());
-	      for (Community c : sim.list) {
-	        //log(value_bloc.ref + " try " + c.value_bloc.ref);
-	        if (c.name.equals(selected_com.get())) { 
-	          //log(" found"); 
-	        selected_comu(c); }
-	        //logln("");
-	      }
-	    //}});
-	    //}});
-	  }
+//	  void search_com() { 
+//	    //sim.inter.addEventNextFrame(new nRunnable() {public void run() { 
+//	    //sim.inter.addEventNextFrame(new nRunnable() {public void run() { 
+//	      //logln(value_bloc.ref + " search " + selected_com.get());
+//	      for (Community c : sim.list) {
+//	        //log(value_bloc.ref + " try " + c.value_bloc.ref);
+//	        if (c.name.equals(selected_com.get())) { 
+//	          //log(" found"); 
+//	        selected_comu(c); }
+//	        //logln("");
+//	      }
+//	    //}});
+//	    //}});
+//	  }
 	  
-	  void selected_comu(Community c) {}
+//	  void selected_comu(Community c) {}
 	  
-	  ArrayList<String> selector_entry;
-	  ArrayList<Community> selector_value;
-	  Community selected_value;
-	  String selected_entry;
-	  nList selector_list;
+//	  ArrayList<String> selector_entry;
+//	  ArrayList<Community> selector_value;
+//	  Community selected_value;
+//	  String selected_entry;
+//	  nList selector_list;
 
 
 	  Simulation sim;
+	  Rapp app;
 	  String name = "";
 	  String type;
 
@@ -127,7 +129,7 @@ public abstract class Community extends Macro_Sheet {
 
 	  sBoo show_entity;
 	  sRun srun_add;
-	  sStr type_value, selected_com;
+	  sStr type_value;// selected_com;
 	  
 	  sInt val_draw_layer;
 
@@ -136,13 +138,14 @@ public abstract class Community extends Macro_Sheet {
 	  Community(Simulation _c, String n, String ty, int max, sValueBloc b) { 
 	    super(_c.inter.macro_main, n, b);
 	    sim = _c; 
+	    app = gui.app;
 	    name = value_bloc.ref;
 	    sim.list.add(this);
 	    type = ty;
 	    
 	    max_entity = newInt(max, "max_entity", "max_entity");
 	    type_value = newStr("type", "type", ty);
-	    selected_com = newStr("selected_com", "scom", "");
+//	    selected_com = newStr("selected_com", "scom", "");
 	    active_entity = newInt(0, "active_entity ", "active_pop");
 	    adding_entity_nb = newInt(0, "adding_entity_nb ", "add nb");
 	    adding_step = newInt(0, "adding_step ", "add stp");
@@ -162,10 +165,10 @@ public abstract class Community extends Macro_Sheet {
 	    );
 	    
 	    
-	    addEventSetupLoad(new nRunnable() { public void run() { 
-	      search_com(); } } );
-	      
-	    search_com();
+//	    addEventSetupLoad(new nRunnable() { public void run() { 
+//	      search_com(); } } );
+//	      
+//	    search_com();
 
 	    reset();
 	  }

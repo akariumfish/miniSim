@@ -10,6 +10,7 @@ import UI.nCursor;
 import UI.nFrontPanel;
 import UI.nFrontTab;
 import UI.nList;
+import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -18,6 +19,7 @@ import sData.sBoo;
 import sData.sCol;
 import sData.sFlt;
 import sData.sInt;
+import sData.sObj;
 import sData.sRun;
 import sData.sStr;
 import sData.sValueBloc;
@@ -54,52 +56,52 @@ public class Canvas extends Macro_Sheet {
 	      .addSeparator(0.125)
 	      ;
 	      
-	    selector_list = tab.getShelf(0)
-	      .addSeparator(0.25)
-	      .addList(4, 10, 1);
-	    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
-	      nList sl = ((nList)builder); 
-	      //logln("a "+sl.last_choice_index +"  "+ sim.list.size());
-	      if (sl.last_choice_index < sim.list.size()) 
-	        selected_comu(sim.list.get(sl.last_choice_index));
-	        //selected_com.set(sim.list.get(sl.last_choice_index).name);
-	    } } );
-	    
-	    selector_list.getShelf()
-	      .addSeparator(0.125)
-	      .addDrawer(10.25, 0.75)
-	      .addWatcherModel("Label-S4", "Selected: ").setLinkedValue(selected_com).getShelf()
-	      .addSeparator(0.125)
-	      ;
-	    
-	    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
-	    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
-	    
-	    update_com_selector_list();
+//	    selector_list = tab.getShelf(0)
+//	      .addSeparator(0.25)
+//	      .addList(4, 10, 1);
+//	    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
+//	      nList sl = ((nList)builder); 
+//	      //logln("a "+sl.last_choice_index +"  "+ sim.list.size());
+//	      if (sl.last_choice_index < sim.list.size()) 
+//	        selected_comu(sim.list.get(sl.last_choice_index));
+//	        //selected_com.set(sim.list.get(sl.last_choice_index).name);
+//	    } } );
+//	    
+//	    selector_list.getShelf()
+//	      .addSeparator(0.125)
+//	      .addDrawer(10.25, 0.75)
+//	      .addWatcherModel("Label-S4", "Selected: ").setLinkedValue(selected_com).getShelf()
+//	      .addSeparator(0.125)
+//	      ;
+//	    
+//	    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
+//	    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
+//	    
+//	    update_com_selector_list();
 	    
 	    sheet_front.toLayerTop();
 	  }
-	  void update_com_selector_list() {
-	    selector_entry.clear();
-	    selector_value.clear();
-	    for (Community v : sim.list) { 
-	      selector_entry.add(v.name); 
-	      selector_value.add(v);
-	    }
-	    if (selector_list != null) selector_list.setEntrys(selector_entry);
-	  }
+//	  void update_com_selector_list() {
+//	    selector_entry.clear();
+//	    selector_value.clear();
+//	    for (Community v : sim.list) { 
+//	      selector_entry.add(v.name); 
+//	      selector_value.add(v);
+//	    }
+//	    if (selector_list != null) selector_list.setEntrys(selector_entry);
+//	  }
+//	  
+//	  void selected_comu(Community c) { 
+////	    if (c != null && c.type_value.get().equals("floc")) { fcom = (FlocComu)c; selected_com.set(fcom.name); }
+//	  }
 	  
-	  void selected_comu(Community c) { 
-//	    if (c != null && c.type_value.get().equals("floc")) { fcom = (FlocComu)c; selected_com.set(fcom.name); }
-	  }
+	  public FlocComu fcom;
 	  
-	//  public FlocComu fcom;
-	  
-	  ArrayList<String> selector_entry;
-	  ArrayList<Community> selector_value;
-	  Community selected_value;
-	  String selected_entry;
-	  nList selector_list;
+//	  ArrayList<String> selector_entry;
+//	  ArrayList<Community> selector_value;
+//	  Community selected_value;
+//	  String selected_entry;
+//	  nList selector_list;
 	  
 	  Simulation sim;
 	  
@@ -110,9 +112,11 @@ public class Canvas extends Macro_Sheet {
 	  sInt val_w, val_h, can_div;
 	  sFlt val_scale, color_keep_thresh, val_decay;
 	  sBoo val_show, val_show_bound, val_show_grab;
-	  sStr selected_com;
+//	  sStr selected_com;
 	  sCol val_col_back;
 	  sRun val_rst_run;
+
+	  sObj floc_obj;
 	  
 	  //nLinkedWidget canvas_grabber;
 	  
@@ -135,7 +139,7 @@ public class Canvas extends Macro_Sheet {
 	    val_show = newBoo(true, "val_show", "show_canvas");
 	    val_show_bound = newBoo(true, "val_show_bound", "show_bound");
 	    val_show_grab = newBoo(true, "val_show_grab", "show_grab");
-	    selected_com = newStr("selected_com", "scom", "");
+//	    selected_com = newStr("selected_com", "scom", "");
 	    val_col_back = menuColor(gui.app.color(0), "background");
 	    val_col_back.addEventChange(new nRunnable() { public void run() { 
 	      reset();
@@ -174,11 +178,21 @@ public class Canvas extends Macro_Sheet {
 	    if (sim != null) sim.inter.addToCamDrawerPile(cam_draw);
 	    if (sim != null) sim.addEventReset(rst_run);
 	    //if (sim != null) sim.reset();
+	    
+
+	    floc_obj = newObj("floc_obj", "floc_obj");
+	    floc_obj.addEventChange(new nRunnable() { public void run() {
+	      if (floc_obj.isSheet()) {
+	        Macro_Sheet ms = floc_obj.asSheet();
+	        if (ms.specialize.get().equals("Floc")) fcom = (FlocComu)ms;
+	      }
+	    }});
+	    
 	    reset();
 	    
 	    addEventSetupLoad(new nRunnable() { public void run() { 
 	      sim.inter.addEventNextFrame(new nRunnable() {public void run() { 
-	        for (Community c : sim.list) if (c.name.equals(selected_com.get())) selected_comu(c);
+//	        for (Community c : sim.list) if (c.name.equals(selected_com.get())) selected_comu(c);
 	        cam_draw.toLayerBottom();
 	      }}); } } );
 	  }
@@ -233,12 +247,12 @@ public class Canvas extends Macro_Sheet {
 	  }
 	  
 	  void tick() {
-//	    if (fcom != null) {
-//	      for (int i = can_st ; i < fcom.list.size() ; i += Math.max(1, can_div.get()) )
-//	        if (fcom.list.get(i).active) {
-//	          ((Floc)fcom.list.get(i)).draw_halo(this);
-//	      }
-//	    }
+	    if (fcom != null) {
+	      for (int i = can_st ; i < fcom.list.size() ; i += Math.max(1, can_div.get()) )
+	        if (fcom.list.get(i).active) {
+	          ((Floc)fcom.list.get(i)).draw_halo(this);
+	      }
+	    }
 	    
 	    for (Face f : faces) f.tick();
 	    
@@ -346,7 +360,7 @@ public class Canvas extends Macro_Sheet {
 	        }
 	    }
 	  }
-	  
+
 	  void addpix(PImage canvas, float x, float y, int nc) {
 	    //x -= int(val_scale.get() / 2);
 	    //y -= int(val_scale.get() / 2);
@@ -360,11 +374,41 @@ public class Canvas extends Macro_Sheet {
 	    int pi = canvas.width * (int)(y) + (int)(x);
 	    if (pi >= 0 && pi < canvas.pixels.length) {
 	      int oc = canvas.pixels[pi];
-	      canvas.pixels[pi] = gui.app.color(gui.app.min(255, gui.app.max(gui.app.red(oc), gui.app.red(nc))), 
-					    		            gui.app.min(255, gui.app.max(gui.app.green(oc), gui.app.green(nc))), 
-					    		            gui.app.min(255, gui.app.max(gui.app.blue(oc), gui.app.blue(nc))) );
+	      canvas.pixels[pi] = gui.app.color(PApplet.min(255, PApplet.max(gui.app.red(oc), gui.app.red(nc))), 
+	    		  							PApplet.min(255, PApplet.max(gui.app.green(oc), gui.app.green(nc))), 
+	    		  							PApplet.min(255, PApplet.max(gui.app.blue(oc), gui.app.blue(nc))) );
 	    }
 	  }
+
+	  void shape_transform(nBase sh, PixelTransform rn) {
+		  for (float px = (int)(sh.pos.x - sh.rad()) ; 
+				  px < (int)(sh.pos.x + sh.rad()) ; px+=val_scale.get())
+			  for (float py = (int)(sh.pos.y - sh.rad()) ; 
+					  py < (int)(sh.pos.y + sh.rad()) ; py+=val_scale.get()) {
+			  PVector p = new PVector(px, py);
+			  if (RConst.point_in_trig(sh.p1(), sh.p2(), sh.p3(), p))
+				  if (active_can == 0) transformpix(can2, px, py, rn);
+				  else if (active_can == 1) transformpix(can1, px, py, rn);
+		  }
+      }
+	  
+	  void transformpix(PImage canvas, float x, float y, PixelTransform rn) {
+		    //x -= int(val_scale.get() / 2);
+		    //y -= int(val_scale.get() / 2);
+		    x -= val_pos.get().x;
+		    y -= val_pos.get().y;
+		    x /= val_scale.get();
+		    y /= val_scale.get();
+		    //x += 1 / val_scale.get();
+		    //y += 1 / val_scale.get();
+		    if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) return;
+		    int pi = canvas.width * (int)(y) + (int)(x);
+		    if (pi >= 0 && pi < canvas.pixels.length) {
+		      int oc = canvas.pixels[pi];
+		      canvas.pixels[pi] = rn.result(oc);
+		    }
+		  }
+	  
 	  //color getpix(PImage canvas, PVector v) { return getpix(canvas, v.x, v.y); }
 	  //color getpix(PImage canvas, float x, float y) {
 	  //  color co = 0;
@@ -403,3 +447,8 @@ public class Canvas extends Macro_Sheet {
 	  //  }
 	  //}
 	}
+
+	  abstract class PixelTransform {
+		  public abstract int result(int v); }
+	  
+	  

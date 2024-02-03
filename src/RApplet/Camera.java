@@ -106,7 +106,7 @@ public class Camera {
     input.app.popMatrix();
     matrixPushed = false;
     if (screenshot) { 
-//      saveFrame("image/shot-########.png");
+      input.app.saveFrame("image/shot-########.png");
     }
     screenshot = false;
 

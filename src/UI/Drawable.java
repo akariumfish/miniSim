@@ -1,6 +1,5 @@
 package UI;
 
-import java.util.ArrayList;
 
 public class Drawable {
 	  Drawing_pile pile = null;

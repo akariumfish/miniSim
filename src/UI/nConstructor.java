@@ -1,11 +1,6 @@
 package UI;
 
-import java.util.ArrayList;
-
 import RApplet.Rapp;
-import RBase.RConst;
-import processing.core.PApplet;
-import sData.*;
 
 public class nConstructor {
   nTheme theme; 

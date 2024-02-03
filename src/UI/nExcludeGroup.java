@@ -1,20 +1,7 @@
 package UI;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Map;
-
-import Macro.Macro_Interf;
-import RBase.RConst;
-import processing.core.PApplet;
 import sData.nRunnable;
-import sData.sBoo;
-import sData.sCol;
-import sData.sFlt;
-import sData.sInt;
-import sData.sStr;
-import sData.sValue;
-import sData.sValueBloc;
 
 /*
 

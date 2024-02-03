@@ -11,9 +11,10 @@ public interface Macro_Interf {
 	                                "midi", "preset", "tool", "tooltri", "toolbin", "toolNC", "pan", 
 	                                "panbin", "pansld", "pangrph", "menu"}; //"cursor", "pancstm", "tmpl", 
 	  final String[] bloc_types3 = {"colRGB", "btrig", "bswitch"};
-	  
-	  final String[] bloc_types4 = {"com", "in", "out", "trig", "btrig", "switch", "gate", "pulse", "not", "bin", 
-	                                "bool", "calc", "comp", "var", "chan", "data", "menu"};
+
+	  final String[] bloc_types4 = {"com", "in", "out", "trig", "btrig", "switch", "gate", "pulse", "not"};
+
+	  final String[] bloc_types5 = {"bin", "bool", "calc", "comp", "var", "chan", "data", "menu"};
 	                                
 	  final String[] bloc_info1 = {"commentary", "sheet input", "sheet output", 
 	                               "trigger > bang", "switch > bool", "can control msg circulation", 

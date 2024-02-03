@@ -47,6 +47,57 @@ import sData.*;
 //}
 
 
+
+
+
+class MCursor_Builder extends MAbstract_Builder {
+	MCursor_Builder() { super("cursor", ""); show_in_buildtool = true; }
+MCursor build(Macro_Sheet s, sValueBloc b) { MCursor m = new MCursor(s, b); return m; }
+}
+class MCursor extends MBasic { 
+	public nCursor cursor;
+	  public sVec pval = null;
+	  public sVec dval = null;
+	  public sBoo show = null;
+	MCursor(Macro_Sheet _sheet, sValueBloc _bloc) { 
+		super(_sheet, "cursor", _bloc); 
+		pval = newVec("pos", "pos");
+	    show = newBoo(false, "show", "show"); //!!!!! is hided by default
+	    dval = newVec("dir", "dir");
+	    cursor = new nCursor(mmain(), value_bloc, true);
+	    mmain().cursors_list.add(cursor);
+	    mmain().update_cursor_selector_list();
+	    sheet.sheet_cursors_list.add(cursor);
+	    sheet.cursor_count++;
+	    
+	    cursor.addEventClear(new nRunnable(cursor) { public void run() { 
+	        sheet.sheet_cursors_list.remove(((nCursor)builder));
+	      mmain().cursors_list.remove(((nCursor)builder)); 
+	      sheet.cursor_count--;
+	      mmain().update_cursor_selector_list(); }});
+	    
+	    addTrigS(0, "goto", new nRunnable() { public void run() {
+	    	mmain().inter.cam.cam_pos
+	        .set(-pval.x() * mmain().inter.cam.cam_scale.get(), 
+	             -pval.y() * mmain().inter.cam.cam_scale.get() );
+	    }});
+	    addSwitchS(1, "show", show);
+	}
+	void build_param() { ; }
+		public MCursor clear() {
+		super.clear(); 
+		cursor.clear();
+		return this; }
+	public MCursor toLayerTop() {
+		super.toLayerTop(); 
+		return this; }
+}
+
+
+
+
+
+
 class MBasic_Builder extends MAbstract_Builder {
   MBasic_Builder() { super("base", ""); show_in_buildtool = true; }
   MBasic build(Macro_Sheet s, sValueBloc b) { MBasic m = new MBasic(s, "base", b); return m; }
@@ -596,7 +647,7 @@ class MComment extends Macro_Bloc {
     if (!rebuilding) {
       //logln("redo");
       rebuilding = true;
-      sVec v = (sVec)(value_bloc.getBloc("settings").getValue("position"));
+//      sVec v = (sVec)(value_bloc.getBloc("settings").getValue("position"));
       //v.setx(v.x() - ref_size * 2); v.sety(v.y() - ref_size * 3);
       prev_selected.clear();
       for(Macro_Abstract m : mmain().selected_macro) prev_selected.add(m);

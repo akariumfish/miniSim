@@ -65,6 +65,6 @@ public class nShelfPanel extends nBuilder {
 	    panel.setLayer(l); for (nShelf d : shelfs) d.setLayer(l); return this; }
 	  public nShelfPanel toLayerTop() { super.toLayerTop(); 
 	    panel.toLayerTop(); for (nShelf d : shelfs) d.toLayerTop(); return this; }
-	  nWidget customBuild(nWidget w) { return w.setParent(panel); }
+	  protected nWidget customBuild(nWidget w) { return w.setParent(panel); }
 	  public nShelfPanel clear() { super.clear(); for (nShelf s : shelfs) s.clear(); return this; }
 	}

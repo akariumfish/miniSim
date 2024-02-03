@@ -814,13 +814,18 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   Macro_Sheet addEventsBuildMenu(nRunnable nRunnable) { eventsBuildMenu.add(nRunnable); return this; }
   ArrayList<nRunnable> eventsBuildMenu = new ArrayList<nRunnable>();
   
+
+  public ArrayList<nCursor> sheet_cursors_list = new ArrayList<nCursor>();
+  
   int cursor_count = 0;
   nCursor newCursor(String r, boolean b) {
     cursor_count++;
     nCursor c = new nCursor(this, r, r, b);
     mmain().cursors_list.add(c);
     mmain().update_cursor_selector_list();
+    sheet_cursors_list.add(c);
     c.addEventClear(new nRunnable(c) { public void run() { 
+        sheet_cursors_list.remove(((nCursor)builder));
       mmain().cursors_list.remove(((nCursor)builder)); 
       mmain().update_cursor_selector_list(); }});
     return c;
@@ -839,7 +844,9 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     } });
     mmain().cursors_list.add(c);
     mmain().update_cursor_selector_list();
+    sheet_cursors_list.add(c);
     c.addEventClear(new nRunnable(c) { public void run() { 
+        sheet_cursors_list.remove(((nCursor)builder));
       mmain().cursors_list.remove(((nCursor)builder)); 
       mmain().update_cursor_selector_list(); }});
     return c;
@@ -1277,7 +1284,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
         gui.app.mlogln(" try new name " + n_ref);
         is_in_other_sheet = false;
         
-        for (Map.Entry me : blocs_to_add.blocs.entrySet()) { 
+        for (Map.Entry<String, sValueBloc> me : blocs_to_add.blocs.entrySet()) { 
           sValueBloc svb = (sValueBloc)me.getValue();
           if (!svb.ref.equals(bloc.ref)) 
             is_in_other_sheet = svb.getBloc(n_ref) != null || is_in_other_sheet;
@@ -1296,7 +1303,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       
       sValueBloc nbloc_child = mmain().inter.getTempBloc();
       //get nbloc child
-      for (Map.Entry me : nbloc.blocs.entrySet()) {
+      for (Map.Entry<String, sValueBloc> me : nbloc.blocs.entrySet()) {
         sValueBloc vb = ((sValueBloc)me.getValue());
         if (!vb.base_ref.equals("settings")) mmain().inter.data.copy_bloc(vb, nbloc_child);
       }
@@ -1304,7 +1311,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       //empty nbloc
       sValueBloc sett_temp = mmain().inter.getTempBloc();
       sValueBloc sbloc = mmain().inter.data.copy_bloc(bloc.getBloc("settings"), sett_temp, "settings");
-      for (Map.Entry b : nbloc.blocs.entrySet()) { 
+      for (Map.Entry<String, sValueBloc> b : nbloc.blocs.entrySet()) { 
         sValueBloc s = (sValueBloc)b.getValue(); s.clean();
       } 
       nbloc.blocs.clear();

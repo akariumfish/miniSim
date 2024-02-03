@@ -1,16 +1,13 @@
 package Specialize;
 
 import UI.*;
-import processing.core.PApplet;
 import processing.core.PConstants;
-import processing.core.PImage;
 import processing.core.PVector;
 
 import java.util.ArrayList;
 
 import Macro.*;
 import RApplet.Rapp;
-import RBase.RConst;
 import sData.*;
 
 

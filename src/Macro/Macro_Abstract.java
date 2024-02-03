@@ -6,13 +6,11 @@ import UI.nLinkedWidget;
 import UI.nShelfPanel;
 import UI.nWatcherWidget;
 import UI.nWidget;
-import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
 
 import RApplet.sInterface;
-import RBase.RConst;
 import sData.*;
 
 //

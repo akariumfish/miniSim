@@ -1,16 +1,7 @@
 package UI;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import RApplet.Rapp;
-import RBase.RConst;
-import sData.*;
-import RApplet.sInput;
-import processing.core.PApplet;
-import processing.core.PVector;
-
 
 
 

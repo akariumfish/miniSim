@@ -8,6 +8,8 @@ import RBase.InputData;
 import RBase.RConst;
 import Specialize.Canvas;
 import Specialize.Face;
+import Specialize.FlocComu;
+import Specialize.GrowerComu;
 import Specialize.Organism;
 import Specialize.Simulation;
 import UI.nWidget;
@@ -107,8 +109,8 @@ public class Rapp extends PApplet implements InputData, RConst {
 		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
 		  interf.addSpecializedSheet(new Face.FacePrint(canv));
 		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
-		  //interf.addSpecializedSheet(new GrowerPrint(simul));
-		  //interf.addSpecializedSheet(new FlocPrint(simul));
+		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
+		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
 		  //interf.addSpecializedSheet(new BoxPrint(simul));
 		  
 		  
@@ -275,6 +277,25 @@ public class Rapp extends PApplet implements InputData, RConst {
 		  if (save_log_all) savelog();
 		}
 		
+		
+
+		boolean DEBUG_SVALUE = false;
+		void vlog(String s) {
+		//  if (DEBUG_SVALUE) print(s);
+		}
+		public void vlogln(String s) {
+		//  if (DEBUG_SVALUE) println(s);
+		}
+		
+
+		boolean DEBUG_DATA = false;
+		public void dlog(String s) {
+		//  if (DEBUG_DATA) print(s);
+		}
+		public void dlogln(String s) {
+		//  if (DEBUG_DATA) println(s);
+		}
+
 
 		//#######################################################################
 		//##                             MIDIBus                               ##

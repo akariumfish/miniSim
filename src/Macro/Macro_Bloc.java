@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import RBase.RConst;
 import UI.nCtrlWidget;
+import UI.nLinkedWidget;
 import UI.nWidget;
 import processing.core.PApplet;
 import sData.nRunnable;
@@ -57,10 +58,15 @@ public class Macro_Bloc extends Macro_Abstract {
     return m;
   }
   nCtrlWidget addTrigS(int c, String l, nRunnable r) { 
-    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
-    addElement(c, m); 
-    return m.addCtrlModel("MC_Element_SButton", l).setRunnable(r);
-  }
+	    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
+	    addElement(c, m); 
+	    return m.addCtrlModel("MC_Element_SButton", l).setRunnable(r);
+	  }
+  nLinkedWidget addSwitchS(int c, String l, sBoo r) { 
+	    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
+	    addElement(c, m); 
+	    return m.addLinkedModel("MC_Element_SButton", l).setLinkedValue(r);
+	  }
   nCtrlWidget addTrigSwtchS(int c, String sw_txt, sBoo vb, String bp_txt, nRunnable r) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
     addElement(c, m); 

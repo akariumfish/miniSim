@@ -14,7 +14,7 @@ public class sObj extends sValue {
 	  public sObj set(Object r) { 
 	    if (r instanceof sValue) return set((sValue)r); 
 	    if (r instanceof sValueBloc) return set((sValueBloc)r);  
-//	    if (r instanceof Macro_Sheet) return set((Macro_Sheet)r);  
+	    if (r instanceof Macro_Sheet) return set((Macro_Sheet)r);  
 	    is_value = false; is_bloc = false; is_sheet = false;
 	    if (val != r) { val = r; doChange(); } 
 	    return this; }
@@ -24,9 +24,9 @@ public class sObj extends sValue {
 	  sObj set(sValueBloc r) { 
 	    is_value = false; is_bloc = true; is_sheet = false; 
 	    if (val != r) { val = r; doChange(); } return this; }
-	//  sObj set(Macro_Sheet r) { 
-//	    is_value = false; is_bloc = false; is_sheet = true; 
-//	    if (val != r) { val = r; doChange(); } return this; }
+	  sObj set(Macro_Sheet r) { 
+	    is_value = false; is_bloc = false; is_sheet = true; 
+	    if (val != r) { val = r; doChange(); } return this; }
 	  public Object get() { return val; }
 	  
 	  sValue asValue() { if (isValue()) return (sValue)val; else return null; }

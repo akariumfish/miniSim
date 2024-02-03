@@ -388,7 +388,7 @@ class MPreset extends Macro_Bloc {
       .setRunnable(new nRunnable() { public void run() { load_prst(); }});
   }
   void load_prst() {
-    for (Map.Entry me : mmain().saved_preset.blocs.entrySet()) {
+    for (Map.Entry<String, sValueBloc> me : mmain().saved_preset.blocs.entrySet()) {
       sValueBloc vb = ((sValueBloc)me.getValue());
       if (vb.ref.equals(val_txt.get())) {
         mmain().inter.data.transfer_bloc_values(vb, sheet.value_bloc);
@@ -1275,7 +1275,7 @@ class MTool extends Macro_Bloc {
   }
   public MTool clear() {
     if (front_panel != null) front_panel.clear();
-    mmain().pan_macros.remove(this);
+    mmain().tool_macros.remove(this);
     super.clear(); return this; }
 }
 

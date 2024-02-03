@@ -1,11 +1,8 @@
 package sData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import RApplet.Rapp;
-import processing.core.PVector;
 
 
 /*
@@ -23,7 +20,7 @@ public class DataHolder extends sValueBloc {
   
   public DataHolder(Rapp a) {
     super(); 
-	  app = a; ref = "data"; parent = this; 
+	  app = a; ref = "data"; parent = this; data = this;
   }
   Rapp app;
   String[] types = {"flt", "int", "boo", "str", "vec", "col", "run", "obj"};
