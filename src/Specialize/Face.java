@@ -15,7 +15,46 @@ import sData.sCol;
 import sData.sFlt;
 import sData.sInt;
 import sData.sValueBloc;
+/*
 
+keep your mouse on a cursor for 0.5s > a bar appear under it, 
+	its a slider to change scale, 
+	always appear centered, go from 0.25x current scale to 4x current scale
+	ephemere : will disappear if mouse stop hovering it or the cursor
+	
+cursor pointer in losange, point in direction > need custom drawable
+	correct centering error on pointer widget
+
+
+Collection de position : cursors in a specialized sheet
+	position, dir and scale
+		add scale value to MCursor or to nCursor ?
+
+form : specialized sheet
+	graphic object : line, trig, ellipse, rect...
+	axis aligned
+	colors, line width
+	
+shape : specialized sheet
+	replicate given form in patern
+		replicant have own pos, dir, scale, line width multiplyer and color filter
+	patern can be driven by a given random seed
+	building can be driven by tick input << !! sim random seed will be used !!
+
+Camera dessinateur : specialized sheet
+	draw given shape to given cursors positions in camera view
+
+Canvas dessinateur : specialized sheet
+	print given cursors as halo to given canvas
+	print given shape to given cursors positions as halo to given canvas
+	
+	print can be different things, add color, modify, decay ...
+
+modificateur de position : specialized sheet
+	floc
+	create movement by changing given cursors position and direction
+
+ */
 
 
 
@@ -33,7 +72,7 @@ public static class FacePrint extends Sheet_Specialize {
   public void build_custom_menu(nFrontPanel sheet_front) {
     if (sheet_front != null) {
       
-      nDrawer dr = sheet_front.getTab(2).getShelf()
+      sheet_front.getTab(2).getShelf()
         .addSeparator(0.125)
         .addDrawerFactValue(val_dens, 2, 10, 1)
         .addSeparator(0.125)
@@ -44,8 +83,11 @@ public static class FacePrint extends Sheet_Specialize {
         .addDrawerButton(val_mirage, 10, 1)
         .addSeparator(0.125)
         .addDrawerButton(val_transf, 10, 1)
-        .addSeparator(0.125)
-        .addDrawer(10.25, 6.25);
+        .addSeparator(0.125);
+      
+      nDrawer dr = sheet_front.addTab("Shape").getShelf()
+    	        .addSeparator(0.125)
+    	        .addDrawer(10.25, 6.25);
       
       graph = dr.addModel("Field");
       graph.setPosition(ref_size * 2, ref_size * 2 / 16)
@@ -111,8 +153,9 @@ public static class FacePrint extends Sheet_Specialize {
     can.sim.faces.add(this);
     shape = new nBase(gui.app);
     val_draw_layer = menuIntIncr(0, 1, "val_draw_layer");
-    val_scale = menuFltSlide(100, 10, 400, "scale");
-    val_linew = menuFltSlide(0.05F, 0.01F, 0.2F, "line_weight");
+    val_scale = menuFltSlide(500, 1, 1000, "scale");
+    shape.dir.setMag(val_scale.get());
+    val_linew = menuFltSlide(0.05F, 0.01F, 1.0F, "line_weight");
     shape.line_w = val_linew.get();
     val_dens = newFlt(0.5F, "val_dens", "val_dens");
     val_disp = newFlt(5, "val_disp", "val_disp");
@@ -126,13 +169,19 @@ public static class FacePrint extends Sheet_Specialize {
     vpby = newFlt(shape.face.p2.y, "vpby", "vpby");
     vpcx = newFlt(shape.face.p3.x, "vpcx", "vpcx");
     vpcy = newFlt(shape.face.p3.y, "vpcy", "vpcy");
-    
+
     vpax.addEventChange(new nRunnable() { public void run() { shape.face.p1.x = vpax.get(); }});
     vpay.addEventChange(new nRunnable() { public void run() { shape.face.p1.y = vpay.get(); }});
     vpbx.addEventChange(new nRunnable() { public void run() { shape.face.p2.x = vpbx.get(); }});
     vpby.addEventChange(new nRunnable() { public void run() { shape.face.p2.y = vpby.get(); }});
     vpcx.addEventChange(new nRunnable() { public void run() { shape.face.p3.x = vpcx.get(); }});
     vpcy.addEventChange(new nRunnable() { public void run() { shape.face.p3.y = vpcy.get(); }});
+    shape.face.p1.x = vpax.get(); 
+    shape.face.p1.y = vpay.get(); 
+    shape.face.p2.x = vpbx.get(); 
+    shape.face.p2.y = vpby.get();
+    shape.face.p3.x = vpcx.get();
+    shape.face.p3.y = vpcy.get();
     
     val_stroke = menuColor(gui.app.color(10, 190, 40), "val_stroke");
     val_fill = menuColor(gui.app.color(30, 90, 20), "val_fill");

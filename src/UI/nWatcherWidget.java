@@ -3,6 +3,7 @@ package UI;
 import RBase.RConst;
 import sData.nRunnable;
 import sData.sBoo;
+import sData.sCol;
 import sData.sFlt;
 import sData.sInt;
 import sData.sStr;
@@ -19,11 +20,11 @@ public class nWatcherWidget extends nWidget {
   if (b.type.equals("boo")) setLinkedValue((sBoo)b);
   if (b.type.equals("str")) setLinkedValue((sStr)b);
   if (b.type.equals("vec")) setLinkedValue((sVec)b);
-//  if (b.type.equals("col")) setLinkedValue((sCol)b);
+  if (b.type.equals("col")) setLinkedValue((sCol)b);
   return this; }
 nRunnable val_run;
 sValue val;
-sBoo bval; sInt ival; sFlt fval; sStr sval; sVec vval; //sCol cval;
+sBoo bval; sInt ival; sFlt fval; sStr sval; sVec vval; sCol cval;
 String base_text = "";
 public nWatcherWidget(nGUI g) { super(g); }
 nWatcherWidget setLinkedValue(sInt b) { 
@@ -54,12 +55,12 @@ nWatcherWidget setLinkedValue(sStr b) {
     ((nWatcherWidget)builder).changeText(base_text + sval.get()); } };
   b.addEventChange(val_run);
   return this; }
-//nWatcherWidget setLinkedValue(sCol b) { 
-//  cval = b; setStandbyColor(cval.get());
-//  val_run = new nRunnable(this) { public void run() { 
-//    ((nWatcherWidget)builder).setStandbyColor(cval.get()); } };
-//  b.addEventChange(val_run);
-//  return this; }
+nWatcherWidget setLinkedValue(sCol b) { 
+  cval = b; setStandbyColor(cval.get());
+  val_run = new nRunnable(this) { public void run() { 
+    ((nWatcherWidget)builder).setStandbyColor(cval.get()); } };
+  b.addEventChange(val_run);
+  return this; }
 nWatcherWidget setLinkedValue(sVec b) { 
   vval = b; 
   setText(RConst.trimStringFloat(vval.x()) + "," + RConst.trimStringFloat(vval.y()));

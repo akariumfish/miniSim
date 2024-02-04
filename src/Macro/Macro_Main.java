@@ -912,7 +912,8 @@ public Macro_Main(sInterface _int) {
     access = inter.getAccess();
     cam_gui = inter.cam_gui; 
     screen_gui = inter.screen_gui;
-    info = new nInfo(cam_gui, ref_size);
+//    info = new nInfo(cam_gui, ref_size);
+    info = cam_gui.info;
     saved_template = inter.interface_bloc.newBloc("Template");
     saved_preset = inter.interface_bloc.newBloc("Preset");
     new_temp_name = setting_bloc.newStr("new_temp_name", "new_temp_name", "template");

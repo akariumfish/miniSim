@@ -29,13 +29,17 @@ abstract class nShape {
 	  app.rotate(dir.heading());
 	  app.scale(dir.mag());
     if (do_fill) app.fill(col_fill); else app.noFill(); 
+    app.noStroke();
+    draw_fill_call(app);
+    app.noFill(); 
     if (do_stroke) app.stroke(col_line); else app.noStroke(); app.strokeWeight(line_w);
+    draw_stroke_call(app);
     
-    drawcall(app);
     
     app.popMatrix();
   }
-  abstract void drawcall(Rapp a);
+  abstract void draw_fill_call(Rapp a);
+  abstract void draw_stroke_call(Rapp a);
 }
 
 public class nBase extends nShape {
@@ -47,6 +51,11 @@ public class nBase extends nShape {
     face.p2 = new PVector(0, 0.3F);
     face.p3 = new PVector(-1, -0.3F);
     //face.norma();
+
+    m = new PVector(0, 0);
+    l1 = new PVector(0, 0);
+    l2 = new PVector(0, 0);
+    l3 = new PVector(0, 0);
   }
   float nrad() {
     return Math.max(Math.max(face.p1.mag(), face.p2.mag()), face.p3.mag()); }
@@ -64,7 +73,24 @@ public class nBase extends nShape {
     PVector p = new PVector(face.p3.x, face.p3.y);
     p.rotate(dir.heading()); p.setMag(face.p3.mag()*dir.mag()); p.add(pos);
     return p; }
-  void drawcall(Rapp app) {
-    app.triangle(face.p1.x, face.p1.y, face.p2.x, face.p2.y, face.p3.x, face.p3.y);
-  }
+  void draw_fill_call(Rapp app) {
+	    app.triangle(face.p1.x, face.p1.y, face.p2.x, face.p2.y, face.p3.x, face.p3.y);
+	  }
+  PVector m,l1,l2,l3;
+	void draw_stroke_call(Rapp app) {
+		m.set(face.p1.x, face.p1.y);
+		m.add(face.p2.x, face.p2.y);
+		m.add(face.p3.x, face.p3.y);
+		m.set(m.x/3.0F, m.y/3.0F);
+//		l1.set(face.p1.x - m.x, face.p1.y - m.y)
+//				.setMag(line_w/2).add(face.p1.x, face.p1.y);
+//		l2.set(face.p2.x - m.x, face.p2.y - m.y)
+//				.setMag(line_w/2).add(face.p2.x, face.p2.y);
+//		l3.set(face.p3.x - m.x, face.p3.y - m.y)
+//				.setMag(line_w/2).add(face.p3.x, face.p3.y);
+		l1.set(face.p1.x - m.x, face.p1.y - m.y).mult(1.0F + line_w/nrad()).add(m);
+		l2.set(face.p2.x - m.x, face.p2.y - m.y).mult(1.0F + line_w/nrad()).add(m);
+		l3.set(face.p3.x - m.x, face.p3.y - m.y).mult(1.0F + line_w/nrad()).add(m);
+		app.triangle(l1.x, l1.y, l2.x, l2.y, l3.x, l3.y);
+	}
 }

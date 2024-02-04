@@ -290,6 +290,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     title.addEventFieldChange(new nRunnable() { public void run() { title.setOutline(true); } });
     title.clearParent().setParent(panel);
     title.alignDown().stackLeft();
+    title.setSX(ref_size*(0.5F + 0.3F*val_title.get().length()) );
     grabber.addEventMouseEnter(new nRunnable() { public void run() { 
       if (openning.get() == REDUC) title.show(); } });
     grabber.addEventMouseLeave(new nRunnable() { public void run() { 

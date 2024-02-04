@@ -186,7 +186,7 @@ class MSheetObj extends Macro_Bloc {
   sBoo setup_send;
   MSheetObj(Macro_Sheet _sheet, sValueBloc _bloc) { 
     super(_sheet, "sheet obj", "sheet obj", _bloc); 
-    setup_send = newBoo("stp_snd", "stp_snd", false);
+    setup_send = newBoo("stp_snd", "stp_snd", true);
     get_run = new nRunnable() { public void run() {
       out.send(Macro_Packet.newPacketSheet(sheet));
     }};

@@ -4,9 +4,10 @@ import sData.nRunnable;
 
 public class nInfo {
 	  //  A AMELIORER
-	  //nInfo on cam react to object pos in cam space not on object pos on screen
+	  // this is ok > //nInfo on cam react to object pos in cam space not on object pos on screen
+	//but now dont take scale correctly
 	  public void showText(String t) { 
-	    float s = (float) (t.length()*(ref.getLocalSX() / 1.2));
+	    float s = (float) ((t.length()+0.5F)*(ref.getLocalSX() / 1.2));
 	    float p = (float) (-t.length()*(ref.getLocalSX() / 1.2) / 2);
 	    if (ref.getLocalX() + p + s > gui.view.pos.x + gui.view.size.x) 
 	      p -= ref.getLocalX() + p + s - (gui.view.pos.x + gui.view.size.x);
@@ -21,21 +22,23 @@ public class nInfo {
 	    gui = _g;
 	    ref = new nWidget(gui, 0, 0, f/2, f/2).setPassif()
 	      .setDrawable(new Drawable(_g.drawing_pile) { public void drawing() {
-//	        fill(ref.look.standbyColor);
-//	        noStroke();
-//	        if (invert) triangle(ref.getX(), ref.getY(), 
-//	                 ref.getX() - ref.getSX()/2, ref.getY() + ref.getSY(), 
-//	                 ref.getX() + ref.getSX()/2, ref.getY() + ref.getSY() );
-//	        else triangle(ref.getX(), ref.getY() + ref.getSY(), 
-//	                 ref.getX() - ref.getSX()/2, ref.getY(), 
-//	                 ref.getX() + ref.getSX()/2, ref.getY() );
+	        gui.app.fill(ref.look.standbyColor);
+	        gui.app.noStroke();
+	        if (invert) gui.app.triangle(ref.getX(), ref.getY(), 
+	                 ref.getX() - ref.getSX()/2, ref.getY() + ref.getSY(), 
+	                 ref.getX() + ref.getSX()/2, ref.getY() + ref.getSY() );
+	        else gui.app.triangle(ref.getX(), ref.getY() + ref.getSY(), 
+	                 ref.getX() - ref.getSX()/2, ref.getY(), 
+	                 ref.getX() + ref.getSX()/2, ref.getY() );
 	      } } )
 	      .addEventFrame(new nRunnable() { public void run() {
 	        if (count > 0) {
 	          count--; if (count == 0) ref.hide();
 	          ref.setPosition(gui.mouseVector.x, gui.mouseVector.y);
-	          if (gui.mouseVector.y < ref.getLocalSY()*8 && !invert) invert = true;
-	          else if (gui.mouseVector.y > ref.getLocalSY()*12 && invert) invert = false; 
+	          if (gui.mouseVector.y - gui.view.pos.y < 
+	        	  ref.getLocalSY()*8 + gui.app.window_head / gui.scale && !invert) invert = true;
+	          else if (gui.mouseVector.y - gui.view.pos.y > 
+	          		   ref.getLocalSY()*12 + gui.app.window_head / gui.scale && invert) invert = false; 
 	        }
 	      } } );
 	    ref.stackDown();

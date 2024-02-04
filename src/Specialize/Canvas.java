@@ -207,9 +207,10 @@ public class Canvas extends Macro_Sheet {
 	  }
 	  
 	  public Canvas clear() {
-	    //sim.removeEventTick(tick_run);
-	    //sim.removeEventReset(rst_run);
-	    //cam_draw.clear();
+//	    sim.removeEventTick(tick_run);
+//	    sim.removeEventReset(rst_run);
+//	    cam_draw.clear();
+		fcom = null;
 	    super.clear();
 	    return this;
 	  }
