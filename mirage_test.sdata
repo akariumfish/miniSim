@@ -227,7 +227,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -1151,7 +1151,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -1371,7 +1371,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -2635,7 +2635,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -3543,7 +3543,7 @@ int
 shr
 delay
 val
-1000
+2000
 0
 0
 3_gate
@@ -6549,7 +6549,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -7187,7 +7187,7 @@ int
 shr
 menu_tab
 val
-2
+4
 0
 0
 menu_reduc
@@ -7485,7 +7485,7 @@ flt
 shr
 dif
 val
-6000.0
+12000.0
 0
 0
 adding_step 
@@ -7517,7 +7517,7 @@ flt
 shr
 lmax
 val
-40.0
+56.568542
 0
 0
 AGE_ON
@@ -7691,7 +7691,7 @@ flt
 shr
 lmin
 val
-10.0
+20.0
 0
 0
 die_dif
@@ -7707,7 +7707,7 @@ flt
 shr
 dif
 val
-40.0
+160.0
 0
 0
 min_line_width
@@ -7867,7 +7867,7 @@ int
 shr
 active_pop
 val
-541
+600
 0
 0
 floc_prob
@@ -7883,7 +7883,7 @@ flt
 shr
 floc_prob
 val
-2.828427
+1.4142134
 0
 0
 floc_obj
@@ -7931,7 +7931,7 @@ int
 shr
 growers nb
 val
-10
+4
 0
 0
 create_floc
@@ -8029,7 +8029,7 @@ flt
 shr
 age
 val
-200.0
+800.0
 0
 0
 stop_dif
@@ -8045,7 +8045,7 @@ flt
 shr
 dif
 val
-4.0
+128.0
 0
 0
 0_sheet_1
@@ -8249,7 +8249,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -8969,7 +8969,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -9893,7 +9893,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -10065,7 +10065,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -10285,7 +10285,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -10957,7 +10957,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -11129,7 +11129,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -11537,7 +11537,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -11797,9 +11797,9 @@ vec
 shr
 menu_pos
 x
--774.0
+-428.0
 y
--669.5
+-632.5
 0
 0
 menu_tab
@@ -11815,7 +11815,7 @@ int
 shr
 menu_tab
 val
-3
+2
 0
 0
 menu_reduc
@@ -12239,7 +12239,7 @@ flt
 shr
 Dens
 val
-0.3
+0.6
 0
 0
 grow_obj
@@ -12427,7 +12427,7 @@ flt
 shr
 point
 val
-0.01
+0.005
 0
 0
 val_col_def
@@ -12459,7 +12459,7 @@ int
 shr
 limit
 val
-1600
+6400
 0
 0
 DRAWMODE_DEBUG
@@ -12587,7 +12587,7 @@ flt
 shr
 length
 val
-5.9139805
+39.419357
 0
 0
 selected_com
@@ -12635,7 +12635,7 @@ int
 shr
 active_pop
 val
-2
+30
 0
 0
 val_col_halo
@@ -12719,7 +12719,7 @@ int
 shr
 age
 val
-2000
+8000
 0
 0
 SPACING
@@ -12735,7 +12735,7 @@ flt
 shr
 space
 val
-134.35028
+268.70056
 0
 0
 create_grower
@@ -12907,7 +12907,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -13127,7 +13127,7 @@ int
 shr
 op
 val
-3
+0
 0
 0
 specialize
@@ -13299,7 +13299,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 cible
@@ -13529,7 +13529,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 ~2_menu~_elem_0_self
@@ -13765,7 +13765,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 cible
@@ -13831,7 +13831,7 @@ flt
 shr
 clrkeep_thresh
 val
-260.0
+35.268818
 0
 0
 val_show_bound
@@ -13911,7 +13911,7 @@ flt
 shr
 decay
 val
-1.0003439
+0.9999138
 0
 0
 can_div
@@ -14213,7 +14213,7 @@ boo
 shr
 show
 val
-1
+0
 0
 0
 new_temp_name
@@ -14513,7 +14513,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -14685,7 +14685,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -14857,7 +14857,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 val_com
@@ -15077,7 +15077,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -15521,7 +15521,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -17603,7 +17603,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -17823,7 +17823,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -18795,7 +18795,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -21101,7 +21101,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -21321,7 +21321,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -24717,7 +24717,7 @@ int
 shr
 tick
 val
-648
+8818624
 0
 0
 tick seconde
@@ -24733,7 +24733,7 @@ flt
 shr
 tps
 val
-150.70644
+158.73015
 0
 0
 pause
@@ -24827,7 +24827,7 @@ int
 shr
 SEED
 val
-2011179
+506524928
 0
 0
 sim_next_frame
@@ -25043,7 +25043,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -25263,7 +25263,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 specialize
@@ -26187,7 +26187,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -26359,7 +26359,7 @@ int
 shr
 op
 val
-2
+0
 0
 0
 stp_snd
@@ -26449,7 +26449,7 @@ int
 shr
 frsr
 val
-81
+1102328
 0
 0
 files_management
@@ -26495,7 +26495,7 @@ flt
 shr
 fdur
 val
-53.0
+56.0
 0
 0
 full_screen_run
@@ -26541,7 +26541,7 @@ flt
 shr
 cfr
 val
-0.053
+0.056
 0
 0
 sec_since_reset
@@ -26557,7 +26557,7 @@ int
 shr
 sec
 val
-4
+92876
 0
 0
 median_framerate
@@ -26573,7 +26573,7 @@ flt
 shr
 mfr
 val
-18.838305
+19.841269
 0
 0
 cam scale
@@ -26589,7 +26589,7 @@ flt
 shr
 scale
 val
-0.12343855
+0.11221687
 0
 0
 auto_load
@@ -26621,9 +26621,9 @@ vec
 shr
 pos
 x
--13.178872
+-11.980794
 y
-75.97313
+69.0665
 0
 0
 quicksave
