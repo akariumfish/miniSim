@@ -26,6 +26,10 @@ cursor pointer in losange, point in direction > need custom drawable
 	correct centering error on pointer widget
 
 
+
+
+
+
 Collection de position : cursors in a specialized sheet
 	position, dir and scale
 		add scale value to MCursor or to nCursor ?

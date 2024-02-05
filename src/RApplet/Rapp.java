@@ -41,9 +41,9 @@ PApplet
 
 public class Rapp extends PApplet implements InputData, RConst {
 	
-	public static void main(String[] args) {
-		PApplet.main("RApplet.Rapp");
-	}
+//	public static void main(String[] args) {
+//		PApplet.main("RApplet.Rapp");
+//	}
 	
 	sInterface interf;
 	
@@ -85,8 +85,8 @@ public class Rapp extends PApplet implements InputData, RConst {
 		  app_close = new nWidget(interf.screen_gui, "X", 28, base_width - 40, 0, 40, 40)
 		    .setTrigger()
 		    .addEventTrigger(new nRunnable() { public void run() { 
-//		      logln("exit");
-//		      if (save_log_exit) savelog(); 
+		      logln("exit");
+		      if (save_log_exit) savelog(); 
 		      interf.addEventTwoFrame(new nRunnable() { 
 		        public void run() { exit(); } } ); } } );
 		  
