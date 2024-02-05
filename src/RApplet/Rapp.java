@@ -17,6 +17,10 @@ import processing.core.*;
 import processing.event.MouseEvent;
 import sData.nRunnable;
 
+
+// Library : The MidiBus 8 Severin Smith http://smallbutdigital.com/projects/themidibus/
+
+
 /*
 
 todo : see top of Macro_Sheet  MacSh.pde
