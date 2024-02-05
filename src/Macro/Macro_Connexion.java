@@ -440,7 +440,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 
   Macro_Packet last_packet = null;
   
-  Macro_Packet getLastPacket() { return last_packet; }
+  Macro_Packet lastPack() { return last_packet; }
   
   void receive(Macro_Connexion s, Macro_Packet p) {
     if (filter == null || p.def.equals(filter) || 

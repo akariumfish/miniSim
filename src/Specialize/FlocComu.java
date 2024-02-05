@@ -111,6 +111,10 @@ class Floc extends Entity {
   Floc clear() { return this; }
   FlocComu com() { return ((FlocComu)com); }
   
+//#######################################################################
+//##          ROTATING TO ANGLE CIBLE BY SHORTEST DIRECTION            ##
+//#######################################################################
+
   float mapToCircularValues(float current, float cible, float increment, float start, float stop) {
 	  if (start > stop) {float i = start; start = stop; stop = i;}
 	  increment = Math.abs(increment);
@@ -144,9 +148,6 @@ class Floc extends Entity {
   
 }
 
-//#######################################################################
-//##          ROTATING TO ANGLE CIBLE BY SHORTEST DIRECTION            ##
-//#######################################################################
 
 
 

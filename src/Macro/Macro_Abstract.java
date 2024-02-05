@@ -21,7 +21,7 @@ import sData.*;
 // */
 public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
   
-  Macro_Abstract deploy() { open(); return this; }
+  Macro_Abstract deploy() { open(); return this; } //
   Macro_Abstract open() {
     if (openning.get() != OPEN) {
       openning.set(OPEN);
@@ -327,9 +327,9 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     sheet.child_macro.add(this); 
     
     mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-      if (openning.get() == REDUC) { openning.set(OPEN); reduc(); }
-      else if (openning.get() == OPEN) { openning.set(REDUC); open(); }
-      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); hide(); }
+      if (openning.get() == REDUC) { /*deploy(); */openning.set(OPEN); reduc(); }
+      else if (openning.get() == OPEN) { /*deploy();*/ openning.set(REDUC); open(); }
+      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); /*deploy();*/ hide(); }
       else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
       if (!pos_given) find_place(); 
       if (openning.get() != HIDE && !mmain().is_paste_loading) { 

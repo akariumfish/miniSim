@@ -195,7 +195,7 @@ public static class FacePrint extends Sheet_Specialize {
     val_scale.addEventChange(new nRunnable() { public void run() { shape.dir.setMag(val_scale.get()); }});
     val_linew.addEventChange(new nRunnable() { public void run() { shape.line_w = val_linew.get(); }});
     
-    ref_cursor = menuCursor("center", true);
+    ref_cursor = menuSheetCursor("center", true);
     //ref_cursor.show.set(true);
     if (ref_cursor.pval != null) ref_cursor.pval.addEventChange(new nRunnable() { public void run() { 
       shape.pos.set(ref_cursor.pval.get()); }});

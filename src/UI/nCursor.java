@@ -83,6 +83,7 @@ public class nCursor extends nWidget {
 	    
 	    if (blc.getValue("pos") != null && blc.getValue("show") != null && blc.getValue("dir") != null) {
 	      s_bloc = blc;
+	      
 	      pval = (sVec)blc.getValue("pos");
 	      show = (sBoo)blc.getValue("show"); //!!!!! is hided by default
 	      dval = (sVec)blc.getValue("dir");

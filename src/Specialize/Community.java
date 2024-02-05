@@ -155,7 +155,7 @@ public abstract class Community extends Macro_Sheet {
 	    
 	    val_draw_layer = menuIntIncr(0, 1, "val_draw_layer");
 
-	    adding_cursor = new nCursor(this, n, "add", true);
+	    adding_cursor = menuCursor(n, true);
 
 	    srun_add = newRun("add_entity", "add_pop", new nRunnable() { 
 	      public void run() { 

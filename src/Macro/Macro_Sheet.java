@@ -25,12 +25,6 @@ import sData.*;
   when manually adding try to stay on top of sheet back to keep it small
     >> start add place search from existing bloc median pos (or 0) then try in spiral
   
-  debug MComment
-    rebuild itself > change name, lose co, change place
-    
-    only do rebuild on command : a bp switch between mode when all wanted param are set
-    to rebuild use a copy of sheet addbyblockmethods
-  
   distence mesuring tool
   
   bloc node : one point in and out at the same time
@@ -782,6 +776,9 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     empty();
     if (!unclearable) {
       super.clear();
+      if (sheetCursor != null) sheetCursor.clear();
+		if (sheetCursor_pval != null) sheetCursor_pval.removeEventChange(pval_run);
+		if (sheet != mmain()) sheet.grab_pos.removeEventChange(sheet_grab_run);
       sheet.child_sheet.remove(this);
       value_bloc.clear();
       if (mmain() != this) mmain().szone.removeEventStartSelect(szone_run);
@@ -819,38 +816,94 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   
   int cursor_count = 0;
   nCursor newCursor(String r, boolean b) {
-    cursor_count++;
-    nCursor c = new nCursor(this, r, r, b);
-    mmain().cursors_list.add(c);
-    mmain().update_cursor_selector_list();
-    sheet_cursors_list.add(c);
-    c.addEventClear(new nRunnable(c) { public void run() { 
-        sheet_cursors_list.remove(((nCursor)builder));
-      mmain().cursors_list.remove(((nCursor)builder)); 
-      mmain().update_cursor_selector_list(); }});
-    return c;
-  }
+	    cursor_count++;
+	    nCursor c = new nCursor(this, r, r, b);
+	    mmain().cursors_list.add(c);
+	    mmain().update_cursor_selector_list();
+	    sheet_cursors_list.add(c);
+	    c.addEventClear(new nRunnable(c) { public void run() { 
+	        sheet_cursors_list.remove(((nCursor)builder));
+	      mmain().cursors_list.remove(((nCursor)builder)); 
+	      mmain().update_cursor_selector_list(); }});
+	    return c;
+	  }
+
+  public nCursor sheetCursor;
+  public sVec sheetCursor_pval = null;
+  public sVec sheetCursor_dval = null;
+  public sBoo sheetCursor_show = null;
+	nRunnable sheet_grab_run, pval_run;
+  nCursor newSheetCursor(String r, boolean b) {
+		sheetCursor_pval = newVec("pos", "pos");
+	    sheetCursor_show = newBoo(false, "show", "show"); //!!!!! is hided by default
+	    sheetCursor_dval = newVec("dir", "dir");
+	    sheetCursor = new nCursor(mmain(), value_bloc, true);
+	    mmain().cursors_list.add(sheetCursor);
+	    mmain().update_cursor_selector_list();
+	    sheet.sheet_cursors_list.add(sheetCursor);
+	    sheet.cursor_count++;
+	    
+	    setPosition(sheetCursor_pval.get().x - sheet.grabber.getX(), 
+					sheetCursor_pval.get().y - sheet.grabber.getY());
+	    moving();	
+	    
+	    sheetCursor.addEventClear(new nRunnable(sheetCursor) { public void run() { 
+	        sheet.sheet_cursors_list.remove(((nCursor)builder));
+	      mmain().cursors_list.remove(((nCursor)builder)); 
+	      sheet.cursor_count--;
+	      mmain().update_cursor_selector_list(); }});
+	    
+	    grabber.addEventDrag(new nRunnable() { public void run() {
+	    	if (sheetCursor.pval != null) sheetCursor.pval.set(grabber.getX(), grabber.getY());
+	    } });
+	    pval_run = new nRunnable() { public void run() {
+	    	if (sheet != mmain())
+	    	setPosition(sheetCursor.pval.get().x - sheet.grabber.getX(), 
+	    			sheetCursor.pval.get().y - sheet.grabber.getY());
+	    	else if (sheetCursor.pval != null) setPosition(sheetCursor.pval.get().x, sheetCursor.pval.get().y);
+	    	moving();
+		}};
+		sheetCursor.pval.addEventChange(pval_run);
+	    
+	    
+	    if (sheet != mmain()) {
+	    	sheet_grab_run = new nRunnable() { public void run() {
+		    	setPosition(sheetCursor.pval.get().x - sheet.grabber.getX(), 
+		    			sheetCursor.pval.get().y - sheet.grabber.getY());
+		    	moving();
+		    } };
+	    	sheet.grab_pos.addEventChange(sheet_grab_run);
+	    }
+	    return sheetCursor;
+	  }
   public nCursor menuCursor(String r, boolean b) {
-    cursor_count++;
-    nCursor c = new nCursor(this, r, r, b);
-    addEventsBuildMenu(new nRunnable(c) { public void run() { 
-      if (custom_tab != null) custom_tab.getShelf()
-        .addDrawer(10, 1)
-        .addLinkedModel("Auto_Button-S2-P3", "show").setLinkedValue(((nCursor)builder).show).getDrawer()
-        .addModel("Label_Small_Text-S1-P1", "Cursor: " + ((nCursor)builder).ref)
-          .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
-        .getShelf()
-        .addSeparator(0.125);
-    } });
-    mmain().cursors_list.add(c);
-    mmain().update_cursor_selector_list();
-    sheet_cursors_list.add(c);
-    c.addEventClear(new nRunnable(c) { public void run() { 
-        sheet_cursors_list.remove(((nCursor)builder));
-      mmain().cursors_list.remove(((nCursor)builder)); 
-      mmain().update_cursor_selector_list(); }});
-    return c;
-  }
+	    cursor_count++;
+	    nCursor c = newCursor(r, b);
+	    addEventsBuildMenu(new nRunnable(c) { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addLinkedModel("Auto_Button-S2-P3", "show").setLinkedValue(((nCursor)builder).show).getDrawer()
+	        .addModel("Label_Small_Text-S1-P1", "Cursor: " + ((nCursor)builder).ref)
+	          .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+	        .getShelf()
+	        .addSeparator(0.125);
+	    } });
+	    return c;
+	  }
+  public nCursor menuSheetCursor(String r, boolean b) {
+	    cursor_count++;
+	    nCursor c = newSheetCursor(r, b);
+	    addEventsBuildMenu(new nRunnable(c) { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addLinkedModel("Auto_Button-S2-P3", "show").setLinkedValue(((nCursor)builder).show).getDrawer()
+	        .addModel("Label_Small_Text-S1-P1", "Cursor: " + ((nCursor)builder).ref)
+	          .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+	        .getShelf()
+	        .addSeparator(0.125);
+	    } });
+	    return c;
+	  }
   sInt menuIntSlide(int v, int _min, int _max, String r) {
     sInt f = newInt(v, r, r);
     f.set_limit(_min, _max);

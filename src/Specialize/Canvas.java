@@ -157,7 +157,7 @@ public class Canvas extends Macro_Sheet {
 	      if (ref_cursor.show != null) ref_cursor.show.set(val_show.get() && val_show_grab.get());
 	    } });
 	    
-	    ref_cursor = menuCursor("Canvas", false);
+	    ref_cursor = menuSheetCursor("Canvas", false);
 	    if (ref_cursor.show != null) ref_cursor.show.set(val_show.get() && val_show_grab.get());
 	    if (ref_cursor.pval != null) ref_cursor.pval.set(val_pos.get());
 	    if (ref_cursor.pval != null) ref_cursor.pval.addEventChange(new nRunnable() { public void run() { 
@@ -281,7 +281,9 @@ public class Canvas extends Macro_Sheet {
 	    	gui.app.stroke(180);
 	    	gui.app.strokeWeight(ref_size / (10 * mmain().gui.scale) );
 	    	gui.app.noFill();
-	    	gui.app.rect(val_pos.get().x, val_pos.get().y, val_w.get() * val_scale.get(), val_h.get() * val_scale.get());
+	    	gui.app.rect(val_pos.get().x - val_w.get() * val_scale.get() / 2, 
+	    				 val_pos.get().y - val_h.get() * val_scale.get() / 2, 
+	    				 val_w.get() * val_scale.get(), val_h.get() * val_scale.get());
 	    }
 	    if (val_show.get()) {
 	      if (active_can == 0) draw(can1);
@@ -301,7 +303,8 @@ public class Canvas extends Macro_Sheet {
 	  void draw(PImage canvas) {
 	    canvas.updatePixels();
 	    gui.app.pushMatrix();
-	    gui.app.translate(val_pos.get().x, val_pos.get().y);
+	    gui.app.translate(val_pos.get().x - val_w.get() * val_scale.get() / 2, 
+	    				  val_pos.get().y - val_h.get() * val_scale.get() / 2);
 	    gui.app.scale(val_scale.get());
 	    gui.app.image(canvas, 0, 0);
 	    gui.app.popMatrix();
@@ -365,8 +368,8 @@ public class Canvas extends Macro_Sheet {
 	  void addpix(PImage canvas, float x, float y, int nc) {
 	    //x -= int(val_scale.get() / 2);
 	    //y -= int(val_scale.get() / 2);
-	    x -= val_pos.get().x;
-	    y -= val_pos.get().y;
+	    x -= val_pos.get().x - val_w.get() * val_scale.get() / 2;
+	    y -= val_pos.get().y - val_h.get() * val_scale.get() / 2;
 	    x /= val_scale.get();
 	    y /= val_scale.get();
 	    //x += 1 / val_scale.get();
@@ -396,8 +399,8 @@ public class Canvas extends Macro_Sheet {
 	  void transformpix(PImage canvas, float x, float y, PixelTransform rn) {
 		    //x -= int(val_scale.get() / 2);
 		    //y -= int(val_scale.get() / 2);
-		    x -= val_pos.get().x;
-		    y -= val_pos.get().y;
+		    x -= val_pos.get().x - val_w.get() * val_scale.get() / 2;
+		    y -= val_pos.get().y - val_h.get() * val_scale.get() / 2;
 		    x /= val_scale.get();
 		    y /= val_scale.get();
 		    //x += 1 / val_scale.get();

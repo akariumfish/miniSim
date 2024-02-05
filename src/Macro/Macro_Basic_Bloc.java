@@ -50,17 +50,19 @@ import sData.*;
 
 
 
-class MCursor_Builder extends MAbstract_Builder {
-	MCursor_Builder() { super("cursor", ""); show_in_buildtool = true; }
-MCursor build(Macro_Sheet s, sValueBloc b) { MCursor m = new MCursor(s, b); return m; }
-}
+
 class MCursor extends MBasic { 
+	static class MCursor_Builder extends MAbstract_Builder {
+		MCursor_Builder() { super("cursor", ""); show_in_buildtool = true; }
+	MCursor build(Macro_Sheet s, sValueBloc b) { MCursor m = new MCursor(s, b); return m; }
+	}
 	public nCursor cursor;
 	  public sVec pval = null;
 	  public sVec dval = null;
 	  public sBoo show = null;
-	MCursor(Macro_Sheet _sheet, sValueBloc _bloc) { 
-		super(_sheet, "cursor", _bloc); 
+	nRunnable sheet_grab_run, pval_run;
+	MCursor(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "cursor", _bloc); }
+	void init() {
 		pval = newVec("pos", "pos");
 	    show = newBoo(false, "show", "show"); //!!!!! is hided by default
 	    dval = newVec("dir", "dir");
@@ -70,23 +72,49 @@ class MCursor extends MBasic {
 	    sheet.sheet_cursors_list.add(cursor);
 	    sheet.cursor_count++;
 	    
+	    setPosition(pval.get().x - sheet.grabber.getX(), 
+					pval.get().y - sheet.grabber.getY());
+	    moving();	
+	    
 	    cursor.addEventClear(new nRunnable(cursor) { public void run() { 
 	        sheet.sheet_cursors_list.remove(((nCursor)builder));
 	      mmain().cursors_list.remove(((nCursor)builder)); 
 	      sheet.cursor_count--;
 	      mmain().update_cursor_selector_list(); }});
 	    
-	    addTrigS(0, "goto", new nRunnable() { public void run() {
-	    	mmain().inter.cam.cam_pos
-	        .set(-pval.x() * mmain().inter.cam.cam_scale.get(), 
-	             -pval.y() * mmain().inter.cam.cam_scale.get() );
-	    }});
-	    addSwitchS(1, "show", show);
+	    grabber.addEventDrag(new nRunnable() { public void run() {
+	    	if (cursor.pval != null) cursor.pval.set(grabber.getX(), grabber.getY());
+	    } });
+	    pval_run = new nRunnable() { public void run() {
+	    	if (sheet != mmain())
+	    	setPosition(cursor.pval.get().x - sheet.grabber.getX(), 
+	    			cursor.pval.get().y - sheet.grabber.getY());
+	    	else if (cursor.pval != null) setPosition(cursor.pval.get().x, cursor.pval.get().y);
+	    	moving();
+		}};
+		cursor.pval.addEventChange(pval_run);
+	    
+	    
+	    if (sheet != mmain()) {
+	    	sheet_grab_run = new nRunnable() { public void run() {
+		    	setPosition(cursor.pval.get().x - sheet.grabber.getX(), 
+		    			cursor.pval.get().y - sheet.grabber.getY());
+		    	moving();
+		    } };
+	    	sheet.grab_pos.addEventChange(sheet_grab_run);
+	    }
 	}
-	void build_param() { ; }
-		public MCursor clear() {
+	void build_param() {
+		addSwitchS(1, "show", show);
+	}
+	void build_normal() {
+		
+	}
+	public MCursor clear() {
 		super.clear(); 
 		cursor.clear();
+		if (pval != null) pval.removeEventChange(pval_run);
+		if (sheet != mmain()) sheet.grab_pos.removeEventChange(sheet_grab_run);
 		return this; }
 	public MCursor toLayerTop() {
 		super.toLayerTop(); 
@@ -96,13 +124,11 @@ class MCursor extends MBasic {
 
 
 
-
-
-class MBasic_Builder extends MAbstract_Builder {
-  MBasic_Builder() { super("base", ""); show_in_buildtool = true; }
-  MBasic build(Macro_Sheet s, sValueBloc b) { MBasic m = new MBasic(s, "base", b); return m; }
-}
 class MBasic extends Macro_Bloc { 
+	static class MBasic_Builder extends MAbstract_Builder {
+		  MBasic_Builder() { super("base", ""); show_in_buildtool = true; }
+		  MBasic build(Macro_Sheet s, sValueBloc b) { MBasic m = new MBasic(s, "base", b); return m; }
+		}
   Macro_Element elem_com;
   
   sBoo param_view;
@@ -114,7 +140,7 @@ class MBasic extends Macro_Bloc {
   MBasic(Macro_Sheet _sheet, String t, sValueBloc _bloc) { 
     super(_sheet, t, t, _bloc); 
     
-    param_view = newBoo("com_param_view", "com_param_view", true);
+    param_view = newBoo("com_param_view", "com_param_view", false);
     
     //addEmpty(1);
     elem_com = addEmptyS(0);
@@ -129,11 +155,13 @@ class MBasic extends Macro_Bloc {
     } };
     param_ctrl.addEventSwitchOn(pview_run);
     param_ctrl.addEventSwitchOff(pview_run);
-    if (param_view.get()) {
-      build_param();
-    } 
+    init();
+    if (param_view.get()) build_param();
+   	build_normal();
   }
+  void init() { ; }
   void build_param() { addEmptyS(1); }
+  void build_normal() { addEmptyS(1); }
   Macro_Abstract mv;
   boolean was_select = false;
   Macro_Sheet prev_sheet = null;
@@ -174,13 +202,94 @@ class MBasic extends Macro_Bloc {
 
 
 
+class MComment extends MBasic { 
+  Macro_Connexion in;
+  
+  Macro_Element elem_param;
+  
+  sStr val_com;
+  sFlt w_f, h_f;
+  
+  nLinkedWidget com_field;
+  nCtrlWidget w_add, w_sub, h_add, h_sub;
+  
+	MComment(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "com", _bloc); }
+	void init() {
+		val_com = newStr("val_com", "val_com", "");
+	    w_f = newFlt("w_f", "w_f", 3.875F);
+	    h_f = newFlt("h_f", "h_f", 0.875F);
+	}
+	void build_param() {
 
-
-class MSheetObj_Builder extends MAbstract_Builder {
-  MSheetObj_Builder() { super("sheet obj", ""); show_in_buildtool = true; }
-  MSheetObj build(Macro_Sheet s, sValueBloc b) { MSheetObj m = new MSheetObj(s, b); return m; }
+      in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+	        if (in.lastPack() != null) {
+	        	if (in.lastPack().isBang()) gui.app.logln(val_com.get());
+	        	else gui.app.logln(val_com.get() + " : " + in.lastPack().getText());
+	        }
+      } });
+      
+      elem_param = addEmptyL(1);
+      w_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_1", "W-")
+        .setRunnable(new nRunnable() { public void run() { 
+        if (w_f.get() > 3.875) {
+          w_f.set(3.875);
+          rebuild();
+        }
+      } });
+      w_add = elem_param.addCtrlModel("MC_Element_Button_Selector_2", "W+")
+        .setRunnable(new nRunnable() { public void run() { 
+        if (w_f.get() < 5.75) {
+          w_f.set(5.75);
+          rebuild();
+        }
+      } });
+      h_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_3", "H-")
+        .setRunnable(new nRunnable() { public void run() { 
+        if (h_f.get() > 1.125) {
+          h_f.add(-1.125);
+          rebuild();
+        }
+      } });
+      h_add = elem_param.addCtrlModel("MC_Element_Button_Selector_4", "H+")
+        .setRunnable(new nRunnable() { public void run() { 
+        if (h_f.get() < 5) {
+          h_f.add(1.125);
+          rebuild();
+        }
+      } });
+      w_sub.setFont((int)(ref_size/2.8)); w_add.setFont((int)(ref_size/2.8));
+      h_sub.setFont((int)(ref_size/2.8)); h_add.setFont((int)(ref_size/2.8));
+	}
+	void build_normal() {
+		addEmptyS(1);
+	    if (w_f.get() >= 2) addEmptyS(1);
+	    if (h_f.get() > 1) addEmptyS(1);
+	    if (h_f.get() > 2) addEmptyS(1);
+	    if (h_f.get() > 4) addEmptyS(1);
+	    if (h_f.get() > 5) addEmptyS(1);
+		elem_com = addEmptyS(0);
+	    com_field = elem_com.addLinkedModel("MC_Element_Field").setLinkedValue(val_com);
+	    com_field.setPosition(ref_size*3 / 16, ref_size * 1 / 16)
+	      .setSize(ref_size * w_f.get(), ref_size * h_f.get())
+	      .setTextAlignment(PConstants.LEFT, PConstants.TOP)
+	      .setTextAutoReturn(true)
+	      .setFont((int)(ref_size / 1.7));
+	}
+	public MComment clear() {
+	  super.clear(); 
+	  return this; }
+	public MComment toLayerTop() {
+	  super.toLayerTop(); 
+	  return this; }
 }
+
+
+
 class MSheetObj extends Macro_Bloc { 
+	static class MSheetObj_Builder extends MAbstract_Builder {
+		  MSheetObj_Builder() { super("sheet obj", ""); show_in_buildtool = true; }
+		  MSheetObj build(Macro_Sheet s, sValueBloc b) { MSheetObj m = new MSheetObj(s, b); return m; }
+		}
   nRunnable get_run;
   Macro_Connexion in, out;
   sBoo setup_send;
@@ -203,11 +312,12 @@ class MSheetObj extends Macro_Bloc {
     super.toLayerTop(); 
     return this; }
 }
-class MValue_Builder extends MAbstract_Builder {
-  MValue_Builder() { super("svalue", ""); show_in_buildtool = true; }
-  MValue build(Macro_Sheet s, sValueBloc b) { MValue m = new MValue(s, b); return m; }
-}
 class MValue extends MBasic { 
+	static 
+	class MValue_Builder extends MAbstract_Builder {
+		  MValue_Builder() { super("svalue", ""); show_in_buildtool = true; }
+		  MValue build(Macro_Sheet s, sValueBloc b) { MValue m = new MValue(s, b); return m; }
+		}
   nRunnable get_run;
   Macro_Connexion in, out;
   sStr val_cible; 
@@ -329,13 +439,13 @@ class MData extends Macro_Bloc {
   }
   void get_cible() {
     val_field.setLook(gui.theme.getLook("MC_Element_Text")).setText("");
+    if (val_run != null && cible != null) cible.removeEventChange(val_run);
+    if (val_run != null && cible != null) cible.removeEventAllChange(val_run);
     if (!search_folder.get()) cible = sheet.value_bloc.getValue(val_cible.get());
     else if (sheet != mmain()) cible = sheet.sheet.value_bloc.getValue(val_cible.get());
     if (cible != null) setValue(cible);
   }
   void setValue(sValue v) {
-    if (val_run != null && cible != null) cible.removeEventChange(val_run);
-    if (val_run != null && cible != null) cible.removeEventAllChange(val_run);
     if (in_run != null) in.removeEventReceive(in_run);
     val_cible.set(v.ref);
     cible = v; val_field.setLinkedValue(cible);
@@ -353,12 +463,12 @@ class MData extends Macro_Bloc {
     oval = v;
     val_run = new nRunnable() { public void run() { out.send(oval.asPacket()); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isValue()) { 
-        oval.set(in.getLastPacket().asValue()); }
-      if (in.getLastPacket() != null && in.getLastPacket().isBloc()) { 
-        oval.set(in.getLastPacket().asBloc()); }
-      if (in.getLastPacket() != null && in.getLastPacket().isSheet()) { 
-        oval.set(in.getLastPacket().asSheet()); }
+      if (in.lastPack() != null && in.lastPack().isValue()) { 
+        oval.set(in.lastPack().asValue()); }
+      if (in.lastPack() != null && in.lastPack().isBloc()) { 
+        oval.set(in.lastPack().asBloc()); }
+      if (in.lastPack() != null && in.lastPack().isSheet()) { 
+        oval.set(in.lastPack().asSheet()); }
     } };
     v.addEventAllChange(val_run);
     in.addEventReceive(in_run);
@@ -367,7 +477,7 @@ class MData extends Macro_Bloc {
     rval = v;
     val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketBang()); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isBang()) { 
+      if (in.lastPack() != null && in.lastPack().isBang()) { 
         rval.doEvent(false); 
         rval.run(); 
         rval.doEvent(true); 
@@ -382,9 +492,9 @@ class MData extends Macro_Bloc {
     ftmp = v.get();
     val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketFloat(fval.get())); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isFloat() && ftmp != in.getLastPacket().asFloat()) { 
-        ftmp = in.getLastPacket().asFloat();
-        fval.set(in.getLastPacket().asFloat()); }
+      if (in.lastPack() != null && in.lastPack().isFloat() && ftmp != in.lastPack().asFloat()) { 
+        ftmp = in.lastPack().asFloat();
+        fval.set(in.lastPack().asFloat()); }
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -396,9 +506,9 @@ class MData extends Macro_Bloc {
     itmp = v.get();
     val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketInt(ival.get())); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isInt() && itmp != in.getLastPacket().asInt()) { 
-        itmp = in.getLastPacket().asInt();
-        ival.set(in.getLastPacket().asInt()); }
+      if (in.lastPack() != null && in.lastPack().isInt() && itmp != in.lastPack().asInt()) { 
+        itmp = in.lastPack().asInt();
+        ival.set(in.lastPack().asInt()); }
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -410,10 +520,10 @@ class MData extends Macro_Bloc {
     btmp = v.get();
     val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketBool(bval.get())); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isBool() && !(btmp == in.getLastPacket().asBool())) { 
-        btmp = in.getLastPacket().asBool();
-        bval.set(in.getLastPacket().asBool()); }
-      if (in.getLastPacket() != null && in.getLastPacket().isBang()) { 
+      if (in.lastPack() != null && in.lastPack().isBool() && !(btmp == in.lastPack().asBool())) { 
+        btmp = in.lastPack().asBool();
+        bval.set(in.lastPack().asBool()); }
+      if (in.lastPack() != null && in.lastPack().isBang()) { 
         btmp = !btmp;
         bval.set(!bval.get()); }
     } };
@@ -427,9 +537,9 @@ class MData extends Macro_Bloc {
     stmp = RConst.copy(v.get());
     val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketStr(sval.get())); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isStr() && !stmp.equals(in.getLastPacket().asStr())) { 
-        stmp = RConst.copy(in.getLastPacket().asStr());
-        sval.set(in.getLastPacket().asStr()); }
+      if (in.lastPack() != null && in.lastPack().isStr() && !stmp.equals(in.lastPack().asStr())) { 
+        stmp = RConst.copy(in.lastPack().asStr());
+        sval.set(in.lastPack().asStr()); }
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -444,9 +554,9 @@ class MData extends Macro_Bloc {
       out.send(Macro_Packet.newPacketVec(vval.get())); inib_send = false; }}); 
       inib_send = true; }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isVec() && !in.getLastPacket().equalsVec(vtmp)) { 
-        vtmp.set(in.getLastPacket().asVec());
-        vval.set(in.getLastPacket().asVec()); 
+      if (in.lastPack() != null && in.lastPack().isVec() && !in.lastPack().equalsVec(vtmp)) { 
+        vtmp.set(in.lastPack().asVec());
+        vval.set(in.lastPack().asVec()); 
       }
     } };
     v.addEventChange(val_run);
@@ -462,9 +572,9 @@ class MData extends Macro_Bloc {
       out.send(Macro_Packet.newPacketCol(cval.get())); inib_send = false; }}); 
       inib_send = true; }};
     in_run = new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isCol() && !in.getLastPacket().equalsCol(ctmp)) { 
-        ctmp = in.getLastPacket().asCol();
-        cval.set(in.getLastPacket().asCol()); 
+      if (in.lastPack() != null && in.lastPack().isCol() && !in.lastPack().equalsCol(ctmp)) { 
+        ctmp = in.lastPack().asCol();
+        cval.set(in.lastPack().asCol()); 
       }
     } };
     v.addEventChange(val_run);
@@ -482,11 +592,12 @@ class MData extends Macro_Bloc {
 
 
 
-class MSheetView_Builder extends MAbstract_Builder {
-  MSheetView_Builder() { super("sheet view", ""); show_in_buildtool = true; }
-  MSheetView build(Macro_Sheet s, sValueBloc b) { MSheetView m = new MSheetView(s, b); return m; }
-}
+
 class MSheetView extends Macro_Bloc { 
+	static class MSheetView_Builder extends MAbstract_Builder {
+		  MSheetView_Builder() { super("sheet view", ""); show_in_buildtool = true; }
+		  MSheetView build(Macro_Sheet s, sValueBloc b) { MSheetView m = new MSheetView(s, b); return m; }
+		}
   nRunnable goto_run;
   Macro_Connexion in;
   MSheetView(Macro_Sheet _sheet, sValueBloc _bloc) { 
@@ -505,7 +616,7 @@ class MSheetView extends Macro_Bloc {
     }};
     addTrigS(0, "goto", goto_run);
     in = addInput(0, "goto", new nRunnable() { public void run() { 
-      if (in.getLastPacket().isBang()) goto_run.run(); }});
+      if (in.lastPack().isBang()) goto_run.run(); }});
   }
   public MSheetView clear() {
     super.clear(); 
@@ -529,152 +640,7 @@ class MSheetView extends Macro_Bloc {
 
 
 
-class MComment extends Macro_Bloc { 
-  //sBoo vtop;
-  //sStr val_screen; 
-  //nLinkedWidget screen_field, vline;
-  //nWatcherWidget screen_txt;
-  Macro_Connexion in;
-  
-  Macro_Element elem_com, elem_param;
-  
-  sStr val_com;
-  sFlt w_f, h_f;
-  sBoo param_view;
-  
-  nLinkedWidget com_field, param_ctrl;
-  nCtrlWidget w_add, w_sub, h_add, h_sub;
-  nRunnable pview_run;
-  
-  boolean rebuilding = false;
-  
-  MComment(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "com", "com", _bloc); 
-    
-    val_com = newStr("val_com", "val_com", "");
-    w_f = newFlt("w_f", "w_f", 3.875F);
-    h_f = newFlt("h_f", "h_f", 0.875F);
-    param_view = newBoo("com_param_view", "com_param_view", true);
-    
-    if (param_view.get()) {
-      in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-//        if (in.getLastPacket() != null) logln(val_com.get());
-      } });
-      
-      elem_param = addEmptyL(1);
-      w_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_1", "W-")
-        .setRunnable(new nRunnable() { public void run() { 
-        if (w_f.get() > 3.875) {
-          w_f.set(3.875);
-          rebuild();
-        }
-      } });
-      w_add = elem_param.addCtrlModel("MC_Element_Button_Selector_2", "W+")
-        .setRunnable(new nRunnable() { public void run() { 
-        if (w_f.get() < 5.75) {
-          w_f.set(5.75);
-          rebuild();
-        }
-      } });
-      h_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_3", "H-")
-        .setRunnable(new nRunnable() { public void run() { 
-        if (h_f.get() > 1.125) {
-          h_f.add(-1.125);
-          rebuild();
-        }
-      } });
-      h_add = elem_param.addCtrlModel("MC_Element_Button_Selector_4", "H+")
-        .setRunnable(new nRunnable() { public void run() { 
-        if (h_f.get() < 5) {
-          h_f.add(1.125);
-          rebuild();
-        }
-      } });
-      w_sub.setFont((int)(ref_size/2.8)); w_add.setFont((int)(ref_size/2.8));
-      h_sub.setFont((int)(ref_size/2.8)); h_add.setFont((int)(ref_size/2.8));
-    } 
-   
-    elem_com = addEmptyS(0);
-    param_ctrl = elem_com.addLinkedModel("MC_Element_MiniButton", "S");
-    param_ctrl.setSwitch()
-      .setSwitchState(param_view.get())
-      ;
-    param_ctrl.setPX(-ref_size*1 / 16).setInfo("show param");
-    pview_run = new nRunnable() { public void run() { 
-      param_view.set(!param_view.get());
-      rebuild();
-    } };
-    param_ctrl.addEventSwitchOn(pview_run);
-    param_ctrl.addEventSwitchOff(pview_run);
-    
-    com_field = elem_com.addLinkedModel("MC_Element_Field").setLinkedValue(val_com);
-    com_field.setPosition(ref_size*3 / 16, ref_size * 1 / 16)
-      .setSize(ref_size * w_f.get(), ref_size * h_f.get())
-      .setTextAlignment(PConstants.LEFT, PConstants.TOP)
-      .setTextAutoReturn(true)
-      .setFont((int)(ref_size / 1.7));
-    
-    
-    if (w_f.get() >= 2) addEmptyS(1);
-    if (h_f.get() > 1) addEmptyS(1);
-    if (h_f.get() > 2) addEmptyS(1);
-    if (h_f.get() > 4) addEmptyS(1);
-    if (h_f.get() > 5) addEmptyS(1);
-    
-    //val_screen = newStr("screen_field", "screen_field", "");
-    //vtop = newBoo("vtop", "vtop", true);
-    
-    //Macro_Element e = addEmptyL(0);
-    //screen_field = e.addLinkedModel("MC_Element_Field").setLinkedValue(val_screen);
-    //vline = e.addLinkedModel("MC_Element_MiniButton").setLinkedValue(vtop);
-    //screen_txt = mmain().screen_gui.theme.newWatcherWidget(mmain().screen_gui, "Label-S1")
-    //  .setLinkedValue(val_screen);
-    //screen_txt.setFont(int(ref_size/1.4))
-    //  .setTextAlignment(PConstants.CENTER, PConstants.CENTER);
-    //if (vtop.get()) screen_txt.setPY(window_head);
-    //else screen_txt.setPY(window_head + ref_size*2);
-    //vtop.addEventChange(new nRunnable() { public void run() { 
-    //  if (vtop.get()) screen_txt.setPY(window_head);
-    //  else screen_txt.setPY(window_head + ref_size);
-    //} });
-    //screen_txt.setPX(mmain().screen_gui.view.size.x/2.2);
-    //addEmpty(1); 
-  }
-  sValueBloc _bloc;
-  Macro_Sheet prev_sheet = null;
-  ArrayList<Macro_Abstract> prev_selected = new ArrayList<Macro_Abstract>();
-  void rebuild() {
-    if (!rebuilding) {
-      //logln("redo");
-      rebuilding = true;
-//      sVec v = (sVec)(value_bloc.getBloc("settings").getValue("position"));
-      //v.setx(v.x() - ref_size * 2); v.sety(v.y() - ref_size * 3);
-      prev_selected.clear();
-      for(Macro_Abstract m : mmain().selected_macro) prev_selected.add(m);
-      mmain().szone_clear_select();
-      szone_select();
-      mmain().copy_to_tmpl();
-      szone_select();
-      mmain().del_selected();
-      mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-        mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-          mmain().pastebin_tmpl();
-          mmain().szone_clear_select();
-          for(Macro_Abstract m : prev_selected) m.szone_select();
-          prev_selected.clear();
-        } } );
-      } } );
-      //logln("redo done");
-    }
-  }
-  public MComment clear() {
-    //screen_txt.clear();
-    super.clear(); return this; }
-  public MComment toLayerTop() {
-    super.toLayerTop(); 
-    if (com_field != null) com_field.toLayerTop(); 
-    if (param_ctrl != null) param_ctrl.toLayerTop(); return this; }
-}
+
 
 
 
@@ -774,28 +740,28 @@ class MVar extends Macro_Bloc {
     }
     
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null) {
-        if (in.getLastPacket().isBang() && packet != null) out.send(packet);
+      if (in.lastPack() != null) {
+        if (in.lastPack().isBang() && packet != null) out.send(packet);
         else { 
           
-          if (in.getLastPacket().isBool()) {
-            bval.set(in.getLastPacket().asBool());
+          if (in.lastPack().isBool()) {
+            bval.set(in.lastPack().asBool());
             val_type.set("boo");
-            packet = in.getLastPacket(); 
+            packet = in.lastPack(); 
             view.setText(packet.getText()); 
             val_view.set(view.getText());
           }
-          if (in.getLastPacket().isFloat()) {
-            fval.set(in.getLastPacket().asFloat());
+          if (in.lastPack().isFloat()) {
+            fval.set(in.lastPack().asFloat());
             val_type.set("flt");
-            packet = in.getLastPacket(); 
+            packet = in.lastPack(); 
             view.setText(packet.getText()); 
             val_view.set(view.getText());
           }
-          if (in.getLastPacket().isVec()) {
-            vval.set(in.getLastPacket().asVec());
+          if (in.lastPack().isVec()) {
+            vval.set(in.lastPack().asVec());
             val_type.set("vec");
-            packet = in.getLastPacket(); 
+            packet = in.lastPack(); 
             view.setText(packet.getText()); 
             val_view.set(view.getText());
           }
@@ -889,11 +855,11 @@ class MCalc extends Macro_Bloc {
     valDEV.addEventChange(new nRunnable() { public void run() { if (valDEV.get()) receive(); } });
     
     in1 = addInput(0, "in").setFilterFloat().setLastFloat(0).addEventReceive(new nRunnable() { public void run() { 
-      if (in1.getLastPacket() != null && in1.getLastPacket().isFloat() && in1.getLastPacket().asFloat() != pin1) {
-        pin1 = in1.getLastPacket().asFloat(); receive(); } } });
+      if (in1.lastPack() != null && in1.lastPack().isFloat() && in1.lastPack().asFloat() != pin1) {
+        pin1 = in1.lastPack().asFloat(); receive(); } } });
     in2 = addInput(0, "in").setFilterFloat().setLastFloat(0).addEventReceive(new nRunnable() { public void run() { 
-      if (in2.getLastPacket() != null && in2.getLastPacket().isFloat() && in2.getLastPacket().asFloat() != pin2) {
-        pin2 = in2.getLastPacket().asFloat(); view.setText(RConst.trimStringFloat(pin2)); receive(); } } });
+      if (in2.lastPack() != null && in2.lastPack().isFloat() && in2.lastPack().asFloat() != pin2) {
+        pin2 = in2.lastPack().asFloat(); view.setText(RConst.trimStringFloat(pin2)); receive(); } } });
     
     out = addOutput(1, "out")
       .setDefFloat();
@@ -953,11 +919,11 @@ class MBool extends Macro_Bloc {
     valOR = newBoo("valOR", "valOR", false);
     
     in1 = addInput(0, "in").setFilterBool().addEventReceive(new nRunnable() { public void run() { 
-      if (in1.getLastPacket() != null && in1.getLastPacket().isBool() && in1.getLastPacket().asBool() != pin1) {
-        pin1 = in1.getLastPacket().asBool(); receive(); } } });
+      if (in1.lastPack() != null && in1.lastPack().isBool() && in1.lastPack().asBool() != pin1) {
+        pin1 = in1.lastPack().asBool(); receive(); } } });
     in2 = addInput(0, "in").setFilterBool().addEventReceive(new nRunnable() { public void run() { 
-      if (in2.getLastPacket() != null && in2.getLastPacket().isBool() && in2.getLastPacket().asBool() != pin2) {
-        pin2 = in2.getLastPacket().asBool(); receive(); } } });
+      if (in2.lastPack() != null && in2.lastPack().isBool() && in2.lastPack().asBool() != pin2) {
+        pin2 = in2.lastPack().asBool(); receive(); } } });
     
     out = addOutput(1, "out")
       .setDefBool();
@@ -999,10 +965,10 @@ class MBin extends Macro_Bloc {
     state = newBoo("state", "state", false);
     
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isBool() && 
-          in.getLastPacket().asBool()) out.send(Macro_Packet.newPacketBang()); 
-      else if (in.getLastPacket() != null && in.getLastPacket().isBang()) out.send(Macro_Packet.newPacketBool(true));
-      else if (state.get() && in.getLastPacket() != null) out.send(Macro_Packet.newPacketBang());  } });
+      if (in.lastPack() != null && in.lastPack().isBool() && 
+          in.lastPack().asBool()) out.send(Macro_Packet.newPacketBang()); 
+      else if (in.lastPack() != null && in.lastPack().isBang()) out.send(Macro_Packet.newPacketBool(true));
+      else if (state.get() && in.lastPack() != null) out.send(Macro_Packet.newPacketBang());  } });
     out = addOutput(1, "out")
       .setDefBool();
       
@@ -1019,8 +985,8 @@ class MNot extends Macro_Bloc {
     super(_sheet, "not", "not", _bloc); 
     
     in = addInput(0, "in").setFilterBool().addEventReceive(new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isBool()) {
-        if (in.getLastPacket().asBool()) out.send(Macro_Packet.newPacketBool(false)); 
+      if (in.lastPack() != null && in.lastPack().isBool()) {
+        if (in.lastPack().asBool()) out.send(Macro_Packet.newPacketBool(false)); 
         else out.send(Macro_Packet.newPacketBool(true)); } } });
     out = addOutput(1, "out")
       .setDefBool();
@@ -1050,12 +1016,12 @@ class MGate extends Macro_Bloc {
     state = newBoo("state", "state", false);
     
     in_m = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in_m.getLastPacket() != null && state.get()) out.send(in_m.getLastPacket());
+      if (in_m.lastPack() != null && state.get()) out.send(in_m.lastPack());
     } });
     in_b = addInput(0, "gate").addEventReceive(new nRunnable() { public void run() { 
-      if (in_b.getLastPacket() != null && in_b.getLastPacket().isBool()) 
-        state.set(in_b.getLastPacket().asBool()); 
-      if (in_b.getLastPacket() != null && in_b.getLastPacket().isBang()) 
+      if (in_b.lastPack() != null && in_b.lastPack().isBool()) 
+        state.set(in_b.lastPack().asBool()); 
+      if (in_b.lastPack() != null && in_b.lastPack().isBang()) 
         state.set(!state.get()); 
     } });
     out = addOutput(1, "out");
@@ -1110,11 +1076,11 @@ class MSwitch extends Macro_Bloc {
     state = newBoo("state", "state", false);
     
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isBang()) {
+      if (in.lastPack() != null && in.lastPack().isBang()) {
         swtch.setSwitchState(!swtch.isOn());
       } 
-      if (in.getLastPacket() != null && in.getLastPacket().isBool()) {
-        swtch.setSwitchState(in.getLastPacket().asBool());
+      if (in.lastPack() != null && in.lastPack().isBool()) {
+        swtch.setSwitchState(in.lastPack().asBool());
       } 
     } });
     
@@ -1159,7 +1125,7 @@ class MChan extends Macro_Bloc {
     ref_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
     addEmpty(1); 
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null) receive(in.getLastPacket());
+      if (in.lastPack() != null) receive(in.lastPack());
     } });
     out = addOutput(1, "out");
     
@@ -1195,14 +1161,14 @@ class MFrame extends Macro_Bloc {
     super(_sheet, "frame", "frame", _bloc); 
     
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null) { 
+      if (in.lastPack() != null) { 
         if (pack_balance) { 
           pack_balance = false;
-          packet1 = in.getLastPacket();
+          packet1 = in.lastPack();
           mmain().inter.addEventNextFrame(new nRunnable() { public void run() { out.send(packet1); }});
         } else {
           pack_balance = true;
-          packet2 = in.getLastPacket();
+          packet2 = in.lastPack();
           mmain().inter.addEventNextFrame(new nRunnable() { public void run() { out.send(packet2); }});
         }
       } 
@@ -1230,15 +1196,15 @@ class MPulse extends Macro_Bloc { //let throug only 1 bang every <delay> bang
     del_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(delay);
     
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.getLastPacket() != null && in.getLastPacket().isBang()) {
+      if (in.lastPack() != null && in.lastPack().isBang()) {
         count++;
         if (count > delay.get()) { count = 0; out.send(Macro_Packet.newPacketBang()); }
-      } else if (in.getLastPacket() != null && in.getLastPacket().isFloat()) {
+      } else if (in.lastPack() != null && in.lastPack().isFloat()) {
         count = 0;
-        delay.set((int)(in.getLastPacket().asFloat()));
-      } else if (in.getLastPacket() != null && in.getLastPacket().isInt()) {
+        delay.set((int)(in.lastPack().asFloat()));
+      } else if (in.lastPack() != null && in.lastPack().isInt()) {
         count = 0;
-        delay.set(in.getLastPacket().asInt());
+        delay.set(in.lastPack().asInt());
       } 
     } });
         
@@ -1276,21 +1242,21 @@ class MComp extends Macro_Bloc {
     valEQ.addEventChange(new nRunnable() { public void run() { if (valEQ.get()) receive(); } });
     
     in1 = addInput(0, "in").setFilterNumber().setLastFloat(0).addEventReceive(new nRunnable() { public void run() { 
-      if (in1.getLastPacket() != null && in1.getLastPacket().isFloat() && 
-          in1.getLastPacket().asFloat() != pin1) {
-        pin1 = in1.getLastPacket().asFloat(); receive(); 
-      } else if (in1.getLastPacket() != null && in1.getLastPacket().isInt() && 
-                 in1.getLastPacket().asInt() != pin1) {
-        pin1 = in1.getLastPacket().asInt(); receive(); 
+      if (in1.lastPack() != null && in1.lastPack().isFloat() && 
+          in1.lastPack().asFloat() != pin1) {
+        pin1 = in1.lastPack().asFloat(); receive(); 
+      } else if (in1.lastPack() != null && in1.lastPack().isInt() && 
+                 in1.lastPack().asInt() != pin1) {
+        pin1 = in1.lastPack().asInt(); receive(); 
       } 
     } });
     in2 = addInput(0, "in").setFilterNumber().setLastFloat(0).addEventReceive(new nRunnable() { public void run() { 
-      if (in2.getLastPacket() != null && in2.getLastPacket().isFloat() && 
-          in2.getLastPacket().asFloat() != pin2) {
-        pin2 = in2.getLastPacket().asFloat(); view.setText(RConst.trimStringFloat(pin2)); receive(); 
-      } else if (in2.getLastPacket() != null && in2.getLastPacket().isInt() && 
-                 in2.getLastPacket().asInt() != pin2) {
-        pin2 = in2.getLastPacket().asInt(); view.setText(RConst.trimStringFloat(pin2)); receive(); 
+      if (in2.lastPack() != null && in2.lastPack().isFloat() && 
+          in2.lastPack().asFloat() != pin2) {
+        pin2 = in2.lastPack().asFloat(); view.setText(RConst.trimStringFloat(pin2)); receive(); 
+      } else if (in2.lastPack() != null && in2.lastPack().isInt() && 
+                 in2.lastPack().asInt() != pin2) {
+        pin2 = in2.lastPack().asInt(); view.setText(RConst.trimStringFloat(pin2)); receive(); 
       } 
     } });
     

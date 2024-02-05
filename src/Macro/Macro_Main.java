@@ -900,11 +900,11 @@ public Macro_Main(sInterface _int) {
     b = b;
     b = b;
     b = b;
-    //add_bloc_builders(new MBasic_Builder());
-    add_bloc_builders(new MSheetView_Builder());
-    add_bloc_builders(new MSheetObj_Builder());
-    add_bloc_builders(new MValue_Builder());
-    add_bloc_builders(new MCursor_Builder());
+//    add_bloc_builders(new MBasic_Builder());
+    add_bloc_builders(new MSheetView.MSheetView_Builder());
+    add_bloc_builders(new MSheetObj.MSheetObj_Builder());
+    add_bloc_builders(new MValue.MValue_Builder());
+    add_bloc_builders(new MCursor.MCursor_Builder());
     
     
     
