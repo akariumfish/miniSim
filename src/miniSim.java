@@ -8,6 +8,8 @@ public class miniSim {
 
 /*
 
+
+
 		IDEE AND TO DO :
 
 keep your mouse on a cursor for 0.5s > a bar appear under it, 
