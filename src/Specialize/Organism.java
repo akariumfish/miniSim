@@ -203,7 +203,8 @@ public class Organism extends Macro_Sheet {
     this.destroy_All();
     if (max_entity.get() != list.size()) init_array();
     
-    Cell c = newEntity(null);
+//    Cell c = 
+    		newEntity(null);
     
   }
 

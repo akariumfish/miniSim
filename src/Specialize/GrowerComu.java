@@ -8,7 +8,6 @@ import processing.core.PConstants;
 import processing.core.PVector;
 import sData.*;
 
-import java.util.ArrayList;
 
 
 
@@ -120,9 +119,8 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    MIN_LINE_WIDTH = menuFltSlide(0.2F, 0.1F, 3, "min_line_width");
 	    leaf_size_fact = menuFltSlide(1, 1, 4, "leaf_size_fact");
 	    
-	    srun_killg = newRun("kill_grower", "kill", new nRunnable(list) { 
-	      public void run() { 
-	        for (Entity e : ((ArrayList<Entity>)builder)) {
+	    srun_killg = newRun("kill_grower", "kill", new nRunnable() { public void run() { 
+	        for (Entity e : list) {
 	          Grower g = (Grower)e;
 	          if (!g.end && g.sprouts == 0) { 
 	            if (create_floc.get() && fcom != null && 
@@ -136,9 +134,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	            g.end = true;
 	          }
 	        }
-	      }
-	    }
-	    );
+	    } } );
 
 
 	    floc_obj = newObj("floc_obj", "floc_obj");

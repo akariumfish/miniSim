@@ -921,11 +921,6 @@ public Macro_Main(sInterface _int) {
     
 //    mlogln("build macro main ");
     
-    boolean b = true;
-    b = b;
-    b = b;
-    b = b;
-    b = b;
 //    add_bloc_builders(new MBasic_Builder());
     add_bloc_builders(new MSheetView.MSheetView_Builder());
     add_bloc_builders(new MSheetObj.MSheetObj_Builder());

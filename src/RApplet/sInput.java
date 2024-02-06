@@ -110,7 +110,8 @@ public sInput_Button keyAll;
   }
 
   void mouseWheelEvent(MouseEvent event) {
-    float e = event.getAmount();
+    @SuppressWarnings("deprecation")
+	float e = event.getAmount();
     if (e>0) { 
       mouseWheelUp =true; 
       mouseWheelDown =false;

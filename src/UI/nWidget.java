@@ -420,7 +420,8 @@ public class nWidget {
   
   private String label, infoText;
   private boolean auto_line_return = false;
-  private float mx = 0, my = 0, pmx = 0, pmy = 0;
+  private float mx = 0, my = 0;
+//		  float pmx = 0, pmy = 0;
   private int cursorPos = 0;
   private int cursorCount = 0;
   private int cursorCycle = 80;

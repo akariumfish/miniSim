@@ -1128,7 +1128,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       String n_ref = RConst.copy(bloc.ref);
       if (bloc.getBloc("settings") != null && bloc.getBloc("settings").getValue("title") != null)
         n_ref = ((sStr)(bloc.getBloc("settings").getValue("title"))).get();
-      String b_rf = RConst.copy(n_ref);
+//      String b_rf = RConst.copy(n_ref);
       String suff_rf = RConst.copy(n_ref);
       while (suff_rf.length() > 0 && suff_rf.charAt(0) != '_') 
         suff_rf = suff_rf.substring(1, suff_rf.length());
@@ -1183,12 +1183,14 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       //copy link and spot in nbloc_child 
       if (sbloc.getValue("links") != null) {
       //if (bloc.getBloc("settings") != null && bloc.getBloc("settings").getValue("links") != null) {
-        sValue v = mmain().inter.data.copy_value(sbloc.getValue("links"), nbloc_child);
+//        sValue v = 
+        		mmain().inter.data.copy_value(sbloc.getValue("links"), nbloc_child);
         //logln("copy link val has "+v.ref);
       }
       if (sbloc.getValue("spots") != null) {
       //if (bloc.getBloc("settings") != null && bloc.getBloc("settings").getValue("spots") != null) {
-        sValue v = mmain().inter.data.copy_value(sbloc.getValue("spots"), nbloc_child);
+//        sValue v = 
+        		mmain().inter.data.copy_value(sbloc.getValue("spots"), nbloc_child);
         //logln("copy spot val has "+v.ref);
       }
       sett_temp.clear();
