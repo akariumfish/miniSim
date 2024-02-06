@@ -8,8 +8,6 @@ public class miniSim {
 
 /*
 
-TEST
-
 keep your mouse on a cursor for 0.5s > a bar appear under it, 
 	its a slider to change scale, 
 	always appear centered, go from 0.25x current scale to 4x current scale
