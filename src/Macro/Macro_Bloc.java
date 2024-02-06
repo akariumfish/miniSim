@@ -212,8 +212,19 @@ public class Macro_Bloc extends Macro_Abstract {
   }
   public Macro_Bloc clear() {
     for (Macro_Element e : elements) e.clear();
+//    if (sheet.sheet_menu_bloc == this) sheet.sheet_menu_bloc = null;
     super.clear(); return this; }
 
+  
+  Macro_Bloc set_unique() {
+//	  if (sheet.sheet_unique_bloc != null) {
+//	    	mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { clear(); } });
+//	    } else {
+//	    	sheet.sheet_menu_bloc = this;
+//	    }
+	  return this;
+  }
+  
   Macro_Bloc open() {
     super.open();
     for (Macro_Element m : elements) m.show();

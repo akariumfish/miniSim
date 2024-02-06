@@ -58,6 +58,7 @@ public class Organism extends Macro_Sheet {
 	public static class OrganismPrint extends Sheet_Specialize {
 	  Simulation sim;
 	  public OrganismPrint(Simulation s) { super("Organism"); sim = s; }
+	  public void default_build() { }
 	  public Organism get_new(Macro_Sheet s, String n, sValueBloc b) { return new Organism(sim, n, b); }
 	  Organism get_new(Macro_Sheet s, String n, Organism b) { return new Organism(sim, n, b); }
 	}

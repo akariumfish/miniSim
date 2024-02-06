@@ -1740,7 +1740,10 @@ class MMenu extends Macro_Bloc {
     //addEmptyS(1);
     Macro_Element e = addEmptyS(0);
     e.addCtrlModel("MC_Element_SButton", "menu").setRunnable(new nRunnable() { public void run() {
-      menu(); } }).setInfo("open sheet general menu");
+      menu(); 
+      grab_run.run();
+  	tab_run.run();
+  	reduc_run.run(); } }).setInfo("open sheet general menu");
     e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
     
     grab_run = new nRunnable() { public void run() {
@@ -1762,19 +1765,31 @@ class MMenu extends Macro_Bloc {
     in = addInput(0, "open").setFilterBang().addEventReceive(new nRunnable() { public void run() { 
       menu(); setup_send.set(true);
     } });
+    
+//    if (sheet.sheet_menu_bloc != null) {
+//    	mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { clear(); } });
+//    } else {
+//    	sheet.sheet_menu_bloc = this;
+//    }
+//	if (sheet != mmain()) {
+//    	sheet.add_spot("right", e);
+//    	sheet.add_spot("left", in.elem);
+//	}
+    
   }
   void menu() {
     sheet.build_sheet_menu();
     if (sheet.sheet_front != null) { 
-      if (setup_send.get()) sheet.sheet_front.grabber.setPosition(menu_pos.get());
-      if (setup_send.get() && menu_reduc.get()) sheet.sheet_front.collapse();
-      if (setup_send.get() && !menu_reduc.get()) sheet.sheet_front.popUp();
-      if (setup_send.get()) sheet.sheet_front.setTab(menu_tab.get());
-      setup_send.set(true);
-      sheet.sheet_front.grabber.addEventDrag(grab_run); 
-      sheet.sheet_front.addEventCollapse(reduc_run);  
-      sheet.sheet_front.addEventClose(close_run);  
-      sheet.sheet_front.addEventTab(tab_run); 
+    	if (menu_pos.get().x == 0 && menu_pos.get().y == 0) grab_run.run();
+	  if (setup_send.get() && !(menu_pos.get().x == 0 && menu_pos.get().y == 0)) sheet.sheet_front.grabber.setPosition(menu_pos.get());
+	  if (setup_send.get() && menu_reduc.get()) sheet.sheet_front.collapse();
+	  if (setup_send.get() && !menu_reduc.get()) sheet.sheet_front.popUp();
+	  if (setup_send.get()) sheet.sheet_front.setTab(menu_tab.get());
+	  setup_send.set(true);
+	  sheet.sheet_front.grabber.addEventDrag(grab_run); 
+	  sheet.sheet_front.addEventCollapse(reduc_run);  
+	  sheet.sheet_front.addEventClose(close_run);  
+	  sheet.sheet_front.addEventTab(tab_run); 
     }
   }
   public MMenu clear() {
@@ -1782,6 +1797,7 @@ class MMenu extends Macro_Bloc {
     if (sheet.sheet_front != null) sheet.sheet_front.removeEventCollapse(reduc_run); 
     if (sheet.sheet_front != null) sheet.sheet_front.removeEventClose(close_run); 
     if (sheet.sheet_front != null) sheet.sheet_front.clear();
+//    if (sheet.sheet_menu_bloc == this) sheet.sheet_menu_bloc = null;
     super.clear(); return this; }
 }
 

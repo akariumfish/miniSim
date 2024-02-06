@@ -326,25 +326,24 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     setParent(sheet); 
     sheet.child_macro.add(this); 
     
-    mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-      if (openning.get() == REDUC) { /*deploy(); */openning.set(OPEN); reduc(); }
+  }
+  void init_end() {
+	  if (openning.get() == REDUC) { /*deploy(); */openning.set(OPEN); reduc(); }
       else if (openning.get() == OPEN) { /*deploy();*/ openning.set(REDUC); open(); }
       else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); /*deploy();*/ hide(); }
       else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
       if (!pos_given) find_place(); 
-      if (openning.get() != HIDE && !mmain().is_paste_loading) { 
+      if (!is_cleared && openning.get() != HIDE && !mmain().is_paste_loading) { 
         mmain().szone_clear_select();
         szone_select();
       }
       if (!mmain().show_macro.get()) hide();
       
       if (mmain().sheet_explorer != null) mmain().sheet_explorer.update(); 
-      runEvents(eventsSetupLoad); 
+      nRunnable.runEvents(eventsSetupLoad); 
       toLayerTop(); 
-    } } );
   }
   void find_place() {
-    
     grabber.setPY(grabber.getLocalY() - grabber.getLocalY()%(ref_size * 0.5));
     grabber.setPX(grabber.getLocalX() - grabber.getLocalX()%(ref_size * 0.5));
     
@@ -378,9 +377,14 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     }
     sheet.updateBack();
   }
+  private boolean is_cleared = false;
   public Macro_Abstract clear() {
     if (!unclearable) {
+    	is_cleared = true;
+    	szone_unselect();
+//    	mmain().selected_macro.remove(this);
       super.clear();
+      
       val_type.clear(); val_descr.clear(); val_title.clear(); grab_pos.clear();
       openning.clear(); openning_pre_hide.clear(); val_self.clear();
       priority.clear();

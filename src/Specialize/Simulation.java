@@ -74,6 +74,7 @@ public class Simulation extends Macro_Sheet {
 	
 	public static class SimPrint extends Sheet_Specialize {
 		public SimPrint() { super("Sim"); }
+		  public void default_build() { }
 	  public Simulation get_new(Macro_Sheet s, String n, sValueBloc b) { return new Simulation(mmain.inter, b); }
 	}
   

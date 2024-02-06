@@ -15,27 +15,27 @@ public class nTheme {
 	public nWidget getModel(String r) {  return models.get(r); }
 	public nLook getLook(String r) { return models.get(r).look; }
 	public nWidget newWidget(String r) { //only for theme model making !!
-	  for (Map.Entry me : models.entrySet()) if (me.getKey().equals(r)) { 
+	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    return new nWidget(app).copy(m); }
 	  return null; }
 	public nWidget newWidget(nGUI g, String r) {
-	  for (Map.Entry me : models.entrySet()) if (me.getKey().equals(r)) { 
+	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    return new nWidget(g).copy(m); }
 	  return null; }
 	public nLinkedWidget newLinkedWidget(nGUI g, String r) {
-	  for (Map.Entry me : models.entrySet()) if (me.getKey().equals(r)) { 
+	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    nLinkedWidget lw = new nLinkedWidget(g); lw.copy(m); return lw; }
 	  return null; }
 	public nWatcherWidget newWatcherWidget(nGUI g, String r) {
-	  for (Map.Entry me : models.entrySet()) if (me.getKey().equals(r)) { 
+	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    nWatcherWidget lw = new nWatcherWidget(g); lw.copy(m); return lw; }
 	  return null; }
 	public nCtrlWidget newCtrlWidget(nGUI g, String r) {
-	  for (Map.Entry me : models.entrySet()) if (me.getKey().equals(r)) { 
+	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    nCtrlWidget lw = new nCtrlWidget(g); lw.copy(m); return lw; }
 	  return null; }

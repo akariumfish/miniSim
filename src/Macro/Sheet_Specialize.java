@@ -33,6 +33,7 @@ public abstract class Sheet_Specialize {
 	      else if (b != null) m = get_new(s, b.base_ref, (sValueBloc)b);
 	      else if (p != null) m = get_new(s, p.value_bloc.base_ref, p);
 	      if (m != null) {
+	    	m.init_end();
 	        m.sheet_specialize = this; m.specialize.set(name); if (unique) m.unclearable = true;
 	        m.open();
 	        if (b == null && default_template.length() > 0 && mmain.saved_template.getBloc(default_template) != null) {

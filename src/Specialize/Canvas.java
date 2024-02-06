@@ -9,21 +9,11 @@ import UI.Drawable;
 import UI.nCursor;
 import UI.nFrontPanel;
 import UI.nFrontTab;
-import UI.nList;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
-import sData.nRunnable;
-import sData.sBoo;
-import sData.sCol;
-import sData.sFlt;
-import sData.sInt;
-import sData.sObj;
-import sData.sRun;
-import sData.sStr;
-import sData.sValueBloc;
-import sData.sVec;
+import sData.*;
 
 
 
@@ -39,6 +29,7 @@ public class Canvas extends Macro_Sheet {
 	public static class CanvasPrint extends Sheet_Specialize {
 		  Simulation sim;
 		  public CanvasPrint(Simulation s) { super("Canvas"); sim = s; }
+		  public void default_build() { }
 		  public Canvas get_new(Macro_Sheet s, String n, sValueBloc b) { return new Canvas(sim, b); }
 		}
 	

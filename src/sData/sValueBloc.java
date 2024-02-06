@@ -11,7 +11,7 @@ import processing.core.PVector;
 
 public class sValueBloc {
   void runIterator(nIterator<sValue> i) { 
-	    for (Map.Entry mev : values.entrySet()) {
+	    for (Map.Entry<String,sValue> mev : values.entrySet()) {
 	      sValue v = ((sValue)mev.getValue());
 	      i.run(v);
 	    }
@@ -21,7 +21,7 @@ public class sValueBloc {
 	    }
 	  }
 	  void runValueIterator(nIterator<sValue> i) { 
-	    for (Map.Entry mev : values.entrySet()) {
+	    for (Map.Entry<String,sValue> mev : values.entrySet()) {
 	      sValue v = ((sValue)mev.getValue());
 	      i.run(v);
 	    }
@@ -32,7 +32,7 @@ public class sValueBloc {
 	      i.run(vb); } }
 	  int runIterator_Counted(nIterator<sValue> i) { return runIterator_Counted(i, 0); }
 	  int runIterator_Counted(nIterator<sValue> i, int c) { 
-	    for (Map.Entry mev : values.entrySet()) {
+	    for (Map.Entry<String,sValue> mev : values.entrySet()) {
 	      sValue v = ((sValue)mev.getValue());
 	      i.run(v, c); c++;
 	    }
@@ -43,7 +43,7 @@ public class sValueBloc {
 	    return c;
 	  }
 	  void runIterator_Filter(String t, nIterator<sValue> i) { 
-	    for (Map.Entry mev : values.entrySet()) {
+	    for (Map.Entry<String,sValue> mev : values.entrySet()) {
 	      sValue v = ((sValue)mev.getValue());
 	      if (v.type.equals(t)) i.run(v);
 	    }
@@ -54,7 +54,7 @@ public class sValueBloc {
 	  }
 	  int runIterator_Filter_Counted(String t, nIterator<sValue> i) { return runIterator_Filter_Counted(t, i, 0); }
 	  int runIterator_Filter_Counted(String t, nIterator<sValue> i, int c) { 
-	    for (Map.Entry mev : values.entrySet()) {
+	    for (Map.Entry<String,sValue> mev : values.entrySet()) {
 	      sValue v = ((sValue)mev.getValue());
 	      if (v.type.equals(t)) { i.run(v, c); c++; }
 	    }
@@ -74,7 +74,7 @@ public class sValueBloc {
 	  }
 	  int getCountOfType(String t) { return getCountOfType(t, 0); }
 	  int getCountOfType(String t, int c) {
-	    for (Map.Entry mev : values.entrySet()) {
+	    for (Map.Entry<String,sValue> mev : values.entrySet()) {
 	      sValue v = ((sValue)mev.getValue());
 	      if (v.type.equals(t)) c++;
 	    }
@@ -156,7 +156,7 @@ public class sValueBloc {
 	    for (int i = tmpblc.size()-1 ; i >= 0 ; i--) tmpblc.get(i).frame();
 	    tmpblc.clear();
 	    tmpval.clear();
-	    for (Map.Entry b : values.entrySet()) tmpval.add((sValue)b.getValue());
+	    for (Map.Entry<String,sValue> b : values.entrySet()) tmpval.add((sValue)b.getValue());
 	    for (int i = tmpval.size()-1 ; i >= 0 ; i--) tmpval.get(i).frame();
 	    tmpval.clear();
 	  }
@@ -171,7 +171,7 @@ public class sValueBloc {
 	    for (Map.Entry<String, sValueBloc> b : blocs.entrySet()) { sValueBloc s = (sValueBloc)b.getValue(); s.clean(); } 
 	    
 	    tmpval.clear();
-	    for (Map.Entry b : values.entrySet()) tmpval.add((sValue)b.getValue());
+	    for (Map.Entry<String,sValue> b : values.entrySet()) tmpval.add((sValue)b.getValue());
 	    for (int i = tmpval.size()-1 ; i >= 0 ; i--) tmpval.get(i).clean();
 	    tmpval.clear();
 	    
@@ -182,12 +182,12 @@ public class sValueBloc {
 	  }
 	  public void empty() {
 	    tmpblc.clear();
-	    for (Map.Entry b : blocs.entrySet()) tmpblc.add((sValueBloc)b.getValue());
+	    for (Map.Entry<String,sValueBloc> b : blocs.entrySet()) tmpblc.add((sValueBloc)b.getValue());
 	    for (int i = tmpblc.size()-1 ; i >= 0 ; i--) tmpblc.get(i).clear();
 	    tmpblc.clear();
 	    
 	    tmpval.clear();
-	    for (Map.Entry b : values.entrySet()) tmpval.add((sValue)b.getValue());
+	    for (Map.Entry<String,sValue> b : values.entrySet()) tmpval.add((sValue)b.getValue());
 	    for (int i = tmpval.size()-1 ; i >= 0 ; i--) tmpval.get(i).clean();
 	    tmpval.clear();
 	    
@@ -197,7 +197,7 @@ public class sValueBloc {
 	  void load_from_bloc(Save_Bloc sb) {
 	    data.app.vlogln("svb load " + ref + "  /svb " + sb.blocs.size() + " /sv " + sb.datas.size());
 	    
-	    for (Map.Entry b : blocs.entrySet()) { 
+	    for (Map.Entry<String,sValueBloc> b : blocs.entrySet()) { 
 	      sValueBloc s = (sValueBloc)b.getValue(); 
 	      data.app.vlogln("test vb "+ s.ref);
 	      Save_Bloc child_blocs = sb.getBloc(s.ref);
@@ -207,7 +207,7 @@ public class sValueBloc {
 	      }
 	    }
 	    
-	    for (Map.Entry b : values.entrySet()) { 
+	    for (Map.Entry<String,sValue> b : values.entrySet()) { 
 	      sValue s = (sValue)b.getValue(); 
 	      data.app.vlogln("test vb "+ s.ref);
 	      Save_Bloc child_blocs = sb.getBloc(s.ref);
@@ -221,7 +221,7 @@ public class sValueBloc {
 	  void load_values_from_bloc(Save_Bloc sb) {
 	    data.app.vlogln("svb load " + ref + "  /svb " + sb.blocs.size() + " /sv " + sb.datas.size());
 	    
-	    for (Map.Entry b : values.entrySet()) { 
+	    for (Map.Entry<String,sValue> b : values.entrySet()) { 
 	      sValue s = (sValue)b.getValue(); 
 	      data.app.vlogln("test vb "+ s.ref);
 	      Save_Bloc child_blocs = sb.getBloc(s.ref);
@@ -241,7 +241,7 @@ public class sValueBloc {
 	    sb.newData("__bloc_use", use);
 	    
 	    data.app.dlogln("saving under values >");
-	    for (Map.Entry me : values.entrySet()) { 
+	    for (Map.Entry<String,sValue> me : values.entrySet()) { 
 	      sValue s = (sValue)me.getValue(); 
 	      Save_Bloc sbv = sb.newBloc((String)me.getKey());
 	      sbv.newData("__bloc_type", "val");
@@ -254,14 +254,14 @@ public class sValueBloc {
 	    String struct = "<bloc_"+type;
 	    if (print_ref) struct += "_"+ref;
 	    struct += ":"+"values<";
-	    for (Map.Entry me : values.entrySet()) { 
+	    for (Map.Entry<String,sValue> me : values.entrySet()) { 
 	      sValue v = (sValue)me.getValue(); 
 	      struct += "<val_"+v.type;
 	      if (print_ref) struct += "_"+v.ref;
 	      struct += ">";
 	    } 
 	    struct += ">blocs<";
-	    for (Map.Entry me : blocs.entrySet()) { 
+	    for (Map.Entry<String,sValueBloc> me : blocs.entrySet()) { 
 	      sValueBloc vb = (sValueBloc)me.getValue(); 
 	      struct += vb.getHierarchy(print_ref);
 	      struct += "-";
@@ -273,7 +273,7 @@ public class sValueBloc {
 	    String struct = "<bloc_"+type;
 	    if (print_ref) struct += "_"+ref;
 	    struct += ":"+"values<";
-	    for (Map.Entry me : values.entrySet()) { 
+	    for (Map.Entry<String,sValue> me : values.entrySet()) { 
 	      sValue v = (sValue)me.getValue(); 
 	      struct += "<val_"+v.type;
 	      if (print_ref) struct += "_"+v.ref;
@@ -296,13 +296,13 @@ public class sValueBloc {
 	    sb.newData("__bloc_use", use);
 	    
 	    data.app.dlogln("saving under blocs >");
-	    for (Map.Entry me : blocs.entrySet()) { 
+	    for (Map.Entry<String,sValueBloc> me : blocs.entrySet()) { 
 	      sValueBloc svb = (sValueBloc)me.getValue(); 
 	      Save_Bloc sb2 = sb.newBloc(svb.ref);
 	      cnt = svb.preset_to_save_bloc(sb2, cnt); 
 	    } 
 	    data.app.dlogln("saving under values >");
-	    for (Map.Entry me : values.entrySet()) { 
+	    for (Map.Entry<String,sValue> me : values.entrySet()) { 
 	      sValue s = (sValue)me.getValue(); 
 	      Save_Bloc sbv = sb.newBloc((String)me.getKey());
 	      sbv.newData("__bloc_type", "val");

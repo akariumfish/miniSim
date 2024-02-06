@@ -37,10 +37,10 @@ public class DataHolder extends sValueBloc {
 	  
 	public boolean values_found(sValueBloc from, sValueBloc in) {
 	  boolean all_found = true;
-	  for (Map.Entry me1 : from.values.entrySet()) { 
+	  for (Map.Entry<String,sValue> me1 : from.values.entrySet()) { 
 	    sValue v1 = (sValue)me1.getValue(); 
 	    boolean found = false;
-	    for (Map.Entry me2 : in.values.entrySet()) { 
+	    for (Map.Entry<String,sValue> me2 : in.values.entrySet()) { 
 	      sValue v2 = (sValue)me2.getValue(); 
 	      found = found || v1.ref.equals(v2.ref);
 	    } 

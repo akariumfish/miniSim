@@ -68,7 +68,7 @@ public class nValuePicker extends nWindowPanel {
 	    update_list();
 	  }
 	  void update_list() {
-	    for (Map.Entry b : search_bloc.values.entrySet()) { 
+	    for (Map.Entry<String,sValue> b : search_bloc.values.entrySet()) { 
 	      sValue s = (sValue)b.getValue(); 
 	      explorer_entry.add(s.ref);
 	    }

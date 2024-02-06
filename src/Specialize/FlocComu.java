@@ -158,6 +158,7 @@ public class FlocComu extends Community {
 public static class FlocPrint extends Sheet_Specialize {
   Simulation sim;
   public FlocPrint(Simulation s) { super("Floc"); sim = s; }
+  public void default_build() { }
   public FlocComu get_new(Macro_Sheet s, String n, sValueBloc b) { return new FlocComu(sim, n, b); }
 }
 

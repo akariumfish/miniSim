@@ -53,7 +53,7 @@ import sData.*;
 
 class MCursor extends MBasic { 
 	static class MCursor_Builder extends MAbstract_Builder {
-		MCursor_Builder() { super("cursor", ""); show_in_buildtool = true; }
+		MCursor_Builder() { super("cursor", "add a cursor"); show_in_buildtool = true; }
 	MCursor build(Macro_Sheet s, sValueBloc b) { MCursor m = new MCursor(s, b); return m; }
 	}
 	public nCursor cursor;
@@ -287,7 +287,7 @@ class MComment extends MBasic {
 
 class MSheetObj extends Macro_Bloc { 
 	static class MSheetObj_Builder extends MAbstract_Builder {
-		  MSheetObj_Builder() { super("sheet obj", ""); show_in_buildtool = true; }
+		  MSheetObj_Builder() { super("sheet obj", "send his sheet as packet"); show_in_buildtool = true; }
 		  MSheetObj build(Macro_Sheet s, sValueBloc b) { MSheetObj m = new MSheetObj(s, b); return m; }
 		}
   nRunnable get_run;
@@ -315,7 +315,7 @@ class MSheetObj extends Macro_Bloc {
 class MValue extends MBasic { 
 	static 
 	class MValue_Builder extends MAbstract_Builder {
-		  MValue_Builder() { super("svalue", ""); show_in_buildtool = true; }
+		  MValue_Builder() { super("svalue", "send selected value as packet"); show_in_buildtool = true; }
 		  MValue build(Macro_Sheet s, sValueBloc b) { MValue m = new MValue(s, b); return m; }
 		}
   nRunnable get_run;
@@ -595,7 +595,7 @@ class MData extends Macro_Bloc {
 
 class MSheetView extends Macro_Bloc { 
 	static class MSheetView_Builder extends MAbstract_Builder {
-		  MSheetView_Builder() { super("sheet view", ""); show_in_buildtool = true; }
+		  MSheetView_Builder() { super("sheet view", "set the camera on his sheet"); show_in_buildtool = true; }
 		  MSheetView build(Macro_Sheet s, sValueBloc b) { MSheetView m = new MSheetView(s, b); return m; }
 		}
   nRunnable goto_run;

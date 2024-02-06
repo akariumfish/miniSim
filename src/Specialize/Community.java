@@ -7,7 +7,6 @@ import RApplet.Rapp;
 import UI.nCursor;
 import UI.nFrontPanel;
 import UI.nFrontTab;
-import UI.nList;
 import sData.nRunnable;
 import sData.sBoo;
 import sData.sInt;

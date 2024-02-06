@@ -5,6 +5,16 @@ public class Drawable {
 	  Drawing_pile pile = null;
 	  int layer = 0;
 	  boolean active = true;
+	  Drawable set_view(boolean b) { if (b) show(); else hide(); return this; }
+	  Drawable show() { 
+		  if (!active && pile != null && !pile.drawables.contains(this)) 
+			  pile.drawables.add(this); 
+		  active = true; return this; }
+	  Drawable hide() { 
+		  if (pile != null) while (pile.drawables.contains(this)) 
+			  pile.drawables.remove(this); 
+		  active = false; return this; }
+	  boolean get_view() { return active; }
 	  public Drawable setPile(Drawing_pile p) {
 	    pile = p; pile.drawables.add(this);
 	    return this; }

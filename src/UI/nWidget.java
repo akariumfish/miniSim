@@ -58,7 +58,7 @@ public class nWidget {
     drawer = d; 
     if (drawer != null) {
       drawer.setLayer(layer); 
-      gui.drawing_pile.drawables.add(d); 
+//      gui.drawing_pile.drawables.add(d); 
     }
     return this; 
   }
@@ -100,7 +100,7 @@ public class nWidget {
     if (!hide) {
       hide = true; 
       changePosition(); 
-      if (drawer != null) { drawerHideState = drawer.active; drawer.active = false; }
+      if (drawer != null) { drawerHideState = drawer.get_view(); drawer.hide(); }
       if (hover != null) { hoverHideState = hover.active; hover.active = false; }
       nRunnable.runEvents(eventVisibilityChange); 
       for (nWidget w : childs) w.hide(); 
@@ -111,7 +111,7 @@ public class nWidget {
     if (hide) {
       hide = false; 
       changePosition(); 
-      if (drawer != null) drawer.active = drawerHideState; 
+      if (drawer != null) drawer.set_view(drawerHideState); 
       if (hover != null) hover.active = hoverHideState; 
       nRunnable.runEvents(eventVisibilityChange); 
       for (nWidget w : childs) w.show(); 

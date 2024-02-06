@@ -15,50 +15,7 @@ import sData.sCol;
 import sData.sFlt;
 import sData.sInt;
 import sData.sValueBloc;
-/*
 
-keep your mouse on a cursor for 0.5s > a bar appear under it, 
-	its a slider to change scale, 
-	always appear centered, go from 0.25x current scale to 4x current scale
-	ephemere : will disappear if mouse stop hovering it or the cursor
-	
-cursor pointer in losange, point in direction > need custom drawable
-	correct centering error on pointer widget
-
-
-
-
-
-
-Collection de position : cursors in a specialized sheet
-	position, dir and scale
-		add scale value to MCursor or to nCursor ?
-
-form : specialized sheet
-	graphic object : line, trig, ellipse, rect...
-	axis aligned
-	colors, line width
-	
-shape : specialized sheet
-	replicate given form in patern
-		replicant have own pos, dir, scale, line width multiplyer and color filter
-	patern can be driven by a given random seed
-	building can be driven by tick input << !! sim random seed will be used !!
-
-Camera dessinateur : specialized sheet
-	draw given shape to given cursors positions in camera view
-
-Canvas dessinateur : specialized sheet
-	print given cursors as halo to given canvas
-	print given shape to given cursors positions as halo to given canvas
-	
-	print can be different things, add color, modify, decay ...
-
-modificateur de position : specialized sheet
-	floc
-	create movement by changing given cursors position and direction
-
- */
 
 
 
@@ -68,6 +25,7 @@ public class Face extends Macro_Sheet {
 public static class FacePrint extends Sheet_Specialize {
   Canvas sim;
   public FacePrint(Canvas s) { super("Face"); sim = s; }
+  public void default_build() { }
   public Face get_new(Macro_Sheet s, String n, sValueBloc b) { return new Face(sim, b); }
 }
   nWidget graph;

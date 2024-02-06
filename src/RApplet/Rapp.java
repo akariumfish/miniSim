@@ -109,13 +109,14 @@ public class Rapp extends PApplet implements InputData, RConst {
 //		  setup_midi();
 		  
 		  
-		  
-		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
-		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
-		  interf.addSpecializedSheet(new Face.FacePrint(canv));
-		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
-		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
-		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
+
+		  interf.addSpecializedSheet(new Simulation.SimPrint());
+//		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
+//		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
+//		  interf.addSpecializedSheet(new Face.FacePrint(canv));
+//		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
+//		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
+//		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
 		  //interf.addSpecializedSheet(new BoxPrint(simul));
 		  
 		  
@@ -154,6 +155,7 @@ public class Rapp extends PApplet implements InputData, RConst {
 	}
 	
 	public void draw() {
+		
 	  interf.frame();
 	  global_frame_count++;
 	  if (global_frame_count < 5) { fill(0); noStroke(); rect(0, 0, width, height); }

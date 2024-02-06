@@ -1,4 +1,6 @@
 package Macro;
+
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -11,202 +13,7 @@ import processing.core.PConstants;
 import sData.*;
 
 
-/*
-                  TO DO
-  
-  corrige error on group_grabber grid snaping, 
-    small constant misalignment, because of his size not multyple?
-  
-  add min/max param to slide (/2 X2) > set minmax of sval
-    event limit change for synchro
-  
-  number formating!!!
-  
-  when manually adding try to stay on top of sheet back to keep it small
-    >> start add place search from existing bloc median pos (or 0) then try in spiral
-  
-  distence mesuring tool
-  
-  bloc node : one point in and out at the same time
-    use a custom macro_connect
-    created by leftclick on empty space
-  
-  its needed to group shapes to limit object nb
-  
-  to big trig et switch : when too dezoomed show a screen widget (on/off)
-    set button text (large font)
-  
-  
-  
-  
-  
-  
-  hide majority of macro widgets when dezoom
-  bloc a faire:
-    cursor bloc : 
-      (like menu) named, listed in mmain so global, 
-      the bloc point to an existing cursor or can build a new
-      custom setlinkedPosition(svec) setlinkedDir(svec) setlinkedShow(sboo)
-      constrain (dir pos mag ..)
-      registered independently from theirs sheet and easily accessible for
-        new comus start
-        global effect field
-        multi comu objectif
-      
-      auto follow / point to objects, instent or chasing
-      memorize path for display
-      dif shape / look
-    MVar
-      add a hideable (like com) param drawer : select variable type
-      int str and vec better handling 
-    MComment can log received data (auto text format with insertion token??)
-    camview
-      like a menu, name, click to go, 3 field for values, 
-      when selected capture n store cam pos / scale
-    frame delay / tick delay / packet process delay
-    setreset, counter, sequance, multigate 
-  
-  
-  
-  
-  
-  
-  open finished bp, search file in sub folder, cant save on it again
-    save final bp to save in this folder (verify if new file name is existing to stop you from overwriting)
-    
-  for macro main toolpanel bp and basic sim features add shortcut menu
-  
-  list knows dangerous (bugged) actions
-  
-  sujet principaux dans la doc
-    data sval, svalblc save/load templ/prst
-    macro sheet bloc co sheet_co
-    list detailler bloc sp
-    packet process
-  
-  change sheet selection right when click down
-    no more diff sheet bloc select in 2 click
-  
-  nExplorer : more entry and smaller height
-  
-  save log at crash? how to detect crash?
-  
-  bool flag destroyed widgets!!!! to filter irregular
-  
-  TEST packet processing order for inputs
-  
-  redo link loop protection
-    auto delete last link
-  
-  mesure and store the relative process time used by each special sheet
-  
-  macro blocs and groups adding position can be controllable
-    can be relative or absolute depending on case
 
-
-
-                    R & D
-                    
-  sending sval and sbloc through link
-    output keep a packet as pointer to last send val, packet is passer
-    
-    need clean rythme
-      all activated outs call conected in for new val then deactive
-      all activated in gets val pass it to bloc then deactive
-      all activated bloc process the vals
-    thats 1 packet process update
-    repeat util no more new packet or too much time ellapsed, start again next turn
-    
-    >>>> reuse the mconnection structure
-      will just need to add a turn with priority of exe for the blocs
-    sval new methods 
-      bool isType()
-      packet asPacket()
-    sbloc new methods
-      packet asPacket()
-    packet new methods
-      sval asType()
-      sbloc asBloc()
-      bool isType()
-      bool isBloc()
-  
-  can send sbloc as cible for everything! solve the cursor or pairing proble
-  
-  spe blocs can iterate throug bloc contents on ticking
-  
-  simply put macro blocs for all svalue handling methods 
-    add macro from bloc too
-    
-  slow mo mode :    
-    real slow mode or just a slowed down recording of a finished packet process update ??
-    
-    real permit interaction and observation > 
-      objectif no number no words just visual for organic learnning
-    
-    permit to see the content sended through a link visualy
-      and his speed of evolution > show synchronisation and sequances
-    
-    along the one update bubble transit along the links 
-    then bloc lit up if activated ( intensity show process difficuty?? )
-    
-    for number / bool bubble is more or less filled (min max sval)
-    text trensit
-    color trensit
-  
-  infrastructure :
-    structural model switchable (patch structure)
-    need used value to be present  
-    
-  mtemplate : load / save bang > run
-  sheet selector : select sheet choosen by name on bang
-  pack / unpack > build complex packet
-  
-  visualize sheet val content has phantom on the sheet back?
-  
-  unique macro bloc custom build by the special sheet, non deletable, non duplicable
-    ex: Canvas :
-      will send each pixel throug this:
-        4 out color of the neigbours
-        1 out my color
-        4 in color modif for the neigbours
-        1 in color modif for myself
-      by charging the pixels data on the inputs, forcibly running packet process, getting the outs
-      need no exterior co and no packet delaying
-      
-  special sheet : effect field
-    affect a canvas
-    all pixel under his shape get a custom processing
-                    
-  make organism use a face as exemple for its shape
-                    
-  enregistrement de different POV camera entre lesquel on peut basquler
-    vue macro / vue exploration / vue general
-    macro camview
-  
-  change access
-    low access hide certain sheet
-    gain access by meeting enigmatic condition ??
-  
-  when selecting a preset auto hide uncompatible widget ? > need to redo explorer
-  
-  gameplay thinking :
-    consumable is needed to influence the world :
-      modifying svalues
-      diplaying a shape
-      processing data (running macro)
-      packet hold consummable
-    the canvas is the origin and destination of the consumable
-    links connect consummable pool with restriction
-      macro bloc are pool
-      restriction on volume and quantity by tick
-      transfer quality : some of the packet consummable is lost to the canvas
-    displayed shape are pool
-    collision between shape create pool link
-      collision area influence link quality
-    
-    
-    
-  */
 
 
 
@@ -691,9 +498,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     
     gui.app.mlogln("build sheet "+n+" "+ _bloc);
     
-    if (_bloc == null 
-        && !unclearable
-        ) 
+    if (_bloc == null && !unclearable) 
       mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { select(); } });
   }
   public Macro_Sheet(sInterface _int) {
@@ -704,7 +509,6 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     child_sheet = new ArrayList<Macro_Sheet>(0);
     
     new_preset_name = setting_bloc.newStr("preset_name", "preset", "preset");
-    
     specialize = setting_bloc.newStr("specialize", "specialize", "");
     
     links = setting_bloc.newStr("links", "links", "");
@@ -776,6 +580,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     empty();
     if (!unclearable) {
       super.clear();
+      
+      
       if (sheetCursor != null) sheetCursor.clear();
 		if (sheetCursor_pval != null) sheetCursor_pval.removeEventChange(pval_run);
 		if (sheet != mmain()) sheet.grab_pos.removeEventChange(sheet_grab_run);
@@ -813,6 +619,10 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   
 
   public ArrayList<nCursor> sheet_cursors_list = new ArrayList<nCursor>();
+  
+  public ArrayList<Macro_Bloc> sheet_unique_bloc = new ArrayList<Macro_Bloc>();
+  
+  protected MMenu sheet_menu_bloc = null;
   
   int cursor_count = 0;
   nCursor newCursor(String r, boolean b) {
@@ -1395,18 +1205,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       
       //add copyed child to new macro
       if (a != null && a.val_type.get().equals("sheet")) {
-        //if (nbloc_child.getValue("links") != null && 
-        //    a.value_bloc.getBloc("settings") != null && 
-        //    a.value_bloc.getBloc("settings").getValue("links") != null) 
-        //  a.value_bloc.getBloc("settings").getValue("links").clear();
-        //if (nbloc_child.getValue("spots") != null && 
-        //    a.value_bloc.getBloc("settings") != null && 
-        //    a.value_bloc.getBloc("settings").getValue("spots") != null) 
-        //  a.value_bloc.getBloc("settings").getValue("spots").clear();
         ((Macro_Sheet)a).addCopyofBlocContent(nbloc_child, false);
         for (Macro_Abstract m : ((Macro_Sheet)a).child_macro) m.szone_unselect();
-        //((Macro_Sheet)a).redo_spot();
-        //((Macro_Sheet)a).redo_link();
       }
       
       //no new macro = invalid bloc
@@ -1440,51 +1240,50 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   
   Macro_Abstract addByType(String t) { return addByType(t, null); }
   Macro_Abstract addByType(String t, sValueBloc b) { 
+	  Macro_Abstract nm = null;
     for (MAbstract_Builder m : mmain().bloc_builders)
-      if (t.equals(m.type)) return m.build(this, b);
-    if (t.equals("data")) return addData(b);
-    else if (t.equals("in")) return addSheetIn(b);
-    else if (t.equals("out")) return addSheetOut(b);
-    else if (t.equals("keyb")) return addKey(b);
-    else if (t.equals("switch")) return addSwitch(b);
-    else if (t.equals("trig")) return addTrig(b);
-    else if (t.equals("bswitch")) return addBigSwitch(b);
-    else if (t.equals("btrig")) return addBigTrig(b);
-    else if (t.equals("gate")) return addGate(b);
-    else if (t.equals("not")) return addNot(b);
-    else if (t.equals("bin")) return addBin(b);
-    else if (t.equals("bool")) return addBool(b);
-    else if (t.equals("var")) return addVar(b);
-    else if (t.equals("pulse")) return addPulse(b);
-    else if (t.equals("calc")) return addCalc(b);
-    else if (t.equals("comp")) return addComp(b);
-    else if (t.equals("chan")) return addChan(b);
-    else if (t.equals("vecXY")) return addVecXY(b);
-    else if (t.equals("vecMD")) return addVecMD(b);
-    else if (t.equals("frame")) return addFrame(b);
-    else if (t.equals("numCtrl")) return addNumCtrl(b);
-    else if (t.equals("vecCtrl")) return addVecCtrl(b);
-    else if (t.equals("rng")) return addRng(b);
-    else if (t.equals("mouse")) return addMouse(b);
-    //else if (t.equals("cursor")) return addCursor(b);
-    else if (t.equals("com")) return addComment(b);
-    //else if (t.equals("tmpl")) return addTmpl(b);
-    else if (t.equals("preset")) return addPrst(b);
-    else if (t.equals("midi")) return addMidi(b);
-    else if (t.equals("menu")) return addMenu(b);
-    else if (t.equals("tool")) return addTool(b);
-    else if (t.equals("toolbin")) return addToolBin(b);
-    else if (t.equals("tooltri")) return addToolTri(b);
-    else if (t.equals("toolNC")) return addToolNCtrl(b);
-    else if (t.equals("pan")) return addPanel(b);
-    else if (t.equals("panbin")) return addPanBin(b);
-    else if (t.equals("pansld")) return addPanSld(b);
-    else if (t.equals("pangrph")) return addPanGrph(b);
-    //else if (t.equals("pancstm")) return addPanCstm(b);
-    else if (t.equals("ramp")) return addRamp(b);
-    else if (t.equals("crossVec")) return addCrossVec(b);
-    else if (t.equals("colRGB")) return addColRGB(b);
-    return null;
+      if (t.equals(m.type)) nm = m.build(this, b);
+    if (t.equals("data")) nm = addData(b);
+    else if (t.equals("in")) nm = addSheetIn(b);
+    else if (t.equals("out")) nm = addSheetOut(b);
+    else if (t.equals("keyb")) nm = addKey(b);
+    else if (t.equals("switch")) nm = addSwitch(b);
+    else if (t.equals("trig")) nm = addTrig(b);
+    else if (t.equals("bswitch")) nm = addBigSwitch(b);
+    else if (t.equals("btrig")) nm = addBigTrig(b);
+    else if (t.equals("gate")) nm = addGate(b);
+    else if (t.equals("not")) nm = addNot(b);
+    else if (t.equals("bin")) nm = addBin(b);
+    else if (t.equals("bool")) nm = addBool(b);
+    else if (t.equals("var")) nm = addVar(b);
+    else if (t.equals("pulse")) nm = addPulse(b);
+    else if (t.equals("calc")) nm = addCalc(b);
+    else if (t.equals("comp")) nm = addComp(b);
+    else if (t.equals("chan")) nm = addChan(b);
+    else if (t.equals("vecXY")) nm = addVecXY(b);
+    else if (t.equals("vecMD")) nm = addVecMD(b);
+    else if (t.equals("frame")) nm = addFrame(b);
+    else if (t.equals("numCtrl")) nm = addNumCtrl(b);
+    else if (t.equals("vecCtrl")) nm = addVecCtrl(b);
+    else if (t.equals("rng")) nm = addRng(b);
+    else if (t.equals("mouse")) nm = addMouse(b);
+    else if (t.equals("com")) nm = addComment(b);
+    else if (t.equals("preset")) nm = addPrst(b);
+    else if (t.equals("midi")) nm = addMidi(b);
+    else if (t.equals("menu")) nm = addMenu(b);
+    else if (t.equals("tool")) nm = addTool(b);
+    else if (t.equals("toolbin")) nm = addToolBin(b);
+    else if (t.equals("tooltri")) nm = addToolTri(b);
+    else if (t.equals("toolNC")) nm = addToolNCtrl(b);
+    else if (t.equals("pan")) nm = addPanel(b);
+    else if (t.equals("panbin")) nm = addPanBin(b);
+    else if (t.equals("pansld")) nm = addPanSld(b);
+    else if (t.equals("pangrph")) nm = addPanGrph(b);
+    else if (t.equals("ramp")) nm = addRamp(b);
+    else if (t.equals("crossVec")) nm = addCrossVec(b);
+    else if (t.equals("colRGB")) nm = addColRGB(b);
+    nm.init_end();
+    return nm;
   }
   
   MData addData(sValueBloc b) { MData m = null;
@@ -1535,9 +1334,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     else m = new MVecCtrl(this, b, null); return m; }
   MRandom addRng(sValueBloc b) { MRandom m = new MRandom(this, b); return m; }
   MMouse addMouse(sValueBloc b) { MMouse m = new MMouse(this, b); return m; }
-  //MCursor addCursor(sValueBloc b) { MCursor m = new MCursor(this, b); return m; }
   MComment addComment(sValueBloc b) { MComment m = new MComment(this, b); return m; }
-  //MTemplate addTmpl(sValueBloc b) { MTemplate m = new MTemplate(this, b); return m; }
   MPreset addPrst(sValueBloc b) { MPreset m = new MPreset(this, b); return m; }
   MMIDI addMidi(sValueBloc b) { MMIDI m = new MMIDI(this, b); return m; }
   MMenu addMenu(sValueBloc b) { MMenu m = new MMenu(this, b); return m; }

@@ -3,7 +3,6 @@ package RApplet;
 import java.util.ArrayList;
 
 import Macro.Macro_Main;
-import Macro.Macro_Sheet;
 import Macro.Sheet_Specialize;
 import RBase.RConst;
 import UI.*;
@@ -578,8 +577,8 @@ public sRun full_screen_run;
   
   void addSpecializedSheet(Sheet_Specialize s) {
     macro_main.addSpecializedSheet(s); }
-  Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
-    return macro_main.addUniqueSheet(s); }
+//  Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
+//    return macro_main.addUniqueSheet(s); }
 
 
   public sValueBloc getTempBloc() {
@@ -598,6 +597,9 @@ public sRun full_screen_run;
   boolean is_starting = true;
   public boolean show_info = true;
   void frame() {
+	  
+	  // BREAKPOINT
+	  
     input.frame_str(); // track mouse
     framerate.frame(); // calc last frame
     app.background(0);

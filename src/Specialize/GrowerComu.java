@@ -18,6 +18,7 @@ public class GrowerComu extends Community {
 public static class GrowerPrint extends Sheet_Specialize {
 	  Simulation sim;
 	  public GrowerPrint(Simulation s) { super("Grower"); sim = s; }
+	  public void default_build() { }
 	  public GrowerComu get_new(Macro_Sheet s, String n, sValueBloc b) { 
 		  return new GrowerComu(sim, n, b); }
 	}
