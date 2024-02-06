@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 import RBase.InputData;
 import RBase.RConst;
-import Specialize.Canvas;
-import Specialize.Face;
-import Specialize.FlocComu;
-import Specialize.GrowerComu;
-import Specialize.Organism;
+//import Specialize.Canvas;
+//import Specialize.Face;
+//import Specialize.FlocComu;
+//import Specialize.GrowerComu;
+//import Specialize.Organism;
 import Specialize.Simulation;
 import UI.nWidget;
 import processing.core.*;
