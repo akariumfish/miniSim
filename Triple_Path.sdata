@@ -11299,9 +11299,9 @@ vec
 shr
 pos
 x
--620.0
+-637.85645
 y
-820.0
+822.14355
 0
 0
 type
@@ -35575,7 +35575,7 @@ flt
 shr
 end
 val
--72.3345
+-72.334496
 0
 0
 valLOOP
@@ -86547,7 +86547,7 @@ flt
 shr
 end
 val
--10.098312
+-10.098314
 0
 0
 valLOOP
@@ -98107,9 +98107,9 @@ vec
 shr
 pos
 x
--1220.0
+-1223.6
 y
-1320.0
+1329.282
 0
 0
 type
@@ -108533,7 +108533,7 @@ str
 shr
 lbl
 val
-fps 31.4
+fps 21.6
 0
 0
 2_gate
@@ -125053,9 +125053,9 @@ vec
 shr
 pos
 x
--1199.82
+-1179.6692
 y
-412.82202
+1291.2466
 0
 0
 type
@@ -136417,9 +136417,9 @@ vec
 shr
 dir
 x
--57.528114
+30.061134
 y
--5.0031424
+-59.8247
 0
 0
 val_halo_type2
@@ -136483,9 +136483,9 @@ vec
 shr
 pos
 x
--1199.82
+-1179.6692
 y
-412.82202
+1291.2466
 0
 0
 val_dens
@@ -142369,9 +142369,9 @@ vec
 shr
 pos
 x
--1180.0
+-1199.2102
 y
-380.0
+389.32306
 0
 0
 type
@@ -144515,7 +144515,7 @@ boo
 shr
 stp_snd
 val
-1
+0
 0
 0
 menu_pos
@@ -144565,7 +144565,7 @@ boo
 shr
 menu_reduc
 val
-1
+0
 0
 0
 1_bin
@@ -152235,9 +152235,9 @@ vec
 shr
 dir
 x
-28.047981
+28.04798
 y
-74.922035
+74.92203
 0
 0
 val_halo_type2
@@ -154273,7 +154273,7 @@ str
 shr
 lbl1
 val
-turn 1082
+turn 399
 0
 0
 valTRIG1
@@ -167173,7 +167173,7 @@ boo
 shr
 stp_send
 val
-1
+0
 0
 0
 pan_title
@@ -167329,7 +167329,7 @@ int
 shr
 tick
 val
-1084
+400
 0
 0
 tick seconde
@@ -167345,7 +167345,7 @@ flt
 shr
 tps
 val
-31.44654
+21.691975
 0
 0
 pause
@@ -168967,7 +168967,7 @@ int
 shr
 frsr
 val
-1083
+400
 0
 0
 files_management
@@ -169013,7 +169013,7 @@ flt
 shr
 fdur
 val
-31.0
+44.0
 0
 0
 full_screen_run
@@ -169059,7 +169059,7 @@ flt
 shr
 cfr
 val
-0.031
+0.044
 0
 0
 sec_since_reset
@@ -169075,7 +169075,7 @@ int
 shr
 sec
 val
-41
+23
 0
 0
 median_framerate
@@ -169091,7 +169091,7 @@ flt
 shr
 mfr
 val
-31.44654
+21.691975
 0
 0
 cam scale
@@ -169139,9 +169139,9 @@ vec
 shr
 pos
 x
-260.93948
+203.48259
 y
--323.25467
+-399.6784
 0
 0
 quicksave
