@@ -16,33 +16,41 @@ public class Camera {
   Rect cam_view;
   public sVec cam_pos; //position de la camera
   public sFlt cam_scale; //facteur de grossicement
+  public sFlt cam_grid_spacing; //facteur de grossicement
   float ZOOM_FACTOR = 1.1F; //facteur de modification de cam_scale quand on utilise la roulette de la sourie
   boolean GRAB = true, grabbed = false;
   public sBoo grid; //show grid
   public boolean screenshot = false; //enregistre une image de la frame sans les menu si true puis se desactive
   boolean matrixPushed = false; //track if in or out of the cam matrix
-
+  
+  float min_scale = 0.02F, max_scale = 5.0F;
+  
+  nRunnable up_view_run;
   Camera(sInput i, sValueBloc d) { 
 	input = i;
-    grid = new sBoo(d, true, "show grid", "grid");
-    cam_scale = new sFlt(d, 1.0F, "cam scale", "scale");
-    cam_scale.addEventChange(new nRunnable() { public void run() {
-    	cam_view.pos.set(screen_to_cam(new PVector(0, 0)));
-    	cam_view.size.set(screen_to_cam(
-    			new PVector(input.app.width, input.app.height)).sub(cam_view.pos)); 
-      nRunnable.runEvents(eventsZoom);
-      nRunnable.runEvents(eventsMove); }});
+    grid = new sBoo(d, true, "show_grid", "grid");
+    cam_scale = new sFlt(d, 1.0F, "cam_scale", "scale");
+    cam_grid_spacing = new sFlt(d, 200F, "cam_grid_spacing", "grid_spacing");
+    up_view_run = new nRunnable() { public void run() {
+	    cam_view.pos.set(screen_to_cam(
+	    		new PVector(input.app.screen_0_x, input.app.screen_0_y)));
+	    cam_view.size.set(screen_to_cam(
+	    		new PVector(input.app.screen_0_x + input.app.screen_width, 
+	    				input.app.screen_0_y + input.app.screen_height)));
+	    cam_view.size.add(-cam_view.pos.x, -cam_view.pos.y);
+	  nRunnable.runEvents(eventsZoom);
+	  nRunnable.runEvents(eventsMove); 
+    }};
+    cam_scale.addEventChange(up_view_run);
     cam_pos = new sVec(d, "cam pos", "pos");
-    cam_pos.addEventChange(new nRunnable() { public void run() {
-    	cam_view.pos.set(screen_to_cam(new PVector(0, 0)));
-    	cam_view.size.set(screen_to_cam(
-    			new PVector(input.app.width, input.app.height)).sub(cam_view.pos)); 
-      nRunnable.runEvents(eventsZoom);
-      nRunnable.runEvents(eventsMove); }});
-    cam_view = new Rect(0, 0, input.app.width, input.app.height);
-    cam_view.pos.set(screen_to_cam(new PVector(0, 0)));
-    cam_view.size.set(screen_to_cam(
-    		new PVector(input.app.width, input.app.height)).sub(cam_view.pos));
+    cam_pos.addEventChange(up_view_run);
+    cam_view = new Rect();
+    up_view_run.run();
+    
+//    cam_view.pos.set(screen_to_cam(
+//    		new PVector(input.app.screen_0_x, input.app.screen_0_y)));
+//    cam_view.size.set(screen_to_cam(
+//    		new PVector(input.app.screen_width, input.app.screen_height))); //.sub(cam_view.pos)
   }
 
   ArrayList<nRunnable> eventsZoom = new ArrayList<nRunnable>();
@@ -70,13 +78,14 @@ public class Camera {
 
   void pushCam() {
 	input.app.pushMatrix();
-	input.app.translate(input.app.width / 2, (input.app.height) / 2);
+	input.app.translate(input.app.screen_width / 2 + input.app.screen_0_x, 
+			(input.app.screen_height) / 2 + input.app.screen_0_y);
 	input.app.scale(cam_scale.get());
 	input.app.translate((cam_pos.x() / cam_scale.get()), (cam_pos.y() / cam_scale.get()));
     matrixPushed = true;
 
     if (grid.get() && cam_scale.get() > 0.0008) {
-      int spacing = 200;
+      float spacing = cam_grid_spacing.get();
       if (cam_scale.get() > 2) spacing /= 5;
       if (cam_scale.get() < 0.2) spacing *= 5;
       if (cam_scale.get() < 0.04) spacing *= 5;
@@ -86,7 +95,7 @@ public class Camera {
       PVector s = screen_to_cam(new PVector(-spacing * cam_scale.get(), -spacing * cam_scale.get()));
       s.x -= s.x%spacing; 
       s.y -= s.y%spacing;
-      PVector m = screen_to_cam( new PVector(input.app.width, input.app.height) );
+      PVector m = screen_to_cam( new PVector(input.app.screen_width, input.app.screen_height) );
       for (float x = s.x; x < m.x; x += spacing) {
         if ( ( (x-(x%spacing)) / spacing) % 5 == 0 ) input.app.stroke(100); 
         else input.app.stroke(70);
@@ -124,31 +133,21 @@ public class Camera {
     if (input.getClick("MouseLeft") && GRAB) grabbed = true; 
     if (!input.getState("MouseLeft") && grabbed) grabbed = false; 
     if (input.getState("MouseLeft") && grabbed) { 
-      cam_pos.add((mouse.x - pmouse.x)*cam_scale.get(), (mouse.y - pmouse.y)*cam_scale.get());
-      cam_view.pos.set(screen_to_cam(new PVector(0, 0)));
-      cam_view.size.set(screen_to_cam(
-    		  new PVector(input.app.width, input.app.height)).sub(cam_view.pos));
-      nRunnable.runEvents(eventsMove);
+      cam_pos.add((mouse.x - pmouse.x)*cam_scale.get(), 
+    		  		  (mouse.y - pmouse.y)*cam_scale.get());
+      up_view_run.run();
     }
 
     //permet le zoom
-    if (input.mouseWheelUp && GRAB) { 
+    if (input.mouseWheelUp && GRAB && cam_scale.get() > min_scale) { 
       cam_scale.set(cam_scale.get()*1/ZOOM_FACTOR); 
       cam_pos.mult(1/ZOOM_FACTOR); 
-      cam_view.pos.set(screen_to_cam(new PVector(0, 0)));
-      cam_view.size.set(screen_to_cam(
-    		  new PVector(input.app.width, input.app.height)).sub(cam_view.pos));
-      nRunnable.runEvents(eventsMove);
-      nRunnable.runEvents(eventsZoom);
+      up_view_run.run();
     }
-    if (input.mouseWheelDown && GRAB) {
+    if (input.mouseWheelDown && GRAB && cam_scale.get() < max_scale) {
       cam_scale.set(cam_scale.get()*ZOOM_FACTOR); 
       cam_pos.mult(ZOOM_FACTOR); 
-      cam_view.pos.set(screen_to_cam(new PVector(0, 0)));
-      cam_view.size.set(screen_to_cam(
-    		  new PVector(input.app.width, input.app.height)).sub(cam_view.pos));
-      nRunnable.runEvents(eventsMove);
-      nRunnable.runEvents(eventsZoom);
+      up_view_run.run();
     }
   }
 
@@ -159,7 +158,8 @@ public class Camera {
       r.y = input.app.screenY(p.x, p.y);
     } else {
     	input.app.pushMatrix();
-    	input.app.translate(input.app.width / 2, input.app.height / 2);
+    	input.app.translate(input.app.screen_width / 2 + input.app.screen_0_x, 
+    			input.app.screen_height / 2 + input.app.screen_0_y);
       input.app.scale(cam_scale.get());
       input.app.translate((cam_pos.x() / cam_scale.get()), (cam_pos.y() / cam_scale.get()));
 
@@ -177,20 +177,22 @@ public class Camera {
     	input.app.pushMatrix();
     	input.app.translate(-(cam_pos.x() / cam_scale.get()), -(cam_pos.y() / cam_scale.get()));
     	input.app.scale(1/cam_scale.get());
-    	input.app.translate(-input.app.width / 2, -input.app.height / 2);
+    	input.app.translate(-input.app.screen_width / 2  - input.app.screen_0_x, 
+    			-input.app.screen_height / 2 - input.app.screen_0_y);
 
       input.app.translate(-(cam_pos.x() / cam_scale.get()), -(cam_pos.y() / cam_scale.get()));
       input.app.scale(1/cam_scale.get());
-      input.app.translate(-input.app.width / 2, -input.app.height / 2);
+      input.app.translate(-input.app.screen_width / 2, -input.app.screen_height / 2);
 
       r.x = input.app.screenX(p.x, p.y); 
-      r.y = input.app.screenY(p.x, p.y);
+      r.y = input.app.screenY(p.x, p.y); 
       input.app.popMatrix();
     } else {
     	input.app.pushMatrix();
       input.app.translate(-(cam_pos.x() / cam_scale.get()), -(cam_pos.y() / cam_scale.get()));
       input.app.scale(1/cam_scale.get());
-      input.app.translate(-input.app.width / 2, -input.app.height / 2);
+      input.app.translate(-input.app.screen_width / 2 - input.app.screen_0_x, 
+    		  -input.app.screen_height / 2 - input.app.screen_0_y);
       r.x = input.app.screenX(p.x, p.y); 
       r.y = input.app.screenY(p.x, p.y);
       input.app.popMatrix();

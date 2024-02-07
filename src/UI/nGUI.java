@@ -35,8 +35,10 @@ Global GUI Theme
 public class nGUI {
   public nGUI setMouse(PVector v) { mouseVector = v; return this; }
   public nGUI setpMouse(PVector v) { pmouseVector = v; return this; }
-  public nGUI setView(Rect v) { view = v; scale = app.base_width / view.size.x; return this; }
-  public nGUI updateView() { scale = app.base_width / view.size.x; return this; }
+  public nGUI setView(Rect v) { view = v; updateView(); return this; }
+  public nGUI updateView() { 
+	  scale = app.screen_width / view.size.x; 
+	  return this; }
   public nGUI setTheme(nTheme v) { theme = v; return this; }
   public nGUI addEventFrame(nRunnable r) { eventsFrame.add(r); return this; }
   public nGUI removeEventFrame(nRunnable r) { eventsFrame.remove(r); return this; }
@@ -50,11 +52,11 @@ public class nGUI {
     app = in.app;
     mouseVector = in.mouse; pmouseVector = in.pmouse;
     ref_size = _ref_size;
-    view = new Rect(0, 0, app.width, app.height);
+//    view = new Rect(0, 0, app.width, app.height);
     info = new nInfo(this, ref_size*0.75F);
-    addEventsFullScreen(new nRunnable(this) { public void run() { 
-      view.size.set(app.width, app.height); updateView();
-    } } );
+//    addEventsFullScreen(new nRunnable(this) { public void run() { 
+//      view.size.set(app.width, app.height); updateView();
+//    } } );
   }
   
   public sInput in;

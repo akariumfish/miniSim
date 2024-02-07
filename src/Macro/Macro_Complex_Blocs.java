@@ -1738,7 +1738,7 @@ class MMenu extends Macro_Bloc {
     menu_tab = newInt("menu_tab", "menu_tab", 0);
     menu_pos = newVec("menu_pos", "menu_pos");
     //addEmptyS(1);
-    Macro_Element e = addEmptyS(0);
+    Macro_Element e = addEmptyS(1);
     e.addCtrlModel("MC_Element_SButton", "menu").setRunnable(new nRunnable() { public void run() {
       menu(); 
       grab_run.run();

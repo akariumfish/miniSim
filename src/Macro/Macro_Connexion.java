@@ -153,7 +153,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     ref_draw = new Drawable(gui.drawing_pile, 0) { 
       public void drawing() {
         //logln("draw " + descr + " sheet " + sheet.value_bloc.ref + " op " + sheet.openning.get());
-        if (
+        if (ref.isViewable() && 
             isDraw()
             ) {
           if (lens.isClicked) app.fill(ref.look.pressColor);
@@ -185,34 +185,36 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
             app.ellipse(newLine.x, newLine.y, 
                     getSize(), getSize() );
           }
-          for (Macro_Connexion m : connected_inputs) {
-            if (gui.scale > 0.03 && 
-                m.isDraw()
-                ) {
-              if (RConst.distancePointToLine(elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
-                  getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
-                  3 * ref.look.outlineWeight / gui.scale) { 
-                if (pack_info != null && hasSend > 0) elem.bloc.mmain().info.showText(pack_info);
-                app.fill(ref.look.outlineSelectedColor); app.stroke(ref.look.outlineSelectedColor); } 
-              else if (sending || hasSend > 0) { app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); }
-              else { app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); }
-              app.strokeWeight(ref.look.outlineWeight);
-              PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
-              PVector lm = new PVector(l.x, l.y);
-              lm.setMag(getSize()/2);
-              app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
-                   getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
-            }
-          }
-          if (hasSend > 0) hasSend--;
-          if (hasReceived > 0) hasReceived--;
+          
         }
+        for (Macro_Connexion m : connected_inputs) {
+        if (gui.scale > 0.03 && 
+            m.isDraw()
+            ) {
+          if (RConst.distancePointToLine(elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
+              getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
+              3 * ref.look.outlineWeight / gui.scale) { 
+            if (pack_info != null && hasSend > 0) elem.bloc.mmain().info.showText(pack_info);
+            app.fill(ref.look.outlineSelectedColor); app.stroke(ref.look.outlineSelectedColor); } 
+          else if (sending || hasSend > 0) { app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); }
+          else { app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); }
+          app.strokeWeight(ref.look.outlineWeight);
+          PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
+          PVector lm = new PVector(l.x, l.y);
+          lm.setMag(getSize()/2);
+          app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+               getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
+          }
+        }
+        if (hasSend > 0) hasSend--;
+        if (hasReceived > 0) hasReceived--;
       }
     };
     ref = addModel("MC_Connect_Link")
       .setSize(ref_size*4/16, ref_size*4/16)
       .setPosition(-ref_size*6/16, ref_size*6/16)
-      .setDrawable(ref_draw);
+      .setDrawable(ref_draw)
+      .setFineView(true);
     if (_info != null) lens.setInfo(_info);
     infoText = RConst.copy(_info);
     ref.setParent(elem.back);
@@ -251,8 +253,9 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   }
   
   boolean isDraw() {
-    return sheet.mmain().show_macro.get() && ( (!is_sheet_co && sheet.openning.get() == DEPLOY)
-            || (is_sheet_co && elem.spot != null && sheet.openning.get() == DEPLOY)
+    return sheet.mmain().show_macro.get() && ( 
+    			(!is_sheet_co && sheet.openning.get() == DEPLOY) || 
+            (is_sheet_co && elem.spot != null && sheet.openning.get() == DEPLOY)
             );
   }
   

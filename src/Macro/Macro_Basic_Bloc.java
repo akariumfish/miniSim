@@ -72,9 +72,11 @@ class MCursor extends MBasic {
 	    sheet.sheet_cursors_list.add(cursor);
 	    sheet.cursor_count++;
 	    
-	    setPosition(pval.get().x - sheet.grabber.getX(), 
-					pval.get().y - sheet.grabber.getY());
-	    moving();	
+	    if (!(pval.x() == 0 && pval.y() == 0)) {
+		    setPosition(pval.get().x - sheet.grabber.getX(), 
+						pval.get().y - sheet.grabber.getY());
+		    moving();	
+	    }
 	    
 	    cursor.addEventClear(new nRunnable(cursor) { public void run() { 
 	        sheet.sheet_cursors_list.remove(((nCursor)builder));
@@ -82,15 +84,17 @@ class MCursor extends MBasic {
 	      sheet.cursor_count--;
 	      mmain().update_cursor_selector_list(); }});
 	    
-	    grabber.addEventDrag(new nRunnable() { public void run() {
-	    	if (cursor.pval != null) cursor.pval.set(grabber.getX(), grabber.getY());
+	    grab_pos.addEventChange(new nRunnable() { public void run() {
+	    		if (cursor.pval != null) cursor.pval.set(
+	    				grab_pos.get().x + sheet.grabber.getX(), 
+	    				grab_pos.get().y + sheet.grabber.getY());
 	    } });
 	    pval_run = new nRunnable() { public void run() {
-	    	if (sheet != mmain())
-	    	setPosition(cursor.pval.get().x - sheet.grabber.getX(), 
-	    			cursor.pval.get().y - sheet.grabber.getY());
-	    	else if (cursor.pval != null) setPosition(cursor.pval.get().x, cursor.pval.get().y);
-	    	moving();
+		    	if (sheet != mmain())
+			    	setPosition(cursor.pval.get().x - sheet.grabber.getX(), 
+			    				cursor.pval.get().y - sheet.grabber.getY());
+		    	else setPosition(cursor.pval.get().x, cursor.pval.get().y);
+		    	moving();
 		}};
 		cursor.pval.addEventChange(pval_run);
 	    
@@ -105,10 +109,11 @@ class MCursor extends MBasic {
 	    }
 	}
 	void build_param() {
-		addSwitchS(1, "show", show);
+		
 	}
 	void build_normal() {
-		
+		addEmptyS(0);
+		addSwitchS(1, "show", show);
 	}
 	public MCursor clear() {
 		super.clear(); 
@@ -142,52 +147,35 @@ class MBasic extends Macro_Bloc {
     
     param_view = newBoo("com_param_view", "com_param_view", false);
     
-    //addEmpty(1);
-    elem_com = addEmptyS(0);
-    param_ctrl = elem_com.addLinkedModel("MC_Element_SButton", "Param");
-    param_ctrl.setSwitch()
-      .setSwitchState(param_view.get())
-      ;
-    param_ctrl.setInfo("show param");
-    pview_run = new nRunnable() { public void run() { 
-      param_view.set(!param_view.get());
-      rebuild();
-    } };
-    param_ctrl.addEventSwitchOn(pview_run);
-    param_ctrl.addEventSwitchOff(pview_run);
+    get_param_openner().setRunnable(new nRunnable() { public void run() { 
+        param_view.set(!param_view.get());
+        rebuild();
+      } });
     init();
     if (param_view.get()) build_param();
    	build_normal();
   }
   void init() { ; }
-  void build_param() { addEmptyS(1); }
-  void build_normal() { addEmptyS(1); }
-  Macro_Abstract mv;
-  boolean was_select = false;
-  Macro_Sheet prev_sheet = null;
-  ArrayList<Macro_Abstract> prev_selected = new ArrayList<Macro_Abstract>();
+  void build_param() { addEmptyS(0); addEmptyS(1); }
+  void build_normal() { addEmptyS(0); addEmptyS(1); }
+  
   void rebuild() {
     if (!rebuilding) {
       rebuilding = true;
       
-      was_select = mmain().selected_macro.contains(this);
+      boolean was_select = mmain().selected_macro.contains(this);
       
-      prev_selected.clear();
+      ArrayList<Macro_Abstract> prev_selected = new ArrayList<Macro_Abstract>();
       for(Macro_Abstract m : mmain().selected_macro) if (m != this) prev_selected.add(m);
       
       sValueBloc _bloc = mmain().inter.data.copy_bloc(value_bloc, mmain().inter.data);
       clear();
       sValueBloc v_bloc = mmain().inter.data.copy_bloc(_bloc, sheet.value_bloc);
-      mv = sheet.addByValueBloc(v_bloc); 
+      Macro_Abstract mv = sheet.addByValueBloc(v_bloc); 
       
-      mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-        mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-          mmain().szone_clear_select();
-          for(Macro_Abstract m : prev_selected) m.szone_select();
-          if (was_select) mv.szone_select();
-          prev_selected.clear();
-        } } );
-      } } );
+      mmain().szone_clear_select();
+      for(Macro_Abstract m : prev_selected) m.szone_select();
+      if (was_select) mv.szone_select();
     }
   }
   public MBasic clear() {
@@ -231,18 +219,30 @@ class MComment extends MBasic {
       elem_param = addEmptyL(1);
       w_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_1", "W-")
         .setRunnable(new nRunnable() { public void run() { 
-        if (w_f.get() > 3.875) {
-          w_f.set(3.875);
-          rebuild();
-        }
-      } });
+	        if (w_f.get() > 3.875) {
+			  w_f.set(3.875);
+			  rebuild();
+			  return;
+			}
+            if (w_f.get() > 	1.375) {
+      	      w_f.set(1.375);
+      	      rebuild();
+      		  return;
+	      	    }
+        } });
       w_add = elem_param.addCtrlModel("MC_Element_Button_Selector_2", "W+")
         .setRunnable(new nRunnable() { public void run() { 
-        if (w_f.get() < 5.75) {
-          w_f.set(5.75);
-          rebuild();
-        }
-      } });
+	        if (w_f.get() < 3.875) {
+	            w_f.set(3.875);
+	            rebuild();
+	            return;
+	        } 
+	        if (w_f.get() < 5.75) {
+		        w_f.set(5.75);
+		        rebuild();
+		  		return;
+	        }
+        } });
       h_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_3", "H-")
         .setRunnable(new nRunnable() { public void run() { 
         if (h_f.get() > 1.125) {
@@ -262,7 +262,6 @@ class MComment extends MBasic {
 	}
 	void build_normal() {
 		addEmptyS(1);
-	    if (w_f.get() >= 2) addEmptyS(1);
 	    if (h_f.get() > 1) addEmptyS(1);
 	    if (h_f.get() > 2) addEmptyS(1);
 	    if (h_f.get() > 4) addEmptyS(1);
@@ -285,6 +284,10 @@ class MComment extends MBasic {
 
 
 
+
+
+
+
 class MSheetObj extends Macro_Bloc { 
 	static class MSheetObj_Builder extends MAbstract_Builder {
 		  MSheetObj_Builder() { super("sheet obj", "send his sheet as packet"); show_in_buildtool = true; }
@@ -299,10 +302,9 @@ class MSheetObj extends Macro_Bloc {
     get_run = new nRunnable() { public void run() {
       out.send(Macro_Packet.newPacketSheet(sheet));
     }};
-    addTrigSwtchS(0, "st", setup_send, "get", get_run);
     in = addInputBang(0, "get", get_run);
-    addEmptyS(1);
     out = addOutput(1, "out");
+    addTrigSwtchS(0, "st", setup_send, "get", get_run);
     if (setup_send.get()) get_run.run();
   }
   public MSheetObj clear() {
@@ -312,6 +314,13 @@ class MSheetObj extends Macro_Bloc {
     super.toLayerTop(); 
     return this; }
 }
+
+
+
+
+
+
+
 class MValue extends MBasic { 
 	static 
 	class MValue_Builder extends MAbstract_Builder {
@@ -325,22 +334,25 @@ class MValue extends MBasic {
   sValue cible;
   nCtrlWidget picker, pop_pan;
   nWatcherWidget val_field;
-  MValue(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "svalue", _bloc); 
-    val_cible = newStr("cible", "cible", "");
-    setup_send = newBoo("stp_snd", "stp_snd", false);
-    get_cible();
-    get_run = new nRunnable() { public void run() {
-      if (cible != null) out.send(cible.asPacket());
-    }};
-    addTrigSwtchS(1, "st", setup_send, "get", get_run);
-    in = addInputBang(0, "get", get_run);
-    //addEmptyS(1);
-    out = addOutput(1, "out");
-    if (setup_send.get()) get_run.run();
+  MValue(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "svalue", _bloc); }
+  void init() {
+	    val_cible = newStr("cible", "cible", "");
+	    setup_send = newBoo("stp_snd", "stp_snd", false);
+	    get_cible();
+	    get_run = new nRunnable() { public void run() {
+	      if (cible != null) out.send(cible.asPacket());
+	    }};
+	    if (setup_send.get()) get_run.run();
   }
+  void build_normal() { 
+	    addTrigSwtchS(1, "st", setup_send, "get", get_run);
+	    in = addInputBang(0, "get", get_run);
+	    //addEmptyS(1);
+	    out = addOutput(1, "out");
+  }
+
   void build_param() { 
-    Macro_Element e = addEmptyS(1);
+    Macro_Element e = addEmptyS(0);
     picker = e.addCtrlModel("MC_Element_SButton", "pick").setRunnable(new nRunnable() { public void run() {
       new nValuePicker(mmain().screen_gui, mmain().inter.taskpanel, val_cible, sheet.value_bloc, true)
         .addEventChoose(new nRunnable() { public void run() { get_cible(); } } );
@@ -363,7 +375,7 @@ class MValue extends MBasic {
     } }); 
     addEmpty(1);
     val_field = addEmptyL(0).addWatcherModel("MC_Element_Text");
-    addEmpty(0);
+    addEmpty(1);
   }
   void get_cible() {
     if (val_field != null) val_field.setLook(gui.theme.getLook("MC_Element_Text")).setText("");
@@ -379,6 +391,14 @@ class MValue extends MBasic {
     super.toLayerTop(); 
     return this; }
 }
+
+
+
+
+
+
+
+
 
 class MData extends Macro_Bloc {
   boolean inib_send = false;
@@ -607,14 +627,14 @@ class MSheetView extends Macro_Bloc {
       if (gui.view.size.x / sheet.back.getLocalSX() < gui.view.size.y / sheet.back.getLocalSY())
         ns *= gui.view.size.x / sheet.back.getLocalSX();
       else ns *= gui.view.size.y / sheet.back.getLocalSY();
-      ns = Math.min(1.5F, ns);
+      ns = Math.min(1.0F, ns);
       ns = Math.max(0.03F, ns);
       mmain().inter.cam.cam_scale.set(ns);
       mmain().inter.cam.cam_pos
         .set(-(sheet.back.getX() + sheet.back.getLocalSX()/2) * mmain().inter.cam.cam_scale.get(), 
              -(sheet.back.getY() + sheet.back.getLocalSY()/2) * mmain().inter.cam.cam_scale.get() );
     }};
-    addTrigS(0, "goto", goto_run);
+    addTrigS(1, "goto", goto_run);
     in = addInput(0, "goto", new nRunnable() { public void run() { 
       if (in.lastPack().isBang()) goto_run.run(); }});
   }
@@ -794,7 +814,7 @@ class MSheetIn extends Macro_Bloc {
   MSheetIn(Macro_Sheet _sheet, sValueBloc _bloc) { 
     super(_sheet, "in", "in", _bloc); 
     val_view = newStr("val", "val", "");
-    view = addEmptyS(0).addLinkedModel("MC_Element_SField");
+    view = addEmptyS(1).addLinkedModel("MC_Element_SField");
     view.addEventFieldChange(new nRunnable() { public void run() { 
       elem.sheet_connect.setInfo(val_view.get());
     } });
@@ -820,7 +840,7 @@ class MSheetOut extends Macro_Bloc {
       elem.sheet_connect.setInfo(val_view.get());
     } });
     view.setLinkedValue(val_view);
-    elem = addSheetOutput(0, "out");
+    elem = addSheetOutput(1, "out");
     if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
     //val_title.addEventChange(new nRunnable() { public void run() { 
     //if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_title.get()); } });

@@ -87,10 +87,11 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
   }
   void group_move(float x, float y) { 
     grabber.setPY(grabber.getLocalY() + y); grabber.setPX(grabber.getLocalX() + x); }
+  Macro_Abstract setPosition(double x, double y) { return setPosition((float)x, (float)y); }
   Macro_Abstract setPosition(float x, float y) { 
-    grab_pos.doEvent(false);
-    grabber.setPosition(x, y); grab_pos.set(x, y);
-    grab_pos.doEvent(true);
+//    grab_pos.doEvent(false);
+    grabber.setPosition(x, y); //grab_pos.set(x, y);
+//    grab_pos.doEvent(true);
     return this; }
   Macro_Abstract setParent(Macro_Sheet s) { grabber.clearParent(); grabber.setParent(s.grabber); return this; }
   public Macro_Abstract toLayerTop() { 
@@ -121,13 +122,14 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     sheet_depth = sheet.sheet_depth + 1;
     
     if (_bloc == null) {
+    	
       String n_suff = "";
-      if (n == null) n_suff = ty;
+      if (n == null || n.equals("")) n_suff = ty;
       else n_suff = n;
       String n_ref = "0_" + n_suff;
-      if (sheet == mmain() && mmain().child_sheet != null && mmain().child_sheet.size() == 0 ) {
-        
-      } else {
+//      if (sheet == mmain() && mmain().child_sheet != null && mmain().child_sheet.size() == 0 ) {
+//        
+//      } else {
         int cn = -1;
         n_ref = cn + "_" + n_suff;
         //mlogln(n_suff + " search new name");
@@ -152,7 +154,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
           
         }
         //mlogln(n_ref + " found his name");
-      }
+//      }
       value_bloc = sheet.value_bloc.newBloc(n_ref);
       
     } else value_bloc = _bloc;
@@ -184,8 +186,8 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     		  					   (float)(mmain().screen_gui.view.pos.y + mmain().screen_gui.view.size.y / 3.0) );
       sc_pos = mmain().inter.cam.screen_to_cam(sc_pos);
       grab_pos.set(sc_pos.x - sheet.grabber.getX(), sc_pos.y - sheet.grabber.getY());
-      grab_pos.setx(grab_pos.x() - grab_pos.x()%(ref_size * 0.5));
-      grab_pos.sety(grab_pos.y() - grab_pos.y()%(ref_size * 0.5));
+      grab_pos.setx(grab_pos.x() - grab_pos.x()%(ref_size * GRID_SNAP_FACT));
+      grab_pos.sety(grab_pos.y() - grab_pos.y()%(ref_size * GRID_SNAP_FACT));
     }
     
     if (openning == null) openning = setting_bloc.newInt("open", "op", OPEN);
@@ -241,8 +243,8 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
       .setLinkedValue(grab_pos);
       
     grabber.clearParent().addEventDrag(new nRunnable(this) { public void run() { 
-      grabber.setPY(grabber.getLocalY() - grabber.getLocalY()%(ref_size * 0.5));
-      grabber.setPX(grabber.getLocalX() - grabber.getLocalX()%(ref_size * 0.5));
+      grabber.setPY(grabber.getLocalY() - grabber.getLocalY()%(ref_size * GRID_SNAP_FACT));
+      grabber.setPX(grabber.getLocalX() - grabber.getLocalX()%(ref_size * GRID_SNAP_FACT));
       
       if (mmain().selected_macro.contains(((Macro_Abstract)builder)))
         for (Macro_Abstract m : mmain().selected_macro) if (m != ((Macro_Abstract)builder))
@@ -286,6 +288,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     prio_view.setParent(panel);
     prio_view.stackUp().alignRight().setInfo("priority");
     
+
     title = addLinkedModel("MC_Title").setLinkedValue(val_title);
     title.addEventFieldChange(new nRunnable() { public void run() { title.setOutline(true); } });
     title.clearParent().setParent(panel);
@@ -328,11 +331,11 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     
   }
   void init_end() {
-	  if (openning.get() == REDUC) { /*deploy(); */openning.set(OPEN); reduc(); }
-      else if (openning.get() == OPEN) { /*deploy();*/ openning.set(REDUC); open(); }
-      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); /*deploy();*/ hide(); }
+	  if (openning.get() == REDUC) { openning.set(OPEN); reduc(); }
+      else if (openning.get() == OPEN) { openning.set(REDUC); open(); }
+      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); hide(); }
       else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
-      if (!pos_given) find_place(); 
+      if (!pos_given) find_place(panel); 
       if (!is_cleared && openning.get() != HIDE && !mmain().is_paste_loading) { 
         mmain().szone_clear_select();
         szone_select();
@@ -343,41 +346,66 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
       nRunnable.runEvents(eventsSetupLoad); 
       toLayerTop(); 
   }
-  void find_place() {
-    grabber.setPY(grabber.getLocalY() - grabber.getLocalY()%(ref_size * 0.5));
-    grabber.setPX(grabber.getLocalX() - grabber.getLocalX()%(ref_size * 0.5));
-    
-    int adding_v = 0;
+  void find_place(nWidget collide_cible) {
+	  
+	PVector sc_pos = new PVector(mmain().screen_gui.view.pos.x + mmain().screen_gui.view.size.x * 1.0F / 2.0F, 
+								mmain().screen_gui.view.pos.y + mmain().screen_gui.view.size.y / 2.0F);
+	sc_pos = mmain().inter.cam.screen_to_cam(sc_pos);
+	grabber.setPosition(sc_pos.x - sheet.grabber.getX(), sc_pos.y - sheet.grabber.getY());
+	grabber.setPY(grabber.getLocalY() - grabber.getLocalY()%(ref_size * GRID_SNAP_FACT));
+	grabber.setPX(grabber.getLocalX() - grabber.getLocalX()%(ref_size * GRID_SNAP_FACT));
+
+	int adding_dir_x = -1;
+	int adding_dir_y = 0;
+	int adding_side_l = 1;
+	int adding_side_cnt = 0;
+    int adding_count = 0;
+    float phf = 0.75F;
+    float move_fct = Math.max(collide_cible.getPhantomRect().size.x, collide_cible.getPhantomRect().size.y);
+    move_fct /= ref_size;
+    move_fct = move_fct - move_fct%GRID_SNAP_FACT + 3*GRID_SNAP_FACT;
     boolean found = false;
     while (!found) {
-      if (adding_v > 0) setPosition(grabber.getLocalX() - ref_size * 3, grabber.getLocalY());
-      adding_v++; 
-      if (adding_v == 6) { 
-        adding_v = 0; setPosition(grabber.getLocalX() + ref_size * 15, grabber.getLocalY() + ref_size * 3); }
       boolean col = false;
-      float phf = 0.5F;
       for (Macro_Abstract c : sheet.child_macro) 
         if (c != this && c.openning.get() == DEPLOY 
-            && Rect.rectCollide(panel.getRect(), c.back.getRect(), ref_size * phf)) col = true;
+            && Rect.rectCollide(collide_cible.getRect(), c.back.getRect(), ref_size * phf)) col = true;
         else if (c != this && c.openning.get() == REDUC 
-                 && Rect.rectCollide(panel.getRect(), c.grabber.getRect(), ref_size * phf)) col = true;
+                 && Rect.rectCollide(collide_cible.getRect(), c.grabber.getRect(), ref_size * phf)) col = true;
         else if (c != this && c.openning.get() == OPEN 
-                 && Rect.rectCollide(panel.getRect(), c.panel.getRect(), ref_size * phf)) col = true;
+                 && Rect.rectCollide(collide_cible.getRect(), c.panel.getRect(), ref_size * phf)) col = true;
         else if (c != this && c.openning.get() == HIDE && c.openning_pre_hide.get() == DEPLOY
-                 && Rect.rectCollide(panel.getPhantomRect(), c.back.getPhantomRect(), ref_size * phf)) col = true;
+                 && Rect.rectCollide(collide_cible.getPhantomRect(), c.back.getPhantomRect(), ref_size * phf)) col = true;
         else if (c != this && c.openning.get() == HIDE && c.openning_pre_hide.get() == REDUC
-                 && Rect.rectCollide(panel.getPhantomRect(), c.grabber.getPhantomRect(), ref_size * phf)) col = true;
+                 && Rect.rectCollide(collide_cible.getPhantomRect(), c.grabber.getPhantomRect(), ref_size * phf)) col = true;
         else if (c != this && c.openning.get() == HIDE && c.openning_pre_hide.get() == OPEN
-                 && Rect.rectCollide(panel.getPhantomRect(), c.panel.getPhantomRect(), ref_size * phf)) col = true;
+                 && Rect.rectCollide(collide_cible.getPhantomRect(), c.panel.getPhantomRect(), ref_size * phf)) col = true;
       if (sheet != mmain() && openning.get() == HIDE 
-          && Rect.rectCollide(panel.getPhantomRect(), sheet.panel.getPhantomRect(), ref_size * phf*2)) col = true;
+          && Rect.rectCollide(collide_cible.getPhantomRect(), sheet.panel.getPhantomRect(), ref_size * phf*2)) col = true;
       if (sheet != mmain() && openning.get() != HIDE 
-          && Rect.rectCollide(panel.getRect(), sheet.panel.getRect(), ref_size * phf*2)) col = true;
+          && Rect.rectCollide(collide_cible.getRect(), sheet.panel.getRect(), ref_size * phf*2)) col = true;
       if (!col) found = true;
+      else {
+    	  	setPosition(grabber.getLocalX() + ref_size * adding_dir_x * move_fct, 
+    	  				grabber.getLocalY() + ref_size * adding_dir_y * move_fct);
+    	  	adding_count++;
+    	  	if (adding_count >= adding_side_l) {
+    	  		adding_count = 0;
+    	  		if (adding_dir_x == 0) { adding_dir_x = adding_dir_y; adding_dir_y = 0; }
+    	  		else { adding_dir_y = adding_dir_x; adding_dir_x = 0; }
+    	  		adding_side_cnt++;
+    	  		if (adding_side_cnt >= 2) {
+    	  			adding_side_cnt = 0;
+    	  			adding_side_l++;
+    	  			adding_dir_x *= -1;
+    	  			adding_dir_y *= -1;
+    	  		}
+    	  	}
+      }
     }
     sheet.updateBack();
   }
-  private boolean is_cleared = false;
+  protected boolean is_cleared = false;
   public Macro_Abstract clear() {
     if (!unclearable) {
     	is_cleared = true;

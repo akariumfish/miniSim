@@ -223,7 +223,7 @@ nExplorer sheet_explorer;
           .setRunnable(new nRunnable() { public void run() { inter.full_screen_run.run(); }})
           .setInfo("Switch Fullscreen").setFont((int)(ref_size/1.9));
     if (!show_macro_tool.get()) macro_tool.reduc();
-    macro_tool.setPos(app.window_head);
+//    macro_tool.setPos(app.window_head);
     macro_tool.addEventReduc(new nRunnable() { public void run() { 
       show_macro_tool.set(!macro_tool.hide); }});
     
@@ -290,7 +290,7 @@ nExplorer sheet_explorer;
     if (!show_build_tool.get()) build_tool.reduc();
     build_tool.addEventReduc(new nRunnable() { public void run() { 
       show_build_tool.set(!build_tool.hide); }});
-    build_tool.setPos(gui.app.window_head + ref_size*1.25);
+    build_tool.setPos(ref_size*1.25);
     
     if (sheet_tool != null) sheet_tool.clear();
     sheet_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
@@ -597,32 +597,31 @@ nExplorer sheet_explorer;
   void paste_tmpl(sValueBloc bloc) {
     //save adding pos
     PVector prevs_gr_p = new PVector(); //def center
-    boolean to_empty_sheet = selected_sheet.child_macro.size() == 0;
-    if (selected_macro.size() > 0) { //use last selected med pos
-      prevs_gr_p.set(select_grab_widg.getX(), select_grab_widg.getY());
-      prevs_gr_p = inter.cam.screen_to_cam(prevs_gr_p);
-    } else if (show_macro.get() && !to_empty_sheet) { //use screen point
-      //PVector sc_pos = new PVector(mmain().screen_gui.view.pos.x + mmain().screen_gui.view.size.x * 1.0 / 2.0, 
-      //                             mmain().screen_gui.view.pos.y + mmain().screen_gui.view.size.y / 3.0);
-      //sc_pos = mmain().inter.cam.screen_to_cam(sc_pos);
-      //sc_pos.x = (sc_pos.x - sc_pos.x%(ref_size * 0.5));
-      //sc_pos.y = (sc_pos.y - sc_pos.y%(ref_size * 0.5));
-      //prevs_gr_p.set(sc_pos.x - selected_sheet.grabber.getX(), sc_pos.y - selected_sheet.grabber.getY());
-      //prevs_gr_p.x = (prevs_gr_p.x - prevs_gr_p.x%(ref_size * 0.5));
-      //prevs_gr_p.y = (prevs_gr_p.y - prevs_gr_p.y%(ref_size * 0.5));
-    }
+//    boolean to_empty_sheet = selected_sheet.child_macro.size() == 0;
+//    if (selected_macro.size() > 0) { //use last selected med pos
+//      prevs_gr_p.set(select_grab_widg.getX(), select_grab_widg.getY());
+//      prevs_gr_p = inter.cam.screen_to_cam(prevs_gr_p);
+//    } else 
+//    	if (show_macro.get() && !to_empty_sheet) { //use screen point
+      PVector sc_pos = new PVector(mmain().screen_gui.view.pos.x + mmain().screen_gui.view.size.x * 1.0F / 2.0F, 
+                                   mmain().screen_gui.view.pos.y + mmain().screen_gui.view.size.y / 2.0F);
+      sc_pos = mmain().inter.cam.screen_to_cam(sc_pos);
+      prevs_gr_p.set(sc_pos.x - selected_sheet.grabber.getX(), sc_pos.y - selected_sheet.grabber.getY());
+      prevs_gr_p.x = (prevs_gr_p.x - prevs_gr_p.x%(ref_size * GRID_SNAP_FACT));
+      prevs_gr_p.y = (prevs_gr_p.y - prevs_gr_p.y%(ref_size * GRID_SNAP_FACT));
+//    }
     
     //add macros and select them
     szone_clear_select();
     is_paste_loading = true;
     selected_sheet.addCopyofBlocContent(bloc, true); //true: will select 
     
-    if (to_empty_sheet) { 
-      szone_clear_select(); 
-      //selected_sheet.szone_select(); 
-      prevs_gr_p.set(select_grab_widg.getX(), select_grab_widg.getY());
-      prevs_gr_p = inter.cam.screen_to_cam(prevs_gr_p);
-    }
+//    if (to_empty_sheet) { 
+//      szone_clear_select(); 
+//      //selected_sheet.szone_select(); 
+//      prevs_gr_p.set(select_grab_widg.getX(), select_grab_widg.getY());
+//      prevs_gr_p = inter.cam.screen_to_cam(prevs_gr_p);
+//    }
     
     //move group to adding pos
     PVector s_gr_p = new PVector(select_grab_widg.getX(), select_grab_widg.getY());
@@ -633,11 +632,18 @@ nExplorer sheet_explorer;
       m.group_move(s_gr_p.x, s_gr_p.y);
   
     //find place
-    int adding_v = 0;
+    int adding_dir_x = -1;
+	int adding_dir_y = 0;
+	int adding_side_l = 1;
+	int adding_side_cnt = 0;
+    int adding_count = 0;
+    float phf = 0.0F;
+    float move_fct = Math.max(select_bound_widg.getPhantomRect().size.x, select_bound_widg.getPhantomRect().size.y);
+    move_fct /= ref_size;
+    move_fct = move_fct - move_fct%GRID_SNAP_FACT + 2 * GRID_SNAP_FACT;
     boolean found = false;
     while (!found) {
       boolean col = false;
-      float phf = 0.0F;
       selected_sheet.updateBack();
       for (Macro_Abstract c : selected_sheet.child_macro) 
         if (!selected_macro.contains(c) && c.openning.get() == DEPLOY 
@@ -660,16 +666,21 @@ nExplorer sheet_explorer;
       
       if (!col) found = true;
       else {
-        if (adding_v > 0) {
-          for (Macro_Abstract m : selected_macro) 
-            m.group_move(-ref_size * 3, 0);
-        }
-        adding_v++; 
-        if (adding_v == 6) { 
-          adding_v = 0; 
-          for (Macro_Abstract m : selected_macro) 
-            m.group_move(ref_size * 15, ref_size*3);
-        }
+	      for (Macro_Abstract m : selected_macro) 
+	    	  	m.group_move(ref_size * adding_dir_x * move_fct, ref_size * adding_dir_y * move_fct);
+	      adding_count++;
+  		  if (adding_count >= adding_side_l) {
+			adding_count = 0;
+			if (adding_dir_x == 0) { adding_dir_x = adding_dir_y; adding_dir_y = 0; }
+			else { adding_dir_y = adding_dir_x; adding_dir_x = 0; }
+			adding_side_cnt++;
+			if (adding_side_cnt >= 2) {
+				adding_side_cnt = 0;
+				adding_side_l++;
+				adding_dir_x *= -1;
+				adding_dir_y *= -1;
+			}
+	  	  }
       }
     }
     selected_sheet.updateBack();
@@ -980,21 +991,6 @@ public Macro_Main(sInterface _int) {
     
     addSpecializedSheet(new SheetPrint());
     
-    //val_scale = menuIntSlide(int(ref_size), 1, 100, "val_scale");
-    //val_scale.addEventChange(new nRunnable(this) { public void run() {
-    //  boolean b = int(ref_size) == val_scale.get();
-    //  ref_size = val_scale.get();
-    //  if (b) inter.quicksave_run.run();
-    //  //if (b) inter.quickload_run.run();
-    //}});
-
-    inter.addEventSetupLoad(new nRunnable() { public void run() { 
-      //ref_size = val_scale.get();
-      //inter.addEventNextFrame(new nRunnable() { public void run() { build_sheet_menu(); } } );
-    } } );
-    
-    
-    
     
     
     szone = new nSelectZone(cam_gui);
@@ -1002,12 +998,13 @@ public Macro_Main(sInterface _int) {
       select_bound_widg.hide();
       select_grab_widg.hide();
       selected_macro.clear();
+    }}).addEventSelecting(new nRunnable(this) { public void run() {
+//      if (selected_sheet == search_sheet) 
+//      inter.addEventNextFrame(new nRunnable() { public void run() { update_select_bound(); } } );
+    	  if (selected_sheet != search_sheet) search_sheet.select();
     }}).addEventEndSelect(new nRunnable(this) { public void run() {
-      if (selected_sheet == search_sheet) 
-        inter.addEventNextFrame(new nRunnable() { public void run() { update_select_bound(); } } );
-      search_sheet.select();
-      search_sheet = ((Macro_Sheet)builder);
-    }});
+	  search_sheet = ((Macro_Sheet)builder);
+	}});
     
     select_bound_widg = addModel("MC_Selection_Front")
       .setLayer(1)
@@ -1024,14 +1021,8 @@ public Macro_Main(sInterface _int) {
       } } )
       .addEventDrag(new nRunnable() { public void run() {
         
-        select_grab_widg.setPY(select_grab_widg.getLocalY()
-                               - select_grab_widg.getLocalY()%(ref_size * (0.5*cam_gui.scale)));
-        select_grab_widg.setPX(select_grab_widg.getLocalX() 
-                               - select_grab_widg.getLocalX()%(ref_size * (0.5*cam_gui.scale)));
-        
         PVector gr_p = new PVector(select_grab_widg.getX(), select_grab_widg.getY());
         
-
         PVector prev_gr_p = new PVector(sgrab_px, sgrab_py);
         gr_p = inter.cam.screen_to_cam(gr_p);
         prev_gr_p = inter.cam.screen_to_cam(prev_gr_p);
@@ -1044,11 +1035,21 @@ public Macro_Main(sInterface _int) {
         
         selected_sheet.updateBack();
         update_select_bound();
+      } } ).addEventLiberate(new nRunnable() { public void run() {
+        
+        for (Macro_Abstract m : selected_macro) {
+            m.setPosition(m.grabber.getLocalX() - m.grabber.getLocalX()%(ref_size * GRID_SNAP_FACT), 
+          		  m.grabber.getLocalY() - m.grabber.getLocalY()%(ref_size * GRID_SNAP_FACT));
+        }
+        
+        selected_sheet.updateBack();
       } } );
     
     _int.addEventNextFrame(new nRunnable() { public void run() { 
-      inter.cam.addEventZoom(new nRunnable() { public void run() { update_select_bound(); } } )
-               .addEventMove(new nRunnable() { public void run() { update_select_bound(); } } );
+      inter.cam.addEventMove(new nRunnable() { public void run() { update_select_bound(); } } );
+
+      inter.cam.cam_grid_spacing.set(ref_size*5*Macro_Main.GRID_SNAP_FACT*3);
+      
     } } );
     
   }
@@ -1109,9 +1110,9 @@ public Macro_Main(sInterface _int) {
       select_bound_widg.setPosition(minx, miny);
       select_bound_widg.setSize(maxx - minx, maxy - miny);
       PVector p = new PVector(minx + (maxx - minx) / 2, miny + (maxy - miny) / 2);
-      p.add(-p.x%ref_size/2, -p.y%ref_size/2);
+//      p.add(-p.x%ref_size/2, -p.y%ref_size/2);
       p = inter.cam.cam_to_screen(p);
-      //p.add(-select_grab_widg.getLocalSX()/2, -select_grab_widg.getLocalSY()/2);
+      p.add(-select_grab_widg.getLocalSX()/2, -select_grab_widg.getLocalSY()/2);
       if (selected_macro.size() > 1 || ref_size * gui.scale < 20) 
         select_grab_widg.show().setPosition(p.x, p.y);
       else select_grab_widg.hide();
@@ -1400,6 +1401,11 @@ public Macro_Main(sInterface _int) {
 	    );
 	  theme.addModel("MC_Prio_Add", theme.newWidget("MC_Prio")
 	    .setPosition(ref_size*0.5, ref_size*0.125)
+	    );
+	  theme.addModel("MC_Param", theme.newWidget("MC_Reduc")
+	    .setSize(ref_size*0.75, ref_size*0.75)
+	    .setPosition(ref_size*1.75, ref_size*0.5)
+	    .alignDown().stackLeft()
 	    );
 	  theme.addModel("MC_Connect_Default", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(140, 140))

@@ -82,6 +82,8 @@ public class nWidget {
     if (p != null) { parent = p; p.childs.add(this); changePosition(); } return this; }
   public nWidget clearParent() { 
     if (parent != null) { parent.childs.remove(this); parent = null; changePosition(); } return this; }
+
+  public nWidget setFineView(boolean d) { fine_view = d; return this; }
   
   public nWidget setText(String s) { if (s != null) { label = s; cursorPos = label.length(); } return this; }
   public nWidget changeText(String s) { label = s; if (cursorPos > label.length()) cursorPos = label.length(); return this; }
@@ -152,6 +154,7 @@ public class nWidget {
     showInfo = w.showInfo; infoText = RConst.str_copy(w.infoText);
     auto_line_return = w.auto_line_return;
     constrainDlength = w.constrainDlength; constrainD = w.constrainD;
+    fine_view = w.fine_view;
     look.copy(w.look);
     setLayer(w.layer);
     setPosition(w.localrect.pos.x, w.localrect.pos.y);
@@ -374,6 +377,12 @@ public class nWidget {
   public float getLocalSX() { return localrect.size.x; }
   public float getLocalSY() { return localrect.size.y; }
   
+  public boolean isViewable() {
+	  return Rect.rectCollide(getRect(), gui.view) && 
+    		  !(fine_view && getSX()*gui.scale < 0.5 && getSY()*gui.scale < 0.5) && 
+    		  !(!fine_view && getSX()*gui.scale < 10 && getSY()*gui.scale < 10);
+  }
+  
   public nWidget(Rapp a) {   //only for theme model saving !!
     localrect = new Rect();
     globalrect = new Rect();
@@ -425,6 +434,8 @@ public class nWidget {
   private int cursorPos = 0;
   private int cursorCount = 0;
   private int cursorCycle = 80;
+
+  private boolean fine_view = false;
   
   private boolean switchState = false;
   public boolean isClicked = false;
@@ -478,7 +489,7 @@ public class nWidget {
     label = new String();
     look = new nLook(gui.app);
     drawer = new Drawable(g.drawing_pile) { public void drawing() {
-      if (Rect.rectCollide(getRect(), gui.view) && !(getSX()*gui.scale < 3 && getSY()*gui.scale < 3)) {
+      if (isViewable()) {
         if (((triggerMode || switchMode) && isClicked) || switchState) { app.fill(look.pressColor); } 
         else if (isHovered && (triggerMode || switchMode))             { app.fill(look.hoveredColor); } 
         else                                                           { app.fill(look.standbyColor); }
@@ -495,7 +506,7 @@ public class nWidget {
         if (isField && isSelected) app.stroke(look.outlineSelectedColor);
         else if (showOutline || (hoverOutline && isHovered)) app.stroke(look.outlineColor);
         else app.noStroke();
-        float wf = 1;
+        float wf = 1.0F;
         if (constantOutlineWeight) { wf = 1 / gui.scale; app.strokeWeight(look.outlineWeight / gui.scale); }
         else app.strokeWeight(look.outlineWeight);
         
@@ -537,11 +548,18 @@ public class nWidget {
           else if (textAlignX == PConstants.CENTER) tx += getSX() / 2;
           if (!auto_line_return) app.text(l, tx, ty);
           else {
-            int max_l = (int)(getLocalSX() / (look.textFont / 1.7));
+//              int max_l = (int)(getLocalSX() / (look.textFont / 1.7));
             int printed_char = 0;
             int line_cnt = 0;
             while (printed_char < l.length()) {
-              String line_string = l.substring(line_cnt * max_l, Math.min(max_l * (line_cnt+1), l.length()));
+                int line_end = 0;
+              String line_string = l.substring(printed_char, l.length());
+              float tw = app.textWidth(line_string);
+              while (tw > getLocalSX() - look.textFont / 2.0F) {
+	              line_end++;
+	              line_string = l.substring(printed_char, l.length() - line_end);
+	              tw = app.textWidth(line_string);
+              }
               printed_char += line_string.length();
               app.text(line_string, tx, ty + (line_cnt*look.textFont));
               line_cnt++;

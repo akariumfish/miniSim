@@ -19,11 +19,20 @@ import sData.sValueBloc;
  
  */
 public class Macro_Bloc extends Macro_Abstract {
+	nCtrlWidget param_open;
   Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
     super(_sheet, t, n, _bloc);
 //    mlogln("build bloc "+t+" "+n+" "+ _bloc);
     addShelf(); 
     addShelf();
+  }
+  
+  nCtrlWidget get_param_openner() {
+	  if (param_open == null) {
+		  param_open = addCtrlModel("MC_Param", "P");
+		  param_open.setParent(panel).setInfo("show/hide param");
+	  }
+	  return param_open;
   }
 
   Macro_Element addSelectS(int c, sBoo v1, sBoo v2, String s1, String s2) { 
@@ -207,7 +216,8 @@ public class Macro_Bloc extends Macro_Abstract {
     super.toLayerTop(); 
     for (Macro_Element e : elements) e.toLayerTop(); 
     for (Macro_Element e : elements) if (e.spot != null) e.toLayerTop(); 
-    grabber.toLayerTop(); 
+    grabber.toLayerTop();  
+    if (param_open != null) param_open.toLayerTop();
     return this;
   }
   public Macro_Bloc clear() {

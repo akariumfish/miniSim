@@ -7,7 +7,52 @@ public class miniSim {
 }
 
 /*
-		IDEE AND TO DO :
+
+		TO FIX
+
+number formating!!!
+
+text on widget : autoline dont follow widget width
+	character have variable width
+	string text width calc with app.textWidth(str);
+
+
+
+
+
+		TO DO
+
+sheetobj in 1 line (merge get et out?)
+
+MValue add val.ref view
+
+to big trig et switch : when too dezoomed show a screen widget (on/off)
+set button text (large font)
+
+add sheetview menu et sheetobj par def dans spe sheet
+	> default sheet front
+	
+bloc unique, cad only one by sheet
+
+auto spot : bloc auto add some elem to spots at creation
+
+min/max param in sflt numpanel slide
+	event limit change for synchro
+
+nExplorer : more entry and smaller height
+
+bool flag destroyed widgets!!!! to filter irregular
+
+redo link loop protection
+	auto delete last link
+
+trad README French
+
+
+		
+		DOABLE IDEE
+		
+
 
 keep your mouse on a cursor for 0.5s > a bar appear under it, 
 	its a slider to change scale, 
@@ -17,16 +62,76 @@ keep your mouse on a cursor for 0.5s > a bar appear under it,
 cursor pointer in losange, point in direction > need custom drawable
 	correct centering error on pointer widget
 
+distence mesuring tool
+
+bloc node : one point in and out at the same time
+use a custom macro_connect
+created by leftclick on empty space
+
+its needed to group shapes to limit object nb
+
+open finished bp, search file in sub folder, cant save on it again
+save final bp to save in this folder (verify if new file name is existing to stop you from overwriting)
+
+for macro main toolpanel bp and basic sim features add shortcut menu
+
+list knows dangerous (bugged) actions
+
+sujet principaux dans la doc
+	data sval, svalblc save/load templ/prst
+	macro sheet bloc co sheet_co
+	list detailler bloc sp
+	packet process
+
+mesure and store the relative process time used by each special sheet
+
+when selecting a preset auto hide uncompatible widget ? > need to redo explorer
+
+co element made to auto add themself as spot
+
+
+
+
+		BLOC TO CREATE
+		
+cursor bloc : 
+	(like menu) named, listed in mmain so global, 
+	the bloc point to an existing cursor or can build a new
+	custom setlinkedPosition(svec) setlinkedDir(svec) setlinkedShow(sboo)
+	constrain (dir pos mag ..)
+	registered independently from theirs sheet and easily accessible for
+	new comus start
+	global effect field
+	multi comu objectif
+
+	auto follow / point to objects, instent or chasing
+	memorize path for display
+	dif shape / look
+MVar
+	add a hideable (like com) param drawer : select variable type
+	int str and vec better handling 
+MComment can log received data (auto text format with insertion token??)
+camview
+	like a menu, name, click to go, 3 field for values, 
+	when selected capture n store cam pos / scale
+frame delay / tick delay / packet process delay
+setreset, counter, sequance, multigate 
+
+
+
+
+
+
+		NEW STRUCTURE 
+
 working :
 	face as basic shape
 	sheet as collection of position
 	scalable cursor
 	camera dessinateur
-
+	
 object info passed at connection : no need for packet exchange when connecting objet
 	== static connection ?
-
-co element made to auto add themself as spot
 
 Collection de position : cursors in a specialized sheet
 	position, dir and scale
@@ -38,8 +143,12 @@ form : specialized sheet
 	colors, line width
 	
 shape : specialized sheet
-	replicate given form in patern
-		replicant have own pos, dir, scale, line width multiplyer and color filter
+	list of replicant
+		pos, dir, scale, line width multiplyer and color filter
+	replicate a given form in patern
+
+patern : specialized sheet
+	apply a parametrable patern to a shape
 	patern can be driven by a given random seed
 	building can be driven by tick input << !! sim random seed will be used !!
 
@@ -59,100 +168,14 @@ modificateur de position : specialized sheet
 
 
 
-corrige error on group_grabber grid snaping, 
-small constant misalignment, because of his size not multyple?
-
-add min/max param to slide (/2 X2) > set minmax of sval
-event limit change for synchro
-
-number formating!!!
-
-when manually adding try to stay on top of sheet back to keep it small
->> start add place search from existing bloc median pos (or 0) then try in spiral
-
-distence mesuring tool
-
-bloc node : one point in and out at the same time
-use a custom macro_connect
-created by leftclick on empty space
-
-its needed to group shapes to limit object nb
-
-to big trig et switch : when too dezoomed show a screen widget (on/off)
-set button text (large font)
 
 
 
 
-
-
-hide majority of macro widgets when dezoom
-
-bloc a faire:
-	cursor bloc : 
-		(like menu) named, listed in mmain so global, 
-		the bloc point to an existing cursor or can build a new
-		custom setlinkedPosition(svec) setlinkedDir(svec) setlinkedShow(sboo)
-		constrain (dir pos mag ..)
-		registered independently from theirs sheet and easily accessible for
-		new comus start
-		global effect field
-		multi comu objectif
-
-		auto follow / point to objects, instent or chasing
-		memorize path for display
-		dif shape / look
-	MVar
-		add a hideable (like com) param drawer : select variable type
-		int str and vec better handling 
-	MComment can log received data (auto text format with insertion token??)
-	camview
-		like a menu, name, click to go, 3 field for values, 
-		when selected capture n store cam pos / scale
-	frame delay / tick delay / packet process delay
-	setreset, counter, sequance, multigate 
-
-
-
-
-
-
-open finished bp, search file in sub folder, cant save on it again
-save final bp to save in this folder (verify if new file name is existing to stop you from overwriting)
-
-for macro main toolpanel bp and basic sim features add shortcut menu
-
-list knows dangerous (bugged) actions
-
-sujet principaux dans la doc
-	data sval, svalblc save/load templ/prst
-	macro sheet bloc co sheet_co
-	list detailler bloc sp
-	packet process
-
-change sheet selection right when click down
-	no more diff sheet bloc select in 2 click
-
-nExplorer : more entry and smaller height
+		R & D
 
 save log at crash? how to detect crash?
 
-bool flag destroyed widgets!!!! to filter irregular
-
-TEST packet processing order for inputs
-
-redo link loop protection
-	auto delete last link
-
-mesure and store the relative process time used by each special sheet
-
-macro blocs and groups adding position can be controllable
-	can be relative or absolute depending on case
-
-
-
-  R & D
-  
 sending sval and sbloc through link
 	output keep a packet as pointer to last send val, packet is passer
 
@@ -165,23 +188,23 @@ need clean rythme
 
 >>>> reuse the mconnection structure
 will just need to add a turn with priority of exe for the blocs
-sval new methods 
-bool isType()
-packet asPacket()
-sbloc new methods
-packet asPacket()
-packet new methods
-sval asType()
-sbloc asBloc()
-bool isType()
-bool isBloc()
+	sval new methods 
+	bool isType()
+	packet asPacket()
+	sbloc new methods
+	packet asPacket()
+	packet new methods
+	sval asType()
+	sbloc asBloc()
+	bool isType()
+	bool isBloc()
 
 can send sbloc as cible for everything! solve the cursor or pairing proble
 
 spe blocs can iterate throug bloc contents on ticking
 
 simply put macro blocs for all svalue handling methods 
-add macro from bloc too
+	add macro from bloc too
 
 slow mo mode :    
 real slow mode or just a slowed down recording of a finished packet process update ??
@@ -223,17 +246,9 @@ special sheet : effect field
 affect a canvas
 all pixel under his shape get a custom processing
   
-make organism use a face as exemple for its shape
-  
-enregistrement de different POV camera entre lesquel on peut basquler
-vue macro / vue exploration / vue general
-macro camview
-
 change access
 low access hide certain sheet
 gain access by meeting enigmatic condition ??
-
-when selecting a preset auto hide uncompatible widget ? > need to redo explorer
 
 gameplay thinking :
 consumable is needed to influence the world :

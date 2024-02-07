@@ -448,6 +448,8 @@ public class sInterface {
   public Macro_Main macro_main;
   
   public User user;
+  
+  public Rect screen_view;
   /*
   method for sStr : pack unpack
     get string list + token > convert to string
@@ -465,6 +467,9 @@ public class sInterface {
     interface_bloc = new sValueBloc(data, "Interface");
     gui_theme = new nTheme(app, ref_size);
     screen_gui = new nGUI(input, gui_theme, ref_size);
+    screen_view = new Rect(app.screen_0_x, app.screen_0_y, 
+    						app.screen_width, app.screen_height);
+    screen_gui.setView(screen_view);
     cam_gui = new nGUI(input, gui_theme, ref_size);
     
     show_taskpanel = interface_bloc.newBoo("show_taskpanel", "taskpanel", true);
@@ -483,7 +488,7 @@ public class sInterface {
     cam = new Camera(input, macro_main.value_bloc)
       .addEventZoom(new nRunnable() { public void run() { cam_gui.updateView(); } } )
       .addEventMove(new nRunnable() { public void run() { cam_gui.updateView(); } } );
-    
+
     screen_gui.addEventFound(new nRunnable() { public void run() { 
       cam.GRAB = false; cam_gui.hoverpile_passif = true; } } )
     .addEventNotFound(new nRunnable() { public void run() { 
@@ -507,6 +512,11 @@ public class sInterface {
       new nRunnable() { public void run() { filesManagement(); } } );
     full_screen_run = macro_main.newRun("full_screen_run", "fulls", new nRunnable() { public void run() { 
       app.fs_switch(); 
+      screen_view.pos.set(app.screen_0_x, app.screen_0_y);
+      screen_view.size.set(app.screen_width, app.screen_height);
+      screen_gui.updateView();
+      cam.up_view_run.run();
+      cam_gui.updateView();
       runEvents(screen_gui.eventsFullScreen); 
       runEvents(screen_gui.eventsFullScreen); 
       runEvents(eventsFullS); } } );
@@ -597,8 +607,6 @@ public sRun full_screen_run;
   boolean is_starting = true;
   public boolean show_info = true;
   void frame() {
-	  
-	  // BREAKPOINT
 	  
     input.frame_str(); // track mouse
     framerate.frame(); // calc last frame

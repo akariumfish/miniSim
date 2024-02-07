@@ -6,8 +6,10 @@ import processing.core.PVector;
 public interface RConst {
 	public final static float PI = (float) Math.PI;
 	
-	static String copy(String s) { if (s != null) return s.substring(0, s.length()); else return null; }
-	static String str_copy(String s) { if (s != null) return s.substring(0, s.length()); else return null; }
+	static String copy(String s) { 
+		if (s != null) return "" + s/*.substring(0, s.length())*/; else return null; }
+	static String str_copy(String s) { 
+		if (s != null) return "" + s/*.substring(0, s.length())*/; else return null; }
 	
 	static public String trimStringFloat(float f) { return trimStringFloat(f, 3); }
 	static public String trimStringFloat(float f, int p) {

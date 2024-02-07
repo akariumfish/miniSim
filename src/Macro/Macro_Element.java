@@ -2,14 +2,31 @@ package Macro;
 
 import java.util.ArrayList;
 
+import UI.nCtrlWidget;
 import UI.nDrawer;
+import UI.nLinkedWidget;
 import UI.nWidget;
 import sData.nRunnable;
+import sData.sBoo;
 import sData.sObj;
 
 public class Macro_Element extends nDrawer implements Macro_Interf {
-	  Macro_Bloc getBloc() { return bloc; }
+	
 
+	  nCtrlWidget addTrigS(int c, String l, nRunnable r) { 
+		    return addCtrlModel("MC_Element_SButton", l).setRunnable(r);
+		  }
+	  nLinkedWidget addSwitchS(int c, String l, sBoo r) { 
+		    return addLinkedModel("MC_Element_SButton", l).setLinkedValue(r);
+		  }
+	  nCtrlWidget addTrigSwtchS(int c, String sw_txt, sBoo vb, String bp_txt, nRunnable r) { 
+	    nCtrlWidget cw = addCtrlModel("MC_Element_SButton", bp_txt).setRunnable(r);
+	    addLinkedModel("MC_Element_MiniButton", sw_txt).setLinkedValue(vb);
+	    return cw;
+	  }
+	
+	  Macro_Bloc getBloc() { return bloc; }
+	  
 	  nWidget back = null, spot = null;
 	  Macro_Connexion connect = null, sheet_connect = null;
 	  Macro_Bloc bloc;

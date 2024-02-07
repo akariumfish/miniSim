@@ -176,7 +176,7 @@ public class Macro_Sheet extends Macro_Abstract {
     panel.toLayerTop(); front.toLayerTop();
     if (child_macro != null) for (Macro_Abstract e : child_macro) e.toLayerTop(); 
     reduc.toLayerTop(); prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
-    grabber.toLayerTop(); deployer.toLayerTop();
+    grabber.toLayerTop(); deployer.toLayerTop(); title.toLayerTop();
     back_front.toLayerTop(); 
     return this;
   }
@@ -236,14 +236,20 @@ public class Macro_Sheet extends Macro_Abstract {
   
   //call by add_spot widget
   void new_spot(String side) {
-    left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
-    right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
+	  if (!building_spot) {
+    if (!side.equals("left")) left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
+    else right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
     for (Macro_Element m : child_elements) if (m.sheet_viewable) {
       m.back.setTrigger().setLook("MC_Element_For_Spot"); /*event in init de l'element*/ }
     building_spot = true;
     new_spot_side = side;
     mmain().inter.addEventFrame(new_spot_run);
+	  } else {
+		  
+	  }
   }
+  ArrayList<nWidget> spot_text_widget = new ArrayList<nWidget>();
+  
   void selecting_element(Macro_Element elem) { // called by eventTrigger of elem.back
     add_spot(new_spot_side, elem);
     cancel_new_spot();
@@ -489,38 +495,30 @@ public class Macro_Sheet extends Macro_Abstract {
   
  
   
-void delayed_open() {
-  mmain().inter.addEventTwoFrame(new nRunnable(this) { public void run() { open(); } });
-}
+//void delayed_open() {
+//  mmain().inter.addEventTwoFrame(new nRunnable(this) { public void run() { open(); } });
+//}
     
 public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) { 
     super(p, "sheet", n, _bloc); init(); 
     
-    gui.app.mlogln("build sheet "+n+" "+ _bloc);
+    gui.app.mlogln("build sheet "+n+" from "+ _bloc);
     
-    if (_bloc == null && !unclearable) 
-      mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { select(); } });
   }
   public Macro_Sheet(sInterface _int) {
     super(_int);
-    
     gui.app.mlogln("build main sheet ");
-    
     child_sheet = new ArrayList<Macro_Sheet>(0);
-    
     new_preset_name = setting_bloc.newStr("preset_name", "preset", "preset");
     specialize = setting_bloc.newStr("specialize", "specialize", "");
-    
     links = setting_bloc.newStr("links", "links", "");
     spots = setting_bloc.newStr("spots", "spots", OBJ_TOKEN+GROUP_TOKEN+OBJ_TOKEN);
-    
     addShelf(); addShelf();
-    
     left_spot_add = addModel("mc_ref");
     right_spot_add = addModel("mc_ref");
     back_front = addModel("mc_ref");
     deployer = addModel("mc_ref"); 
-	}
+  }
   void init() {
     child_sheet = new ArrayList<Macro_Sheet>(0);
     sheet.child_sheet.add(this);
@@ -573,7 +571,23 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     updateBack();
     
   }
-  
+	void init_end() {
+		  if (openning.get() == REDUC) { openning.set(OPEN); reduc(); }
+	      else if (openning.get() == OPEN) { openning.set(REDUC); open(); }
+	      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); hide(); }
+	      else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
+			if (!pos_given) { 
+				deploy();
+				sheet.select();
+				find_place(back);
+				if (!pos_given) select();
+			}
+	      if (!mmain().show_macro.get()) hide();
+	      
+	      if (mmain().sheet_explorer != null) mmain().sheet_explorer.update(); 
+	      nRunnable.runEvents(eventsSetupLoad); 
+	      toLayerTop(); 
+		}
   
   public Macro_Sheet clear() {
     //an unclearable sheet still need to clear child macro
@@ -1205,10 +1219,11 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
         if (sheet != this) sheet.new_ref = sheet.new_ref + OBJ_TOKEN + bloc.ref+INFO_TOKEN+a.value_bloc.ref;
       }
       
-      //add copyed child to new macro
+      //add copied child to new macro
       if (a != null && a.val_type.get().equals("sheet")) {
         ((Macro_Sheet)a).addCopyofBlocContent(nbloc_child, false);
         for (Macro_Abstract m : ((Macro_Sheet)a).child_macro) m.szone_unselect();
+        ((Macro_Sheet)a).init_end();
       }
       
       //no new macro = invalid bloc

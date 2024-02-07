@@ -79,7 +79,7 @@ public class Rapp extends PApplet implements InputData, RConst {
 	      public void run() { interf.addEventNextFrame(new nRunnable() { 
 	        public void run() { interf.setup_load(); } } ); } } );
 
-		  app_grab = new nWidget(interf.screen_gui, "", 28, 0, 0, base_width - 40, 40)
+		  app_grab = new nWidget(interf.screen_gui, "", 28, 0, 1, base_width - 40, 40)
 		    .setTrigger()
 		    .addEventTrigger(new nRunnable() { public void run() { mx = (int)mouseX; my = (int)mouseY; } } )
 		    .addEventPressed(new nRunnable() { public void run() { 
@@ -87,7 +87,7 @@ public class Rapp extends PApplet implements InputData, RConst {
 		      sy = (int)((int)mouseY + sy - my);
 		      surface.setLocation(sx, sy); 
 		    } } );
-		  app_close = new nWidget(interf.screen_gui, "X", 28, base_width - 40, 0, 40, 40)
+		  app_close = new nWidget(interf.screen_gui, "X", 28, base_width - 40, 1, 40, 40)
 		    .setTrigger()
 		    .addEventTrigger(new nRunnable() { public void run() { 
 		      logln("exit");
@@ -133,16 +133,18 @@ public class Rapp extends PApplet implements InputData, RConst {
 	boolean fullscreen=true;
 	public int base_width=1400; //non fullscreen width
 	public int base_height=800; //non fullscreen height
-	
+	public int screen_0_x, screen_0_y, screen_width, screen_height;
 	void fs_switch() {
 	  if (fullscreen) {
 	    app_grab.show();
 	    app_close.show();
-	    surface.setSize(base_width,base_height); 
-	    surface.setLocation(100, 5);
-	    sx = 100; sy = 5;
+	    surface.setSize(base_width,base_height + (int)window_head); 
+	    surface.setLocation(100, 20);
+	    sx = 100; sy = 20;
 	    fullscreen=false;
 	    surface.setAlwaysOnTop(false);
+	    screen_0_x = 0; screen_0_y = (int)window_head; 
+	    screen_width = base_width; screen_height = base_height;
 	  } else {
 	    app_grab.hide();
 	    app_close.hide();
@@ -151,6 +153,8 @@ public class Rapp extends PApplet implements InputData, RConst {
 	    surface.setLocation(0, (int) -(window_head));
 	    sx = 0; sy = (int) -(window_head);
 	    surface.setAlwaysOnTop(true);
+	    screen_0_x = 0; screen_0_y = (int)window_head; 
+	    screen_width = displayWidth; screen_height = displayHeight;
 	  }
 	}
 	
