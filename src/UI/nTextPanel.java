@@ -1,7 +1,7 @@
 package UI;
 
 import Macro.Macro_Interf;
-import RBase.RConst;
+import RApplet.RConst;
 import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sStr;
@@ -13,8 +13,10 @@ public class nTextPanel extends nWindowPanel implements Macro_Interf  { //
 	  nRunnable val_run;
 	  int larg = 20;
 	  int max_l; float line_cnt, h_fact;
-	  float font = (int)(ref_size/2.1F);
+	  int font = (int)(ref_size/2.1F);
 	  private void up_text() {
+
+		if (text_widget != null) text_widget.setFont((int)(font));
 	    gui.app.textFont(gui.app.getFont((int)font));
 	    
 //		    int max_l = (int)(larg * ref_size / (font / 1.7F));
@@ -40,10 +42,10 @@ public class nTextPanel extends nWindowPanel implements Macro_Interf  { //
 	      }
 	    }
 
-	    h_fact = (font * line_cnt) / ref_size + font / (ref_size * 2);
+	    h_fact = (font * line_cnt / 0.7F) / ref_size;
 	    
 	    if (text_widget != null) { 
-	    		text_widget.setText(txt)
+	    		text_widget.changeText(txt)
 	  	      .setSY(ref_size * h_fact);
 	    }
 	  }

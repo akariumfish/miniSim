@@ -2,7 +2,7 @@ package Macro;
 
 import java.util.ArrayList;
 
-import RBase.RConst;
+import RApplet.RConst;
 import UI.*;
 import processing.core.PConstants;
 import processing.core.PVector;

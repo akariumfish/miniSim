@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import RApplet.sInterface;
-import RBase.RConst;
+import RApplet.RConst;
 import UI.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -41,6 +41,11 @@ import sData.*;
  
  */
 public class Macro_Sheet extends Macro_Abstract {
+	
+	class MSheet_Builder extends MAbstract_Builder {
+		MSheet_Builder() { super("sheet", "can contain blocs and organise them"); show_in_buildtool = true; }
+		Macro_Sheet build(Macro_Sheet s, sValueBloc b) { return new Macro_Sheet(s, type, b); }
+	}
   
   void moving() { updateBack(); sheet.movingChild(this); }
   void movingChild(Macro_Abstract m) { updateBack(); }
@@ -488,7 +493,7 @@ public class Macro_Sheet extends Macro_Abstract {
   nRunnable szone_run;
   
   public sStr specialize;
-  Sheet_Specialize sheet_specialize = null;
+//  Sheet_Specialize sheet_specialize = null;
   
   
   
@@ -603,7 +608,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       value_bloc.clear();
       if (mmain() != this) mmain().szone.removeEventStartSelect(szone_run);
       if (preset_explorer != null) mmain().presets_explorers.remove(preset_explorer);
-      sheet_specialize.sheet_count--;
+//      sheet_specialize.sheet_count--;
     }
     return this;
   }
@@ -1242,15 +1247,16 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       
       String typ = ((sStr)b.getBloc("settings").getValue("type")).get();
       
-      if (!typ.equals("sheet"))   return addByType(typ, b);
+//      if (!typ.equals("sheet"))   
+    	  	return addByType(typ, b);
       
-      else if (b.getBloc("settings").getValue("specialize") != null) {
-        
-        String spe = ((sStr)b.getBloc("settings").getValue("specialize")).get();
-        
-        for (Sheet_Specialize t : Sheet_Specialize.prints) if (!t.unique && t.name.equals(spe))
-          return t.add_new(this, b, null);
-      }
+//      else if (b.getBloc("settings").getValue("specialize") != null) {
+//        
+//        String spe = ((sStr)b.getBloc("settings").getValue("specialize")).get();
+//        
+//        for (Sheet_Specialize t : Sheet_Specialize.prints) if (!t.unique && t.name.equals(spe))
+//          return t.add_new(this, b, null);
+//      }
     }
     return null; 
   }

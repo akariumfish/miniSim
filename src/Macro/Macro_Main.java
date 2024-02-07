@@ -292,21 +292,21 @@ nExplorer sheet_explorer;
       show_build_tool.set(!build_tool.hide); }});
     build_tool.setPos(ref_size*1.25);
     
-    if (sheet_tool != null) sheet_tool.clear();
-    sheet_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
-    sheet_tool.addShelf();
-    
-    for (Sheet_Specialize t : Sheet_Specialize.prints) if (!t.unique) sheet_tool.getShelf(0).addDrawer(3, 0.75)
-      .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.name)
-        .setRunnable(new nRunnable(t) { public void run() { 
-          ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
-        .setFont((int)(ref_size/2));
-        ;
-    
-    if (!show_sheet_tool.get()) sheet_tool.reduc();
-    sheet_tool.addEventReduc(new nRunnable() { public void run() { 
-      show_sheet_tool.set(!sheet_tool.hide); }});
-    sheet_tool.setPos(gui.app.window_head + ref_size*13);
+//    if (sheet_tool != null) sheet_tool.clear();
+//    sheet_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
+//    sheet_tool.addShelf();
+//    
+//    for (Sheet_Specialize t : Sheet_Specialize.prints) if (!t.unique) sheet_tool.getShelf(0).addDrawer(3, 0.75)
+//      .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.name)
+//        .setRunnable(new nRunnable(t) { public void run() { 
+//          ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
+//        .setFont((int)(ref_size/2));
+//        ;
+//    
+//    if (!show_sheet_tool.get()) sheet_tool.reduc();
+//    sheet_tool.addEventReduc(new nRunnable() { public void run() { 
+//      show_sheet_tool.set(!sheet_tool.hide); }});
+//    sheet_tool.setPos(gui.app.window_head + ref_size*13);
   }
   public void build_custom_menu(nFrontPanel sheet_front) {
     nFrontTab tab = sheet_front.getTab(2);
@@ -932,7 +932,7 @@ public Macro_Main(sInterface _int) {
     
 //    mlogln("build macro main ");
     
-//    add_bloc_builders(new MBasic_Builder());
+    add_bloc_builders(new Macro_Sheet.MSheet_Builder());
     add_bloc_builders(new MSheetView.MSheetView_Builder());
     add_bloc_builders(new MSheetObj.MSheetObj_Builder());
     add_bloc_builders(new MValue.MValue_Builder());
@@ -989,7 +989,7 @@ public Macro_Main(sInterface _int) {
     reduc_run = newRun("switch_reduc_run", "switch_reduc", new nRunnable() { public void run() { 
       reduc_selected(); }});
     
-    addSpecializedSheet(new SheetPrint());
+//    addSpecializedSheet(new SheetPrint());
     
     
     
@@ -1045,11 +1045,10 @@ public Macro_Main(sInterface _int) {
         selected_sheet.updateBack();
       } } );
     
-    _int.addEventNextFrame(new nRunnable() { public void run() { 
+    inter.addEventNextFrame(new nRunnable() { public void run() { 
       inter.cam.addEventMove(new nRunnable() { public void run() { update_select_bound(); } } );
-
+      build_macro_menus();
       inter.cam.cam_grid_spacing.set(ref_size*5*Macro_Main.GRID_SNAP_FACT*3);
-      
     } } );
     
   }
@@ -1122,10 +1121,10 @@ public Macro_Main(sInterface _int) {
     }
   }
   
-  public void addSpecializedSheet(Sheet_Specialize s) {
-    s.mmain = this;
-    build_macro_menus();
-  }
+//  public void addSpecializedSheet(Sheet_Specialize s) {
+//    s.mmain = this;
+//    build_macro_menus();
+//  }
 //  public Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
 //    s.mmain = this;
 //    s.unique = true;

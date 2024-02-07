@@ -3,7 +3,7 @@ package sData;
 import java.util.ArrayList;
 
 import RApplet.Rapp;
-import RBase.RConst;
+import RApplet.RConst;
 
 
 //#######################################################################

@@ -1,7 +1,5 @@
 package RApplet;
 
-import RBase.RConst;
-
 public class sInput_Button {
   public boolean state = false;
 public boolean trigClick = false;

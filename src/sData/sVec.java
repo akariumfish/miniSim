@@ -1,6 +1,6 @@
 package sData;
 
-import RBase.RConst;
+import RApplet.RConst;
 import processing.core.PVector;
 
 public class sVec extends sValue implements RConst {

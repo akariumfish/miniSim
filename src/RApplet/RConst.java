@@ -1,4 +1,4 @@
-package RBase;
+package RApplet;
 
 import processing.core.PApplet;
 import processing.core.PVector;

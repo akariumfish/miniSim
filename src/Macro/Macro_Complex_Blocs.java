@@ -3,7 +3,7 @@ package Macro;
 import java.util.ArrayList;
 import java.util.Map;
 
-import RBase.RConst;
+import RApplet.RConst;
 import UI.*;
 import processing.core.PConstants;
 import processing.core.PVector;

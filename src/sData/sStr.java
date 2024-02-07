@@ -1,6 +1,6 @@
 package sData;
 
-import RBase.RConst;
+import RApplet.RConst;
 
 public class sStr extends sValue {
 	  boolean limited; int max;

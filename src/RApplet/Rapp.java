@@ -4,14 +4,6 @@ import java.util.ArrayList;
 
 //import themidibus.*;
 
-import RBase.InputData;
-import RBase.RConst;
-//import Specialize.Canvas;
-//import Specialize.Face;
-//import Specialize.FlocComu;
-//import Specialize.GrowerComu;
-//import Specialize.Organism;
-import Specialize.Simulation;
 import UI.nWidget;
 import processing.core.*;
 import processing.event.MouseEvent;
@@ -44,7 +36,7 @@ PApplet
     Interface.frame  >  frame events, drawing
 */
 
-public class Rapp extends PApplet implements InputData, RConst {
+public class Rapp extends PApplet implements RConst {
 	
 //	public static void main(String[] args) {
 //		PApplet.main("RApplet.Rapp");
@@ -110,7 +102,10 @@ public class Rapp extends PApplet implements InputData, RConst {
 		  
 		  
 
-		  interf.addSpecializedSheet(new Simulation.SimPrint());
+//		  interf.addSpecializedSheet(new Simulation.SimPrint());
+//		  interf.addSpecializedSheet(new Canvas.CanvasPrint());
+//		  interf.addSpecializedSheet(new Face.FacePrint());
+//		  interf.addSpecializedSheet(new Organism.OrganismPrint());
 //		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
 //		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
 //		  interf.addSpecializedSheet(new Face.FacePrint(canv));
@@ -201,20 +196,34 @@ public class Rapp extends PApplet implements InputData, RConst {
 	public float crandom(float d) { return pow(random((float) 1.0), d); }
 		
 		// auto indexing
-		int used_index = 0;
-		int get_free_id() { used_index++; return used_index - 1; }
+//		int used_index = 0;
+//		int get_free_id() { used_index++; return used_index - 1; }
 		
 		// gestion des polices de caractére
-		ArrayList<myFont> existingFont = new ArrayList<myFont>();
-		class myFont { PFont f; int st; }
+//		ArrayList<myFont> existingFont = new ArrayList<myFont>();
+		PFont existingFont;
+		int text_size;
+//		class myFont { PFont f; int st; }
+		public void textFont(PFont p) {
+			textSize(text_size);
+		}
 		public PFont getFont(int st) {
 		  st = (int)(st / 2) * 2;
 		  if (st > 40) st = 40;
 		  if (st < 6) st = 6;
-		  for (myFont f : existingFont) if (f.st == st) return f.f;
-		  myFont f = new myFont();
-		  f.f = createFont("Arial",st); f.st = st;
-		  return f.f; }
+		  if (existingFont == null) { 
+			  text_size = st;
+			  existingFont = createFont("Arial",st,false); //(name, size, smooth)
+			  super.textFont(existingFont);
+		  } else if (st != text_size) {
+			  text_size = st;
+		  }
+		  return existingFont;
+		}
+//		  for (myFont f : existingFont) if (f.st == st) return f.f;
+//		  myFont f = new myFont();
+//		  f.f = createFont("Arial",st); f.st = st;
+//		  return f.f; }
 		//for (String s : PFont.list()) println(s); // liste toute les police de text qui existe
 		
 		

@@ -3,7 +3,7 @@ package sData;
 import java.util.ArrayList;
 
 import Macro.Macro_Packet;
-import RBase.RConst;
+import RApplet.RConst;
 
 public abstract class sValue implements RConst {
 	  sValueBloc getBloc() { return bloc; }

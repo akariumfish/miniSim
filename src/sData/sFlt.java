@@ -1,6 +1,6 @@
 package sData;
 
-import RBase.RConst;
+import RApplet.RConst;
 
 public class sFlt extends sValue implements RConst {
 	  boolean limited_min = false, limited_max = false; float min, max;

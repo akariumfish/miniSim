@@ -3,8 +3,6 @@ package RApplet;
 import java.util.ArrayList;
 
 import Macro.Macro_Main;
-import Macro.Sheet_Specialize;
-import RBase.RConst;
 import UI.*;
 import processing.core.PConstants;
 import sData.*;
@@ -420,7 +418,7 @@ public class sInterface {
   }
   public nWidget match_flag;
   public  nWindowPanel files_panel;
-  public String version_title = "Grows 3.1";
+  public String version_title = "MiniSim 0.3.2";
   public String savepath = "save.sdata";
   public sStr savepath_value, filempath_value;
   public sBoo auto_load, log_ext_save;
@@ -585,8 +583,8 @@ public sRun full_screen_run;
   }
   
   
-  void addSpecializedSheet(Sheet_Specialize s) {
-    macro_main.addSpecializedSheet(s); }
+//  void addSpecializedSheet(Sheet_Specialize s) {
+//    macro_main.addSpecializedSheet(s); }
 //  Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
 //    return macro_main.addUniqueSheet(s); }
 

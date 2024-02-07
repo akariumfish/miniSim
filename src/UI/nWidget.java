@@ -3,7 +3,7 @@ package UI;
 import java.util.ArrayList;
 
 import RApplet.Rapp;
-import RBase.RConst;
+import RApplet.RConst;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
@@ -165,7 +165,7 @@ public class nWidget {
     //if (hover != null && (isSelectable || grabbable || triggerMode || switchMode) && !hide) hover.active = true;
     return this;
   }
-  
+  boolean has_been_cleared = false;
   public void clear() {
     //if (ndrawer != null) ndrawer.widgets.remove(this);
     for (nWidget w : childs) w.clear();
@@ -181,6 +181,7 @@ public class nWidget {
     eventGrabRun.clear(); eventDragRun.clear(); eventLiberateRun.clear(); eventFieldChangeRun.clear();
     eventMouseEnterRun.clear(); eventMouseLeaveRun.clear(); eventPressRun.clear(); eventReleaseRun.clear();
     eventTriggerRun.clear(); eventSwitchOnRun.clear(); eventSwitchOffRun.clear(); eventFieldChangeRun.clear();
+    has_been_cleared = true;
   }
   
   public nGUI getGUI() { return gui; }
@@ -530,40 +531,45 @@ public class nWidget {
             cursorCount++;
             if (cursorCount > cursorCycle) cursorCount = 0;
           }
-          app.fill(look.textColor); 
-          app.textAlign(textAlignX, textAlignY);
-          app.textFont(app.getFont(look.textFont));
-          //int line = 0;
-          //for (int i = 0 ; i < l.length() ; i++) if (l.charAt(i) == '\n') line+=1;
-          float tx = getX();
-          float ty = getY();
-          if (textAlignY == PConstants.CENTER)         
-            ty += (getLocalSY() / 2.0)
-                  - (look.textFont / 6.0)
-                    //- (line * look.textFont / 3)
-                  ;
-          else if (textAlignY == PConstants.BOTTOM) 
-            ty += getLocalSY() - (look.textFont / 10);
-          if (textAlignX == PConstants.LEFT)        tx += look.textFont / 4.0;
-          else if (textAlignX == PConstants.CENTER) tx += getSX() / 2;
-          if (!auto_line_return) app.text(l, tx, ty);
-          else {
-//              int max_l = (int)(getLocalSX() / (look.textFont / 1.7));
-            int printed_char = 0;
-            int line_cnt = 0;
-            while (printed_char < l.length()) {
-                int line_end = 0;
-              String line_string = l.substring(printed_char, l.length());
-              float tw = app.textWidth(line_string);
-              while (tw > getLocalSX() - look.textFont / 2.0F) {
-	              line_end++;
-	              line_string = l.substring(printed_char, l.length() - line_end);
-	              tw = app.textWidth(line_string);
-              }
-              printed_char += line_string.length();
-              app.text(line_string, tx, ty + (line_cnt*look.textFont));
-              line_cnt++;
-            }
+          if (l.length() > 0) {
+	          app.fill(look.textColor); 
+	          app.textAlign(textAlignX, textAlignY);
+	          app.textFont(app.getFont(look.textFont));
+	          //int line = 0;
+	          //for (int i = 0 ; i < l.length() ; i++) if (l.charAt(i) == '\n') line+=1;
+	          float tx = getX();
+	          float ty = getY();
+	          if (textAlignY == PConstants.CENTER)         
+	            ty += (getLocalSY() / 2.0)
+	                  - (look.textFont / 6.0)
+	                    //- (line * look.textFont / 3)
+	                  ;
+	          else if (textAlignY == PConstants.BOTTOM) 
+	            ty += getLocalSY() - (look.textFont / 10);
+	          if (textAlignX == PConstants.LEFT)        tx += look.textFont / 4.0;
+	          else if (textAlignX == PConstants.CENTER) tx += getSX() / 2;
+	
+	  	      float line_max_char = (getSX() / gui.app.textWidth('m'));
+	          if (!auto_line_return || l.length() < line_max_char) app.text(l, tx, ty);
+	          else {
+	            int printed_char = 0;
+	            int line_cnt = 0;
+	            while (printed_char < l.length()) {
+	                int line_end = 0;
+	              String line_string = l.substring(printed_char, l.length());
+	              float tw = app.textWidth(line_string);
+	              while (tw > getLocalSX() - look.textFont / 2.0F) {
+		              line_end++;
+		              line_string = l.substring(printed_char, l.length() - line_end);
+		              tw = app.textWidth(line_string);
+	              }
+	              printed_char += line_string.length();
+	              app.text(line_string, tx, ty + (line_cnt*look.textFont));
+	              line_cnt++;
+	            }
+	        	  
+	//            app.logln(l + "      font" + look.textFont + " line" + line_cnt);
+	          }
           }
         }
       }

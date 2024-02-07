@@ -1,7 +1,7 @@
 package sData;
 
 import RApplet.Rapp;
-import RBase.RConst;
+import RApplet.RConst;
 
 public class sCol extends sValue {
 	public String getString() { return RConst.trimStringFloat(app.red(val)) + "," + 

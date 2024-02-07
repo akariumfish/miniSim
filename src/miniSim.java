@@ -8,13 +8,28 @@ public class miniSim {
 
 /*
 
+
+
+Make sim and all macro bloc !!
+	in and/or out plus label name for each svalue > fat bloc, better inside a sheet
+	
+	menu bp + in + startup to open . tabs:
+		view : list all value + direct control
+		preset
+		the rest is added by a custom methods
+	
+	mmain will need a bloc
+	
+sheet menu : 
+	cursors
+
+main menu :
+	explorer templates
+
+
 		TO FIX
 
 number formating!!!
-
-text on widget : autoline dont follow widget width
-	character have variable width
-	string text width calc with app.textWidth(str);
 
 
 
@@ -22,26 +37,24 @@ text on widget : autoline dont follow widget width
 
 		TO DO
 
+bloc unique, cad only one by sheet
+
+auto spot : bloc auto add some elem to spots at creation
+
 sheetobj in 1 line (merge get et out?)
 
+add sheetview menu et sheetobj par def dans spe sheet
+	> default sheet front
+	
 MValue add val.ref view
 
 to big trig et switch : when too dezoomed show a screen widget (on/off)
 set button text (large font)
 
-add sheetview menu et sheetobj par def dans spe sheet
-	> default sheet front
-	
-bloc unique, cad only one by sheet
-
-auto spot : bloc auto add some elem to spots at creation
-
 min/max param in sflt numpanel slide
 	event limit change for synchro
 
 nExplorer : more entry and smaller height
-
-bool flag destroyed widgets!!!! to filter irregular
 
 redo link loop protection
 	auto delete last link
@@ -92,6 +105,7 @@ co element made to auto add themself as spot
 
 
 
+
 		BLOC TO CREATE
 		
 cursor bloc : 
@@ -132,38 +146,40 @@ working :
 	
 object info passed at connection : no need for packet exchange when connecting objet
 	== static connection ?
+output.addConnectEvent(input);
+
 
 Collection de position : cursors in a specialized sheet
 	position, dir and scale
 		add scale value to MCursor or to nCursor ?
 
-form : specialized sheet
+form : bloc
 	graphic object : line, trig, ellipse, rect...
 	axis aligned
 	colors, line width
 	
-shape : specialized sheet
-	list of replicant
+shape : bloc
+	list of replic
 		pos, dir, scale, line width multiplyer and color filter
 	replicate a given form in patern
 
-patern : specialized sheet
+patern : bloc
 	apply a parametrable patern to a shape
 	patern can be driven by a given random seed
 	building can be driven by tick input << !! sim random seed will be used !!
 
-Camera dessinateur : specialized sheet
+	modif continue : create movement by changing given cursors position and direction
+		floc
+	
+Camera dessinateur : bloc
 	draw given shape to given cursors positions in camera view
 
-Canvas dessinateur : specialized sheet
+Canvas dessinateur : bloc
 	print given cursors as halo to given canvas
 	print given shape to given cursors positions as halo to given canvas
 	
 	print can be different things, add color, modify, decay ...
 
-modificateur de position : specialized sheet
-	floc
-	create movement by changing given cursors position and direction
 
 
 
@@ -173,6 +189,10 @@ modificateur de position : specialized sheet
 
 
 		R & D
+
+bool has_been_cleared flag destroyed widgets
+
+logarythmic slides
 
 save log at crash? how to detect crash?
 

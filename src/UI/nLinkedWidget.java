@@ -1,6 +1,6 @@
 package UI;
 
-import RBase.RConst;
+import RApplet.RConst;
 import sData.nRunnable;
 import sData.sBoo;
 import sData.sFlt;
