@@ -12,6 +12,9 @@ import sData.sObj;
 
 public class Macro_Element extends nDrawer implements Macro_Interf {
 	
+	//Macro_Connexion addLinkedInput(int c, String l, sValue v) {
+	//
+	//}
 
 	  nCtrlWidget addTrigS(int c, String l, nRunnable r) { 
 		    return addCtrlModel("MC_Element_SButton", l).setRunnable(r);

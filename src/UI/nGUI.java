@@ -86,5 +86,13 @@ public class nGUI {
     //logln(""+eventsFrame.size());
   }
   public void draw() {
-    if (isShown) drawing_pile.drawing(); }
+    if (isShown) drawing_pile.drawing(); 
+    for (PVector p : debugpoint) app.ellipse(p.x, p.y, 20, 20);
+    debugpoint.clear();
+  }
+  public ArrayList<PVector> debugpoint = new ArrayList<PVector>();
+  
+  public void point(float x, float y) {
+	  debugpoint.add(new PVector(x, y));
+  }
 }

@@ -5,10 +5,15 @@ import RApplet.RConst;
 public class sFlt extends sValue implements RConst {
 	  boolean limited_min = false, limited_max = false; float min, max;
 	  public sFlt set_limit(float mi, float ma) { 
-	    limited_min = true; limited_max = true; min = mi; max = ma; return this; }
+//	    limited_min = true; limited_max = true; 
+	    min = mi; max = ma; return this; }
 	  
-	  public sFlt set_min(float mi) { limited_min = true; min = mi; return this; }
-	  public sFlt set_max(float ma) { limited_max = true; max = ma; return this; }
+	  public sFlt set_min(float mi) { 
+//		  limited_min = true; 
+		  min = mi; return this; }
+	  public sFlt set_max(float ma) { 
+//		  limited_max = true; 
+		  max = ma; return this; }
 	  public float getmin() { return min; }
 	  public float getmax() { return max; }
 	  public float getscale() { return (val - min) / (max - min); }
@@ -30,8 +35,16 @@ public class sFlt extends sValue implements RConst {
 	  public void add(double v) { add((float)v); }
 	  void save_to_bloc(Save_Bloc svb) { super.save_to_bloc(svb);
 	    svb.newData("val", val);
+	    svb.newData("min", min);
+	    svb.newData("max", max);
+//	    svb.newData("lmin", limited_min);
+//	    svb.newData("lmax", limited_max);
 	  }
 	  void load_from_bloc(Save_Bloc svb) { super.load_from_bloc(svb);
 	    set(svb.getFloat("val"));
+	    min = svb.getFloat("min");
+	    min = svb.getFloat("max");
+//	    limited_min = svb.getBoolean("lmin");
+//	    limited_max = svb.getBoolean("lmax");
 	  }
 	}

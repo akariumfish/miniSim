@@ -95,15 +95,17 @@ public class nExplorer extends nDrawer {
 	        } 
 	      }});
 	      w.addEventVisibilityChange(new nRunnable(w) { public void run() {
-	        int ind = (int)Float.parseFloat(((nCtrlWidget)builder).getText()) + explorer_list.entry_pos;
-	        if (ind != gobackindex && ind > explorer_blocs.size() && 
-	            ind - explorer_blocs.size() < explorer_values.size()+gobackspace) {
-	          sValue val = explorer_values.get(ind-gobackspace - explorer_blocs.size());
-	          if (val.type.equals("str") || val.type.equals("col") || 
-	              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo")) 
-	                ((nCtrlWidget)builder).show();
-	          else { ((nCtrlWidget)builder).hide(); }
-	        } else { ((nCtrlWidget)builder).hide(); }
+	    	  	if (!myshelf.ref.isHided()) {
+		        int ind = (int)Float.parseFloat(((nCtrlWidget)builder).getText()) + explorer_list.entry_pos;
+		        if (ind != gobackindex && ind > explorer_blocs.size() && 
+		            ind - explorer_blocs.size() < explorer_values.size()+gobackspace) {
+		          sValue val = explorer_values.get(ind-gobackspace - explorer_blocs.size());
+		          if (val.type.equals("str") || val.type.equals("col") || 
+		              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo")) 
+		                ((nCtrlWidget)builder).show();
+		          else { ((nCtrlWidget)builder).hide(); }
+		        } else { ((nCtrlWidget)builder).hide(); }
+	    	  	} else { ((nCtrlWidget)builder).hide(); }
 	      }});
 	      w.setPosition(ref_size * 8.125F, ref_size * (i + 0.25F))
 	        .setTextVisibility(false)

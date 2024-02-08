@@ -25,8 +25,16 @@ public class sInt extends sValue {
 	  public void add(int v) { set(get()+v); }
 	  void save_to_bloc(Save_Bloc svb) { super.save_to_bloc(svb);
 	    svb.newData("val", val);
+	    svb.newData("min", min);
+	    svb.newData("max", max);
+//	    svb.newData("lmin", limited_min);
+//	    svb.newData("lmax", limited_max);
 	  }
 	  void load_from_bloc(Save_Bloc svb) { super.load_from_bloc(svb);
 	    set(svb.getInt("val"));
+	    min = svb.getInt("min");
+	    min = svb.getInt("max");
+//	    limited_min = svb.getBoolean("lmin");
+//	    limited_max = svb.getBoolean("lmax");
 	  }
 	}

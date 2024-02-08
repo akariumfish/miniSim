@@ -26,6 +26,8 @@ public class Macro_Packet {
 
 	static Macro_Packet newPacketSheet(Macro_Sheet m) { return new Macro_Packet("sheet").setSheet(m); }
 
+	static Macro_Packet newPacketObject(Object m) { return new Macro_Packet("obj").setObject(m); }
+
 	static Macro_Packet newPacketBool(boolean b) { 
 	  String r; 
 	  if (b) r = "T"; else r = "F"; 
@@ -39,6 +41,20 @@ public class Macro_Packet {
     def = d;
   }
   Macro_Packet addMsg(String m) { messages.add(m); return this; }
+
+  String popMsg() { // !!!!! if the packet is send to two in, for the sec messages will have been emptied
+	  				// packet is shared !!!!!
+	  if (messages.size() > 0) {
+		  String s = messages.get(0); 
+		  messages.remove(s);
+		  return s; 
+	  }
+	  return null; 
+  }
+  
+  boolean hasMsg() {
+	  return messages.size() > 0;
+  }
   
   boolean isBang()  { return def.equals("bang"); }
   boolean isFloat() { return def.equals("float"); }
@@ -89,10 +105,15 @@ public class Macro_Packet {
   public Macro_Packet setValue(sValue b) { val = b; return this; }
   boolean isValue() { return def.equals("value"); }
   sValue  asValue()   { if (isValue()) return val; else return null; }
-  
+
   Macro_Sheet psheet = null;
   Macro_Packet setSheet(Macro_Sheet b) { psheet = b; return this; }
   boolean isSheet() { return def.equals("sheet"); }
   Macro_Sheet  asSheet()   { if (isSheet()) return psheet; else return null; }
+
+  Object pobj = null;
+  Macro_Packet setObject(Object b) { pobj = b; return this; }
+  boolean isObject() { return def.equals("sheet"); }
+  Object  asObject()   { if (isObject()) return pobj; else return null; }
   
 }

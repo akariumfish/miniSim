@@ -9,6 +9,11 @@ public class miniSim {
 /*
 
 
+		NEW STRUCTURE 
+
+object info passed at connection : no need for packet exchange when connecting objet
+	== static connection ?
+output.addConnectEvent(input);
 
 Make sim and all macro bloc !!
 	in and/or out plus label name for each svalue > fat bloc, better inside a sheet
@@ -25,6 +30,46 @@ sheet menu :
 
 main menu :
 	explorer templates
+
+
+
+
+Collection de position : cursors in a sheet
+	position, dir and scale
+		add scale value to MCursor or to nCursor ?
+
+form : bloc
+	graphic object : line, trig, ellipse, rect...
+	axis aligned
+	colors, line width
+	
+structure : bloc
+	list of replic
+		pos, dir, scale, line width multiplyer and color filter
+	replicate a given form
+	max_entity and active_entity tools here
+
+patern : bloc
+	apply a parametrable patern to a shape
+	patern can be driven by a given random seed
+	building can be driven by tick input << !! sim random seed will be used !!
+
+	modif continue : create movement by changing given cursors position and direction
+		floc
+	
+Camera dessinateur : bloc
+	draw given shape to given cursors positions in camera view
+
+Canvas dessinateur : bloc
+	print given cursors as halo to given canvas
+	print given shape to given cursors positions as halo to given canvas
+	
+	print can be different things, add color, modify, decay ...
+
+
+
+
+
 
 
 		TO FIX
@@ -46,9 +91,9 @@ sheetobj in 1 line (merge get et out?)
 add sheetview menu et sheetobj par def dans spe sheet
 	> default sheet front
 	
-MValue add val.ref view
+MValue add watcherwidget for val.ref
 
-to big trig et switch : when too dezoomed show a screen widget (on/off)
+to big trig n switch : when too dezoomed show a screen widget (on/off)
 set button text (large font)
 
 min/max param in sflt numpanel slide
@@ -124,7 +169,7 @@ cursor bloc :
 MVar
 	add a hideable (like com) param drawer : select variable type
 	int str and vec better handling 
-MComment can log received data (auto text format with insertion token??)
+MComment can log auto text format with insertion token??
 camview
 	like a menu, name, click to go, 3 field for values, 
 	when selected capture n store cam pos / scale
@@ -136,51 +181,7 @@ setreset, counter, sequance, multigate
 
 
 
-		NEW STRUCTURE 
-
-working :
-	face as basic shape
-	sheet as collection of position
-	scalable cursor
-	camera dessinateur
-	
-object info passed at connection : no need for packet exchange when connecting objet
-	== static connection ?
-output.addConnectEvent(input);
-
-
-Collection de position : cursors in a specialized sheet
-	position, dir and scale
-		add scale value to MCursor or to nCursor ?
-
-form : bloc
-	graphic object : line, trig, ellipse, rect...
-	axis aligned
-	colors, line width
-	
-shape : bloc
-	list of replic
-		pos, dir, scale, line width multiplyer and color filter
-	replicate a given form in patern
-
-patern : bloc
-	apply a parametrable patern to a shape
-	patern can be driven by a given random seed
-	building can be driven by tick input << !! sim random seed will be used !!
-
-	modif continue : create movement by changing given cursors position and direction
-		floc
-	
-Camera dessinateur : bloc
-	draw given shape to given cursors positions in camera view
-
-Canvas dessinateur : bloc
-	print given cursors as halo to given canvas
-	print given shape to given cursors positions as halo to given canvas
-	
-	print can be different things, add color, modify, decay ...
-
-
+		
 
 
 

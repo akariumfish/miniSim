@@ -1,9 +1,10 @@
+package z_old_specialise;
 //package Specialize;
 //
 //import java.util.ArrayList;
-//
-//import Macro.Macro_Main;
-//import Macro.Macro_Sheet;
+
+import Macro.Macro_Main;
+import Macro.Macro_Sheet;
 //import RApplet.RConst;
 //import UI.Drawable;
 //import UI.nCursor;
@@ -13,7 +14,7 @@
 //import processing.core.PConstants;
 //import processing.core.PImage;
 //import processing.core.PVector;
-//import sData.*;
+import sData.*;
 ////import z_old_specialise.*;
 //
 //
@@ -25,7 +26,7 @@
 //
 //
 //
-//public class Canvas extends Macro_Sheet {
+public class Canvas extends Macro_Sheet {
 //	  
 ////	public static class CanvasPrint extends Sheet_Specialize {
 //////		  Simulation sim;
@@ -115,8 +116,8 @@
 //	  int active_can = 0;
 //	  int can_st;
 //	  
-//	  Canvas(Macro_Main m, sValueBloc b) { 
-//	    super(m, "Canvas", b);
+	  Canvas(Macro_Main m, sValueBloc b) { 
+	    super(m, "Canvas", b);
 //	    
 //	    int def_pix_size = 10;
 //	    val_pos = newVec("val_pos", "val_pos");
@@ -186,7 +187,7 @@
 ////	        for (Community c : sim.list) if (c.name.equals(selected_com.get())) selected_comu(c);
 //	        cam_draw.toLayerBottom();
 //	      }}); } } );
-//	  }
+	  }
 //	  
 //	  void reset() {
 //	    can1 = gui.app.createImage(val_w.get(), val_h.get(), PConstants.RGB);
@@ -441,7 +442,7 @@
 //	  //    p.add(m);
 //	  //  }
 //	  //}
-//	}
+	}
 //
 //	  abstract class PixelTransform {
 //		  public abstract int result(int v); }

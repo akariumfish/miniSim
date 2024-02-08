@@ -20,12 +20,18 @@ import sData.sValueBloc;
  */
 public class Macro_Bloc extends Macro_Abstract {
 	nCtrlWidget param_open;
-  Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
-    super(_sheet, t, n, _bloc);
-//    mlogln("build bloc "+t+" "+n+" "+ _bloc);
-    addShelf(); 
-    addShelf();
-  }
+	  Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
+		    super(_sheet, t, n, _bloc);
+//		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
+		    addShelf(); 
+		    addShelf();
+		  }
+	  Macro_Bloc(Macro_Sheet _sheet, String t, sValueBloc _bloc) {
+		    super(_sheet, t, t, _bloc);
+//		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
+		    addShelf(); 
+		    addShelf();
+		  }
   
   nCtrlWidget get_param_openner() {
 	  if (param_open == null) {
@@ -150,9 +156,12 @@ public class Macro_Bloc extends Macro_Abstract {
   Macro_Connexion addOutput(int c, String t, nRunnable r) { 
     return addOutput(c, t).addEventReceive(r);
   }
-  
+
   Macro_Connexion addInputBang(int c, String t, nRunnable r) { 
     return addInput(c, t).setFilterBang().addEventReceiveBang(r); }
+
+  Macro_Connexion addInputFloat(int c, String t, nRunnable r) { 
+    return addInput(c, t).setFilterFloat().addEventReceiveFloat(r); }
   
   Macro_Element addSheetInput(int c, String t) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", t, OUTPUT, INPUT, true);

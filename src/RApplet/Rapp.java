@@ -147,7 +147,7 @@ public class Rapp extends PApplet implements RConst {
 	    fullscreen=true;
 	    surface.setLocation(0, (int) -(window_head));
 	    sx = 0; sy = (int) -(window_head);
-	    surface.setAlwaysOnTop(true);
+	    surface.setAlwaysOnTop(false);
 	    screen_0_x = 0; screen_0_y = (int)window_head; 
 	    screen_width = displayWidth; screen_height = displayHeight;
 	  }

@@ -1,5 +1,8 @@
-//package z_old_specialise;
+package z_old_specialise;
 //
+
+public class FlocComu {}
+
 //import Macro.*;
 //import Specialize.Canvas;
 //import UI.*;
@@ -111,41 +114,6 @@
 //  }
 //  Floc clear() { return this; }
 //  FlocComu com() { return ((FlocComu)com); }
-//  
-////#######################################################################
-////##          ROTATING TO ANGLE CIBLE BY SHORTEST DIRECTION            ##
-////#######################################################################
-//
-//  float mapToCircularValues(float current, float cible, float increment, float start, float stop) {
-//	  if (start > stop) {float i = start; start = stop; stop = i;}
-//	  increment = Math.abs(increment);
-//	  
-//	  while (cible > stop) {cible -= (stop - start);}
-//	  while (current > stop) {current -= (stop - start);}
-//	  while (cible < start) {cible += (stop - start);}
-//	  while (current < start) {current += (stop - start);}
-//	  
-//	  if (cible < current) {
-//	    if ( (current - cible) <= (stop - current + cible - start) ) {
-//	      if (increment >= current - cible) {return cible;}
-//	      else                              {return current - increment;}
-//	    } else {
-//	      if (increment >= stop - current + cible - start) {return cible;}
-//	      else if (current + increment < stop)             {return current + increment;}
-//	      else                                             {return start + (increment - (stop - current));}
-//	    }
-//	  } else if (cible > current) {
-//	    if ( (cible - current) <= (stop - cible + current - start) ) {
-//	      if (increment >= cible - current) {return cible;}
-//	      else                              {return current + increment;}
-//	    } else { 
-//	      if (increment >= stop - cible + current - start) {return cible;}
-//	      else if (current - increment > start)            {return current - increment;}
-//	      else                                             {return stop - (increment - (current - start));}
-//	    }
-//	  }
-//	  return cible;
-//	}
 //  
 //}
 //

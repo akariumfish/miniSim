@@ -13,9 +13,9 @@ public interface Macro_Interf {
 	  final String[] bloc_types3 = {"colRGB", "btrig", "bswitch", "comp", "ramp", "chan", "data", "pan", 
               						"panbin", "pansld", "pangrph", "calc" , "menu" };
 
-	  final String[] bloc_types4 = {"com", "in", "out", "trig", "btrig", "switch", "gate", "pulse", "not"};
+	  final String[] bloc_types4 = {"bin", "bool", "calc", "comp", "var", "switch", "pulse", "not"};
 
-	  final String[] bloc_types5 = {"bin", "bool", "calc", "comp", "var", "chan", "data", "menu"};
+	  final String[] bloc_types5 = {"com", "in", "out", "trig", "btrig", "gate", "chan", "data", "menu"};
 	                                
 	  final String[] bloc_info1 = {"commentary", "sheet input", "sheet output", 
 	                               "trigger > bang", "switch > bool", "can control msg circulation", 

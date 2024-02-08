@@ -1,4 +1,6 @@
-//package z_old_specialise;
+package z_old_specialise;
+
+public class Community {}
 //
 //import java.util.ArrayList;
 //

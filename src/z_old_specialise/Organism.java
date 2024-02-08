@@ -1,3 +1,4 @@
+package z_old_specialise;
 //package Specialize;
 //
 //import UI.*;
@@ -52,7 +53,7 @@
 //
 //
 //
-//public class Organism extends Macro_Sheet {
+public class Organism {}// extends Macro_Sheet {
 //  
 //
 ////	public static class OrganismPrint extends Sheet_Specialize {

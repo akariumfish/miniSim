@@ -240,18 +240,18 @@ nExplorer sheet_explorer;
         .setInfo(bloc_builders.get(i).descr)
         ;
     }
+//    build_tool.addShelf();
+//    //int c = 0;
+//    for (String t : bloc_types4) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
+//      .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
+//        .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
+//        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
+//        //.setInfo(bloc_info4[c])
+//        ;
+//      //c++;
+//    }
     build_tool.addShelf();
-    //int c = 0;
-    for (String t : bloc_types4) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
-      .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
-        .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
-        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-        //.setInfo(bloc_info4[c])
-        ;
-      //c++;
-    }
-    build_tool.addShelf();
-    for (String t : bloc_types5) { build_tool.getShelf(2).addDrawer(2.5, 0.75)
+    for (String t : bloc_types5) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
       .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
         .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
         .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
@@ -935,8 +935,17 @@ public Macro_Main(sInterface _int) {
     add_bloc_builders(new Macro_Sheet.MSheet_Builder());
     add_bloc_builders(new MSheetView.MSheetView_Builder());
     add_bloc_builders(new MSheetObj.MSheetObj_Builder());
-    add_bloc_builders(new MValue.MValue_Builder());
+//    add_bloc_builders(new MValue.MValue_Builder());
     add_bloc_builders(new MCursor.MCursor_Builder());
+    add_bloc_builders(new MForm.MForm_Builder());
+    add_bloc_builders(new MCamera.MCam_Builder());
+    add_bloc_builders(new MStructure.MStructure_Builder());
+    add_bloc_builders(new MTick.MTick_Builder());
+    add_bloc_builders(new MPatern.MPatern_Builder());
+    add_bloc_builders(new MCanvas.MCanvas_Builder());
+    add_bloc_builders(new MCount.MCount_Builder());
+    add_bloc_builders(new MMcomp.MMcomp_Builder());
+    
     
     
     

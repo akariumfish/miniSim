@@ -70,4 +70,39 @@ public interface RConst {
 	static float distancePointToPoint(float xa, float ya, float xb, float yb) {
 	  return (float) Math.sqrt( Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2) );
 	}
+	
+//#######################################################################
+//##          ROTATING TO ANGLE CIBLE BY SHORTEST DIRECTION            ##
+//#######################################################################
+
+  static float mapToCircularValues(float current, float cible, float increment, float start, float stop) {
+	  if (start > stop) {float i = start; start = stop; stop = i;}
+	  increment = Math.abs(increment);
+	  
+	  while (cible > stop) {cible -= (stop - start);}
+	  while (current > stop) {current -= (stop - start);}
+	  while (cible < start) {cible += (stop - start);}
+	  while (current < start) {current += (stop - start);}
+	  
+	  if (cible < current) {
+	    if ( (current - cible) <= (stop - current + cible - start) ) {
+	      if (increment >= current - cible) {return cible;}
+	      else                              {return current - increment;}
+	    } else {
+	      if (increment >= stop - current + cible - start) {return cible;}
+	      else if (current + increment < stop)             {return current + increment;}
+	      else                                             {return start + (increment - (stop - current));}
+	    }
+	  } else if (cible > current) {
+	    if ( (cible - current) <= (stop - cible + current - start) ) {
+	      if (increment >= cible - current) {return cible;}
+	      else                              {return current + increment;}
+	    } else { 
+	      if (increment >= stop - cible + current - start) {return cible;}
+	      else if (current - increment > start)            {return current - increment;}
+	      else                                             {return stop - (increment - (current - start));}
+	    }
+	  }
+	  return cible;
+	}
 }

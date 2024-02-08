@@ -479,8 +479,12 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           last_packet = packet_received.get(i);
           process_resum = process_resum + last_packet.getText() + " ";
           for (nRunnable r : eventReceiveRun) r.run();
-          
+
           if (last_packet.isBang()) nRunnable.runEvents(eventReceiveBangRun);
+          if (last_packet.isBool()) nRunnable.runEvents(eventReceiveBoolRun);
+          if (last_packet.isInt()) nRunnable.runEvents(eventReceiveIntRun);
+          if (last_packet.isFloat()) nRunnable.runEvents(eventReceiveFloatRun);
+          if (last_packet.isStr()) nRunnable.runEvents(eventReceiveStrRun);
           
           if (direct_co != null && direct_co.type == OUTPUT) direct_co.send(last_packet);
           if (direct_co != null && direct_co.type == INPUT) direct_co.receive(packet_sender.get(i), last_packet);
@@ -506,9 +510,21 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   ArrayList<nRunnable> eventReceiveRun = new ArrayList<nRunnable>();
   Macro_Connexion addEventReceive(nRunnable r)    { eventReceiveRun.add(r); return this; }
   Macro_Connexion removeEventReceive(nRunnable r) { eventReceiveRun.remove(r); return this; }
-  
+
   ArrayList<nRunnable> eventReceiveBangRun = new ArrayList<nRunnable>();
   Macro_Connexion addEventReceiveBang(nRunnable r)    { eventReceiveBangRun.add(r); return this; }
+
+  ArrayList<nRunnable> eventReceiveBoolRun = new ArrayList<nRunnable>();
+  Macro_Connexion addEventReceiveBool(nRunnable r)    { eventReceiveBoolRun.add(r); return this; }
+
+  ArrayList<nRunnable> eventReceiveIntRun = new ArrayList<nRunnable>();
+  Macro_Connexion addEventReceiveInt(nRunnable r)    { eventReceiveIntRun.add(r); return this; }
+
+  ArrayList<nRunnable> eventReceiveFloatRun = new ArrayList<nRunnable>();
+  Macro_Connexion addEventReceiveFloat(nRunnable r)    { eventReceiveFloatRun.add(r); return this; }
+
+  ArrayList<nRunnable> eventReceiveStrRun = new ArrayList<nRunnable>();
+  Macro_Connexion addEventReceiveStr(nRunnable r)    { eventReceiveStrRun.add(r); return this; }
   
   
   Macro_Connexion direct_co = null;

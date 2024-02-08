@@ -70,7 +70,7 @@ public class nLinkedWidget extends nWidget {
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 
 	      String s = ((nLinkedWidget)builder).getText();
-	      if (!String.valueOf(Float.parseFloat(s)).equals("NaN")) fval.set(Float.parseFloat(s)); } } );
+	      if (s.length() > 0 && !s.equals("-") && !String.valueOf(Float.parseFloat(s)).equals("NaN")) fval.set(Float.parseFloat(s)); } } );
 	      //!(s.length() > 0 && float(s) == 0) && 
 	    return this; }
 	  nLinkedWidget setLinkedValue(sVec b) { 

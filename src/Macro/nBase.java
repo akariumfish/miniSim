@@ -1,4 +1,4 @@
-package Specialize;
+package Macro;
 
 import RApplet.Rapp;
 import processing.core.PVector;
@@ -23,23 +23,29 @@ abstract class nShape {
   nShape(Rapp app) {
 	  col_fill = app.color(20, 130, 40); col_line = app.color(10, 190, 40);
   }
-  void draw(Rapp app) {
+  void draw(Rapp app, boolean is_line) {
 	  app.pushMatrix();
 	  app.translate(pos.x, pos.y);
 	  app.rotate(dir.heading());
 	  app.scale(dir.mag());
-    if (do_fill) app.fill(col_fill); else app.noFill(); 
-    app.noStroke();
-    draw_fill_call(app);
-    app.noFill(); 
-    if (do_stroke) app.stroke(col_line); else app.noStroke(); app.strokeWeight(line_w);
-    draw_stroke_call(app);
-    
+	if (!is_line) {
+//	    app.noStroke();
+//	    app.noFill(); 
+	    if (do_fill) app.fill(col_fill); else app.noFill(); 
+	    if (do_stroke) app.stroke(col_line); else app.noStroke(); app.strokeWeight(line_w);
+	    draw_fill_call(app);
+//	    draw_stroke_call(app);
+	} else {
+		app.noFill(); 
+	    if (do_stroke) app.stroke(col_line); else app.noStroke(); app.strokeWeight(line_w);
+	    draw_line_call(app);
+	}
     
     app.popMatrix();
   }
   abstract void draw_fill_call(Rapp a);
   abstract void draw_stroke_call(Rapp a);
+  abstract void draw_line_call(Rapp a);
 }
 
 public class nBase extends nShape {
@@ -48,8 +54,8 @@ public class nBase extends nShape {
 	  super(app);
     face = new nFace();
     face.p1 = new PVector(1, 0);
-    face.p2 = new PVector(0, 0.3F);
-    face.p3 = new PVector(-1, -0.3F);
+    face.p2 = new PVector(0, 0.0F);
+    face.p3 = new PVector(0, -1.0F);
     //face.norma();
 
     m = new PVector(0, 0);
@@ -75,6 +81,9 @@ public class nBase extends nShape {
     return p; }
   void draw_fill_call(Rapp app) {
 	    app.triangle(face.p1.x, face.p1.y, face.p2.x, face.p2.y, face.p3.x, face.p3.y);
+	  }
+  void draw_line_call(Rapp app) {
+	    app.line(face.p1.x, face.p1.y, face.p2.x, face.p2.y);
 	  }
   PVector m,l1,l2,l3;
 	void draw_stroke_call(Rapp app) {
