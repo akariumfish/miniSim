@@ -17,6 +17,8 @@ DataHolding
 
 
 public class DataHolder extends sValueBloc {
+	
+	boolean doevent = true;
   
   public DataHolder(Rapp a) {
     super(); 

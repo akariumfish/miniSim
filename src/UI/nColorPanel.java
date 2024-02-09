@@ -53,7 +53,7 @@ public class nColorPanel extends nWindowPanel {
 	    
 	    if (cval == null) clear();
 	  } 
-	  void update() { 
+	void update() { 
 	    if (cval != null) {
 	      color_widget.setStandbyColor(gui.app.color(red, gre, blu, alp)); 
 	      cval.set(gui.app.color(red, gre, blu, alp)); }

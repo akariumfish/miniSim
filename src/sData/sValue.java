@@ -6,6 +6,7 @@ import Macro.Macro_Packet;
 import RApplet.RConst;
 
 public abstract class sValue implements RConst {
+	public boolean log = false;
 	  sValueBloc getBloc() { return bloc; }
 	  public abstract String getString();
 	  void clear() { 
@@ -13,8 +14,8 @@ public abstract class sValue implements RConst {
 	    bloc.values.remove(ref, this); 
 	  }
 	  void clean() { 
-	    if (doevent) nRunnable.runEvents(eventsDelete);
-	    if (bloc.doevent) nRunnable.runEvents(bloc.eventsDelVal);
+	    if (doevent && data.doevent) nRunnable.runEvents(eventsDelete);
+	    if (bloc.doevent && data.doevent) nRunnable.runEvents(bloc.eventsDelVal);
 	  }
 	  public boolean doevent() { return doevent; }
 	  public sValue doEvent(boolean v) { doevent = v; return this; }
@@ -26,7 +27,7 @@ public abstract class sValue implements RConst {
 	  public sValue removeEventAllChange(nRunnable r) { eventsAllChange.remove(r); return this; }
 	  void doChange() { 
 		  if (!pauseevent) { 
-			  if (doevent) nRunnable.runEvents(eventsAllChange); 
+			  if (doevent && data.doevent) nRunnable.runEvents(eventsAllChange); 
 			  has_changed = true; 
 		  } else {
 			  was_changed = true;
@@ -37,23 +38,23 @@ public abstract class sValue implements RConst {
 	  public String ref;
 	  public String type;
 	  public String shrt;
-	  //abstract Object def;
+	  DataHolder data;
 	  sValue(sValueBloc b, String t, String r, String s) { 
-	    bloc = b; 
+	    bloc = b; data = bloc.data;
 	    while (bloc.values.get(r) != null) r = r + "'";
 	    type = t; ref = r; shrt = s;
 	    bloc.values.put(ref, this); 
 	    if (bloc.doevent) bloc.last_created_value = this; 
-	    if (bloc.doevent) nRunnable.runEvents(bloc.eventsAddVal); }
+	    if (bloc.doevent && data.doevent) nRunnable.runEvents(bloc.eventsAddVal); }
 	  void frame() { 
 		  if (!pauseevent) { 
 			  if (has_changed) { 
-				  if (doevent) nRunnable.runEvents(eventsChange); 
+				  if (doevent && data.doevent) nRunnable.runEvents(eventsChange); 
 			  } 
 			  has_changed = false; 
 		  } else {
 			  if (was_changed) { 
-				  if (doevent) nRunnable.runEvents(eventsAllChange); 
+				  if (doevent && data.doevent) nRunnable.runEvents(eventsAllChange); 
 				  has_changed = true; 
 			  }
 			  pauseevent = false; 

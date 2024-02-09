@@ -95,7 +95,6 @@ class MVar extends Macro_Bloc {
       if (in.lastPack() != null) {
         if (in.lastPack().isBang() && packet != null) out.send(packet);
         else { 
-          
           if (in.lastPack().isBool()) {
             bval.set(in.lastPack().asBool());
             val_type.set("boo");
@@ -103,13 +102,20 @@ class MVar extends Macro_Bloc {
             view.setText(packet.getText()); 
             val_view.set(view.getText());
           }
+          if (in.lastPack().isInt()) {
+              fval.set(in.lastPack().asInt());
+              val_type.set("flt");
+              packet = Macro_Packet.newPacketFloat(in.lastPack().asInt()); 
+              view.setText(packet.getText()); 
+              val_view.set(view.getText());
+            }
           if (in.lastPack().isFloat()) {
-            fval.set(in.lastPack().asFloat());
-            val_type.set("flt");
-            packet = in.lastPack(); 
-            view.setText(packet.getText()); 
-            val_view.set(view.getText());
-          }
+              fval.set(in.lastPack().asFloat());
+              val_type.set("flt");
+              packet = in.lastPack(); 
+              view.setText(packet.getText()); 
+              val_view.set(view.getText());
+            }
           if (in.lastPack().isVec()) {
             vval.set(in.lastPack().asVec());
             val_type.set("vec");
@@ -206,12 +212,18 @@ class MCalc extends Macro_Bloc {
     valMUL.addEventChange(new nRunnable() { public void run() { if (valMUL.get()) receive(); } });
     valDEV.addEventChange(new nRunnable() { public void run() { if (valDEV.get()) receive(); } });
     
-    in1 = addInput(0, "in").setFilterFloat().setLastFloat(0).addEventReceive(new nRunnable() { public void run() { 
-      if (in1.lastPack() != null && in1.lastPack().isFloat() && in1.lastPack().asFloat() != pin1) {
-        pin1 = in1.lastPack().asFloat(); receive(); } } });
-    in2 = addInput(0, "in").setFilterFloat().setLastFloat(0).addEventReceive(new nRunnable() { public void run() { 
-      if (in2.lastPack() != null && in2.lastPack().isFloat() && in2.lastPack().asFloat() != pin2) {
-        pin2 = in2.lastPack().asFloat(); view.setText(RConst.trimStringFloat(pin2)); receive(); } } });
+    in1 = addInput(0, "in").setFilterNumber().setLastFloat(0)
+    		.addEventReceive(new nRunnable() { public void run() { 
+    		      if (in1.lastPack() != null && in1.lastPack().isFloat() && in1.lastPack().asFloat() != pin1) {
+    		          pin1 = in1.lastPack().asFloat(); receive(); } 
+    		      else if (in1.lastPack() != null && in1.lastPack().isInt() && in1.lastPack().asInt() != pin1) {
+    		          pin1 = in1.lastPack().asInt(); receive(); } } });
+    in2 = addInput(0, "in").setFilterNumber().setLastFloat(0)
+    		.addEventReceive(new nRunnable() { public void run() { 
+    		      if (in2.lastPack() != null && in2.lastPack().isFloat() && in2.lastPack().asFloat() != pin2) {
+    		          pin2 = in2.lastPack().asFloat(); view.setText(RConst.trimStringFloat(pin2)); receive(); }
+    		      else if (in2.lastPack() != null && in2.lastPack().isInt() && in2.lastPack().asInt() != pin2) {
+    		          pin2 = in2.lastPack().asInt(); view.setText(RConst.trimStringFloat(pin2)); receive(); } } });
     
     out = addOutput(1, "out")
       .setDefFloat();
@@ -429,18 +441,22 @@ class MSwitch extends Macro_Bloc {
     
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isBang()) {
-        swtch.setSwitchState(!swtch.isOn());
+    	  	state.swtch();
+    	      out_t.send(Macro_Packet.newPacketBool(state.get()));
       } 
       if (in.lastPack() != null && in.lastPack().isBool()) {
-        swtch.setSwitchState(in.lastPack().asBool());
+    	  	state.set(in.lastPack().asBool());
+    	      out_t.send(Macro_Packet.newPacketBool(state.get()));
       } 
     } });
     
     swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton").setLinkedValue(state);
+    swtch.addEventTrigger(new nRunnable() { public void run() {
+	    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	    		out_t.send(Macro_Packet.newPacketBool(state.get()));
+	    	}});
+    }});
     
-    state.addEventChange(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBool(state.get()));
-    } });
     
     out_t = addOutput(2, "out")
       .setDefBool();

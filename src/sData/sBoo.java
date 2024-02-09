@@ -13,4 +13,5 @@ public class sBoo extends sValue {
 	  void load_from_bloc(Save_Bloc svb) { super.load_from_bloc(svb);
 	    set(svb.getBoolean("val"));
 	  }
+	  public void swtch() { val = !val; doChange(); }
 	}

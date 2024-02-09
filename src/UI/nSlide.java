@@ -11,9 +11,11 @@ public class nSlide extends nWidget {
 	  //  return this;
 	  //}
 	  public nSlide setValue(float v) {
-	    if (v < 0) v = 0; if (v > 1) v = 1;
-	    curs.setPX(v * (bar.getLocalSX() - curs.getLocalSX()));
-	    cursor_value = v;
+		  if (v < 0) v = 0; if (v > 1) v = 1;
+		  if (v != cursor_value) {
+		    curs.setPX(v * (bar.getLocalSX() - curs.getLocalSX()));
+		    cursor_value = v;
+		  }
 	    return this;
 	  }
 	  public nWidget addEventSlide(nRunnable r)   { eventSlide.add(r); return this; }

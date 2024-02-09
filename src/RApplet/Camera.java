@@ -23,7 +23,7 @@ public class Camera {
   public boolean screenshot = false; //enregistre une image de la frame sans les menu si true puis se desactive
   boolean matrixPushed = false; //track if in or out of the cam matrix
   
-  float min_scale = 0.2F, max_scale = 5.0F;
+  float min_scale = 0.02F, max_scale = 5.0F;
   
   nRunnable up_view_run;
   Camera(sInput i, sValueBloc d) { 

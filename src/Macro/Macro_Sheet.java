@@ -410,6 +410,7 @@ public class Macro_Sheet extends Macro_Abstract {
 //	  gui.app.plogln("Sheet " + value_bloc.ref+" ask_packet_process from "+co.descr);
     if (co.type == OUTPUT) out_to_process.add(co);
     if (co.type == INPUT) in_to_process.add(co);
+    mmain().pross_in_waiting++;
     mmain().ask_packet_process(this);
   }
 
@@ -428,7 +429,7 @@ public class Macro_Sheet extends Macro_Abstract {
       String procc_resum = value_bloc.ref + " process resum ";
       
       boolean done = false; 
-      while (!done || turn_count > max_turn) {
+      while (!done && (turn_count < max_turn || mmain().loading_delay > 0)) {
         done = true;
         gui.app.plogln("turn " + turn_count);
         gui.app.plogln("   start:in" + in_to_process.size() + "-out" + out_to_process.size() + " OUTs process send");
@@ -436,6 +437,7 @@ public class Macro_Sheet extends Macro_Abstract {
           Macro_Connexion m = out_to_process.remove();
           done = m.process_send() && done;
           procc_resum += m.process_resum;
+          mmain().pross_in_waiting--;
           co_processed.add(m);
         }
         gui.app.plogln("   mid:in" + in_to_process.size() + "-out" + out_to_process.size() + " INs process receive");
@@ -443,26 +445,26 @@ public class Macro_Sheet extends Macro_Abstract {
           Macro_Connexion m = in_to_process.remove();
           done = m.process_receive() && done;
           procc_resum += m.process_resum;
+          mmain().pross_in_waiting--;
           co_processed.add(m);
         }
         gui.app.plogln("   end:in" + in_to_process.size() + "-out" + out_to_process.size() + "");
+
+        done = out_to_process.size() == 0 && in_to_process.size() == 0 && done;
         
         turn_count++;
       }
-      if (max_turn == turn_count) gui.app.plogln("-----------MAX TURN-----------");
+      if (max_turn == turn_count)  { 
+//    	  	gui.app.plogln("-----------MAX TURN-----------");
+    	  	
+      }
       gui.app.plogln("");
       gui.app.plogln(procc_resum);
       gui.app.plogln("");
       
-      //if (turn_count > max_turn) {
-      //  String[] llink = PApplet.splitTokens(mmain().last_created_link, INFO_TOKEN);
-      //  if (llink.length == 2) mmain().last_link_sheet.remove_link(llink[0], llink[1]);
-      //  logln("LOOP");
-      //}
-      
       for (Macro_Connexion m : co_processed) m.end_packet_process();
       co_processed.clear();
-      //packet_process_asked = false;
+      
     }
     return turn_count;
   }

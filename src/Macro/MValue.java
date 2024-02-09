@@ -1,6 +1,6 @@
 package Macro;
 
-import UI.nBoolPanel;
+import UI.nBinPanel;
 import UI.nColorPanel;
 import UI.nCtrlWidget;
 import UI.nNumPanel;
@@ -62,7 +62,7 @@ public class MValue extends MBasic {
 	        } else if (cible.type.equals("int")) { 
 	          new nNumPanel(mmain().screen_gui, mmain().inter.taskpanel, (sInt)cible);
 	        } else if (cible.type.equals("boo")) { 
-	          new nBoolPanel(mmain().screen_gui, mmain().inter.taskpanel, (sBoo)cible);
+	          new nBinPanel(mmain().screen_gui, mmain().inter.taskpanel, (sBoo)cible);
 	        } else if (cible.type.equals("col")) { 
 	          new nColorPanel(mmain().screen_gui, mmain().inter.taskpanel, (sCol)cible);
 	        }

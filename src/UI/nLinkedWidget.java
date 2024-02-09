@@ -59,7 +59,8 @@ public class nLinkedWidget extends nWidget {
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 
 	      String s = ((nLinkedWidget)builder).getText();
-	      if (!(s.length() > 0 && Integer.parseInt(s) == 0) && !PApplet.str(Integer.parseInt(s)).equals("NaN")) ival.set(Integer.parseInt(s)); } } );
+	      if (s.length() > 0 && !PApplet.str(Integer.parseInt(s)).equals("NaN")) 
+	    	  	ival.set(PApplet.parseInt(s)); } } );
 	    return this; }
 	  nLinkedWidget setLinkedValue(sFlt b) { 
 	    fval = b;

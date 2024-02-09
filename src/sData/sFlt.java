@@ -31,10 +31,18 @@ public class sFlt extends sValue implements RConst {
 	  public float get() { return val; }
 	  public void set(double v) { set((float)v); }
 	  public void set(float v) { 
+		  
 	    if (limited_max && v > max) v = max; if (limited_min && v < min) v = min;
-	    if (v != val) { val = v; doChange(); } }
+	    if (v != val) { if (log) bloc.data.app.logln(ref+"issetto"+v); val = v; doChange(); } }
+	  
 	  public void add(float v) { set(get()+v); }
 	  public void add(double v) { add((float)v); }
+	  public void mult(float v) { set(get()*v); }
+	  public void mult(double v) { mult((float)v); }
+	  public void div(float v) { set(get()/v); }
+	  public void div(double v) { div((float)v); }
+	  
+	  
 	  void save_to_bloc(Save_Bloc svb) { super.save_to_bloc(svb);
 	    svb.newData("val", val);
 	    svb.newData("min", min);
@@ -49,8 +57,4 @@ public class sFlt extends sValue implements RConst {
 	    limited_min = svb.getBoolean("lmin");
 	    limited_max = svb.getBoolean("lmax");
 	  }
-	  public void mult(float v) { set(get()*v); }
-	  public void mult(double v) { mult((float)v); }
-	  public void div(float v) { set(get()/v); }
-	  public void div(double v) { div((float)v); }
 	}

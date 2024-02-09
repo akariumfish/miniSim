@@ -357,8 +357,8 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
 	grabber.setPY(grabber.getLocalY() - grabber.getLocalY()%(ref_size * GRID_SNAP_FACT));
 	grabber.setPX(grabber.getLocalX() - grabber.getLocalX()%(ref_size * GRID_SNAP_FACT));
 
-	int adding_dir_x = -1;
-	int adding_dir_y = 0;
+	int adding_dir_x = 0;
+	int adding_dir_y = 1;
 	int adding_side_l = 1;
 	int adding_side_cnt = 0;
     int adding_count = 0;

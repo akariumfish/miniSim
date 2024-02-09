@@ -11,6 +11,10 @@ public class miniSim {
 
 		MACRO BLOC
 trig switch bin not gate OK
+
+general bloc capability
+	send something at startup
+	can open a menupanel
 		
 
 		NEW STRUCTURE 
@@ -80,11 +84,19 @@ Canvas dessinateur : bloc
 
 number formating!!!
 
+MPanel and MTool charge theire composent in blocs priority order
 
+dans sheetview addctrl for deploy/open/reduc
 
 
 
 		TO DO
+		
+in bin menu can choose to "double" it > like if msg go through 2 bin >
+	filter bool false packet
+		
+link are lightened gradually when packet process slowly to show progression
+	see top of Macro_Connexion . send() for methods. 
 
 bloc can has mode unique, cad only one of a type by sheet
 

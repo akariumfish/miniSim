@@ -43,7 +43,7 @@ sFlt frame_duration;
 
     sec_since_reset = new sInt(d, 0, "sec_since_reset", "sec");
     frame_since_reset = new sInt(d, 0, "frame_since_reset", "frsr");
-    median_framerate = new sFlt(d, 0, "median_framerate", "mfr");
+    median_framerate = new sFlt(d, 60, "median_framerate", "mfr");
     current_framerate = new sFlt(d, 0, "current_framerate", "cfr");
     frame_duration = new sFlt(d, 0, "frame_duration", "fdur");
   }

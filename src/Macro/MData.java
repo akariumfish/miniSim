@@ -1,7 +1,7 @@
 package Macro;
 
 import RApplet.RConst;
-import UI.nBoolPanel;
+import UI.nBinPanel;
 import UI.nColorPanel;
 import UI.nCtrlWidget;
 import UI.nLinkedWidget;
@@ -49,7 +49,14 @@ public class MData extends Macro_Bloc {
 	        new nValuePicker(mmain().screen_gui, mmain().inter.taskpanel, val_cible, sheet.sheet.value_bloc, true)
 	          .addEventChoose(new nRunnable() { public void run() { get_cible(); } } );
 	    } });
-	    pop_pan = picker.getDrawer().addCtrlModel("MC_Element_MiniButton", "p")
+	    
+	    ref_field = addEmptyXL(0).addLinkedModel("MC_Element_LField").setLinkedValue(val_cible);
+	    
+	    search_view = ref_field.getDrawer().addLinkedModel("MC_Element_MiniButton").setLinkedValue(search_folder);
+	    
+	    in = addInput(0, "in");
+	    
+	    pop_pan = addEmptyS(0).addCtrlModel("MC_Element_SButton", "panel")
 	    .setRunnable(new nRunnable() { public void run() {
 	      if (cible != null) {
 	        if (cible.type.equals("str")) { 
@@ -59,20 +66,14 @@ public class MData extends Macro_Bloc {
 	        } else if (cible.type.equals("int")) { 
 	          new nNumPanel(mmain().screen_gui, mmain().inter.taskpanel, (sInt)cible);
 	        } else if (cible.type.equals("boo")) { 
-	          new nBoolPanel(mmain().screen_gui, mmain().inter.taskpanel, (sBoo)cible);
+	          new nBinPanel(mmain().screen_gui, mmain().inter.taskpanel, (sBoo)cible);
 	        } else if (cible.type.equals("col")) { 
 	          new nColorPanel(mmain().screen_gui, mmain().inter.taskpanel, (sCol)cible);
 	        }
 	      }
 	    } });
 	    
-	    ref_field = addEmptyXL(0).addLinkedModel("MC_Element_LField").setLinkedValue(val_cible);
-	    
-	    search_view = ref_field.getDrawer().addLinkedModel("MC_Element_MiniButton").setLinkedValue(search_folder);
-	    
-	    in = addInput(0, "in");
-	    
-	    val_field = addEmptyXL(0).addWatcherModel("MC_Element_LText");
+	    val_field = addEmptyL(1).addWatcherModel("MC_Element_Text");
 	    val_cible.addEventChange(new nRunnable(this) { public void run() { get_cible(); } } );
 	    
 	    out = addOutput(2, "out");

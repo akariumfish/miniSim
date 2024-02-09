@@ -565,31 +565,33 @@ public sRun full_screen_run;
   public sInterface addEventSetupLoad(nRunnable r) { eventsSetupLoad.add(r); return this; }
   ArrayList<nRunnable> eventsSetupLoad = new ArrayList<nRunnable>();
   public void setup_load() {
-	  app.logln("setup_load from "+savepath_value.get());
-    file_savebloc.clear();
-    if (setup_bloc != null) setup_bloc.clear();
-    if (file_savebloc.load_from(savepath_value.get())) {
-      
-      setup_bloc = data.newBloc(file_savebloc, "setup");
-      
-      if (setup_bloc.getValue("auto_load") == null || 
-          (setup_bloc.getValue("auto_load") != null && ((sBoo)setup_bloc.getValue("auto_load")).get())) {
-        
-        macro_main.setup_load(setup_bloc);
-        nRunnable.runEvents(eventsSetupLoad);
-        for (nRunnable r : eventsSetupLoad) r.builder = setup_bloc;
-        
-        if (setup_bloc.getValue("show_taskpanel") != null) 
-          show_taskpanel.set(((sBoo)setup_bloc.getValue("show_taskpanel")).get());
-        
-        if (setup_bloc.getValue("log_ext_save") != null) {
-          log_ext_save.set(((sBoo)setup_bloc.getValue("log_ext_save")).get());
-          app.save_log_exit = log_ext_save.get();
-        }
-      }
-      if (setup_bloc.getValue("auto_load") != null) 
-        auto_load.set(((sBoo)setup_bloc.getValue("auto_load")).get());
-    }
+		app.logln("setup_load from "+savepath_value.get());
+	    file_savebloc.clear();
+	    if (setup_bloc != null) setup_bloc.clear();
+	    if (file_savebloc.load_from(savepath_value.get())) {
+	      
+	      setup_bloc = data.newBloc(file_savebloc, "setup");
+	      
+	      if (setup_bloc.getValue("auto_load") == null || 
+	          (setup_bloc.getValue("auto_load") != null && ((sBoo)setup_bloc.getValue("auto_load")).get())) {
+	        
+	        macro_main.setup_load(setup_bloc);
+	        nRunnable.runEvents(eventsSetupLoad);
+	        for (nRunnable r : eventsSetupLoad) r.builder = setup_bloc;
+	        
+	        if (setup_bloc.getValue("show_taskpanel") != null) 
+	          show_taskpanel.set(((sBoo)setup_bloc.getValue("show_taskpanel")).get());
+	        
+	        if (setup_bloc.getValue("log_ext_save") != null) {
+	          log_ext_save.set(((sBoo)setup_bloc.getValue("log_ext_save")).get());
+	          app.save_log_exit = log_ext_save.get();
+	        }
+	      }
+	      if (setup_bloc.getValue("auto_load") != null) 
+	        auto_load.set(((sBoo)setup_bloc.getValue("auto_load")).get());
+	    }
+	    
+	    cam.GRAB = true; cam_gui.hoverpile_passif = false; 
   }
   
   
@@ -646,7 +648,7 @@ public sRun full_screen_run;
     //info:
     if (show_info) {
       app.fill(255); 
-      app.textSize(18); 
+//      app.textSize(18); 
       app.textAlign(PConstants.LEFT);
       app.text(framerate.get(), 10, app.window_head + 24 );
       app.text(" C " + RConst.trimStringFloat(cam.mouse.x) + 

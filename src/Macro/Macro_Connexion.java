@@ -105,7 +105,6 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         }
       } } )
       .addEventFrame(new nRunnable(this) { public void run() {
-        sending = false;
         if (buildingLine) {
           newLine.x = elem.bloc.mmain().gui.mouseVector.x;
           newLine.y = elem.bloc.mmain().gui.mouseVector.y;
@@ -159,13 +158,13 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
             ) {
           if (lens.isClicked) app.fill(ref.look.pressColor);
           else if (lens.isHovered) app.fill(ref.look.hoveredColor);
-          else if (sending || hasSend > 0 || hasReceived > 0) app.fill(ref.look.outlineColor);
+          else if (hasSend > 0 || hasReceived > 0) app.fill(ref.look.outlineColor);
           else app.fill(ref.look.standbyColor);
           app.noStroke(); app.ellipseMode(PConstants.CENTER);
           app.ellipse(getCenter().x, getCenter().y, ref.getLocalSX(), ref.getLocalSY());
           if (lens.isClicked) app.stroke(ref.look.pressColor);
           else if (lens.isHovered) app.stroke(ref.look.hoveredColor);
-          else if (sending || hasSend > 0 || hasReceived > 0) app.stroke(ref.look.outlineColor);
+          else if (hasSend > 0 || hasReceived > 0) app.stroke(ref.look.outlineColor);
           else app.noStroke();
           app.noFill(); app.strokeWeight(ref.look.outlineWeight/4);
           app.ellipse(getCenter().x, getCenter().y, 
@@ -195,16 +194,16 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           if (RConst.distancePointToLine(elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
               getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
               3 * ref.look.outlineWeight / gui.scale) { 
-            if (pack_info != null && hasSend > 0) elem.bloc.mmain().info.showText(pack_info);
-            app.fill(ref.look.outlineSelectedColor); app.stroke(ref.look.outlineSelectedColor); } 
-          else if (sending || hasSend > 0) { app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); }
-          else { app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); }
-          app.strokeWeight(ref.look.outlineWeight);
-          PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
-          PVector lm = new PVector(l.x, l.y);
-          lm.setMag(getSize()/2);
-          app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
-               getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
+            if (pack_info != null && (hasSend > 0 || hasReceived > 0)) elem.bloc.mmain().info.showText(pack_info);
+            	  app.fill(ref.look.outlineSelectedColor); app.stroke(ref.look.outlineSelectedColor); } 
+	          else if (hasSend > 0 || hasReceived > 0) { app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); }
+	          else { app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); }
+	          app.strokeWeight(ref.look.outlineWeight);
+	          PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
+	          PVector lm = new PVector(l.x, l.y);
+	          lm.setMag(getSize()/2);
+	          app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+	               getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
           }
         }
         if (hasSend > 0) hasSend--;
@@ -362,28 +361,45 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   
   void end_packet_process() {
     last_packet = null;
+//    sended_since_last_pross = false;
   }
   
-  boolean sending = false;
+//  boolean sended_since_last_pross = false;
   int hasSend = 0, hasReceived = 0;
   
   String last_def = "";
   
   String pack_info = null;
-  
+//  private boolean is_duplic_packet(Macro_Packet p) {
+//	  boolean result = false;
+//	  for (Macro_Packet s : packet_to_send) 
+//		  result = result || ( s.getText().equals(p.getText()) && 
+//				  			   s.getType().equals(p.getType()) );
+//	  return result;
+//  }
   Macro_Connexion send(Macro_Packet p) {
-    msg_view.setText(p.getText());
-    last_def = RConst.copy(p.def);
-    lens.setInfo(infoText+" "+last_def);
-    pack_info = RConst.copy(p.def);
-    for (String m : p.messages) pack_info = pack_info + " " + m;
-    sending = true;
-    hasSend = PApplet.parseInt(
-    		sheet.mmain().inter.framerate.median_framerate.get() / sheet.mmain().packpross_by_frame.get());
-    gui.app.plogln(descr+" send");
-    packet_to_send.add(p);
-    sheet.ask_packet_process(this);
-    return this;
+//	  if (!sended_since_last_pross || true) { // || !is_duplic_packet(p)
+//		    sended_since_last_pross = true;
+	    msg_view.setText(p.getText());
+	    last_def = RConst.copy(p.def);
+	    lens.setInfo(infoText+" "+last_def);
+	    pack_info = RConst.copy(p.def);
+	    for (String m : p.messages) pack_info = pack_info + " " + m;
+	    
+	    // ici on doit pouvoir quantifier la fraction de longueur 
+	    // a afficher par frame a l'actuelle vitesse de process
+	    // le compte des fraction de longueur deja affiché est donné par 
+	    // mmain . packpross_pile
+	    if (sheet.mmain().loading_delay == 0)
+		    hasSend = Math.max(6, PApplet.parseInt( Math.min( 
+		    		sheet.mmain().inter.framerate.median_framerate.get(), 
+		    		sheet.mmain().inter.framerate.median_framerate.get() / 
+		    		sheet.mmain().packpross_by_frame.get()) ));
+	    gui.app.plogln(descr+" send");
+	    packet_to_send.add(p);
+	    sheet.ask_packet_process(this);
+//	  }
+	  return this;
   }
   ArrayList<Macro_Packet> packet_to_send = new ArrayList<Macro_Packet>();
   
@@ -402,7 +418,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         if (prio < m.elem.bloc.priority.get() ) prio = m.elem.bloc.priority.get();
 //      gui.app.plogln(descr+" max prio "+prio);
       int co_done = 0;
-      while (prio >= 0 && co_done < connected_inputs.size()) {
+      while (prio >= 0 && co_done <= connected_inputs.size()) {
 //    	  gui.app.plogln("try prio "+prio);
         for (Macro_Connexion m : connected_inputs) {
 //        	gui.app.plogln("try co "+m.elem.descr+" of prio "+m.elem.bloc.priority.get());
@@ -417,6 +433,9 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       //for (Macro_Connexion m : connected_inputs) m.receive(p);
     }
     packet_to_send.clear();
+
+    
+    
     return flag;
   }
   
@@ -473,11 +492,11 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     int prio = 0;
     for (Macro_Connexion m : packet_sender) 
       if (prio < m.elem.bloc.priority.get()) prio = m.elem.bloc.priority.get();
-    int c = 0;
-    while (prio >= 0 && c < packet_received.size()) {
+    int co_done = 0;
+    while (prio >= 0 && co_done <= packet_received.size()) {
       for (int i = 0 ; i < packet_received.size() ; i++) 
-        if (prio == packet_sender.get(i).elem.bloc.priority.get()) { 
-          c++; 
+    	  		if (prio == packet_sender.get(i).elem.bloc.priority.get()) { 
+          co_done++; 
           last_packet = packet_received.get(i);
           process_resum = process_resum + last_packet.getText() + " ";
           for (nRunnable r : eventReceiveRun) r.run();
@@ -492,7 +511,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           if (direct_co != null && direct_co.type == INPUT) direct_co.receive(packet_sender.get(i), last_packet);
           msg_view.setText(last_packet.getText());
           hasReceived = 15;
-        }
+      }
       prio--;
     }
     //for (int i = 0 ; i < packet_received.size() ; i++) {

@@ -78,7 +78,8 @@ public class Macro_Packet {
   String  asStr()   { if (isStr()) return messages.get(0); else return ""; }
   boolean asBool()   {
     if (isBool() && messages.get(0).equals("T")) return true; else return false; }
-    
+  
+  String getType() { return def; }
   String getText() {
     if (isBang()) return "bang";
     else if (isFloat()) return RConst.trimStringFloat(asFloat());

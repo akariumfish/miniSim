@@ -632,8 +632,8 @@ nExplorer sheet_explorer;
       m.group_move(s_gr_p.x, s_gr_p.y);
   
     //find place
-    int adding_dir_x = -1;
-	int adding_dir_y = 0;
+    int adding_dir_x = 0;
+	int adding_dir_y = 1;
 	int adding_side_l = 1;
 	int adding_side_cnt = 0;
     int adding_count = 0;
@@ -692,7 +692,7 @@ nExplorer sheet_explorer;
   void del_selected() {
     //del_order = true;
     inter.addEventNextFrame(new nRunnable() { public void run() { 
-    	for (int i = selected_macro.size() - 1 ; i >= 0 ; i--)
+    	for (int i = selected_macro.size() ; i >= 0 ; i--)
     		if (i < selected_macro.size()) selected_macro.get(i).clear(); 
     	
       if (sheet_explorer != null) sheet_explorer.update(); 
@@ -718,43 +718,47 @@ nExplorer sheet_explorer;
   
   */
   public void setup_load(sValueBloc b) { 
-    is_setup_loading = true;
-    is_paste_loading = true;
-    saved_template.empty();
-    saved_preset.empty();
-    
-    load_database();
-    
-    if (b.getBloc("Template") != null) {
-      b.getBloc("Template").runBlocIterator(new nIterator<sValueBloc>() { public void run(sValueBloc bloc) { 
-        Save_Bloc b = new Save_Bloc("");
-        bloc.preset_to_save_bloc(b);
-        if (saved_template.getBloc(bloc.base_ref) == null && !bloc.base_ref.equals("copy")) saved_template.newBloc(b, bloc.base_ref);
-      }});
-    }if (b.getBloc("Preset") != null) {
-      b.getBloc("Preset").runBlocIterator(new nIterator<sValueBloc>() { public void run(sValueBloc bloc) { 
-        Save_Bloc b = new Save_Bloc("");
-        bloc.preset_to_save_bloc(b);
-        if (saved_preset.getBloc(bloc.base_ref) == null) saved_preset.newBloc(b, bloc.base_ref);
-      }});//
-    }
-    
-    setupFromBloc(b.getBloc(value_bloc.base_ref));
+	app.BLACKOUT = true;
 
-    if (b.getValue("show_macro") != null) 
-      show_macro.set(((sBoo)b.getValue("show_macro")).get());
-    if (b.getValue("show_build_tool") != null) 
-      show_build_tool.set(((sBoo)b.getValue("show_build_tool")).get());
-    if (b.getValue("show_sheet_tool") != null) 
-      show_sheet_tool.set(((sBoo)b.getValue("show_sheet_tool")).get());
-    if (b.getValue("show_macro_tool") != null) 
-      show_macro_tool.set(((sBoo)b.getValue("show_macro_tool")).get());
-    
-    if (sheet_explorer != null) sheet_explorer.update();
-    inter.addEventTwoFrame(new nRunnable() { public void run() { is_paste_loading = false; select(); szone_clear_select(); } } );
-      
-    szone_clear_select();
-    is_setup_loading = false;
+    inter.addEventNextFrame(new nRunnable() { public void run() { 
+	    is_setup_loading = true;
+	    is_paste_loading = true;
+	    saved_template.empty();
+	    saved_preset.empty();
+	    
+	    load_database();
+	    
+	    if (b.getBloc("Template") != null) {
+	      b.getBloc("Template").runBlocIterator(new nIterator<sValueBloc>() { public void run(sValueBloc bloc) { 
+	        Save_Bloc b = new Save_Bloc("");
+	        bloc.preset_to_save_bloc(b);
+	        if (saved_template.getBloc(bloc.base_ref) == null && !bloc.base_ref.equals("copy")) saved_template.newBloc(b, bloc.base_ref);
+	      }});
+	    }if (b.getBloc("Preset") != null) {
+	      b.getBloc("Preset").runBlocIterator(new nIterator<sValueBloc>() { public void run(sValueBloc bloc) { 
+	        Save_Bloc b = new Save_Bloc("");
+	        bloc.preset_to_save_bloc(b);
+	        if (saved_preset.getBloc(bloc.base_ref) == null) saved_preset.newBloc(b, bloc.base_ref);
+	      }});//
+	    }
+	    
+	    setupFromBloc(b.getBloc(value_bloc.base_ref));
+	
+	    if (b.getValue("show_macro") != null) 
+	      show_macro.set(((sBoo)b.getValue("show_macro")).get());
+	    if (b.getValue("show_build_tool") != null) 
+	      show_build_tool.set(((sBoo)b.getValue("show_build_tool")).get());
+	    if (b.getValue("show_sheet_tool") != null) 
+	      show_sheet_tool.set(((sBoo)b.getValue("show_sheet_tool")).get());
+	    if (b.getValue("show_macro_tool") != null) 
+	      show_macro_tool.set(((sBoo)b.getValue("show_macro_tool")).get());
+	    
+	    if (sheet_explorer != null) sheet_explorer.update();
+	    inter.addEventTwoFrame(new nRunnable() { public void run() { is_paste_loading = false; select(); szone_clear_select(); } } );
+	      
+	    szone_clear_select();
+	    is_setup_loading = false;
+	} } );
   }
   
   void load_database() {
@@ -855,10 +859,22 @@ nExplorer sheet_explorer;
     sb.save_to(database_path.get());
   }
   
+ 
+
   boolean packet_process_asked = false;
+  boolean first_process_frame = false;
+  boolean all_packet_processed = true;
   LinkedBlockingQueue<Macro_Sheet> sheet_to_process = new LinkedBlockingQueue<Macro_Sheet>();
   Macro_Sheet proccessed_sheet = null;
-  
+  void frame() { 
+	  if (loading_delay > 0) loading_delay--;
+	  if (is_paste_loading) {
+		  loading_delay = 10;
+	  }
+	  if (loading_delay == 1) {
+		  app.BLACKOUT = false;
+	  }
+  }
   void ask_packet_process(Macro_Sheet sh) {
 //      gui.app.plogln("Main ask_packet_process from " + sh.value_bloc.ref);
     if (!do_packet.get()) {
@@ -866,36 +882,49 @@ nExplorer sheet_explorer;
     } else {
       if (!sheet_to_process.contains(sh)) { 
         sheet_to_process.add(sh);
-        if (!packet_process_asked) {
-          packet_process_asked = true;
-          inter.addEventNextFrameEnd(packet_frame_run);
-        }
-      }
+      } 
+      	if (!packet_process_asked)  {
+      		gui.app.plogln("Main ------------ packet process frame ASK");
+	      packet_process_asked = true;
+	      first_process_frame = true;
+	      all_packet_processed = false;
+	      inter.addEventNextFrameEnd(packet_frame_run);
+	    }
     }
   }
   public void packet_frame() {
-	  gui.app.plogln("Main ------------ packet process frame start");
-	  
+	  if (first_process_frame)
+		  gui.app.plogln("Main ------------ packet process frame START");
 	  packpross_pile += packpross_by_frame.get();
 	  
-	  packpross_count = 0;
-	  while (packpross_pile >= 1) { packpross_count++; packpross_pile--; }
-	  
-	  int max_turn = 0;
-      while(sheet_to_process.size() > 0) {
+	  pross_to_do = 0;
+	  while (packpross_pile >= 1) { 
+		  pross_to_do++; packpross_pile--; 
+	  }
+//	  int done_turn = 0;
+      while((pross_to_do >= 1 || mmain().loading_delay > 0) && sheet_to_process.size() > 0) {
         proccessed_sheet = sheet_to_process.remove();
-        max_turn = Math.max(max_turn, proccessed_sheet.process_packets(packpross_count));
+        int sheet_turn = proccessed_sheet.process_packets(pross_to_do);
+//        done_turn += sheet_turn;
+        pross_to_do -= sheet_turn;
       }
-      if (max_turn < packpross_count) {
-    	  gui.app.plogln("Main ------------ packet process END");
+      pross_to_do = 0;
+      if (pross_in_waiting <= 0) {//done_turn >= pross_to_do
+    	  	gui.app.plogln("Main ------------ packet process frame END");
     	  	packet_process_asked = false;
+    	  	all_packet_processed = true;
       }
       else {
-    	  gui.app.plogln("Main ------------ packet process unfinished");
+    	  	if (first_process_frame) 
+    	  		gui.app.plogln("Main ------------ packet process frame unfinished"
+    	  				+ "  --  pross_waiting : " + pross_in_waiting);
     	  	inter.addEventNextFrameEnd(packet_frame_run);
       }
+	  first_process_frame = false;
   }
-  int packpross_count = 0;
+  int pross_in_waiting = 0;
+  float packp_holder = 0;
+  int pross_to_do = 0;
   float packpross_pile = 0;
   sFlt packpross_by_frame;
   nRunnable packet_frame_run;
@@ -916,6 +945,7 @@ public nGUI screen_gui;
 Macro_Sheet search_sheet = this;
   ArrayList<Macro_Abstract> selected_macro = new ArrayList<Macro_Abstract>();
   boolean buildingLine = false, is_setup_loading = false, is_paste_loading = false;
+  int loading_delay = 0;
   String access;
   public boolean canAccess(String a) { return inter.canAccess(a); }
   String last_created_link = "";
@@ -944,7 +974,7 @@ Macro_Sheet search_sheet = this;
   void add_bloc_builders(MAbstract_Builder m) {
     bloc_builders.add(m);
   }
-  
+
 public Macro_Main(sInterface _int) {
     super(_int);
     app = _int.app;
@@ -966,7 +996,8 @@ public Macro_Main(sInterface _int) {
     load_database();
     
     packpross_by_frame = newFlt(60, "packpross_by_frame", "packpross_by_frame");
-
+    packp_holder = packpross_by_frame.get();
+    packpross_by_frame.set(3000);
     packet_frame_run = new nRunnable() { public void run() { packet_frame(); } };
 
     show_macro = setting_bloc.newBoo("show_macro", "show", true);
@@ -996,14 +1027,17 @@ public Macro_Main(sInterface _int) {
     
     do_packet = newBoo(false, "do_packet", "do_packet");
     
-    del_select_run = newRun("del_select_run", "del", new nRunnable() { public void run() { del_selected(); }});
+    del_select_run = newRun("del_select_run", "del", 
+    		new nRunnable() { public void run() { del_selected(); }});
     
-    copy_run = newRun("copy_run", "copy", new nRunnable() { public void run() { copy_to_tmpl(); }});
+    copy_run = newRun("copy_run", "copy", 
+    		new nRunnable() { public void run() { copy_to_tmpl(); }});
     
-    paste_run = newRun("paste_run", "paste", new nRunnable() { public void run() { pastebin_tmpl(); }});
+    paste_run = newRun("paste_run", "paste", 
+    		new nRunnable() { public void run() { pastebin_tmpl(); }});
     
-    reduc_run = newRun("switch_reduc_run", "switch_reduc", new nRunnable() { public void run() { 
-      reduc_selected(); }});
+    reduc_run = newRun("switch_reduc_run", "switch_reduc", 
+    		new nRunnable() { public void run() { reduc_selected(); }});
     
     
 
@@ -1085,7 +1119,12 @@ public Macro_Main(sInterface _int) {
       build_macro_menus();
       inter.cam.cam_grid_spacing.set(ref_size*5*Macro_Main.GRID_SNAP_FACT*3);
     } } );
+
     
+    inter.addEventTwoFrame(new nRunnable() { public void run() { 
+        packpross_by_frame.set(packp_holder);
+        inter.addEventFrame(new nRunnable() { public void run() { frame(); } } );
+      } } );
   }
   float sgrab_px = 0, sgrab_py = 0;
   void update_select_bound() {
@@ -1147,7 +1186,7 @@ public Macro_Main(sInterface _int) {
 //      p.add(-p.x%ref_size/2, -p.y%ref_size/2);
       p = inter.cam.cam_to_screen(p);
       p.add(-select_grab_widg.getLocalSX()/2, -select_grab_widg.getLocalSY()/2);
-      if (selected_macro.size() > 1 || ref_size * gui.scale < 20) 
+      if (selected_macro.size() > 1 || ref_size * gui.scale < 30) 
         select_grab_widg.show().setPosition(p.x, p.y);
       else select_grab_widg.hide();
     } else {
@@ -1296,14 +1335,25 @@ public Macro_Main(sInterface _int) {
 	    .setPosition(-ref_size*2.875, -ref_size*0.25)
 	    );
 	  theme.addModel("MC_Element_Field", theme.newWidget("mc_ref")
-	    .setStandbyColor(theme.app.color(10, 40, 80))
-	    .setOutlineColor(theme.app.color(10, 110, 220))
-	    .setOutlineSelectedColor(theme.app.color(130, 230, 240))
-	    .setOutlineWeight(ref_size / 16F)
-	    .setFont((int)(ref_size/2))
-	    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
-	    .setSize(ref_size*3.125, ref_size*0.875)
-	    );
+			    .setStandbyColor(theme.app.color(10, 40, 80))
+			    .setOutlineColor(theme.app.color(10, 110, 220))
+			    .setOutlineSelectedColor(theme.app.color(130, 230, 240))
+			    .setOutlineWeight(ref_size / 16F)
+			    .setFont((int)(ref_size/2))
+			    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
+			    .setSize(ref_size*3.125, ref_size*0.875)
+			    );
+	  theme.addModel("MC_Element_Comment_Field", theme.newWidget("mc_ref")
+			    .setStandbyColor(theme.app.color(0, 0, 50))
+			    .setOutlineColor(theme.app.color(10, 110, 220))
+			    .setOutlineSelectedColor(theme.app.color(130, 230, 240))
+			    .setOutline(true)
+			    .setOutlineWeight(ref_size / 16F)
+			    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
+		        .setTextAlignment(PConstants.LEFT, PConstants.TOP)
+		        .setTextAutoReturn(true)
+		        .setFont((int)(ref_size / 1.7))
+			    );
 	  theme.addModel("MC_Element_SField", theme.newWidget("MC_Element_Field")
 	    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
 	    .setSize(ref_size*1.375, ref_size*0.875)

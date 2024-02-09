@@ -150,12 +150,8 @@ class MComment extends MBasic {
       if (h_f.get() > 4) addEmptyS(1);
       if (h_f.get() > 5) addEmptyS(1);
     elem_com = addEmptyS(0);
-      com_field = elem_com.addLinkedModel("MC_Element_Field").setLinkedValue(val_com);
-      com_field.setPosition(ref_size*3 / 16, ref_size * 1 / 16)
-        .setSize(ref_size * w_f.get(), ref_size * h_f.get())
-        .setTextAlignment(PConstants.LEFT, PConstants.TOP)
-        .setTextAutoReturn(true)
-        .setFont((int)(ref_size / 1.7));
+      com_field = elem_com.addLinkedModel("MC_Element_Comment_Field").setLinkedValue(val_com);
+      com_field.setSize(ref_size * w_f.get(), ref_size * h_f.get());
   }
   public MComment clear() {
     super.clear(); 

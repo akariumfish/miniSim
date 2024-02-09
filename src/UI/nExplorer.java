@@ -4,13 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import processing.core.PApplet;
-import sData.nRunnable;
-import sData.sBoo;
-import sData.sFlt;
-import sData.sInt;
-import sData.sStr;
-import sData.sValue;
-import sData.sValueBloc;
+import sData.*;
 
 public class nExplorer extends nDrawer {
 	  boolean access_child = true;
@@ -88,9 +82,11 @@ public class nExplorer extends nDrawer {
 	          } else if (clicked_val.type.equals("int")) { 
 	            new nNumPanel(gui, task, (sInt)clicked_val);
 	          } else if (clicked_val.type.equals("boo")) { 
-	            new nBoolPanel(gui, task, (sBoo)clicked_val);
+	            new nBinPanel(gui, task, (sBoo)clicked_val);
 	          } else if (clicked_val.type.equals("col")) { 
-//	            new nColorPanel(gui, task, (sCol)clicked_val);
+	            new nColorPanel(gui, task, (sCol)clicked_val);
+	          } else if (clicked_val.type.equals("run")) { 
+		        new nBinPanel(gui, task, (sRun)clicked_val);
 	          }
 	        } 
 	      }});
@@ -100,7 +96,7 @@ public class nExplorer extends nDrawer {
 		        if (ind != gobackindex && ind > explorer_blocs.size() && 
 		            ind - explorer_blocs.size() < explorer_values.size()+gobackspace) {
 		          sValue val = explorer_values.get(ind-gobackspace - explorer_blocs.size());
-		          if (val.type.equals("str") || val.type.equals("col") || 
+		          if (val.type.equals("str") || val.type.equals("col") || val.type.equals("run") || 
 		              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo")) 
 		                ((nCtrlWidget)builder).show();
 		          else { ((nCtrlWidget)builder).hide(); }

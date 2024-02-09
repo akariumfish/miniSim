@@ -43,6 +43,8 @@ public class Rapp extends PApplet implements RConst {
 //		PApplet.main("RApplet.Rapp");
 //	}
 	
+	boolean START_AS_WINDOW = true;
+	
 	sInterface interf;
 	
 	public void settings() {
@@ -56,55 +58,17 @@ public class Rapp extends PApplet implements RConst {
 		  surface.setResizable(true);
 		
 		frameRate(60);
+		textSize(18);
+		
 //		rectMode(PApplet.CENTER);
 //		ellipseMode(PApplet.RADIUS);
-		
 //		blendMode(REPLACE);
+		
 
-		  interf = new sInterface(this, 40);
-		  
-		init();
-		
-		background(0);//fond noir
-		
-		
-		
-		  
-	    
-	    interf.addEventNextFrame(new nRunnable() { 
-	      public void run() { interf.addEventNextFrame(new nRunnable() { 
-	        public void run() { interf.setup_load(); } } ); } } );
-
-	    
-	    
-	    
-	    
-		  app_grab = new nWidget(interf.screen_gui, "", 28, 0, 1, base_width - 40, 40)
-		    .setTrigger()
-		    .addEventTrigger(new nRunnable() { public void run() { mx = (int)mouseX; my = (int)mouseY; } } )
-		    .addEventPressed(new nRunnable() { public void run() { 
-		      sx = (int)((int)mouseX + sx - mx);
-		      sy = (int)((int)mouseY + sy - my);
-		      surface.setLocation(sx, sy); 
-		    } } );
-		  app_close = new nWidget(interf.screen_gui, "X", 28, base_width - 40, 1, 40, 40)
-		    .setTrigger()
-		    .addEventTrigger(new nRunnable() { public void run() { 
-		      logln("exit");
-		      if (save_log_exit) savelog(); 
-		      interf.addEventTwoFrame(new nRunnable() { 
-		        public void run() { exit(); } } ); } } );
-		  
-		  
-		  interf.full_screen_run.run();
-		  interf.full_screen_run.run();
-		  interf.full_screen_run.run();
-		  surface.setLocation(100, 5);
-	}
-
-	public void init() {//executé au demarage
-		  
 		  logln("init");
+		
+		  interf = new sInterface(this, 40);
+
 		  
 //		  setup_midi();
 		  
@@ -126,13 +90,51 @@ public class Rapp extends PApplet implements RConst {
 		  //logln("end models: "+interf.gui_theme.models.size());
 		  
 		  
-		  logln("setup end");
-		}
+		background(0);//fond noir
+		
+		
+		
+		  
+	    
+	    interf.addEventTwoFrame(new nRunnable() { 
+	      public void run() { interf.setup_load(); } } );
 
+	    
+	    
+	    
+	    
+		  app_grab = new nWidget(interf.screen_gui, "", 28, 0, 0.1F, base_width - 40, 40)
+		    .setTrigger()
+		    .addEventTrigger(new nRunnable() { public void run() { mx = mouseX; my = mouseY; } } )
+		    .addEventPressed(new nRunnable() { public void run() { 
+		      sx = (mouseX + sx - mx); sx = sx - sx%1;
+		      sy = (mouseY + sy - my); sy = sy - sy%1;
+		      surface.setLocation((int)sx, (int)sy); 
+		    } } );
+		  app_close = new nWidget(interf.screen_gui, "X", 28, base_width - 40, 0.1F, 40, 40)
+		    .setTrigger()
+		    .addEventTrigger(new nRunnable() { public void run() { 
+		      logln("exit");
+		      if (save_log_exit) savelog(); 
+		      interf.addEventTwoFrame(new nRunnable() { 
+		        public void run() { exit(); } } ); } } );
+		  
+
+		  interf.full_screen_run.run();
+		  interf.full_screen_run.run();
+		  
+		  if (START_AS_WINDOW) {
+			  interf.full_screen_run.run();
+			  interf.addEventNextFrame(new nRunnable() { public void run() { 
+				  surface.setLocation(100, 50); } } );
+		  }
+		  logln("init end");
+	}
+	
 	nWidget app_grab, app_close;
 	public float window_head = 40;
 	float mx, my;
-	int sx, sy;
+	float sx, sy;
 	boolean fullscreen=true;
 	public int base_width=1400; //non fullscreen width
 	public int base_height=800; //non fullscreen height
@@ -142,8 +144,8 @@ public class Rapp extends PApplet implements RConst {
 	    app_grab.show();
 	    app_close.show();
 	    surface.setSize(base_width,base_height + (int)window_head); 
-	    surface.setLocation(100, 20);
-	    sx = 100; sy = 20;
+	    surface.setLocation(100, 50);
+	    sx = 100; sy = 50;
 	    fullscreen=false;
 	    surface.setAlwaysOnTop(false);
 	    screen_0_x = 0; screen_0_y = (int)window_head; 
@@ -161,13 +163,20 @@ public class Rapp extends PApplet implements RConst {
 	  }
 	}
 	
+	public boolean BLACKOUT = false;
+	boolean starting = true;;
 	public void draw() {
-		
 	  interf.frame();
 	  global_frame_count++;
-	  if (global_frame_count < 5) { fill(0); noStroke(); rect(0, 0, width, height); }
-	  
+	  if (starting && global_frame_count < 5) { fill(0); noStroke(); rect(0, 0, width, height); }
+	  else starting = false;
+	  if (BLACKOUT) { 
+		  fill(0); noStroke(); rect(0, window_head, width, height-window_head); 
+	      fill(255); 
+		  text("Please Wait ...", width/2, height/2);
+	  }
 	  if (do_one_save) { do_one_save = false; savelog(); }
+		logln_this_frame = false;
 	}
 	
 	public void mouseWheel(MouseEvent event) { 
@@ -245,15 +254,22 @@ public class Rapp extends PApplet implements RConst {
 		public boolean DEBUG_HOVERPILE = false;
 		public boolean DEBUG_NOFILL = false;
 		
+		boolean DEBUG = true, save_log_exit = false, save_log_all = false;
+		String logpath = "sim_log.txt";
+		
 		int global_frame_count = 0;
 		ArrayList<String> logs = new ArrayList<String>();
 		String current_log = "";
-		
-		boolean DEBUG = true, save_log_exit = false, save_log_all = false;
-		String logpath = "sim_log.txt";
 		String[] loglist;
-		
 		int log_line_count = 0;
+		boolean logln_this_frame = false;
+		
+
+		String fMrk(String m) {
+			if (!logln_this_frame) { logln_this_frame = true; return ":-"+m+":"; }
+			else return ": "+m+":";
+		}
+		
 		void savelog() {
 		  if (loglist == null || loglist.length < logs.size()) loglist = new String[logs.size() + 10000]; 
 		  for (int i = 0 ; i < log_line_count ; i++) loglist[i] = RConst.copy(logs.get(i));
@@ -266,15 +282,17 @@ public class Rapp extends PApplet implements RConst {
 		}
 		
 		public void og(String s) {
-		  if (DEBUG && current_log.length() == 0) print(global_frame_count+"::");
+			String mark = global_frame_count+fMrk(" ");
+		  if (DEBUG && current_log.length() == 0) print(mark);
 		  if (DEBUG) print(s);
-		  if (current_log.length() == 0) current_log += global_frame_count+"::";
+		  if (current_log.length() == 0) current_log += mark;
 		  current_log += s;
 		}
 		public void logln(String s) {
-		  if (DEBUG && current_log.length() == 0) print(global_frame_count+"::");
+			String mark = global_frame_count+fMrk(" ");
+		  if (DEBUG && current_log.length() == 0) print(mark);
 		  if (DEBUG) println(s);
-		  if (current_log.length() == 0) current_log += global_frame_count+"::";
+		  if (current_log.length() == 0) current_log += mark;
 		  current_log += s;
 		  log_line_count++;
 		  logs.add(RConst.copy(current_log));
@@ -282,18 +300,19 @@ public class Rapp extends PApplet implements RConst {
 		  if (save_log_all) savelog_all();
 		}
 		
-		
 		boolean DEBUG_MACRO = false;
 		public void mlog(String s) {
-		  if (DEBUG && DEBUG_MACRO && current_log.length() == 0) print(global_frame_count+":M:");
+			String mark = global_frame_count+fMrk("M");
+		  if (DEBUG && DEBUG_MACRO && current_log.length() == 0) print(mark);
 		  if (DEBUG && DEBUG_MACRO) print(s);
-		  if (current_log.length() == 0 && DEBUG_MACRO) current_log += global_frame_count+"::";
+		  if (current_log.length() == 0 && DEBUG_MACRO) current_log += mark;
 		  if (DEBUG_MACRO) current_log += s;
 		}
 		public void mlogln(String s) {
-		  if (DEBUG && DEBUG_MACRO && current_log.length() == 0) print(global_frame_count+":M:");
+			String mark = global_frame_count+fMrk("M");
+		  if (DEBUG && DEBUG_MACRO && current_log.length() == 0) print(mark);
 		  if (DEBUG && DEBUG_MACRO) println(s);
-		  if (current_log.length() == 0 && DEBUG_MACRO) current_log += global_frame_count+":M:";
+		  if (current_log.length() == 0 && DEBUG_MACRO) current_log += mark;
 		  if (DEBUG_MACRO) { 
 			  current_log += s;
 			  log_line_count++;
@@ -305,17 +324,19 @@ public class Rapp extends PApplet implements RConst {
 		
 		
 
-		boolean DEBUG_PACKET = true;
+		boolean DEBUG_PACKET = false;
 		public void plog(String s) {
-		  if (DEBUG && DEBUG_PACKET && current_log.length() == 0) print(global_frame_count+":P:");
+			String mark = global_frame_count+fMrk("P");
+		  if (DEBUG && DEBUG_PACKET && current_log.length() == 0) print(mark);
 		  if (DEBUG && DEBUG_PACKET) print(s);
-		  if (current_log.length() == 0 && DEBUG_PACKET) current_log += global_frame_count+":P:";
+		  if (current_log.length() == 0 && DEBUG_PACKET) current_log += mark;
 		  if (DEBUG_PACKET) current_log += s;
 		}
 		public void plogln(String s) {
-		  if (DEBUG && DEBUG_PACKET && current_log.length() == 0) print(global_frame_count+":P:");
+			String mark = global_frame_count+fMrk("P");
+		  if (DEBUG && DEBUG_PACKET && current_log.length() == 0) print(mark);
 		  if (DEBUG && DEBUG_PACKET) println(s);
-		  if (current_log.length() == 0 && DEBUG_PACKET) current_log += global_frame_count+":P:";
+		  if (current_log.length() == 0 && DEBUG_PACKET) current_log += mark;
 		  if (DEBUG_PACKET) { 
 			  current_log += s;
 			  log_line_count++;

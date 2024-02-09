@@ -145,8 +145,8 @@ public class sValueBloc {
 	    while (b.blocs.get(r) != null) r = r + "'";
 	    b.blocs.put(r, this); data = b.data; parent = b; 
 	    ref = r; adress = b.adress + b.ref + "/"; 
-	    if (parent.doevent) parent.last_created_bloc = this; 
-	    if (parent.doevent) nRunnable.runEvents(parent.eventsAddBloc); }
+	    if (parent.doevent && data.doevent) parent.last_created_bloc = this; 
+	    if (parent.doevent && data.doevent) nRunnable.runEvents(parent.eventsAddBloc); }
 	  public void frame() {
 	    //for (Map.Entry b : values.entrySet()) { sValue s = (sValue)b.getValue(); s.frame(); }
 	    //for (Map.Entry b : blocs.entrySet()) { sValueBloc s = (sValueBloc)b.getValue(); s.frame(); } 
@@ -177,8 +177,8 @@ public class sValueBloc {
 	    
 	    //for (Map.Entry b : values.entrySet()) { sValue s = (sValue)b.getValue(); s.clean(); } 
 	    blocs.clear(); values.clear();
-	    if (doevent) nRunnable.runEvents(eventsDelete); 
-	    if (parent.doevent) nRunnable.runEvents(parent.eventsDelBloc);
+	    if (doevent && data.doevent) nRunnable.runEvents(eventsDelete); 
+	    if (parent.doevent && data.doevent) nRunnable.runEvents(parent.eventsDelBloc);
 	  }
 	  public void empty() {
 	    tmpblc.clear();
