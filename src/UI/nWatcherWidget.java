@@ -1,6 +1,7 @@
 package UI;
 
 import RApplet.RConst;
+import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sBoo;
 import sData.sCol;
@@ -28,15 +29,15 @@ sBoo bval; sInt ival; sFlt fval; sStr sval; sVec vval; sCol cval;
 String base_text = "";
 public nWatcherWidget(nGUI g) { super(g); }
 nWatcherWidget setLinkedValue(sInt b) { 
-  ival = b; setText(String.valueOf(ival.get()));
+  ival = b; setText(PApplet.str(ival.get()));
   val_run = new nRunnable(this) { public void run() { 
-    ((nWatcherWidget)builder).setText(String.valueOf(ival.get())); } };
+    ((nWatcherWidget)builder).setText(PApplet.str(ival.get())); } };
   b.addEventChange(val_run);
   return this; }
 nWatcherWidget setLinkedValue(sFlt b) { 
-  fval = b; setText(RConst.trimStringFloat(fval.get()));
+  fval = b; setText(RConst.trimStringFloat(fval.get(), float_pres));
   val_run = new nRunnable(this) { public void run() { 
-    ((nWatcherWidget)builder).setText(RConst.trimStringFloat(fval.get())); } };
+    ((nWatcherWidget)builder).setText(RConst.trimStringFloat(fval.get(), float_pres)); } };
   b.addEventChange(val_run);
   return this; }
 nWatcherWidget setLinkedValue(sBoo b) { 
@@ -63,9 +64,16 @@ nWatcherWidget setLinkedValue(sCol b) {
   return this; }
 nWatcherWidget setLinkedValue(sVec b) { 
   vval = b; 
-  setText(RConst.trimStringFloat(vval.x()) + "," + RConst.trimStringFloat(vval.y()));
+  setText(RConst.trimStringFloat(vval.x(), float_pres) + "," + 
+		  RConst.trimStringFloat(vval.y(), float_pres));
   val_run = new nRunnable(this) { public void run() { 
-    ((nWatcherWidget)builder).setText(RConst.trimStringFloat(vval.x()) + "," + RConst.trimStringFloat(vval.y())); } };
+    ((nWatcherWidget)builder).setText(RConst.trimStringFloat(vval.x(), float_pres) + "," + 
+    									 RConst.trimStringFloat(vval.y(), float_pres)); } };
   b.addEventChange(val_run);
   return this; }
+	int float_pres = 3;
+	nWatcherWidget setFloatPrecision(int i) {
+		float_pres = i;
+		return this;
+	}
 }

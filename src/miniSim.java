@@ -6,8 +6,12 @@ public class miniSim {
 	}
 }
 
-/*
+/* DONT HIT ENTER HERE FFS!!
 
+
+		MACRO BLOC
+trig switch bin not gate OK
+		
 
 		NEW STRUCTURE 
 
@@ -82,9 +86,9 @@ number formating!!!
 
 		TO DO
 
-bloc unique, cad only one by sheet
+bloc can has mode unique, cad only one of a type by sheet
 
-auto spot : bloc auto add some elem to spots at creation
+auto spot : bloc auto add some of his elem to sheet spots at creation
 
 sheetobj in 1 line (merge get et out?)
 

@@ -103,7 +103,9 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
   
   public nGUI gui;
   Macro_Sheet sheet;    int sheet_depth = 0;
-  boolean szone_selected = false, title_fixe = false, unclearable = false, pos_given = false;
+  boolean szone_selected = false, title_fixe = false;
+public boolean unclearable = false;
+boolean pos_given = false;
   public float ref_size = 40;
   sVec grab_pos; sStr val_type;
   public  sStr val_descr;
@@ -432,6 +434,16 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
   String resum_link() { return ""; }
   String resum_spot(String spots) { return spots; }
   
+  
+
+  public sFlt newFlt(float d, String r, String s, float mi, float ma) {
+	    sFlt v = ((sFlt)(value_bloc.getValue(r))); 
+	    if (v == null) v = value_bloc.newFlt(r, s, d).set_limit(mi,ma);
+	    return v; }
+  public sInt newInt(int d, String r, String s, int mi, int ma) {
+	    sInt v = ((sInt)(value_bloc.getValue(r))); 
+	    if (v == null) v = value_bloc.newInt(r, s, d).set_limit(mi,ma);
+	    return v; }
   
   public sBoo newBoo(boolean d, String r, String s) { return newBoo(r, s, d); }
   public sBoo newBoo(boolean d, String r) { return newBoo(r, r, d); }

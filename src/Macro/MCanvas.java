@@ -17,6 +17,7 @@ import sData.sInt;
 import sData.sRun;
 import sData.sValueBloc;
 import sData.sVec;
+import z_old_specialise.nBase;
 
 public class MCanvas extends MBaseMenu { 
 	static class MCanvas_Builder extends MAbstract_Builder {

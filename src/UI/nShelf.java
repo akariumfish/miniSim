@@ -232,6 +232,7 @@ public class nShelf extends nBuilder {
 	  public nShelf addDrawerWatch(sValue val, float w, float h) {
 	    nDrawer d = addDrawer(w, h);
 	    d.addWatcherModel("Label_Back")
+	    	  .setFloatPrecision(6)
 	      .setLinkedValue(val)
 	      .setSize(w*ref_size/3, h*ref_size)
 	      .setPosition(2*w*ref_size/3, 0)

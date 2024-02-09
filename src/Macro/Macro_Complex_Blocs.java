@@ -5,6 +5,7 @@ import java.util.Map;
 
 import RApplet.RConst;
 import UI.*;
+import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
 import sData.*;
@@ -118,13 +119,13 @@ class MVecCtrl extends Macro_Bloc {
     String t = val_mod1.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { mod_f = 0; mod_vec.x = 0; }
-      else if (Float.parseFloat(t) != 0) { mod_f = Float.parseFloat(t); mod_vec.x = mod_f; }
+      else if (PApplet.parseFloat(t) != 0) { mod_f = PApplet.parseFloat(t); mod_vec.x = mod_f; }
     }
     val_mod2 = newStr("mod2", "mod2", "0");
     t = val_mod2.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { mod_vec.y = 0; }
-      else if (Float.parseFloat(t) != 0) { mod_vec.y = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { mod_vec.y = PApplet.parseFloat(t); }
     }
     ref_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
     ref_field.setInfo("value");
@@ -198,7 +199,7 @@ class MVecCtrl extends Macro_Bloc {
       String t = mod_view1.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { mod_f = 0; mod_vec.x = 0; }
-        else if (Float.parseFloat(t) != 0) { mod_f = Float.parseFloat(t); mod_vec.x = mod_f; }
+        else if (PApplet.parseFloat(t) != 0) { mod_f = PApplet.parseFloat(t); mod_vec.x = mod_f; }
       }
     } });
     mod_view2 = addEmptyS(1).addLinkedModel("MC_Element_SField").setLinkedValue(val_mod2);
@@ -206,7 +207,7 @@ class MVecCtrl extends Macro_Bloc {
       String t = mod_view2.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { mod_vec.y = 0; }
-        else if (Float.parseFloat(t) != 0) { mod_vec.y = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { mod_vec.y = PApplet.parseFloat(t); }
       }
     } });
     
@@ -674,7 +675,7 @@ class MNumCtrl extends Macro_Bloc {
     String t = val_mod.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { mod = 0; }
-      else if (Float.parseFloat(t) != 0) { mod = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { mod = PApplet.parseFloat(t); }
     }
     
     ref_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
@@ -700,7 +701,7 @@ class MNumCtrl extends Macro_Bloc {
       String t = mod_view.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { mod = 0; }
-        else if (Float.parseFloat(t) != 0) { mod = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { mod = PApplet.parseFloat(t); }
       }
     } });
     
@@ -793,7 +794,7 @@ class MToolNCtrl extends MToolRow {
     String t = val_mod.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { mod = 0; }
-      else if (Float.parseFloat(t) != 0) { mod = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { mod = PApplet.parseFloat(t); }
     }
     
     ref_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
@@ -817,7 +818,7 @@ class MToolNCtrl extends MToolRow {
       String t = mod_view.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { mod = 0; }
-        else if (Float.parseFloat(t) != 0) { mod = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { mod = PApplet.parseFloat(t); }
       }
     } });
     
@@ -1341,7 +1342,7 @@ class MPanGrph extends MPanTool {
   
   int larg = 0, gc = 0;
   float[] graph_data = null;
-  float max = 10;
+  float max = 0.0001F;
   
   MPanGrph(Macro_Sheet _sheet, sValueBloc _bloc) { 
     super(_sheet, "pangrph", "pangrph", _bloc); 
@@ -1848,12 +1849,12 @@ class MVecXY extends Macro_Bloc {
     String t = val_view1.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { x = 0; }
-      else if (Float.parseFloat(t) != 0) { x = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { x = PApplet.parseFloat(t); }
     }
     t = val_view2.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { y = 0; }
-      else if (Float.parseFloat(t) != 0) { y = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { y = PApplet.parseFloat(t); }
     }
     vec.set(x, y);
     view1 = addEmptyS(0).addLinkedModel("MC_Element_SField").setLinkedValue(val_view1);
@@ -1863,7 +1864,7 @@ class MVecXY extends Macro_Bloc {
       float a = x;
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { x = 0; }
-        else if (Float.parseFloat(t) != 0) { x = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { x = PApplet.parseFloat(t); }
       }
       if (x != a) {
         //view1.changeText(RConst.trimStringFloat(x)); 
@@ -1878,7 +1879,7 @@ class MVecXY extends Macro_Bloc {
       float a = y;
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { y = 0; }
-        else if (Float.parseFloat(t) != 0) { y = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { y = PApplet.parseFloat(t); }
       }
       if (y != a) {
         //view2.changeText(RConst.trimStringFloat(y)); 
@@ -1937,12 +1938,12 @@ class MVecMD extends Macro_Bloc {
     String t = val_view1.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { mag = 0; }
-      else if (Float.parseFloat(t) != 0) { mag = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { mag = PApplet.parseFloat(t); }
     }
     t = val_view2.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { dir = 0; }
-      else if (Float.parseFloat(t) != 0) { dir = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { dir = PApplet.parseFloat(t); }
     }
     vec.set(mag, 0).rotate(dir);
     view1 = addEmptyS(0).addLinkedModel("MC_Element_SField").setLinkedValue(val_view1);
@@ -1952,7 +1953,7 @@ class MVecMD extends Macro_Bloc {
       float a = mag;
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { mag = 0; }
-        else if (Float.parseFloat(t) != 0) { mag = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { mag = PApplet.parseFloat(t); }
       }
       if (mag != a) {
         //view1.changeText(RConst.trimStringFloat(mag)); 
@@ -1967,7 +1968,7 @@ class MVecMD extends Macro_Bloc {
       float a = dir;
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { dir = 0; }
-        else if (Float.parseFloat(t) != 0) { dir = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { dir = PApplet.parseFloat(t); }
       }
       if (dir != a) {
         //view2.changeText(RConst.trimStringFloat(dir)); 
@@ -2005,12 +2006,12 @@ class MRandom extends Macro_Bloc {
     String t = val_view1.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { min = 0; }
-      else if (Float.parseFloat(t) != 0) { min = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { min = PApplet.parseFloat(t); }
     }
     t = val_view2.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { max = 0; }
-      else if (Float.parseFloat(t) != 0) { max = Float.parseFloat(t); }
+      else if (PApplet.parseFloat(t) != 0) { max = PApplet.parseFloat(t); }
     }
     view1 = addEmptyS(0).addLinkedModel("MC_Element_SField").setLinkedValue(val_view1);
     view1.setInfo("min");
@@ -2018,7 +2019,7 @@ class MRandom extends Macro_Bloc {
       String t = view1.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { min = 0; }
-        else if (Float.parseFloat(t) != 0) { min = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { min = PApplet.parseFloat(t); }
       }
       if (min > max) { float a = min; min = max; max = a; }
       //view1.setText(RConst.trimStringFloat(min)); 
@@ -2030,7 +2031,7 @@ class MRandom extends Macro_Bloc {
       String t = view2.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { max = 0; }
-        else if (Float.parseFloat(t) != 0) { max = Float.parseFloat(t); }
+        else if (PApplet.parseFloat(t) != 0) { max = PApplet.parseFloat(t); }
       }
       if (min > max) { float a = min; min = max; max = a; }
       //view1.setText(RConst.trimStringFloat(min)); 

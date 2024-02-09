@@ -14,7 +14,7 @@ public interface RConst {
 	static public String trimStringFloat(float f) { return trimStringFloat(f, 3); }
 	static public String trimStringFloat(float f, int p) {
 	  String s;
-	  if (f%1.0 == 0.0) s = PApplet.nfc((int)(f)); else s = String.valueOf(f);
+	  if (f%1.0 == 0.0) s = PApplet.nfc((int)(f)); else s = PApplet.str(f);
 	  String end = "";
 	  for (int i = s.length()-1; i > 0 ; i--) {
 	    if (s.charAt(i) == 'E') {

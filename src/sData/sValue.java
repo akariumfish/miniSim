@@ -16,15 +16,24 @@ public abstract class sValue implements RConst {
 	    if (doevent) nRunnable.runEvents(eventsDelete);
 	    if (bloc.doevent) nRunnable.runEvents(bloc.eventsDelVal);
 	  }
+	  public boolean doevent() { return doevent; }
 	  public sValue doEvent(boolean v) { doevent = v; return this; }
+	  public sValue pauseEvent() { pauseevent = true; return this; }
 	  public sValue addEventDelete(nRunnable r) { eventsDelete.add(r); return this; }
 	  public sValue addEventChange(nRunnable r) { eventsChange.add(r); return this; }
 	  public sValue removeEventChange(nRunnable r) { eventsChange.remove(r); return this; }
 	  public sValue addEventAllChange(nRunnable r) { eventsAllChange.add(r); return this; }
 	  public sValue removeEventAllChange(nRunnable r) { eventsAllChange.remove(r); return this; }
-	  void doChange() { if (doevent) nRunnable.runEvents(eventsAllChange); has_changed = true; }
+	  void doChange() { 
+		  if (!pauseevent) { 
+			  if (doevent) nRunnable.runEvents(eventsAllChange); 
+			  has_changed = true; 
+		  } else {
+			  was_changed = true;
+		  }
+	  }
 	  public sValueBloc bloc;
-	  boolean has_changed = false, doevent = true;
+	  boolean has_changed = false, doevent = true, pauseevent = false, was_changed = false;
 	  public String ref;
 	  public String type;
 	  public String shrt;
@@ -36,7 +45,20 @@ public abstract class sValue implements RConst {
 	    bloc.values.put(ref, this); 
 	    if (bloc.doevent) bloc.last_created_value = this; 
 	    if (bloc.doevent) nRunnable.runEvents(bloc.eventsAddVal); }
-	  void frame() { if (has_changed) { if (doevent) nRunnable.runEvents(eventsChange); } has_changed = false; }
+	  void frame() { 
+		  if (!pauseevent) { 
+			  if (has_changed) { 
+				  if (doevent) nRunnable.runEvents(eventsChange); 
+			  } 
+			  has_changed = false; 
+		  } else {
+			  if (was_changed) { 
+				  if (doevent) nRunnable.runEvents(eventsAllChange); 
+				  has_changed = true; 
+			  }
+			  pauseevent = false; 
+		  }
+	  }
 	  ArrayList<nRunnable> eventsChange = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsAllChange = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsDelete = new ArrayList<nRunnable>();
@@ -53,6 +75,17 @@ public abstract class sValue implements RConst {
 	    shrt = svb.getData("shr");
 	    has_changed = true;
 	  }
+	  public boolean limited_min = false;
+	  public boolean limited_max = false;
+	  public sValue set_limit_min(boolean b) {
+		  if (b != limited_min) doChange(); 
+		  limited_min = b; return this; }
+	  public sValue set_limit_max(boolean b) { 
+		  if (b != limited_max) doChange(); 
+		  limited_max = b; return this; }
+	  public sValue set_limit(boolean b1, boolean b2) { 
+		  if (b1 != limited_min || b2 != limited_max) doChange(); 
+		  limited_min = b1; limited_max = b2; return this; }
 	  public sValue set_min(float mi) { return this; }
 	  public sValue set_max(float d) { return this; }
 	  public float getmin() { return 0; }

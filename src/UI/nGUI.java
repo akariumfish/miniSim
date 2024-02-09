@@ -53,6 +53,7 @@ public class nGUI {
     mouseVector = in.mouse; pmouseVector = in.pmouse;
     ref_size = _ref_size;
 //    view = new Rect(0, 0, app.width, app.height);
+    hoverable_pile = new Hoverable_pile(app);
     info = new nInfo(this, ref_size*0.75F);
 //    addEventsFullScreen(new nRunnable(this) { public void run() { 
 //      view.size.set(app.width, app.height); updateView();
@@ -69,7 +70,7 @@ public class nGUI {
   public boolean field_used = false;
   
   public Drawing_pile drawing_pile = new Drawing_pile();
-  public Hoverable_pile hoverable_pile = new Hoverable_pile();
+  public Hoverable_pile hoverable_pile;// = new Hoverable_pile();
   
   public ArrayList<nRunnable> eventsFrame = new ArrayList<nRunnable>();
   public ArrayList<nRunnable> eventsFullScreen = new ArrayList<nRunnable>();

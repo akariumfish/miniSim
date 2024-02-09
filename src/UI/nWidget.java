@@ -381,7 +381,7 @@ public class nWidget {
   public boolean isViewable() {
 	  return Rect.rectCollide(getRect(), gui.view) && 
     		  !(fine_view && getSX()*gui.scale < 0.5 && getSY()*gui.scale < 0.5) && 
-    		  !(!fine_view && getSX()*gui.scale < 10 && getSY()*gui.scale < 10);
+    		  !(!fine_view && getSX()*gui.scale < 3 && getSY()*gui.scale < 3);
   }
   
   public nWidget(Rapp a) {   //only for theme model saving !!
@@ -534,7 +534,7 @@ public class nWidget {
           if (l.length() > 0) {
 	          app.fill(look.textColor); 
 	          app.textAlign(textAlignX, textAlignY);
-	          app.textFont(app.getFont(look.textFont));
+//	          app.textFont(app.getFont(look.textFont));
 	          //int line = 0;
 	          //for (int i = 0 ; i < l.length() ; i++) if (l.charAt(i) == '\n') line+=1;
 	          float tx = getX();

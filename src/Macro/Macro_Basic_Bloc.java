@@ -3,6 +3,7 @@ package Macro;
 
 import RApplet.RConst;
 import UI.*;
+import processing.core.PApplet;
 import sData.*;
 
 
@@ -54,8 +55,8 @@ class MVar extends Macro_Bloc {
           val_type.set("boo");
         }
         else {
-          packet = Macro_Packet.newPacketFloat(Float.parseFloat(t));
-          fval.set(Float.parseFloat(t));
+          packet = Macro_Packet.newPacketFloat(PApplet.parseFloat(t));
+          fval.set(PApplet.parseFloat(t));
           val_type.set("flt");
         }
         if (auto_send.get()) out.send(packet);
@@ -222,13 +223,13 @@ class MCalc extends Macro_Bloc {
       String t = view.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { pin2 = 0; in2.setLastFloat(0); receive(); }
-        else if (Float.parseFloat(t) != 0) { pin2 = Float.parseFloat(t); in2.setLastFloat(pin2); receive(); }
+        else if (PApplet.parseFloat(t) != 0) { pin2 = PApplet.parseFloat(t); in2.setLastFloat(pin2); receive(); }
       }
     } });
     String t = view.getText();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { pin2 = 0; in2.setLastFloat(0); }
-      else if (Float.parseFloat(t) != 0) { pin2 = Float.parseFloat(t); in2.setLastFloat(pin2); }  }
+      else if (PApplet.parseFloat(t) != 0) { pin2 = PApplet.parseFloat(t); in2.setLastFloat(pin2); }  }
     Macro_Element e = addEmptyL(0);
     widgADD = e.addLinkedModel("MC_Element_Button_Selector_1", "+").setLinkedValue(valADD);
     widgSUB = e.addLinkedModel("MC_Element_Button_Selector_2", "-").setLinkedValue(valSUB);
@@ -621,13 +622,13 @@ class MComp extends Macro_Bloc {
       String t = view.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { pin2 = 0; in2.setLastFloat(0); receive(); }
-        else if (Float.parseFloat(t) != 0) { pin2 = Float.parseFloat(t); in2.setLastFloat(pin2); receive(); }
+        else if (PApplet.parseFloat(t) != 0) { pin2 = PApplet.parseFloat(t); in2.setLastFloat(pin2); receive(); }
       }
     } });
     String t = view.getText();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { pin2 = 0; in2.setLastFloat(0); receive(); }
-      else if (Float.parseFloat(t) != 0) { pin2 = Float.parseFloat(t); in2.setLastFloat(pin2); receive(); }
+      else if (PApplet.parseFloat(t) != 0) { pin2 = PApplet.parseFloat(t); in2.setLastFloat(pin2); receive(); }
     }
     Macro_Element e = addEmptyL(0);
     widgSUP = e.addLinkedModel("MC_Element_Button_Selector_1", ">").setLinkedValue(valSUP);

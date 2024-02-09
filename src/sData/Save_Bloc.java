@@ -3,6 +3,7 @@ package sData;
 import java.util.ArrayList;
 
 import RApplet.Rapp;
+import processing.core.PApplet;
 import RApplet.RConst;
 
 
@@ -34,8 +35,8 @@ public class Save_Bloc {
 	  Save_Data newData(String n, String d) {
 	    Save_Data sd = new Save_Data(n, d); datas.add(sd); return sd; }
 	    
-	  Save_Data newData(String n, int d) { return newData(n, String.valueOf(d)); } 
-	  Save_Data newData(String n, float d) { return newData(n, String.valueOf(d)); } 
+	  Save_Data newData(String n, int d) { return newData(n, PApplet.str(d)); } 
+	  Save_Data newData(String n, float d) { return newData(n, PApplet.str(d)); } 
 	  Save_Data newData(String n, boolean d) { if (d) return newData(n, "1"); else return newData(n, "0"); } 
 	  
 	  Save_Bloc newBloc(String n) {
@@ -45,9 +46,16 @@ public class Save_Bloc {
 	  
 	  void setData(String n, String d) { for (Save_Data sd : datas) if (sd.name.equals(n)) { sd.set(d); return; } }
 	  
-	  String getData(String n) { for (Save_Data sd : datas) if (sd.name.equals(n)) return sd.get(); return null; }
-	  int getInt(String n) { return (int)Float.parseFloat(getData(n)); }
-	  float getFloat(String n) { return Float.parseFloat(getData(n)); }
+	  String getData(String n) { for (Save_Data sd : datas) if (sd.name.equals(n)) return sd.get(); return ""; }
+	  int getInt(String n) { 
+		  float f = PApplet.parseFloat(getData(n));
+		  if (!PApplet.str(f).equals("NaN"))
+			  return PApplet.parseInt(f); 
+		  else return 0; }
+	  float getFloat(String n) { 
+		  float f = PApplet.parseFloat(getData(n));
+		  if (!PApplet.str(f).equals("NaN")) return f; 
+		  else return 0; }
 	  boolean getBoolean(String n) { if (getData(n).equals("1")) return true; else return false; }
 	  
 	  Save_Bloc getBloc(String n) { for (Save_Bloc sd : blocs) if (sd.name.equals(n)) return sd; return null; }
@@ -91,20 +99,20 @@ public class Save_Bloc {
 	  void to_list(Save_List sl) {
 		  app.slog("Bloc - to string - start");
 	    sl.put("name", name);
-	    sl.put("total size", String.valueOf(size()));
+	    sl.put("total size", PApplet.str(size()));
 	    
-	    sl.put("datas nb", String.valueOf(datas.size()));
+	    sl.put("datas nb", PApplet.str(datas.size()));
 	    int leng = 0;
 	    for (Save_Data sd : datas) leng += sd.size();
-	    sl.put("datas total size", String.valueOf(leng));
+	    sl.put("datas total size", PApplet.str(leng));
 	    app.slog("datas to string start");
 	    for (Save_Data sd : datas) { sl.put("name", sd.name); sl.put("data", sd.data); }
 	    app.slog("datas to string end");
 	    
-	    sl.put("child blocs nb", String.valueOf(blocs.size()));
+	    sl.put("child blocs nb", PApplet.str(blocs.size()));
 	    leng = 0;
 	    for (Save_Bloc sd : blocs) leng += sd.size();
-	    sl.put("child blocs total size", String.valueOf(leng));
+	    sl.put("child blocs total size", PApplet.str(leng));
 	    app.slog("child blocs to string start");
 	    for (Save_Bloc sb : blocs) sb.to_list(sl);
 	    app.slog("child blocs to string end");
@@ -164,7 +172,7 @@ class Save_List {
     return list[index-1]; }
     else return "";
   }
-  int getInt(String log) { return (int)Float.parseFloat(get(log)); }
+  int getInt(String log) { return (int)PApplet.parseFloat(get(log)); }
   
   void init(int size) { list = new String[size]; index = 0; }
   void init(String[] l) { list = l; index = 0; }

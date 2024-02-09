@@ -2,6 +2,7 @@ package UI;
 
 import java.util.ArrayList;
 
+import RApplet.Rapp;
 import processing.core.PVector;
 import sData.nRunnable;
 
@@ -10,7 +11,8 @@ public class Hoverable_pile {
 	  ArrayList<nRunnable> eventsFound = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsNotFound = new ArrayList<nRunnable>();
 	  public boolean found = false;
-	  Hoverable_pile() { }
+	  Rapp app;
+	  Hoverable_pile(Rapp a) { app = a; }
 	  void addEventNotFound(nRunnable r) { eventsNotFound.add(r); }
 	  void removeEventNotFound(nRunnable r) { eventsNotFound.remove(r); }
 	  void addEventFound(nRunnable r) { eventsFound.add(r); }
@@ -31,12 +33,12 @@ public class Hoverable_pile {
 	            count++;
 	            if (!found && h.active && h.rect != null && Rect.rectCollide(pointer, h.rect, h.phantom_space)) {
 	              h.mouseOver = true;
-//	              if (DEBUG_HOVERPILE) {
-//	                fill(255, 0);
-//	                strokeWeight(5);
-//	                stroke(0, 0, 255);
-//	                rect(h.rect.pos.x, h.rect.pos.y, h.rect.size.x, h.rect.size.y);
-//	              }
+	              if (app.DEBUG_HOVERPILE) {
+	            	  app.fill(255, 0);
+	            	  app.strokeWeight(5);
+	            	  app.stroke(0, 0, 255);
+	            	  app.rect(h.rect.pos.x, h.rect.pos.y, h.rect.size.x, h.rect.size.y);
+	              }
 	              found = true;
 	            }
 	          }

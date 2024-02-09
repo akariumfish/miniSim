@@ -23,19 +23,19 @@ class Replic implements Macro_Interf {
 	Replic pos(PVector f) { pos.x = f.x; pos.y = f.y; return this; } 
 	Replic dir(PVector f) { dir.x = f.x; dir.y = f.y; return this; } 
 	String to_str() {
-		String s = String.valueOf(pos.x) + INFO_TOKEN + 
-				String.valueOf(pos.y) + INFO_TOKEN + 
-				String.valueOf(dir.x) + INFO_TOKEN + 
-				String.valueOf(dir.y);
+		String s = PApplet.str(pos.x) + INFO_TOKEN + 
+				PApplet.str(pos.y) + INFO_TOKEN + 
+				PApplet.str(dir.x) + INFO_TOKEN + 
+				PApplet.str(dir.y);
 		return s;
 	}
 	void from_str(String s) {
 		String[] l = PApplet.splitTokens(s, INFO_TOKEN);
 		if (l.length == 4) {
-			pos.x = Float.parseFloat(l[0]);
-			pos.y = Float.parseFloat(l[1]);
-			dir.x = Float.parseFloat(l[2]);
-			dir.y = Float.parseFloat(l[3]);
+			pos.x = PApplet.parseFloat(l[0]);
+			pos.y = PApplet.parseFloat(l[1]);
+			dir.x = PApplet.parseFloat(l[2]);
+			dir.y = PApplet.parseFloat(l[3]);
 		}
 	}
 }
@@ -54,34 +54,34 @@ public class MStructure extends MBaseMenu {
 		Replic r = new Replic().pos(new_pos.get()).dir(new_dir.get());
 		replics.add(r);
 		last_build = r;
-		save_copy = replics_save.get();
-		replics_save.set(replics_save.get() + OBJ_TOKEN + r.to_str());
+//		save_copy = replics_save.get();
+//		replics_save.set(replics_save.get() + OBJ_TOKEN + r.to_str());
 		return this;
 	}
-	String save_copy = "";
+//	String save_copy = "";
 	MStructure del_oldest_replic() {
 		if (last_build != null && last_build != first_rep) {
 			replics.remove(last_build);
 			if (replics.size() > 1) {
 				last_build = replics.get(1);
-				replics_save.set(save_copy);
-				String[] l = PApplet.splitTokens(save_copy, OBJ_TOKEN);
-				save_copy = "";
-				if (l.length > 0) {
-					save_copy = l[0];
-					for (int i = 2 ; i < l.length ; i ++) save_copy = save_copy + l[i];
-				}
+//				replics_save.set(save_copy);
+//				String[] l = PApplet.splitTokens(save_copy, OBJ_TOKEN);
+//				save_copy = "";
+//				if (l.length > 0) {
+//					save_copy = l[0];
+//					for (int i = 2 ; i < l.length ; i ++) save_copy = save_copy + l[i];
+//				}
 			} else {
 				last_build = null;
-				replics_save.set("");
-				save_copy = "";
+//				replics_save.set("");
+//				save_copy = "";
 			}
 		}
 		return this;
 	}
 	MStructure clear_replic() {
 		replics.clear();
-		replics_save.set("");
+//		replics_save.set("");
 		nposx.set(0); nposy.set(0); nscale.set(10); nrot.set(0);
 		first_rep = new Replic().pos(new PVector(0, 0)).dir(new PVector(10, 0));
 		replics.add(first_rep); 
@@ -125,7 +125,7 @@ public class MStructure extends MBaseMenu {
 	sVec new_pos, new_dir;
 	sRun new_rep_run, clear_rep_run;
 	nRunnable up_npos;
-	sStr replics_save;
+//	sStr replics_save;
 	MStructure(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "struct", _bloc); }
 	void init() {
 		super.init();   
@@ -154,15 +154,15 @@ public class MStructure extends MBaseMenu {
 		nposy.addEventChange(up_npos);
 		nscale.addEventChange(up_npos);
 		nrot.addEventChange(up_npos);
-		replics_save = newStr("replics_save", "replics_save", "");
-		if (replics_save.get().length() > 0) {
-			String[] l = PApplet.splitTokens(replics_save.get(), OBJ_TOKEN);
-			for (String s : l) {
-				Replic r = new Replic();
-				replics.add(r);
-				r.from_str(s);
-			}
-		}
+//		replics_save = newStr("replics_save", "replics_save", "");
+//		if (replics_save.get().length() > 0) {
+//			String[] l = PApplet.splitTokens(replics_save.get(), OBJ_TOKEN);
+//			for (String s : l) {
+//				Replic r = new Replic();
+//				replics.add(r);
+//				r.from_str(s);
+//			}
+//		}
 	}
 	void build_normal() {
 		super.build_normal();

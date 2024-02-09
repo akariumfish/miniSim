@@ -11,35 +11,42 @@ import UI.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import sData.*;
-
-
-
-
-
-
+import z_old_specialise.Sheet_Specialize;
 
 
 /*
 
+sheet extend abstract
+shelfpanel of shown bloc
 
 
+methods for adding blocs inside
 
- sheet extend abstract
- shelfpanel of shown bloc
- 
- 
- methods for adding blocs inside
- 
- has spot for blocs to display when reducted
- child bloc au dessus du panel can snap to spot
- 
- no sheet co, stick to a free place in the hard back to make a co 
- 
- quand une sheet est ouverte sont soft back est trensparent et sont parent est caché
- seulement une top sheet ouverte a la fois
- cant be grabbed when open
- 
- */
+has spot for blocs to display when reducted
+child bloc au dessus du panel can snap to spot
+
+no sheet co, stick to a free place in the hard back to make a co 
+
+quand une sheet est ouverte sont soft back est trensparent et sont parent est caché
+seulement une top sheet ouverte a la fois
+cant be grabbed when open
+
+*/
+
+
+class SheetPrint extends Sheet_Specialize {
+  SheetPrint() { super("sheet", ""); }
+  public Macro_Sheet get_new(Macro_Sheet s, String n, sValueBloc b) { return new Macro_Sheet(s, n, b); }
+}
+
+
+abstract class MAbstract_Builder {
+  String type, descr; boolean show_in_buildtool = false;
+  MAbstract_Builder(String t, String d) { type = t; descr = d; }
+  Macro_Abstract build(Macro_Sheet s, sValueBloc b) { return null; }
+}
+
+
 public class Macro_Sheet extends Macro_Abstract {
 	
 	class MSheet_Builder extends MAbstract_Builder {
@@ -92,7 +99,7 @@ public class Macro_Sheet extends Macro_Abstract {
     
     mmain().update_select_bound();
   }
-  Macro_Sheet select() {
+  public Macro_Sheet select() {
     if (mmain().selected_sheet != this) { 
       if (sheet != this && openning.get() != DEPLOY) deploy();
       if (!mmain().show_macro.get()) for (Macro_Abstract m : mmain().child_macro) m.hide();
@@ -130,7 +137,7 @@ public class Macro_Sheet extends Macro_Abstract {
     toLayerTop();
     return this;
   }
-  Macro_Sheet open() {
+  public Macro_Sheet open() {
     if (sheet != this && openning.get() != OPEN && 
         (!(openning.get() == HIDE) || (openning.get() == HIDE && mmain().canAccess(see_access))) ) {
       openning.set(OPEN);
@@ -400,48 +407,52 @@ public class Macro_Sheet extends Macro_Abstract {
       show a popup and desactivate everything somehow
   */
   void ask_packet_process(Macro_Connexion co) {
+//	  gui.app.plogln("Sheet " + value_bloc.ref+" ask_packet_process from "+co.descr);
     if (co.type == OUTPUT) out_to_process.add(co);
     if (co.type == INPUT) in_to_process.add(co);
-    //if (co.type == OUTPUT) logln(co.descr+" ask_packet_process OUT ");
-    //if (co.type == INPUT) logln(co.descr+" ask_packet_process IN ");
     mmain().ask_packet_process(this);
   }
-  
+
   LinkedBlockingQueue<Macro_Connexion> in_to_process = new LinkedBlockingQueue<Macro_Connexion>();
   LinkedBlockingQueue<Macro_Connexion> out_to_process = new LinkedBlockingQueue<Macro_Connexion>();
+  LinkedBlockingQueue<Macro_Connexion> co_processed = new LinkedBlockingQueue<Macro_Connexion>();
   boolean DEBUG_PACKETS = true;
-  void process_packets() {
+  int process_packets(int max_turn) {
+	  int turn_count = 0;
     if (!mmain().do_packet.get()) {
       in_to_process.clear();
       out_to_process.clear();
     } else {
-      //logln(value_bloc.ref+" process start ");
-      //String procc_resum = value_bloc.ref + " process resum ";
-      //logln(send_resum);
+    	gui.app.plogln("");
+    	gui.app.plogln(value_bloc.ref+" packet process start ");
+      String procc_resum = value_bloc.ref + " process resum ";
       
-      boolean done = false; int turn_count = 0, max_turn = 10;
+      boolean done = false; 
       while (!done || turn_count > max_turn) {
         done = true;
-        //logln("    turn " + turn_count + " start " + in_to_process.size() + "in" + out_to_process.size() + "out");
+        gui.app.plogln("turn " + turn_count);
+        gui.app.plogln("   start:in" + in_to_process.size() + "-out" + out_to_process.size() + " OUTs process send");
         while(out_to_process.size() > 0) {
           Macro_Connexion m = out_to_process.remove();
           done = m.process_send() && done;
-          //procc_resum += m.process_resum;
+          procc_resum += m.process_resum;
+          co_processed.add(m);
         }
-        //logln("    turn " + turn_count + " mid " + in_to_process.size() + "in" + out_to_process.size() + "out");
+        gui.app.plogln("   mid:in" + in_to_process.size() + "-out" + out_to_process.size() + " INs process receive");
         while(in_to_process.size() > 0) {
-          //logln("----IN");
           Macro_Connexion m = in_to_process.remove();
-          //logln("     got "+m.descr);
           done = m.process_receive() && done;
-          //procc_resum += m.process_resum;
+          procc_resum += m.process_resum;
+          co_processed.add(m);
         }
-        //logln("    turn " + turn_count + " end " + in_to_process.size() + "in" + out_to_process.size() + "out");
+        gui.app.plogln("   end:in" + in_to_process.size() + "-out" + out_to_process.size() + "");
         
         turn_count++;
       }
-      
-      //logln(procc_resum);
+      if (max_turn == turn_count) gui.app.plogln("-----------MAX TURN-----------");
+      gui.app.plogln("");
+      gui.app.plogln(procc_resum);
+      gui.app.plogln("");
       
       //if (turn_count > max_turn) {
       //  String[] llink = PApplet.splitTokens(mmain().last_created_link, INFO_TOKEN);
@@ -449,10 +460,11 @@ public class Macro_Sheet extends Macro_Abstract {
       //  logln("LOOP");
       //}
       
-      for (Macro_Connexion m : child_connect) m.end_packet_process();
-      
+      for (Macro_Connexion m : co_processed) m.end_packet_process();
+      co_processed.clear();
       //packet_process_asked = false;
     }
+    return turn_count;
   }
   
   
@@ -493,7 +505,7 @@ public class Macro_Sheet extends Macro_Abstract {
   nRunnable szone_run;
   
   public sStr specialize;
-//  Sheet_Specialize sheet_specialize = null;
+  public Sheet_Specialize sheet_specialize = null;
   
   
   
@@ -576,7 +588,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     updateBack();
     
   }
-	void init_end() {
+	public void init_end() {
 		  if (openning.get() == REDUC) { openning.set(OPEN); reduc(); }
 	      else if (openning.get() == OPEN) { openning.set(REDUC); open(); }
 	      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); hide(); }
@@ -1247,16 +1259,19 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       
       String typ = ((sStr)b.getBloc("settings").getValue("type")).get();
       
-//      if (!typ.equals("sheet"))   
+      if (!typ.equals("sheet"))   
     	  	return addByType(typ, b);
       
-//      else if (b.getBloc("settings").getValue("specialize") != null) {
-//        
-//        String spe = ((sStr)b.getBloc("settings").getValue("specialize")).get();
-//        
-//        for (Sheet_Specialize t : Sheet_Specialize.prints) if (!t.unique && t.name.equals(spe))
-//          return t.add_new(this, b, null);
-//      }
+      else if (b.getBloc("settings").getValue("specialize") != null) {
+        
+        String spe = ((sStr)b.getBloc("settings").getValue("specialize")).get();
+        
+        if (spe.equals("sheet"))   
+    	  		return addByType("sheet", b);
+        
+        for (Sheet_Specialize t : Sheet_Specialize.prints) if (!t.unique && t.name.equals(spe))
+          return t.add_new(this, b, null);
+      }
     }
     return null; 
   }
@@ -1384,12 +1399,6 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   
 }
 
-
-abstract class MAbstract_Builder {
-  String type, descr; boolean show_in_buildtool = false;
-  MAbstract_Builder(String t, String d) { type = t; descr = d; }
-  Macro_Abstract build(Macro_Sheet s, sValueBloc b) { return null; }
-}
 
 
 

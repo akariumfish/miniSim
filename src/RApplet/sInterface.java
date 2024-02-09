@@ -3,9 +3,11 @@ package RApplet;
 import java.util.ArrayList;
 
 import Macro.Macro_Main;
+import Macro.Macro_Sheet;
 import UI.*;
 import processing.core.PConstants;
 import sData.*;
+import z_old_specialise.Sheet_Specialize;
 
 /*
  Interface
@@ -221,11 +223,11 @@ public class sInterface {
             .getDrawer()
             
           .addModel("Button_Small_Text_Outline-S1-P4", "C")
-            .setSwitch().setSwitchState(app.console_log)
+            .setSwitch().setSwitchState(app.DEBUG)
             .addEventSwitchOn(new nRunnable() { public void run() { 
-            	app.console_log = true; } } ).setInfo("log")
+            	app.DEBUG = true; } } ).setInfo("log")
             .addEventSwitchOff(new nRunnable() { public void run() { 
-            	app.console_log = false; } } )
+            	app.DEBUG = false; } } )
             .getDrawer()
             
           .addModel("Button_Small_Text_Outline-S1-P6", "M")
@@ -236,6 +238,13 @@ public class sInterface {
             	app.DEBUG_MACRO = false; } } )
             .getDrawer()
             
+	        .addModel("Button_Small_Text_Outline-S1-P7", "P")
+	          .setSwitch().setSwitchState(app.DEBUG_PACKET)
+	          .addEventSwitchOn(new nRunnable() { public void run() { 
+	          	app.DEBUG_PACKET = true; } } ).setInfo("macro packet process logs")
+	          .addEventSwitchOff(new nRunnable() { public void run() { 
+	          	app.DEBUG_PACKET = false; } } )
+	          .getDrawer()
           //.addModel("Button_Small_Text_Outline-S1-P7", "")
           //  //.setSwitch()
           //  //.addEventSwitchOn(new Runnable() { public void run() { 
@@ -387,6 +396,7 @@ public class sInterface {
   public void full_data_save() {
     macro_main.saving_database();
     if (!savepath_value.get().equals("default.sdata")) {
+  	  app.logln("full_data_save to "+savepath_value.get());
       file_savebloc.clear(); 
       interface_bloc.preset_to_save_bloc(file_savebloc); 
       file_savebloc.save_to(savepath_value.get());
@@ -555,7 +565,7 @@ public sRun full_screen_run;
   public sInterface addEventSetupLoad(nRunnable r) { eventsSetupLoad.add(r); return this; }
   ArrayList<nRunnable> eventsSetupLoad = new ArrayList<nRunnable>();
   public void setup_load() {
-    
+	  app.logln("setup_load from "+savepath_value.get());
     file_savebloc.clear();
     if (setup_bloc != null) setup_bloc.clear();
     if (file_savebloc.load_from(savepath_value.get())) {
@@ -583,10 +593,10 @@ public sRun full_screen_run;
   }
   
   
-//  void addSpecializedSheet(Sheet_Specialize s) {
-//    macro_main.addSpecializedSheet(s); }
-//  Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
-//    return macro_main.addUniqueSheet(s); }
+  void addSpecializedSheet(Sheet_Specialize s) {
+    macro_main.addSpecializedSheet(s); }
+  Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
+    return macro_main.addUniqueSheet(s); }
 
 
   public sValueBloc getTempBloc() {

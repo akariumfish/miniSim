@@ -1,6 +1,7 @@
 package UI;
 
 import RApplet.RConst;
+import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sBoo;
 import sData.sFlt;
@@ -51,14 +52,14 @@ public class nLinkedWidget extends nWidget {
 	    return this; }
 	  nLinkedWidget setLinkedValue(sInt b) { 
 	    ival = b;
-	    setText(String.valueOf(ival.get()));
+	    setText(PApplet.str(ival.get()));
 	    val_run = new nRunnable(this) { public void run() { 
-	      ((nLinkedWidget)builder).changeText(String.valueOf(ival.get())); } };
+	      ((nLinkedWidget)builder).changeText(PApplet.str(ival.get())); } };
 	    b.addEventChange(val_run);
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 
 	      String s = ((nLinkedWidget)builder).getText();
-	      if (!(s.length() > 0 && Integer.parseInt(s) == 0) && !String.valueOf(Integer.parseInt(s)).equals("NaN")) ival.set(Integer.parseInt(s)); } } );
+	      if (!(s.length() > 0 && Integer.parseInt(s) == 0) && !PApplet.str(Integer.parseInt(s)).equals("NaN")) ival.set(Integer.parseInt(s)); } } );
 	    return this; }
 	  nLinkedWidget setLinkedValue(sFlt b) { 
 	    fval = b;
@@ -70,7 +71,8 @@ public class nLinkedWidget extends nWidget {
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 
 	      String s = ((nLinkedWidget)builder).getText();
-	      if (s.length() > 0 && !s.equals("-") && !String.valueOf(Float.parseFloat(s)).equals("NaN")) fval.set(Float.parseFloat(s)); } } );
+	      if (s.length() > 0 && !PApplet.str(PApplet.parseFloat(s)).equals("NaN")) 
+	    	  	fval.set(PApplet.parseFloat(s)); } } );//Float.parseFloat(s)
 	      //!(s.length() > 0 && float(s) == 0) && 
 	    return this; }
 	  nLinkedWidget setLinkedValue(sVec b) { 

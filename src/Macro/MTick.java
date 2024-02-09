@@ -14,14 +14,32 @@ public class MTick extends MBaseMenu {
 		MTick_Builder() { super("tick", "time control"); show_in_buildtool = true; }
 		MTick build(Macro_Sheet s, sValueBloc b) { MTick m = new MTick(s, b); return m; }
 	}
+	
 	int run_tck_cnt = 0, met_tck_cnt = 0;
 	Macro_Connexion tick_out, rst_out, com_in;
+	
+
+	  sInt tick_counter; //conteur de tour depuis le dernier reset ou le debut
+	  sBoo pause; //permet d'interompre le defilement des tour
+	  sInt force_next_tick; 
+	  sFlt tick_by_frame; //nombre de tour a executé par frame
+	  sFlt tick_sec,tick_time;
+	  sInt SEED; //seed pour l'aleatoire
+	  sBoo auto_reset, auto_reset_rng_seed, auto_reset_screenshot, show_com;
+	  sInt auto_reset_turn;
+	  sRun srun_reset, srun_rngr, srun_nxtf, srun_tick, srun_scrsht;
+	  sBoo show_toolpanel;
+
+	  float tick_pile = 0; //pile des tick a exec
+
+	
 	MTick(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "tick", _bloc); }
 	void init() {
 		super.init();
 	    tick_counter = newInt(0, "tick_counter", "tick");
 	    tick_by_frame = newFlt(2, "tick by frame", "tck/frm");
 	    tick_sec = newFlt(0, "tick seconde", "tps");
+	    tick_time = newFlt(0, "tick duration (ms)", "tls");
 	    pause = newBoo(false, "pause", "pause");
 	    force_next_tick = newInt(0, "force_next_tick", "nxt tick");
 	    auto_reset = newBoo(true, "auto_reset", "auto reset");
@@ -36,7 +54,6 @@ public class MTick extends MBaseMenu {
 	    srun_tick = newRun("sim_tick", "tick", new nRunnable() { 
 	    	  public void run() { 
 	    		  run_tck_cnt++; 
-	    		  force_next_tick.add(1); 
 	    		  while (run_tck_cnt > met_tck_cnt) tick();
 	    		  if (tick_out != null) tick_out.send(Macro_Packet.newPacketBang());
 	    	} } );
@@ -61,32 +78,23 @@ public class MTick extends MBaseMenu {
 	}
 	
 
-	  sInt tick_counter; //conteur de tour depuis le dernier reset ou le debut
-	  sBoo pause; //permet d'interompre le defilement des tour
-	  sInt force_next_tick; 
-	  sFlt tick_by_frame; //nombre de tour a executé par frame
-	  sFlt tick_sec;
-	  sInt SEED; //seed pour l'aleatoire
-	  sBoo auto_reset, auto_reset_rng_seed, auto_reset_screenshot, show_com;
-	  sInt auto_reset_turn;
-	  sRun srun_reset, srun_rngr, srun_nxtf, srun_tick, srun_scrsht;
-	  sBoo show_toolpanel;
-
-	  float tick_pile = 0; //pile des tick a exec
-
 	
 	  public void build_custom_menu(nFrontPanel sheet_front) {
 	    nFrontTab tab = sheet_front.getTab(2);
 	
 	    tab.getShelf()
 	      .addDrawer(10.25, 0.6)
-	      .addModel("Label-S4", "- Simulation Control -").setFont((int)(ref_size/1.4)).getShelf()
+	      .addModel("Label-S4", "- Tick Control -").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
 	      .addDrawerWatch(tick_counter, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerLargeFieldCtrl(SEED, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(tick_by_frame, 2, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerWatch(tick_sec, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerWatch(tick_time, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(auto_reset_turn, 1000, 10, 1)
 	      .addSeparator(0.125)
@@ -115,9 +123,11 @@ public class MTick extends MBaseMenu {
 
   void frame() {
     if (!pause.get()) {
-      tick_sec.set(mmain().inter.framerate.median_framerate.get() * tick_by_frame.get());
-      
-      tick_pile += tick_by_frame.get();
+    	tick_sec.set(mmain().inter.framerate.median_framerate.get() * tick_by_frame.get());
+    	tick_time.set(1 / tick_sec.get()*1000);
+
+//        tick_pile += tick_by_frame.get();
+        tick_pile += tick_by_frame.get();
 
       //auto screenshot before reset
       if (auto_reset.get() && auto_reset_screenshot.get() &&

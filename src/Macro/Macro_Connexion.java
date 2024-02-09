@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import RApplet.Rapp;
 import RApplet.RConst;
 import UI.*;
+import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
 import sData.*;
@@ -377,8 +378,9 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     pack_info = RConst.copy(p.def);
     for (String m : p.messages) pack_info = pack_info + " " + m;
     sending = true;
-    hasSend = 15;
-    //logln(descr+" send");
+    hasSend = PApplet.parseInt(
+    		sheet.mmain().inter.framerate.median_framerate.get() / sheet.mmain().packpross_by_frame.get());
+    gui.app.plogln(descr+" send");
     packet_to_send.add(p);
     sheet.ask_packet_process(this);
     return this;
@@ -386,11 +388,11 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   ArrayList<Macro_Packet> packet_to_send = new ArrayList<Macro_Packet>();
   
   boolean process_send() {
-    //logln(descr+" process send");
+	  gui.app.plogln(descr+" process send");
     
     process_resum = ""; 
     boolean flag = packet_to_send.size() == 0;
-    if (!flag) process_resum += descr+" send ";
+    if (!flag) process_resum += ">>>"+descr+" send ";
     for (Macro_Packet p : packet_to_send) {
       process_resum = process_resum + p.getText() + " ";
       if (direct_co != null && direct_co.type == OUTPUT) direct_co.send(p);
@@ -398,14 +400,14 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       int prio = 0;
       for (Macro_Connexion m : connected_inputs) 
         if (prio < m.elem.bloc.priority.get() ) prio = m.elem.bloc.priority.get();
-      //logln(descr+" max prio "+prio);
+//      gui.app.plogln(descr+" max prio "+prio);
       int co_done = 0;
       while (prio >= 0 && co_done < connected_inputs.size()) {
-        //logln("try prio "+prio);
+//    	  gui.app.plogln("try prio "+prio);
         for (Macro_Connexion m : connected_inputs) {
-          //logln("try co "+m.elem.descr+" of prio "+m.elem.bloc.priority.get());
+//        	gui.app.plogln("try co "+m.elem.descr+" of prio "+m.elem.bloc.priority.get());
           if (prio == m.elem.bloc.priority.get()) { 
-            //logln("found"); 
+//        	  gui.app.plogln("found"); 
             co_done++; 
             m.receive(this, p); 
           }
@@ -451,7 +453,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         (filter.equals("num") && (p.def.equals("float") || p.def.equals("int"))) ||
         (filter.equals("val") && (p.def.equals("float") || p.def.equals("int") || 
                                   p.def.equals("bool"))) ) {
-      //logln(descr+"receive");
+    	gui.app.plogln(descr+"receive");
       packet_received.add(p);
       packet_sender.add(s);
       sheet.ask_packet_process(this);
@@ -462,11 +464,11 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   
   String process_resum = "";
   boolean process_receive() {
-    //logln(descr+" process receive");
+	  gui.app.plogln(descr+" process receive");
     
     process_resum = "";
     boolean flag = packet_received.size() == 0;
-    if (!flag) process_resum += descr+" receive ";
+    if (!flag) process_resum += ">>>"+descr+" receive ";
     
     int prio = 0;
     for (Macro_Connexion m : packet_sender) 

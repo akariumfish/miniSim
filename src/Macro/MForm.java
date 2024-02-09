@@ -11,6 +11,7 @@ import sData.sCol;
 import sData.sFlt;
 import sData.sInt;
 import sData.sValueBloc;
+import z_old_specialise.nBase;
 
 public class MForm extends MBaseMenu { 
 	static class MForm_Builder extends MAbstract_Builder {

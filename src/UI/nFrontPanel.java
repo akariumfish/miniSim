@@ -16,6 +16,7 @@ public class nFrontPanel extends nWindowPanel {
 	  nFrontTab current_tab;
 	  public int current_tab_id = 0;
 	  public nFrontTab addTab(String n) {
+		  if (current_tab != null) current_tab.hide();
 	    nFrontTab tab = new nFrontTab(this, n);
 	    tab.id = tabs.size();
 	    tabs.add(tab);

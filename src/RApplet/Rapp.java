@@ -8,6 +8,7 @@ import UI.nWidget;
 import processing.core.*;
 import processing.event.MouseEvent;
 import sData.nRunnable;
+import z_old_specialise.*;
 
 
 // Library : The MidiBus 8 Severin Smith http://smallbutdigital.com/projects/themidibus/
@@ -65,12 +66,19 @@ public class Rapp extends PApplet implements RConst {
 		init();
 		
 		background(0);//fond noir
+		
+		
+		
 		  
 	    
 	    interf.addEventNextFrame(new nRunnable() { 
 	      public void run() { interf.addEventNextFrame(new nRunnable() { 
 	        public void run() { interf.setup_load(); } } ); } } );
 
+	    
+	    
+	    
+	    
 		  app_grab = new nWidget(interf.screen_gui, "", 28, 0, 1, base_width - 40, 40)
 		    .setTrigger()
 		    .addEventTrigger(new nRunnable() { public void run() { mx = (int)mouseX; my = (int)mouseY; } } )
@@ -96,7 +104,7 @@ public class Rapp extends PApplet implements RConst {
 
 	public void init() {//executé au demarage
 		  
-		  logln("setup");
+		  logln("init");
 		  
 //		  setup_midi();
 		  
@@ -106,13 +114,13 @@ public class Rapp extends PApplet implements RConst {
 //		  interf.addSpecializedSheet(new Canvas.CanvasPrint());
 //		  interf.addSpecializedSheet(new Face.FacePrint());
 //		  interf.addSpecializedSheet(new Organism.OrganismPrint());
-//		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
-//		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
-//		  interf.addSpecializedSheet(new Face.FacePrint(canv));
-//		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
-//		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
-//		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
-		  //interf.addSpecializedSheet(new BoxPrint(simul));
+		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
+		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
+		  interf.addSpecializedSheet(new Face.FacePrint(canv));
+		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
+		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
+		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
+//		  interf.addSpecializedSheet(new BoxPrint(simul));
 		  
 		  
 		  //logln("end models: "+interf.gui_theme.models.size());
@@ -159,10 +167,8 @@ public class Rapp extends PApplet implements RConst {
 	  global_frame_count++;
 	  if (global_frame_count < 5) { fill(0); noStroke(); rect(0, 0, width, height); }
 	  
-	  show();
+	  if (do_one_save) { do_one_save = false; savelog(); }
 	}
-	
-	public void show() {}
 	
 	public void mouseWheel(MouseEvent event) { 
 	  interf.input.mouseWheelEvent(event);
@@ -201,29 +207,31 @@ public class Rapp extends PApplet implements RConst {
 		
 		// gestion des polices de caractére
 //		ArrayList<myFont> existingFont = new ArrayList<myFont>();
-		PFont existingFont;
-		int text_size;
+//		PFont existingFont;
+//		int text_size;
 //		class myFont { PFont f; int st; }
 		public void textFont(PFont p) {
-			textSize(text_size);
+//			textSize(text_size);
 		}
 		public PFont getFont(int st) {
-		  st = (int)(st / 2) * 2;
-		  if (st > 40) st = 40;
-		  if (st < 6) st = 6;
-		  if (existingFont == null) { 
-			  text_size = st;
-			  existingFont = createFont("Arial",st,false); //(name, size, smooth)
-			  super.textFont(existingFont);
-		  } else if (st != text_size) {
-			  text_size = st;
-		  }
-		  return existingFont;
-		}
+//			if (st < 0) st *= -1;
+//		  if (st > 40) st = 40;
+//		  if (st < 6) st = 6;
+//		  if (existingFont == null) { 
+//			  text_size = st;
+//			  existingFont = createFont("Arial",st,false); //(name, size, smooth)
+//			  super.textFont(existingFont);
+//		  } else if (st != text_size) {
+//			  text_size = st;
+//		  }
+//		  return existingFont;
+		
 //		  for (myFont f : existingFont) if (f.st == st) return f.f;
 //		  myFont f = new myFont();
 //		  f.f = createFont("Arial",st); f.st = st;
-//		  return f.f; }
+//		  return f.f; 
+			  return null; 
+		}
 		//for (String s : PFont.list()) println(s); // liste toute les police de text qui existe
 		
 		
@@ -233,72 +241,105 @@ public class Rapp extends PApplet implements RConst {
 		
 		
 		
-
-		boolean DEBUG_HOVERPILE = false;
+//		graphic debugs
+		public boolean DEBUG_HOVERPILE = false;
 		public boolean DEBUG_NOFILL = false;
-		
-		boolean DEBUG_MACRO = false;
-		
-		boolean DEBUG = true;
 		
 		int global_frame_count = 0;
 		ArrayList<String> logs = new ArrayList<String>();
 		String current_log = "";
-		boolean console_log = true, save_log_exit = false, save_log_all = false;
-		String logpath = "log.txt";
+		
+		boolean DEBUG = true, save_log_exit = false, save_log_all = false;
+		String logpath = "sim_log.txt";
 		String[] loglist;
+		
+		int log_line_count = 0;
 		void savelog() {
-		  if (loglist == null || loglist.length < logs.size()) loglist = new String[logs.size() + 500]; 
-		  int i = 0;
-		  for (String s : logs) { loglist[i] = RConst.copy(s); i++; }
+		  if (loglist == null || loglist.length < logs.size()) loglist = new String[logs.size() + 10000]; 
+		  for (int i = 0 ; i < log_line_count ; i++) loglist[i] = RConst.copy(logs.get(i));
 		  saveStrings(logpath, loglist);
 		}
+		boolean do_one_save = false;
+		void savelog_all() {
+//			do_one_save = true;
+			savelog();
+		}
+		
 		public void og(String s) {
-		  if (console_log && DEBUG && current_log.length() == 0) print(global_frame_count+"::");
-		  if (console_log && DEBUG) print(s);
+		  if (DEBUG && current_log.length() == 0) print(global_frame_count+"::");
+		  if (DEBUG) print(s);
 		  if (current_log.length() == 0) current_log += global_frame_count+"::";
 		  current_log += s;
 		}
 		public void logln(String s) {
-		  if (console_log && DEBUG && current_log.length() == 0) print(global_frame_count+"::");
-		  if (console_log && DEBUG) println(s);
+		  if (DEBUG && current_log.length() == 0) print(global_frame_count+"::");
+		  if (DEBUG) println(s);
 		  if (current_log.length() == 0) current_log += global_frame_count+"::";
 		  current_log += s;
+		  log_line_count++;
 		  logs.add(RConst.copy(current_log));
 		  current_log = "";
-		  if (save_log_all) savelog();
+		  if (save_log_all) savelog_all();
 		}
+		
+		
+		boolean DEBUG_MACRO = false;
 		public void mlog(String s) {
-		  if (console_log && DEBUG_MACRO && current_log.length() == 0) print(global_frame_count+":M:");
-		  if (console_log && DEBUG_MACRO) print(s);
+		  if (DEBUG && DEBUG_MACRO && current_log.length() == 0) print(global_frame_count+":M:");
+		  if (DEBUG && DEBUG_MACRO) print(s);
 		  if (current_log.length() == 0 && DEBUG_MACRO) current_log += global_frame_count+"::";
 		  if (DEBUG_MACRO) current_log += s;
 		}
 		public void mlogln(String s) {
-		  if (console_log && DEBUG_MACRO && current_log.length() == 0) print(global_frame_count+":M:");
-		  if (console_log && DEBUG_MACRO) println(s);
+		  if (DEBUG && DEBUG_MACRO && current_log.length() == 0) print(global_frame_count+":M:");
+		  if (DEBUG && DEBUG_MACRO) println(s);
 		  if (current_log.length() == 0 && DEBUG_MACRO) current_log += global_frame_count+":M:";
-		  if (DEBUG_MACRO) current_log += s;
-		  logs.add(RConst.copy(current_log));
-		  current_log = "";
-		  if (save_log_all) savelog();
-		}
-		
-		boolean DEBUG_SAVE_FULL = false;
-		public void slog(String s) {
-		  if (console_log && DEBUG_SAVE_FULL) print(s);
-		  if (DEBUG_SAVE_FULL) current_log += s;
-		}
-		public void slogln(String s) {
-		  if (console_log && DEBUG_SAVE_FULL) println(s+":S:"+global_frame_count);
-		  if (DEBUG_SAVE_FULL) current_log += s+":S:"+global_frame_count;
-		  logs.add(RConst.copy(current_log));
-		  current_log = "";
-		  if (save_log_all) savelog();
+		  if (DEBUG_MACRO) { 
+			  current_log += s;
+			  log_line_count++;
+			  logs.add(RConst.copy(current_log));
+			  current_log = "";
+			  if (save_log_all) savelog_all();
+		  }
 		}
 		
 		
 
+		boolean DEBUG_PACKET = true;
+		public void plog(String s) {
+		  if (DEBUG && DEBUG_PACKET && current_log.length() == 0) print(global_frame_count+":P:");
+		  if (DEBUG && DEBUG_PACKET) print(s);
+		  if (current_log.length() == 0 && DEBUG_PACKET) current_log += global_frame_count+":P:";
+		  if (DEBUG_PACKET) current_log += s;
+		}
+		public void plogln(String s) {
+		  if (DEBUG && DEBUG_PACKET && current_log.length() == 0) print(global_frame_count+":P:");
+		  if (DEBUG && DEBUG_PACKET) println(s);
+		  if (current_log.length() == 0 && DEBUG_PACKET) current_log += global_frame_count+":P:";
+		  if (DEBUG_PACKET) { 
+			  current_log += s;
+			  log_line_count++;
+			  logs.add(RConst.copy(current_log));
+			  current_log = "";
+			  if (save_log_all) savelog_all();
+		  }
+		}
+		
+		
+		
+		boolean DEBUG_SAVE_FULL = false;
+		public void slog(String s) {
+//		  if (DEBUG && DEBUG_SAVE_FULL) print(s);
+//		  if (DEBUG_SAVE_FULL) current_log += s;
+		}
+		public void slogln(String s) {
+//		  if (DEBUG && DEBUG_SAVE_FULL) println(s+":S:"+global_frame_count);
+//		  if (DEBUG_SAVE_FULL) current_log += s+":S:"+global_frame_count;
+//		  logs.add(RConst.copy(current_log));
+//		  current_log = "";
+//		  if (save_log_all) savelog_all();
+		}
+		
 		boolean DEBUG_SVALUE = false;
 		void vlog(String s) {
 		//  if (DEBUG_SVALUE) print(s);
@@ -307,7 +348,6 @@ public class Rapp extends PApplet implements RConst {
 		//  if (DEBUG_SVALUE) println(s);
 		}
 		
-
 		boolean DEBUG_DATA = false;
 		public void dlog(String s) {
 		//  if (DEBUG_DATA) print(s);
