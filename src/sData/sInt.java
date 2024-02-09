@@ -1,6 +1,7 @@
 package sData;
 
 public class sInt extends sValue {
+	  public int asInt() { return val; }
 	  int min, max;
 	  public sInt set_limit(int mi, int ma) { 
 		  if (!limited_min || !limited_max || min != mi || max != ma) doChange(); 

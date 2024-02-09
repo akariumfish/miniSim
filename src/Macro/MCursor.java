@@ -16,6 +16,7 @@ public class MCursor extends MBasic {
 		    public sVec dval = null;
 		    public sBoo show = null;
 		  nRunnable sheet_grab_run, pval_run;
+		  Macro_Connexion in, out;
 		  MCursor(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "cursor", _bloc); }
 		  void init() {
 		    pval = newVec("pos", "pos");
@@ -64,7 +65,7 @@ public class MCursor extends MBasic {
 		      }
 		  }
 		  void build_param() {
-		    
+			  
 		  }
 		  void build_normal() {
 		    addEmptyS(0);

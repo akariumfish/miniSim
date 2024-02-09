@@ -41,28 +41,31 @@ class MVar extends Macro_Bloc {
     e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
     
     view = addEmptyS(0).addLinkedModel("MC_Element_SField");
-    view.addEventFieldChange(new nRunnable() { public void run() { 
-      String t = view.getText();
-      if (t.length() > 0) {
-        if (t.equals("true")) {
-          packet = Macro_Packet.newPacketBool(true);
-          bval.set(true);
-          val_type.set("boo");
-        } else 
-        if (t.equals("false")) {
-          packet = Macro_Packet.newPacketBool(false);
-          bval.set(false);
-          val_type.set("boo");
-        }
-        else {
-          packet = Macro_Packet.newPacketFloat(PApplet.parseFloat(t));
-          fval.set(PApplet.parseFloat(t));
-          val_type.set("flt");
-        }
-        if (auto_send.get()) out.send(packet);
-      }
-    } });
     view.setLinkedValue(val_view);
+    val_view.addEventChange(new nRunnable() { public void run() { 
+        String t = val_view.get();
+        if (t.length() > 0) {
+          if (t.equals("true")) {
+            packet = Macro_Packet.newPacketBool(true);
+            bval.set(true);
+            val_type.set("boo");
+          } else 
+          if (t.equals("false")) {
+            packet = Macro_Packet.newPacketBool(false);
+            bval.set(false);
+            val_type.set("boo");
+          }
+          else {
+        	  	if (PApplet.parseFloat(t) != fval.get()) {
+	            packet = Macro_Packet.newPacketFloat(PApplet.parseFloat(t));
+	            fval.set(PApplet.parseFloat(t));
+	            val_type.set("flt");
+	            val_view.set(PApplet.str(fval.get()));
+        	  	}
+          }
+          if (auto_send.get()) out.send(packet);
+        }
+      } });
     
     view.getDrawer().addLinkedModel("MC_Element_MiniButton", "A")
       .setLinkedValue(auto_send)

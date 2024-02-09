@@ -12,23 +12,23 @@ public class Macro_Packet {
 	
 	static Macro_Packet newPacketBang() { return new Macro_Packet("bang"); }
 
-	static Macro_Packet newPacketFloat(float f) { return new Macro_Packet("float").addMsg(String.valueOf(f)); }
+	public static Macro_Packet newPacketFloat(float f) { return new Macro_Packet("float").addMsg(String.valueOf(f)); }
 	static Macro_Packet newPacketFloat(String f) { return new Macro_Packet("float").addMsg(f); }
 
-	static Macro_Packet newPacketInt(int f) { return new Macro_Packet("int").addMsg(String.valueOf(f)); }
+	public static Macro_Packet newPacketInt(int f) { return new Macro_Packet("int").addMsg(String.valueOf(f)); }
 
-	static Macro_Packet newPacketVec(PVector p) { return new Macro_Packet("vec").addMsg(String.valueOf(p.x)).addMsg(String.valueOf(p.y)); }
+	public static Macro_Packet newPacketVec(PVector p) { return new Macro_Packet("vec").addMsg(String.valueOf(p.x)).addMsg(String.valueOf(p.y)); }
 
-	static Macro_Packet newPacketCol(int p) { return new Macro_Packet("col")
+	public static Macro_Packet newPacketCol(int p) { return new Macro_Packet("col")
 	  .addMsg(String.valueOf(app.red(p))).addMsg(String.valueOf(app.green(p))).addMsg(String.valueOf(app.blue(p))); }
 
-	static Macro_Packet newPacketStr(String p) { return new Macro_Packet("str").addMsg(RConst.copy(p)); }
+	public static Macro_Packet newPacketStr(String p) { return new Macro_Packet("str").addMsg(RConst.copy(p)); }
 
 	static Macro_Packet newPacketSheet(Macro_Sheet m) { return new Macro_Packet("sheet").setSheet(m); }
 
-	static Macro_Packet newPacketObject(Object m) { return new Macro_Packet("obj").setObject(m); }
+	public static Macro_Packet newPacketObject(Object m) { return new Macro_Packet("obj").setObject(m); }
 
-	static Macro_Packet newPacketBool(boolean b) { 
+	public static Macro_Packet newPacketBool(boolean b) { 
 	  String r; 
 	  if (b) r = "T"; else r = "F"; 
 	  return new Macro_Packet("bool").addMsg(r); }
@@ -114,7 +114,7 @@ public class Macro_Packet {
 
   Object pobj = null;
   Macro_Packet setObject(Object b) { pobj = b; return this; }
-  boolean isObject() { return def.equals("sheet"); }
-  Object  asObject()   { if (isObject()) return pobj; else return null; }
+  boolean isObj() { return def.equals("sheet"); }
+  Object  asObj()   { if (isObj()) return pobj; else return null; }
   
 }

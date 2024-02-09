@@ -1055,8 +1055,9 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MTick.MTick_Builder());
       add_bloc_builders(new MPatern.MPatern_Builder());
       add_bloc_builders(new MCanvas.MCanvas_Builder());
-      add_bloc_builders(new MCount.MCount_Builder());
-      add_bloc_builders(new MMcomp.MMcomp_Builder());
+//      add_bloc_builders(new MCount.MCount_Builder());
+//      add_bloc_builders(new MMcomp.MMcomp_Builder());
+      add_bloc_builders(new MValue.MValue_Builder());
       
       
       

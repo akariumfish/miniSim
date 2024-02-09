@@ -3,6 +3,7 @@ package sData;
 import RApplet.RConst;
 
 public class sStr extends sValue {
+	  public String asStr() { return RConst.copy(val); }
 	  boolean limited; int max;
 	  sStr set_limit(int ma) { limited = true; max = ma; return this; }
 	  sStr clear_limit() { limited = false; return this; }

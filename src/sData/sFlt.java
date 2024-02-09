@@ -3,6 +3,7 @@ package sData;
 import RApplet.RConst;
 
 public class sFlt extends sValue implements RConst {
+	  public float asFlt() { return val; }
 	float min, max;
 	  public sFlt set_limit(float mi, float ma) { 
 		  if (!limited_min || !limited_max) doChange(); 

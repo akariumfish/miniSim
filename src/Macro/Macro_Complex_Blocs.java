@@ -1260,7 +1260,18 @@ class MTool extends Macro_Bloc {
       
       front_panel.addShelf().addDrawer(4, 0);
       
-      for (MToolRow m : tool_macros) m.build_front_panel(front_panel);
+      int prio = 0;
+      for (MToolRow m : tool_macros) prio = Math.max(prio, m.priority.get());
+      int co_done = 0;
+      while (prio >= 0 && co_done <= tool_macros.size()) {
+        for (MToolRow m : tool_macros) {
+          if (prio == m.priority.get()) { 
+            co_done++; 
+            m.build_front_panel(front_panel);
+          }
+        }
+        prio--;
+      }
       
       front_panel.setPos(ref_size*menu_pos.get());
       
@@ -1712,7 +1723,18 @@ class MPanel extends Macro_Bloc {
       front_panel.addEventClose(new nRunnable(this) { public void run() { 
         front_panel = null; setup_send.set(false); } } );
       
-      for (MPanTool m : tool_macros) m.build_front_panel(front_panel);
+      int prio = 0;
+      for (MPanTool m : tool_macros) prio = Math.max(prio, m.priority.get());
+      int co_done = 0;
+      while (prio >= 0 && co_done <= tool_macros.size()) {
+        for (MPanTool m : tool_macros) {
+          if (prio == m.priority.get()) { 
+            co_done++; 
+            m.build_front_panel(front_panel);
+          }
+        }
+        prio--;
+      }
       
       front_panel.grabber.addEventDrag(grab_run); 
       front_panel.addEventCollapse(reduc_run); 

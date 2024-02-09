@@ -1322,7 +1322,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     else if (t.equals("ramp")) nm = addRamp(b);
     else if (t.equals("crossVec")) nm = addCrossVec(b);
     else if (t.equals("colRGB")) nm = addColRGB(b);
-    nm.init_end();
+    if (nm != null) nm.init_end();
     return nm;
   }
   

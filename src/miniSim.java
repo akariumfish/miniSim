@@ -10,18 +10,23 @@ public class miniSim {
 
 
 		MACRO BLOC
-trig switch bin not gate OK
+trig switch bin not gate OK!
 
 general bloc capability
 	send something at startup
 	can open a menupanel
+	can rebuild itself
+	
+method build ui :
+	2 bp add/sub + 1 val_view in line > sInt
+	in to value : get sValue : custom filters
+		filter doublon
+		limits, set/reset ...
+	self valuebloc out
 		
 
 		NEW STRUCTURE 
 
-object info passed at connection : no need for packet exchange when connecting objet
-	== static connection ?
-output.addConnectEvent(input);
 
 Make sim and all macro bloc !!
 	in and/or out plus label name for each svalue > fat bloc, better inside a sheet
@@ -84,41 +89,55 @@ Canvas dessinateur : bloc
 
 number formating!!!
 
-MPanel and MTool charge theire composent in blocs priority order
-
-dans sheetview addctrl for deploy/open/reduc
-
-
 
 		TO DO
 		
+
+
+sheetobj in 2 line + add ctrl for deploy/open/reduc
+
+Merge MData n MVar in MValue
+	will be abel to access sval of any type from sheet or parent sheet
+	MValue add watcherwidget for val.ref
+	can get a valuebloc as message : will search inside
+	
+	field search_place 2, ref 3, value 3
+	bp picker
+	bp panel
+	in bang bool nul vec col : if val set > set val
+	in new co : if not set > as search place
+	out
+
+
+
 in bin menu can choose to "double" it > like if msg go through 2 bin >
 	filter bool false packet
-		
-link are lightened gradually when packet process slowly to show progression
-	see top of Macro_Connexion . send() for methods. 
-
-bloc can has mode unique, cad only one of a type by sheet
-
-auto spot : bloc auto add some of his elem to sheet spots at creation
-
-sheetobj in 1 line (merge get et out?)
-
+	
 add sheetview menu et sheetobj par def dans spe sheet
 	> default sheet front
 	
-MValue add watcherwidget for val.ref
+bloc can has mode unique, cad only one of a type by sheet
 
-to big trig n switch : when too dezoomed show a screen widget (on/off)
-set button text (large font)
+to big trig n switch : 
+	when too dezoomed show a screen widget (on/off)
+	on param view : 
+	field L set button text (large font)
+	bp incremental for size
+	picker for bp color
 
-min/max param in sflt numpanel slide
-	event limit change for synchro
+
+when adding tool or pan rows auto cible last master build
+
+
+output who send pre given packet auto when new co is made
+co who run event when co is created / deleted 
+	
+link are lightened gradually when packet process slowly to show progression
+	see top of Macro_Connexion . send() for methods. 
+
+auto spot : bloc auto add some of his elem to sheet spots at creation
 
 nExplorer : more entry and smaller height
-
-redo link loop protection
-	auto delete last link
 
 trad README French
 
@@ -127,6 +146,11 @@ trad README French
 		DOABLE IDEE
 		
 
+
+conf file with general param loaded once at start
+	fullscreen on/off
+	autoload
+	file to open (last openned)
 
 keep your mouse on a cursor for 0.5s > a bar appear under it, 
 	its a slider to change scale, 

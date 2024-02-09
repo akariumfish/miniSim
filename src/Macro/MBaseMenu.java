@@ -171,48 +171,50 @@ if (preset_explorer.selected_bloc != null) {
   
 
 sInt menuIntSlide(int v, int _min, int _max, String r) {
-sInt f = newInt(v, r, r);
-f.set_limit(_min, _max);
-addEventsBuildMenu(new nRunnable(f) { public void run() { 
-  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
-  .addModel("Label_Small_Text-S1-P1", ((sInt)builder).ref)
-    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
-  .addWatcherModel("Auto_Watch_Label-S1-P3")
-    .setLinkedValue(((sInt)builder))
-    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
-  .addWidget(new nSlide(custom_tab.gui, ref_size * 6, ref_size * 0.75F)
-    .setValue( ( ((sInt)builder).get() - ((sInt)builder).getmin() ) / 
-               ( ((sInt)builder).getmax() - ((sInt)builder).getmin() ) )
-    .addEventSlide(new nRunnable(((sInt)builder)) { public void run(float c) { 
-      ((sInt)builder).set( (int)( ((sInt)builder).getmin() + 
-                                c * (((sInt)builder).getmax() - ((sInt)builder).getmin()) ) ); 
-    } } )
-    .setPosition(4*ref_size, ref_size * 2 / 16) ).getShelf()
-  .addSeparator(0.125);
-} });
-return f;
+	boolean new_val = value_bloc.getValue(r) == null;
+	sInt f = newInt(v, r, r);
+	if (new_val) f.set_limit(_min, _max);
+	addEventsBuildMenu(new nRunnable(f) { public void run() { 
+	  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
+	  .addModel("Label_Small_Text-S1-P1", ((sInt)builder).ref)
+	    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+	  .addWatcherModel("Auto_Watch_Label-S1-P3")
+	    .setLinkedValue(((sInt)builder))
+	    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
+	  .addWidget(new nSlide(custom_tab.gui, ref_size * 6, ref_size * 0.75F)
+	    .setValue( ( ((sInt)builder).get() - ((sInt)builder).getmin() ) / 
+	               ( ((sInt)builder).getmax() - ((sInt)builder).getmin() ) )
+	    .addEventSlide(new nRunnable(((sInt)builder)) { public void run(float c) { 
+	      ((sInt)builder).set( (int)( ((sInt)builder).getmin() + 
+	                                c * (((sInt)builder).getmax() - ((sInt)builder).getmin()) ) ); 
+	    } } )
+	    .setPosition(4*ref_size, ref_size * 2 / 16) ).getShelf()
+	  .addSeparator(0.125);
+	} });
+	return f;
 }
 protected sFlt menuFltSlide(float v, float _min, float _max, String r) {
-sFlt f = newFlt(v, r, r);
-f.set_limit(_min, _max);
-addEventsBuildMenu(new nRunnable(f) { public void run() { 
-  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
-  .addModel("Label_Small_Text-S1-P1", ((sFlt)builder).ref)
-    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
-  .addWatcherModel("Auto_Watch_Label-S1-P3")
-    .setLinkedValue(((sFlt)builder))
-    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
-  .addWidget(new nSlide(custom_tab.gui, ref_size * 6, ref_size * 0.75F)
-    .setValue( ( ((sFlt)builder).get() - ((sFlt)builder).getmin() ) / 
-               ( ((sFlt)builder).getmax() - ((sFlt)builder).getmin() ) )
-    .addEventSlide(new nRunnable(((sFlt)builder)) { public void run(float c) { 
-      ((sFlt)builder).set( ((sFlt)builder).getmin() + 
-                           c * (((sFlt)builder).getmax() - ((sFlt)builder).getmin()) ); 
-    } } )
-    .setPosition(4*ref_size, ref_size * 2 / 16) ).getShelf()
-  .addSeparator(0.125);
-} });
-return f;
+	boolean new_val = value_bloc.getValue(r) == null;
+	sFlt f = newFlt(v, r, r);
+	if (new_val) f.set_limit(_min, _max);
+	addEventsBuildMenu(new nRunnable(f) { public void run() { 
+	  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
+	  .addModel("Label_Small_Text-S1-P1", ((sFlt)builder).ref)
+	    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+	  .addWatcherModel("Auto_Watch_Label-S1-P3")
+	    .setLinkedValue(((sFlt)builder))
+	    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
+	  .addWidget(new nSlide(custom_tab.gui, ref_size * 6, ref_size * 0.75F)
+	    .setValue( ( ((sFlt)builder).get() - ((sFlt)builder).getmin() ) / 
+	               ( ((sFlt)builder).getmax() - ((sFlt)builder).getmin() ) )
+	    .addEventSlide(new nRunnable(((sFlt)builder)) { public void run(float c) { 
+	      ((sFlt)builder).set( ((sFlt)builder).getmin() + 
+	                           c * (((sFlt)builder).getmax() - ((sFlt)builder).getmin()) ); 
+	    } } )
+	    .setPosition(4*ref_size, ref_size * 2 / 16) ).getShelf()
+	  .addSeparator(0.125);
+	} });
+	return f;
 }
 public sCol menuColor(int v, String r) {
     sCol f = newCol(r, r, v);

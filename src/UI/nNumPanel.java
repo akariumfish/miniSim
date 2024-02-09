@@ -57,7 +57,7 @@ public class nNumPanel extends nWindowPanel {
 	        .setRunnable(new nRunnable() { public void run() { clear(); } }).getDrawer();
 	    
 	    field_widget = getDrawer(0,0).addModel("Field-S4");
-	    field_widget.setText(RConst.trimStringFloat(val.asFloat(), 10))
+	    field_widget.setText(RConst.trimStringFloat(val.asFlt(), 10))
 	      .setField(true)
 	      .addEventFieldChange(field_run);
 	    
@@ -66,7 +66,7 @@ public class nNumPanel extends nWindowPanel {
 	      val.setscale(v);
 	    } };
 	    val_run = new nRunnable() { public void run() { 
-		      field_widget.changeText(RConst.trimStringFloat(val.asFloat(), 10));
+		      field_widget.changeText(RConst.trimStringFloat(val.asFlt(), 10));
 	      slide.setValue(val.getscale());
 	    } };
 	    

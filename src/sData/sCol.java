@@ -4,6 +4,7 @@ import RApplet.Rapp;
 import RApplet.RConst;
 
 public class sCol extends sValue {
+	  public int asCol() { return val; }
 	public String getString() { return RConst.trimStringFloat(app.red(val)) + "," + 
 			RConst.trimStringFloat(app.green(val)) + "," + 
 			RConst.trimStringFloat(app.blue(val)); }

@@ -182,6 +182,7 @@ class MSheetObj extends Macro_Bloc {
       out.send(Macro_Packet.newPacketSheet(sheet));
     }};
     in = addInputBang(0, "get", get_run);
+//    addEmptyS(0);
     out = addOutput(1, "out");
     addTrigSwtchS(0, "st", setup_send, "get", get_run);
     if (setup_send.get()) get_run.run();

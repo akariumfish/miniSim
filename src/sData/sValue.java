@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Macro.Macro_Packet;
 import RApplet.RConst;
+import processing.core.PVector;
 
 public abstract class sValue implements RConst {
 	public boolean log = false;
@@ -93,9 +94,35 @@ public abstract class sValue implements RConst {
 	  public float getmax() { return 0; }
 	  public float getscale() { return 0; }
 	  public void setscale(float v) { ; }
+
+	  public boolean asBoo() { return false; }
+	  public int asInt() { return 0; }
+	  public float asFlt() { return 0; }
+	  public PVector asVec() { return null; }
+	  public int asCol() { return 0; }
+	  public String asStr() { return ""; }
+	  public Object asObj() { return null; }
+
+	  public boolean isRun()   { return type.equals("run"); }
+	  public boolean isObj()   { return type.equals("obj"); }
+	  public boolean isFloat() { return type.equals("flt"); }
+	  public boolean isInt()   { return type.equals("int"); }
+	  public boolean isBool()  { return type.equals("boo"); }
+	  public boolean isVec()   { return type.equals("vec"); }
+	  public boolean isCol()   { return type.equals("col"); }
+	  public boolean isStr()   { return type.equals("str"); }
 	  
-	  public float asFloat() { return 0; }
-	  
-	  public Macro_Packet asPacket() { return new Macro_Packet("value").setValue(this); }
+	  public Macro_Packet asPacket() { 
+		  if (isBool()) return Macro_Packet.newPacketBool(asBoo());
+		  if (isInt()) return Macro_Packet.newPacketInt(asInt());
+		  if (isFloat()) return Macro_Packet.newPacketFloat(asFlt());
+		  if (isVec()) return Macro_Packet.newPacketVec(asVec());
+		  if (isCol()) return Macro_Packet.newPacketCol(asCol());
+		  if (isStr()) return Macro_Packet.newPacketStr(asStr());
+		  if (isObj()) return Macro_Packet.newPacketObject(asObj());
+		  if (isStr()) return Macro_Packet.newPacketStr(asStr());
+		  
+		  return new Macro_Packet("value").setValue(this); 
+	  }
 	  
 	}

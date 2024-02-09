@@ -1,6 +1,8 @@
 package sData;
 
 public class sBoo extends sValue {
+
+	  public boolean asBoo() { return val; }
 	  public String getString() { return String.valueOf(val); }
 	  public void clear() { super.clear(); val = def; }
 	  boolean val = false, def;

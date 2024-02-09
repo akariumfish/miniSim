@@ -3,6 +3,7 @@ package sData;
 import Macro.Macro_Sheet;
 
 public class sObj extends sValue {
+	  public Object asObj() { return val; }
 	public String getString() { return ref; }
 	  public void clear() { super.clear(); }
 	  private Object val = null;

@@ -98,4 +98,9 @@ public class nLinkedWidget extends nWidget {
 	      String s = ((nLinkedWidget)builder).getText();
 	      sval.set(s); } } );
 	    return this; }
+		int float_pres = 3;
+		public nLinkedWidget setFloatPrecision(int i) {
+			float_pres = i;
+			return this;
+		}
 	}
