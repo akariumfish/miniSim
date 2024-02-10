@@ -1,10 +1,9 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-2626:  :full_data_save to save.sdata
-3109:  :setup_load from various_paterns.sdata
-11340:  :full_data_save to various_paterns.sdata
-11812:  :exit
+283:  :setup_load from back1.sdata
+4342:  :full_data_save to back1.sdata
+5455:  :exit
 null
 null
 null
