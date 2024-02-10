@@ -33,9 +33,9 @@ public class MPatern extends MBaseMenu {
 			if (in_tick.lastPack() != null &&in_tick.lastPack().isBang()) tick(); 
 		} };
 
-		auto_mode_val = menuBoo(false, "auto_mode_val");
-		mode_1 = menuBoo(false, "mode_1");
-		mode_2 = menuBoo(false, "mode_2");
+		auto_mode_val = newBoo(false, "auto_mode_val");
+		mode_1 = newBoo(false, "mode_1");
+		mode_2 = newBoo(false, "mode_2");
 		
 		rot_speed = menuFltSlide(0, -RConst.PI / 60, RConst.PI / 60, "rot_speed");
 
@@ -127,7 +127,13 @@ public class MPatern extends MBaseMenu {
 			nscale.set(in_s.lastPack().asFloat()); }});
 		in_r = addInputFloat(0, "nrot", new nRunnable() { public void run() { 
 			nrot.set(in_r.lastPack().asFloat()); }});
+		
+		in_m1 = addInputBool(0, "mode1", new nRunnable() { public void run() { 
+			if (in_m1.lastPack() != null) mode_1.set(in_m1.lastPack().asBool()); }});
+		in_m2 = addInputBool(0, "mode2", new nRunnable() { public void run() { 
+			if (in_m2.lastPack() != null) mode_2.set(in_m2.lastPack().asBool()); }});
 	}
+	Macro_Connexion in_m1, in_m2;
 	void ask_add() {
 //		Macro_Packet p = new Macro_Packet("ASK");
 //		p.addMsg("STRUCT_NEW");
@@ -169,6 +175,10 @@ public class MPatern extends MBaseMenu {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
 				mf = ((MStructure)c.elem.bloc);
 				current_replic.from_str(mf.current_replic());
+				out_px.sendFloat(current_replic.pos.x);
+				out_py.sendFloat(current_replic.pos.y);
+				out_s.sendFloat(current_replic.dir.mag());
+				out_r.sendFloat(current_replic.dir.heading());
 			}
 		}
 	}
@@ -196,7 +206,7 @@ public class MPatern extends MBaseMenu {
 	      .addSeparator(0.125)
 	      .addDrawerDoubleButton(ask_get_run, ask_set_run, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(mode_1, mode_2, 10, 1)
+	      .addDrawerTripleButton(mode_1, mode_2, auto_mode_val, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 	}

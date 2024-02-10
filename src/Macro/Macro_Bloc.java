@@ -160,6 +160,9 @@ public class Macro_Bloc extends Macro_Abstract {
   Macro_Connexion addInputBang(int c, String t, nRunnable r) { 
     return addInput(c, t).setFilterBang().addEventReceiveBang(r); }
 
+  Macro_Connexion addInputBool(int c, String t, nRunnable r) { 
+    return addInput(c, t).setFilterBool().addEventReceiveBool(r); }
+
   Macro_Connexion addInputFloat(int c, String t, nRunnable r) { 
     return addInput(c, t).setFilterFloat().addEventReceiveFloat(r); }
   

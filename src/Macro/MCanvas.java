@@ -93,10 +93,10 @@ public class MCanvas extends MBaseMenu {
 		drawable = new Drawable() { 
 			public void drawing() { canvas_drawcall(); } } ;
 			
-//		priority.addEventChange(new nRunnable() {public void run() {
-//			drawable.setLayer(priority.get());
-//		}});
-//		drawable.setLayer(priority.get());
+		priority.addEventChange(new nRunnable() {public void run() {
+			drawable.setLayer(priority.get());
+		}});
+		drawable.setLayer(priority.get());
 
 	    mmain().inter.addToCamDrawerPile(drawable);
 

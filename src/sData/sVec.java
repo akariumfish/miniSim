@@ -4,6 +4,7 @@ import RApplet.RConst;
 import processing.core.PVector;
 
 public class sVec extends sValue implements RConst {
+	  public PVector asVec() { return new PVector(val.x, val.y); }
 	  public String getString() { 
 		  return RConst.trimStringFloat(val.x) + "," + RConst.trimStringFloat(val.y); }
 	  public void clear() { super.clear(); val.x = def.x; val.y = def.y; }

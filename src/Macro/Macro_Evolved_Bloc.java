@@ -9,6 +9,38 @@ import sData.*;
 
 
 
+
+
+
+
+class MPoint extends Macro_Bloc { 
+  static class MPoint_Builder extends MAbstract_Builder {
+	  MPoint_Builder() { super("point", "connection node"); show_in_buildtool = true; }
+      MPoint build(Macro_Sheet s, sValueBloc b) { MPoint m = new MPoint(s, b); return m; }
+    }
+  Macro_Connexion in, out; 
+  MPoint(Macro_Sheet _sheet, sValueBloc _bloc) { 
+    super(_sheet, "point", "connection node", _bloc); 
+    in = addInputBang(0, "in", new nRunnable() {public void run() { 
+    		if (in.lastPack() != null) out.send(in.lastPack()); }});
+    out = addOutput(0, "out");
+  }
+  public MPoint clear() {
+    super.clear(); 
+    return this; }
+  public MPoint toLayerTop() {
+    super.toLayerTop(); 
+    return this; }
+}
+
+
+
+
+
+
+
+
+
 class MMcomp extends Macro_Bloc { 
   static class MMcomp_Builder extends MAbstract_Builder {
 	  MMcomp_Builder() { super("minicomp", "minicomp"); show_in_buildtool = true; }

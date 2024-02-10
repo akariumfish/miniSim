@@ -55,7 +55,7 @@ public class MStructure extends MBaseMenu {
 		replics.add(r);
 		last_build = r;
 //		save_copy = replics_save.get();
-//		replics_save.set(replics_save.get() + OBJ_TOKEN + r.to_str());
+		replics_save.set(replics_save.get() + OBJ_TOKEN + r.to_str());
 		return this;
 	}
 //	String save_copy = "";
@@ -81,7 +81,7 @@ public class MStructure extends MBaseMenu {
 	}
 	MStructure clear_replic() {
 		replics.clear();
-//		replics_save.set("");
+		replics_save.set("");
 		nposx.set(0); nposy.set(0); nscale.set(10); nrot.set(0);
 		first_rep = new Replic().pos(new PVector(0, 0)).dir(new PVector(10, 0));
 		replics.add(first_rep); 
@@ -106,14 +106,17 @@ public class MStructure extends MBaseMenu {
 	MStructure translate(PVector r) {
 		nposx.add(r.x);
 		nposy.add(r.y);
+		up_npos.run();
 		return this;
 	}
 	MStructure rotate(float r) {
 		nrot.add(r);
+		up_npos.run();
 		return this;
 	}
 	MStructure scale(float r) {
 		nscale.add(r);
+		up_npos.run();
 		return this;
 	}
 	
@@ -125,7 +128,7 @@ public class MStructure extends MBaseMenu {
 	sVec new_pos, new_dir;
 	sRun new_rep_run, clear_rep_run;
 	nRunnable up_npos;
-//	sStr replics_save;
+	sStr replics_save;
 	MStructure(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "struct", _bloc); }
 	void init() {
 		super.init();   
@@ -138,9 +141,9 @@ public class MStructure extends MBaseMenu {
 			clear_replic(); }});
 		new_pos = newVec("new_pos", "new_pos");
 		new_dir = newVec("new_dir", "new_dir");
-		nposx = menuFltSlide(0, -5000, 5000, "adding_x");
-		nposy = menuFltSlide(0, -5000, 5000, "adding_y");
-		nscale = menuFltSlide(10, 5, 20, "adding_scale");
+		nposx = menuFltSlide(0, -10000, 10000, "adding_x");
+		nposy = menuFltSlide(0, -10000, 10000, "adding_y");
+		nscale = menuFltSlide(10, 1, 20, "adding_scale");
 		nrot = menuFltSlide(0, -RConst.PI, RConst.PI, "adding_rot");
 		up_npos = new nRunnable() {public void run() { 
 			new_pos.set(nposx.get(), nposy.get()); 
@@ -154,15 +157,15 @@ public class MStructure extends MBaseMenu {
 		nposy.addEventChange(up_npos);
 		nscale.addEventChange(up_npos);
 		nrot.addEventChange(up_npos);
-//		replics_save = newStr("replics_save", "replics_save", "");
-//		if (replics_save.get().length() > 0) {
-//			String[] l = PApplet.splitTokens(replics_save.get(), OBJ_TOKEN);
-//			for (String s : l) {
-//				Replic r = new Replic();
-//				replics.add(r);
-//				r.from_str(s);
-//			}
-//		}
+		replics_save = newStr("replics_save", "replics_save", "");
+		if (replics_save.get().length() > 0) {
+			String[] l = PApplet.splitTokens(replics_save.get(), OBJ_TOKEN);
+			for (String s : l) {
+				Replic r = new Replic();
+				replics.add(r);
+				r.from_str(s);
+			}
+		}
 	}
 	void build_normal() {
 		super.build_normal();

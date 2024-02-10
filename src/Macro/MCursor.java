@@ -1,6 +1,7 @@
 package Macro;
 
 import UI.nCursor;
+import processing.core.PVector;
 import sData.nRunnable;
 import sData.sBoo;
 import sData.sValueBloc;
@@ -51,21 +52,30 @@ public class MCursor extends MBasic {
 		                  cursor.pval.get().y - sheet.grabber.getY());
 		          else setPosition(cursor.pval.get().x, cursor.pval.get().y);
 		          moving();
+		          
+		          if (out != null) out.send(cursor.pval.asPacket());
 		    }};
 		    cursor.pval.addEventChange(pval_run);
 		      
 		      
 		      if (sheet != mmain()) {
 		        sheet_grab_run = new nRunnable() { public void run() {
-		          setPosition(cursor.pval.get().x - sheet.grabber.getX(), 
-		              cursor.pval.get().y - sheet.grabber.getY());
+		        	PVector tm = new PVector(cursor.pval.get().x, cursor.pval.get().y);
+		          setPosition(tm.x - sheet.grabber.getX(), 
+		              tm.y - sheet.grabber.getY());
 		          moving();
 		        } };
-		        sheet.grab_pos.addEventChange(sheet_grab_run);
+		        sheet.grab_pos.addEventAllChange(sheet_grab_run);
 		      }
 		  }
 		  void build_param() {
-			  
+			  in = addInput(0, "set", new nRunnable() { public void run() {
+				  if (in.lastPack() != null && cursor.pval != null && 
+					  in.lastPack().isVec()) cursor.pval.set(in.lastPack().asVec());
+			  }});
+			  out = addOutput(1, "get");
+			    addEmptyS(0);
+			    addSwitchS(1, "show", show);
 		  }
 		  void build_normal() {
 		    addEmptyS(0);
