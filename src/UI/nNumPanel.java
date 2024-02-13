@@ -38,9 +38,9 @@ public class nNumPanel extends nWindowPanel {
 	  boolean event_paused = false;
 	  
 	  void up_limit() {
-		    min_v.setText(RConst.trimStringFloat(val.getmin(), 4)); 
-		    max_v.setText(RConst.trimStringFloat(val.getmax(), 4)); 
-		    val.setscale(slide.cursor_value);
+		    min_v.setText(RConst.trimFlt(val.getmin(), 4)); 
+		    max_v.setText(RConst.trimFlt(val.getmax(), 4)); 
+		    if (val.limited_min && val.limited_max) val.setscale(slide.cursor_value);
 		  }
 	  
 	  void build_ui(sValue v) {
@@ -57,17 +57,19 @@ public class nNumPanel extends nWindowPanel {
 	        .setRunnable(new nRunnable() { public void run() { clear(); } }).getDrawer();
 	    
 	    field_widget = getDrawer(0,0).addModel("Field-S4");
-	    field_widget.setText(RConst.trimStringFloat(val.asFlt(), 10))
-	      .setField(true)
+	    if (fval != null) field_widget.setText(RConst.trimFlt(val.asFlt(), 10));
+	    if (ival != null) field_widget.setText(RConst.trimFlt(val.asInt(), 10));
+	    field_widget.setField(true)
 	      .addEventFieldChange(field_run);
 	    
 	    slide_run = new nRunnable() { public void run(float v) { 
 			if(event_paused) val.pauseEvent();
-	      val.setscale(v);
+			if (val.limited_min && val.limited_max) val.setscale(v);
 	    } };
 	    val_run = new nRunnable() { public void run() { 
-		      field_widget.changeText(RConst.trimStringFloat(val.asFlt(), 10));
-	      slide.setValue(val.getscale());
+	      if (fval != null) field_widget.setText(RConst.trimFlt(val.asFlt(), 10));
+	      if (ival != null) field_widget.setText(RConst.trimFlt(val.asInt(), 10));
+	      if (val.limited_min && val.limited_max) slide.setValue(val.getscale());
 	    } };
 	    
 	    v.addEventChange(val_run);
@@ -84,9 +86,9 @@ public class nNumPanel extends nWindowPanel {
 
 	    int limit_set_drawer = 5;
 	    max_v = getDrawer(0,limit_set_drawer).addModel("Label_Outline-S1-P7").setSX(ref_size*2.125F)
-	      .setText(RConst.trimStringFloat(val.getmax(), 4));
+	      .setText(RConst.trimFlt(val.getmax(), 4));
 	    min_v = getDrawer(0,limit_set_drawer).addModel("Label_Outline-S1-P2", "min:").setSX(ref_size*2.125F)
-	      .setText(RConst.trimStringFloat(val.getmin(), 4));
+	      .setText(RConst.trimFlt(val.getmin(), 4));
 	    getDrawer(0,limit_set_drawer).addCtrlModel("Button-N1-P1", "-").setRunnable(new nRunnable() { public void run() { 
 			if(event_paused) val.pauseEvent();
 	      val.set_min(val.getmin()-1); up_limit(); } }).setInfo("min -1");

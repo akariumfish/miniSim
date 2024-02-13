@@ -130,7 +130,7 @@ public static class FlocPrint extends Sheet_Specialize {
 
 
   void comPanelBuild(nFrontPanel sim_front) {
-    nFrontTab tab = sim_front.addTab(name);
+    nFrontTab tab = sim_front.addTab("Control");
     tab.getShelf()
       .addDrawerDoubleButton(DRAWMODE_DEF, DRAWMODE_DEBUG, 10.25F, 1)
       .addSeparator(0.125)

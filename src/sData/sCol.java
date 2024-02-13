@@ -5,9 +5,9 @@ import RApplet.RConst;
 
 public class sCol extends sValue {
 	  public int asCol() { return val; }
-	public String getString() { return RConst.trimStringFloat(app.red(val)) + "," + 
-			RConst.trimStringFloat(app.green(val)) + "," + 
-			RConst.trimStringFloat(app.blue(val)); }
+	public String getString() { return RConst.trimFlt(app.red(val)) + "," + 
+			RConst.trimFlt(app.green(val)) + "," + 
+			RConst.trimFlt(app.blue(val)); }
 	public void clear() { super.clear(); val = def; }
 	private int val = 0, def = 0;
 	Rapp app;

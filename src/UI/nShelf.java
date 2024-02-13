@@ -90,22 +90,22 @@ public class nShelf extends nBuilder {
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P1")
 	      .setLinkedValue(val2)
 	      .setIncrement(incr)
-	      .setText(RConst.trimStringFloat(incr))
+	      .setText(RConst.trimFlt(incr))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P2")
 	      .setLinkedValue(val2)
 	      .setIncrement(incr/10)
-	      .setText(RConst.trimStringFloat(incr/10))
+	      .setText(RConst.trimFlt(incr/10))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P8")
 	      .setLinkedValue(val2)
 	      .setIncrement(-incr/10)
-	      .setText(RConst.trimStringFloat(-incr/10))
+	      .setText(RConst.trimFlt(-incr/10))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P9")
 	      .setLinkedValue(val2)
 	      .setIncrement(-incr)
-	      .setText(RConst.trimStringFloat(-incr))
+	      .setText(RConst.trimFlt(-incr))
 	      ;
 	    return this;
 	  }
@@ -128,22 +128,22 @@ public class nShelf extends nBuilder {
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P1")
 	      .setLinkedValue(val2)
 	      .setFactor(fact)
-	      .setText("x"+RConst.trimStringFloat(fact))
+	      .setText("x"+RConst.trimFlt(fact))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P2")
 	      .setLinkedValue(val2)
 	      .setFactor((float) Math.sqrt(fact))
-	      .setText("x"+RConst.trimStringFloat((float) Math.sqrt(fact)))
+	      .setText("x"+RConst.trimFlt((float) Math.sqrt(fact)))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P8")
 	      .setLinkedValue(val2)
 	      .setFactor(1/(float) Math.sqrt(fact))
-	      .setText("/"+RConst.trimStringFloat(1/(float) Math.sqrt(fact)))
+	      .setText("/"+RConst.trimFlt(1/(float) Math.sqrt(fact)))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P9")
 	      .setLinkedValue(val2)
 	      .setFactor(1/fact)
-	      .setText("/"+RConst.trimStringFloat(fact))
+	      .setText("/"+RConst.trimFlt(fact))
 	      ;
 	    return this;
 	  }
@@ -162,22 +162,22 @@ public class nShelf extends nBuilder {
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P1")
 	      .setLinkedValue(val2)
 	      .setFactor(fact)
-	      .setText("x"+RConst.trimStringFloat(fact))
+	      .setText("x"+RConst.trimFlt(fact))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P2")
 	      .setLinkedValue(val2)
 	      .setFactor((float) Math.sqrt(fact))
-	      .setText("x"+RConst.trimStringFloat((float) Math.sqrt(fact)))
+	      .setText("x"+RConst.trimFlt((float) Math.sqrt(fact)))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P8")
 	      .setLinkedValue(val2)
 	      .setFactor(1/(float) Math.sqrt(fact))
-	      .setText("/"+RConst.trimStringFloat(1/(float) Math.sqrt(fact)))
+	      .setText("/"+RConst.trimFlt(1/(float) Math.sqrt(fact)))
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P9")
 	      .setLinkedValue(val2)
 	      .setFactor(1/fact)
-	      .setText("/"+RConst.trimStringFloat(fact))
+	      .setText("/"+RConst.trimFlt(fact))
 	      ;
 	    return this;
 	  }
@@ -333,6 +333,11 @@ public class nShelf extends nBuilder {
 	    insertDrawer(d);
 	    return d;
 	  }
+	  public nBetterList addBetterList(int n, float wf, float hf) {
+		    nBetterList d = new nBetterList(this, n, ref_size, wf, hf);
+		    insertDrawer(d);
+		    return d;
+		  }
 	  
 	  public nExplorer addExplorer() {
 	    nExplorer d = new nExplorer(this);

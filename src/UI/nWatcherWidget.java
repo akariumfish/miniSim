@@ -7,6 +7,7 @@ import sData.sBoo;
 import sData.sCol;
 import sData.sFlt;
 import sData.sInt;
+import sData.sObj;
 import sData.sStr;
 import sData.sValue;
 import sData.sVec;
@@ -22,6 +23,7 @@ public class nWatcherWidget extends nWidget {
   if (b.type.equals("str")) setLinkedValue((sStr)b);
   if (b.type.equals("vec")) setLinkedValue((sVec)b);
   if (b.type.equals("col")) setLinkedValue((sCol)b);
+  if (b.type.equals("obj")) setLinkedValue((sObj)b);
   return this; }
 nRunnable val_run;
 sValue val;
@@ -35,9 +37,9 @@ nWatcherWidget setLinkedValue(sInt b) {
   b.addEventChange(val_run);
   return this; }
 nWatcherWidget setLinkedValue(sFlt b) { 
-  fval = b; setText(RConst.trimStringFloat(fval.get(), float_pres));
+  fval = b; setText(RConst.trimFlt(fval.get(), float_pres));
   val_run = new nRunnable(this) { public void run() { 
-    ((nWatcherWidget)builder).setText(RConst.trimStringFloat(fval.get(), float_pres)); } };
+    ((nWatcherWidget)builder).setText(RConst.trimFlt(fval.get(), float_pres)); } };
   b.addEventChange(val_run);
   return this; }
 nWatcherWidget setLinkedValue(sBoo b) { 
@@ -62,13 +64,16 @@ nWatcherWidget setLinkedValue(sCol b) {
     ((nWatcherWidget)builder).setStandbyColor(cval.get()); } };
   b.addEventChange(val_run);
   return this; }
+nWatcherWidget setLinkedValue(sObj b) { 
+  setText(b.ref);
+  return this; }
 nWatcherWidget setLinkedValue(sVec b) { 
   vval = b; 
-  setText(RConst.trimStringFloat(vval.x(), float_pres) + "," + 
-		  RConst.trimStringFloat(vval.y(), float_pres));
+  setText(RConst.trimFlt(vval.x(), float_pres) + "," + 
+		  RConst.trimFlt(vval.y(), float_pres));
   val_run = new nRunnable(this) { public void run() { 
-    ((nWatcherWidget)builder).setText(RConst.trimStringFloat(vval.x(), float_pres) + "," + 
-    									 RConst.trimStringFloat(vval.y(), float_pres)); } };
+    ((nWatcherWidget)builder).setText(RConst.trimFlt(vval.x(), float_pres) + "," + 
+    									 RConst.trimFlt(vval.y(), float_pres)); } };
   b.addEventChange(val_run);
   return this; }
 	int float_pres = 3;

@@ -10,10 +10,10 @@ import sData.sValueBloc;
 
 public class Macro_Packet {
 	
-	static Macro_Packet newPacketBang() { return new Macro_Packet("bang"); }
+	public static Macro_Packet newPacketBang() { return new Macro_Packet("bang"); }
 
 	public static Macro_Packet newPacketFloat(float f) { return new Macro_Packet("float").addMsg(String.valueOf(f)); }
-	static Macro_Packet newPacketFloat(String f) { return new Macro_Packet("float").addMsg(f); }
+	public static Macro_Packet newPacketFloat(String f) { return new Macro_Packet("float").addMsg(f); }
 
 	public static Macro_Packet newPacketInt(int f) { return new Macro_Packet("int").addMsg(String.valueOf(f)); }
 
@@ -24,8 +24,6 @@ public class Macro_Packet {
 
 	public static Macro_Packet newPacketStr(String p) { return new Macro_Packet("str").addMsg(RConst.copy(p)); }
 
-	static Macro_Packet newPacketSheet(Macro_Sheet m) { return new Macro_Packet("sheet").setSheet(m); }
-
 	public static Macro_Packet newPacketObject(Object m) { return new Macro_Packet("obj").setObject(m); }
 
 	public static Macro_Packet newPacketBool(boolean b) { 
@@ -33,8 +31,15 @@ public class Macro_Packet {
 	  if (b) r = "T"; else r = "F"; 
 	  return new Macro_Packet("bool").addMsg(r); }
 	
-	static public Rapp app;
-	
+  static public Rapp app;
+  
+  public Macro_Packet copy() {
+	  Macro_Packet p = new Macro_Packet(def);
+	  p.pobj = pobj;
+	  for (String s : messages) p.addMsg(s);
+	  return p;
+  }
+  Object pobj = null;
   String def = new String();
   ArrayList<String> messages = new ArrayList<String>();
   public Macro_Packet(String d) {
@@ -82,37 +87,19 @@ public class Macro_Packet {
   String getType() { return def; }
   String getText() {
     if (isBang()) return "bang";
-    else if (isFloat()) return RConst.trimStringFloat(asFloat());
+    else if (isFloat()) return RConst.trimFlt(asFloat());
     else if (isInt()) return String.valueOf(asInt());
     else if (isBool() && messages.get(0).equals("T")) return "true";
     else if (isBool() && !messages.get(0).equals("T")) return "false";
-    else if (isVec()) return RConst.trimStringFloat(asVec().x)+","+RConst.trimStringFloat(asVec().y);
-    else if (isCol()) return RConst.trimStringFloat(app.red(asCol()))+","+
-                             RConst.trimStringFloat(app.green(asCol()))+","+
-                             RConst.trimStringFloat(app.blue(asCol()));
+    else if (isVec()) return RConst.trimFlt(asVec().x)+","+RConst.trimFlt(asVec().y);
+    else if (isCol()) return RConst.trimFlt(app.red(asCol()))+","+
+                             RConst.trimFlt(app.green(asCol()))+","+
+                             RConst.trimFlt(app.blue(asCol()));
     else if (isStr()) return asStr();
-    else if (isBloc()) return asBloc().ref;
-    else if (isValue()) return asValue().ref;
-    else if (isSheet()) return asSheet().value_bloc.ref;
+    else if (isObj()) return "object";
     return "";
   }
-  
-  sValueBloc bloc = null;
-  public Macro_Packet setBloc(sValueBloc b) { bloc = b; return this; }
-  boolean isBloc() { return def.equals("bloc"); }
-  sValueBloc  asBloc()   { if (isBloc()) return bloc; else return null; }
-  
-  sValue val = null;
-  public Macro_Packet setValue(sValue b) { val = b; return this; }
-  boolean isValue() { return def.equals("value"); }
-  sValue  asValue()   { if (isValue()) return val; else return null; }
 
-  Macro_Sheet psheet = null;
-  Macro_Packet setSheet(Macro_Sheet b) { psheet = b; return this; }
-  boolean isSheet() { return def.equals("sheet"); }
-  Macro_Sheet  asSheet()   { if (isSheet()) return psheet; else return null; }
-
-  Object pobj = null;
   Macro_Packet setObject(Object b) { pobj = b; return this; }
   boolean isObj() { return def.equals("sheet"); }
   Object  asObj()   { if (isObj()) return pobj; else return null; }

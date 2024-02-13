@@ -49,7 +49,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  sObj floc_obj;
 
 	  void comPanelBuild(nFrontPanel sim_front) {
-	    nFrontTab tab = sim_front.addTab(name);
+	    nFrontTab tab = sim_front.addTab("Control");
 	    tab.getShelf()
 	      .addDrawerWatch(activeGrower, 10, 1)
 	      .addDrawer(10.25, 0).getShelf()

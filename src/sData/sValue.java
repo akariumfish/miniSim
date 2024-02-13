@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Macro.Macro_Packet;
 import RApplet.RConst;
+import UI.*;
 import processing.core.PVector;
 
 public abstract class sValue implements RConst {
@@ -121,8 +122,23 @@ public abstract class sValue implements RConst {
 		  if (isStr()) return Macro_Packet.newPacketStr(asStr());
 		  if (isObj()) return Macro_Packet.newPacketObject(asObj());
 		  if (isStr()) return Macro_Packet.newPacketStr(asStr());
-		  
-		  return new Macro_Packet("value").setValue(this); 
+		  return null;
+//		  return new Macro_Packet("value").setValue(this); 
 	  }
 	  
+	  public void pop_panel(nGUI gui, nTaskPanel tpan) {
+        if (type.equals("str")) { 
+          new nTextPanel(gui, tpan, (sStr)this);
+        } else if (type.equals("flt")) { 
+          new nNumPanel(gui, tpan, (sFlt)this);
+        } else if (type.equals("int")) { 
+          new nNumPanel(gui, tpan, (sInt)this);
+        } else if (type.equals("boo")) { 
+          new nBinPanel(gui, tpan, (sBoo)this);
+        } else if (type.equals("col")) { 
+          new nColorPanel(gui, tpan, (sCol)this);
+        } else if (type.equals("vec")) { 
+          new nVecPanel(gui, tpan, (sVec)this);
+        }
+	  }
 	}

@@ -11,32 +11,39 @@ public interface RConst {
 	static String str_copy(String s) { 
 		if (s != null) return "" + s/*.substring(0, s.length())*/; else return null; }
 	
-	static public String trimStringFloat(float f) { return trimStringFloat(f, 3); }
-	static public String trimStringFloat(float f, int p) {
-	  String s;
-	  if (f%1.0 == 0.0) s = PApplet.nfc((int)(f)); else s = PApplet.str(f);
-	  String end = "";
-	  for (int i = s.length()-1; i > 0 ; i--) {
-	    if (s.charAt(i) == 'E') {
-	      end = s.substring(i, s.length());
-	    }
-	  }
-	  for (int i = 0; i < s.length() ; i++) {
-	    if (s.charAt(i) == '.' && s.length() - i > p) {
-	      int m = p;
-	      for (int c = 0 ; c < p ; c++) {
-	        if (f >= Math.pow(10, c+1)) m -= 1;
-	        if (f >= Math.pow(10, c+1) && (c+1)%3 == 0) m -= 1;
-	      }
-	      //if (f >= 10) m -= 1;
-	      //if (f >= 100) m -= 1;
-	      //if (f >= 1000) m -= 2;
-	      s = s.substring(0, i+m);
-	      s = s + end;
-	      return s;
-	    }
-	  }
-	  return s;
+	static public String trimFlt(float f) { return trimFlt(f, 3); }
+	static public String trimFlt(float f, int p) {
+		String s;
+		  if (f%1.0 == 0.0) s = PApplet.nfc((int)(f)); else s = PApplet.str(f);
+		  String end = "";
+		  for (int i = s.length()-1; i > 0 ; i--) {
+		    if (s.charAt(i) == 'E') {
+		      end = s.substring(i, s.length());
+		    }
+		  }
+		  for (int i = 0; i < s.length() ; i++) {
+		    if (s.charAt(i) == '.' && s.length() - i > p) {
+		      int m = p;
+		      for (int c = 0 ; c < p ; c++) {
+		        if (f >= PApplet.pow(10, c+1)) m -= 1;
+		        if (f >= PApplet.pow(10, c+1) && (c+1)%3 == 0) m -= 1;
+		      }
+		      //if (f >= 10) m -= 1;
+		      //if (f >= 100) m -= 1;
+		      //if (f >= 1000) m -= 2;
+		      s = s.substring(0, i+m);
+		      s = s + end;
+		      return s;
+		    }
+		  }
+		  return s;
+//		int dec_m = 0;
+//		while (f > 10) { f /= 10; dec_m++; }
+//		while (f < 1) { f *= 10; dec_m--; }
+//		String s = PApplet.str(f);
+//		s = s.substring(0, p+1);
+//		s += "E"+dec_m;
+//		return s;
 	}
 	
 	static float soothedcurve(float rad, float dst) {

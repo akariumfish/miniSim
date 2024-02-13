@@ -2,6 +2,7 @@ package Macro;
 
 import RApplet.*;
 import UI.*;
+import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
 import sData.*;
@@ -157,7 +158,7 @@ main
  */
 
 public class Macro_Main extends Macro_Sheet { 
-  nToolPanel macro_tool, build_tool, sheet_tool;
+  nToolPanel macro_tool, build_tool;//, sheet_tool
   public nExplorer template_explorer;
 nExplorer sheet_explorer;
   sValueBloc pastebin = null;
@@ -227,118 +228,69 @@ nExplorer sheet_explorer;
     macro_tool.addEventReduc(new nRunnable() { public void run() { 
       show_macro_tool.set(!macro_tool.hide); }});
     
-    if (build_tool != null) build_tool.clear();
-    build_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
-    build_tool.addShelf();
-    for (int i = 0 ; i < bloc_builders.size() ; i++) if (bloc_builders.get(i).show_in_buildtool) {
-      nDrawer dr = build_tool.getShelf(0).addDrawer(2.5, 0.75);
-      dr.addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", bloc_builders.get(i).type)
-        .setRunnable(new nRunnable(bloc_builders.get(i).type) { public void run() { 
-          selected_sheet.addByType(((String)builder)); }})
-        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-        .setPX(ref_size*0.0)
-        .setInfo(bloc_builders.get(i).descr)
-        ;
-    }
-//    build_tool.addShelf();
-//    //int c = 0;
-//    for (String t : bloc_types4) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
-//      .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
-//        .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
-//        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-//        //.setInfo(bloc_info4[c])
-//        ;
-//      //c++;
-//    }
-    build_tool.addShelf();
-    for (String t : bloc_types5) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
-      .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
-        .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
-        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-        ;
-    }
-    //build_tool.addShelf();
-    //int c = 0;
-    //for (String t : bloc_types3) { build_tool.getShelf(0).addDrawer(2.5, 0.75)
-    //  .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
-    //    .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
-    //    .setFont(int(ref_size/2)).setTextAlignment(LEFT, CENTER)
-    //    .setInfo(bloc_info3[c])
-    //    ;
-    //  c++;
-    //}
-    //build_tool.addShelf();
-    //c = 0;
-    //for (String t : bloc_types2) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
-    //  .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
-    //    .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
-    //    .setFont(int(ref_size/2)).setTextAlignment(LEFT, CENTER)
-    //    .setInfo(bloc_info2[c])
-    //    ;
-    //  c++;
-    //}
-    //build_tool.addShelf();
-    //c = 0;
-    //for (String t : bloc_types1) { build_tool.getShelf(2).addDrawer(2.5, 0.75)
-    //  .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
-    //    .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
-    //    .setFont(int(ref_size/2)).setTextAlignment(LEFT, CENTER)
-    //    .setInfo(bloc_info1[c])
-    //    ;
-    //  c++;
-    //}
-    if (!show_build_tool.get()) build_tool.reduc();
-    build_tool.addEventReduc(new nRunnable() { public void run() { 
-      show_build_tool.set(!build_tool.hide); }});
-    build_tool.setPos(ref_size*1.25);
+    build_buildtool();
     
-    if (sheet_tool != null) sheet_tool.clear();
-    sheet_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
-    sheet_tool.addShelf();
-    
-    for (Sheet_Specialize t : Sheet_Specialize.prints) if (!t.unique) sheet_tool.getShelf(0).addDrawer(3, 0.75)
-      .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.name)
-        .setRunnable(new nRunnable(t) { public void run() { 
-          ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
-        .setFont((int)(ref_size/2));
-        ;
-    
-    if (!show_sheet_tool.get()) sheet_tool.reduc();
-    sheet_tool.addEventReduc(new nRunnable() { public void run() { 
-      show_sheet_tool.set(!sheet_tool.hide); }});
-    sheet_tool.setPos(gui.app.window_head + ref_size*13);
+  }
+  void build_buildtool() {
+	  nShelf sh = null;
+	  int row_count = 0;
+//	  int shelf_cible = 0;
+	  if (build_tool != null) build_tool.clear();
+	  boolean found = false;
+	  for (int i = 0 ; i < bloc_builders.size() ; i++) 
+	    if (bloc_builders.get(i).show_in_buildtool && bloc_builders.get(i).visible) 
+	    	found = true;
+	  for (Sheet_Specialize t : Sheet_Specialize.prints) 
+		if (!t.unique && t.visible && t.show_in_buildtool) { found = true;  }
+	  if (found) {
+	    build_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
+	    sh = build_tool.addShelf();
+	    for (int i = 0 ; i < bloc_builders.size() ; i++) 
+	    if (bloc_builders.get(i).show_in_buildtool && bloc_builders.get(i).visible) {
+	    	row_count++;
+	    	if (row_count > 20) {
+//	    		shelf_cible++; 
+	    		row_count = 0;
+	    		sh = build_tool.addShelf();
+	    	}
+	      sh.addDrawer(3F, 0.75F).addCtrlModel("Menu_Button_Small_Outline-S3/0.75", bloc_builders.get(i).title)
+	        .setRunnable(new nRunnable(bloc_builders.get(i).type) { public void run() { 
+	          selected_sheet.addByType(((String)builder)); }})
+	        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
+	        .setInfo(bloc_builders.get(i).descr)
+	        ;
+	    }
+//	    sh.addSeparator(0.25);
+	    for (Sheet_Specialize t : Sheet_Specialize.prints) 
+	    if (!t.unique && t.visible && t.show_in_buildtool) {
+	    	row_count++;
+			if (row_count > 20) {
+//				shelf_cible++; 
+				row_count = 0;
+				sh = build_tool.addShelf();
+			}
+		    sh.addDrawer(3F, 0.75F)
+		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.name)
+		    .setRunnable(new nRunnable(t) { public void run() { 
+		      ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
+		    .setFont((int)(ref_size/2));
+		    ;
+	    }
+	//    build_tool.addShelf();
+	//    for (String t : bloc_types5) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
+	//      .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
+	//        .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
+	//        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
+	//        ;
+	//    }
+	    if (!show_build_tool.get()) build_tool.reduc();
+	    build_tool.addEventReduc(new nRunnable() { public void run() { 
+	      show_build_tool.set(!build_tool.hide); }});
+	    build_tool.setPos(ref_size*1.25);
+	}
   }
   public void build_custom_menu(nFrontPanel sheet_front) {
-    nFrontTab tab = sheet_front.getTab(2);
-    tab.getShelf()
-      .addDrawerDoubleButton(inter.auto_load, inter.filesm_run, 10.25F, 1)
-      .addSeparator(0.125F)
-      .addDrawerDoubleButton(inter.quickload_run, inter.quicksave_run, 10, 1)
-      .addSeparator(0.25F)
-      ;
-    selector_list = tab.getShelf(0)
-      .addSeparator(0.125F)
-      .addDrawer(10.25F, 1).addModel("Label-S3", "Cursors :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getShelf()
-      .addSeparator(0.25F)
-      .addList(4, 10, 1);
-    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
-      nList sl = ((nList)builder); 
-      if (sl.last_choice_index < cursors_list.size()) {
-        nCursor cr = cursors_list.get(sl.last_choice_index);
-        if (selected_value != cr) { cr.show.set(true); }
-        else cr.show.set(!cr.show.get());
-        selected_value = cr;
-        inter.cam.cam_pos
-          .set(-(cr.pval.get().x) * inter.cam.cam_scale.get(), 
-               -(cr.pval.get().y) * inter.cam.cam_scale.get() );
-      }
-    } } );
-    selector_list.getShelf()
-      .addSeparator(0.25F)
-      ;
-    update_cursor_selector_list();
-    
-    tab = sheet_front.addTab("Explorer");
+    nFrontTab tab = sheet_front.addTab("Explorer");
     tab.getShelf()
       .addSeparator(0.125)
       .addDrawer(10.25, 1).addModel("Label-S3", "sheets explorer :")
@@ -421,93 +373,95 @@ nExplorer sheet_explorer;
     tab = sheet_front.addTab("Blocs");
     tab.getShelf()
       .addSeparator(0.125)
-      .addDrawer(10.25, 1).addModel("Label-S3", "Add new bloc to selected sheet :").setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-      .getShelf()
+      .addDrawer(10.25, 1).addModel("Label-S3", "Add new bloc to current sheet :       View")
+      	.setTextAlignment(PConstants.LEFT, PConstants.CENTER).getShelf()
       .addSeparator()
       ;
-    
-    for (int i = 0 ; i < (bloc_builders.size()  / 3.0F); i++) {
-      nDrawer dr = tab.getShelf().addDrawer(10, 0.75);
-      int j = (i * 3) + 0;
-      if (j < bloc_builders.size()) {
-	      dr.addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", bloc_builders.get(j).type)
-	        .setRunnable(new nRunnable(bloc_builders.get(j).type) { public void run() { 
-	          selected_sheet.addByType(((String)builder)); }})
-	        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-	        .setPX(ref_size*0.125)
-	        .setInfo(bloc_builders.get(j).descr)
-	        ;
-      }
-      j = (i * 3) + 1;
-      if (j < bloc_builders.size()) {
-	      dr.addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", bloc_builders.get(j).type)
-	        .setRunnable(new nRunnable(bloc_builders.get(j).type) { public void run() { 
-	          selected_sheet.addByType(((String)builder)); }})
-	        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-	        .setPX(ref_size*2.675)
-	        .setInfo(bloc_builders.get(j).descr)
-	        ;
-      }
-      j = (i * 3) + 2;
-      if (j < bloc_builders.size()) {
-	      dr.addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", bloc_builders.get(j).type)
-	        .setRunnable(new nRunnable(bloc_builders.get(j).type) { public void run() { 
-	          selected_sheet.addByType(((String)builder)); }})
-	        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-	        .setPX(ref_size*(5.25 - 0.5/16.0))
-	        .setInfo(bloc_builders.get(j).descr)
-	        ;
-      }
-    }
-    tab.getShelf()
-      .addSeparator()
-      ;
-    for (int i = 0 ; i < Math.max(Math.max(bloc_types1.length, bloc_types2.length), bloc_types3.length) ; i++) {
-      nDrawer dr = tab.getShelf().addDrawer(10, 0.75);
-      if (i < bloc_types1.length) {
-        dr.addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", bloc_types1[i])
-          .setRunnable(new nRunnable(bloc_types1[i]) { public void run() { selected_sheet.addByType(((String)builder)); }})
-          .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-          .setPX(ref_size*0.125)
-          .setInfo(bloc_info1[i])
-          ;
-      }
-      if (i < bloc_types2.length) {
-        dr.addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", bloc_types2[i])
-          .setRunnable(new nRunnable(bloc_types2[i]) { public void run() { selected_sheet.addByType(((String)builder)); }})
-          .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-          .setPX(ref_size*2.675)
-          .setInfo(bloc_info2[i])
-          ;
-      }
-      if (i < bloc_types3.length) {
-        dr.addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", bloc_types3[i])
-          .setRunnable(new nRunnable(bloc_types3[i]) { public void run() { selected_sheet.addByType(((String)builder)); }})
-          .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-          .setPX(ref_size*(5.25 - 0.5/16.0))
-          .setInfo(bloc_info3[i])
-          ;
-      }
-    }
-    
+	  selector_list = tab.getShelf(0)
+	    .addBetterList(15, 10, 0.9F);
+	  selector_list.setTextAlign(PApplet.LEFT);
+	  selector_list.getShelf()
+	    .addSeparator(0.25F)
+	    ;
+	  update_bloc_selector_list();
   }
-  void update_cursor_selector_list() {
-    if (selector_entry == null) selector_entry = new ArrayList<String>();
-    if (selector_value == null) selector_value = new ArrayList<nCursor>(); 
-    selector_entry.clear();
-    selector_value.clear();
-    for (nCursor v : cursors_list) { 
-      selector_entry.add(v.ref); 
-      selector_value.add(v);
-    }
-    if (selector_list != null) selector_list.setEntrys(selector_entry);
+  void update_bloc_selector_list() {
+	  if (selector_list != null) {
+		selector_list.start_complexe_entry();
+		selector_list.new_comp_entry("            --- Blocs ---");
+	  }
+		String[] saved_shown = PApplet.splitTokens(shown_builder.get(), OBJ_TOKEN);
+		shown_type_list.clear();
+		shown_builder.set("");
+		for (MAbstract_Builder m : bloc_builders) {
+			boolean found = false;
+			for (String t : saved_shown) if (t.equals(m.type)) {
+				found = true;
+				shown_type_list.add(m);
+				m.show_in_buildtool = true; }
+			if (!found) m.show_in_buildtool = false;
+		} 
+	    for (MAbstract_Builder m2 : shown_type_list) 
+	    	shown_builder.set(shown_builder.get() + OBJ_TOKEN + m2.type);
+		
+		build_buildtool();
+
+		ArrayList<String> catego = new ArrayList<String>();
+		for (MAbstract_Builder m : bloc_builders) {
+			String cat = m.category; boolean found = false;
+			for (String s : catego) if (s.equals(cat)) found = true;
+			if (!found && m.visible) catego.add(cat);
+		}
+
+	  if (selector_list != null) {
+		for (String cat : catego) {
+			if (cat.length() > 0) selector_list.new_comp_entry("     - "+cat+" -");
+			else selector_list.new_comp_entry("     - Others -");
+			for (MAbstract_Builder m : bloc_builders) 
+			if (m.visible && m.category.equals(cat)) {
+				selector_list.new_comp_entry(" - "+m.title).setBuilder(m)
+				.setSelectable(m.descr, new nRunnable(m) { public void run() {
+					selected_sheet.addByType(((MAbstract_Builder)builder).type);
+				}})
+				.setOption(m.show_in_buildtool, "", new nRunnable(m) { public void run() {
+					MAbstract_Builder m = ((MAbstract_Builder)builder);
+					m.show_in_buildtool = !m.show_in_buildtool;
+					if (m.show_in_buildtool) shown_type_list.add(m);
+					else shown_type_list.remove(m);
+	
+				    shown_builder.set("");
+				    for (MAbstract_Builder m2 : shown_type_list) 
+				    	shown_builder.set(shown_builder.get() + OBJ_TOKEN + m2.type);
+					
+					build_buildtool();
+				}});
+			}
+		}
+		
+		selector_list.new_comp_entry("            --- Specialized Sheet ---");
+	    for (Sheet_Specialize m : Sheet_Specialize.prints) if (!m.unique && m.visible) 
+			selector_list.new_comp_entry(" - "+m.name).setBuilder(m)
+			.setSelectable(new nRunnable(m) { public void run() {
+				((Sheet_Specialize)builder).add_new(selected_sheet, null, null); 
+			}})
+			.setOption(m.show_in_buildtool, "", new nRunnable(m) { public void run() {
+				Sheet_Specialize m = ((Sheet_Specialize)builder);
+				m.show_in_buildtool = !m.show_in_buildtool;
+				build_buildtool();
+			}});
+
+		selector_list.new_comp_entry("            --- Old Blocs ---");
+	    for (String m : bloc_types1) 
+			selector_list.new_comp_entry(" - "+m).setBuilder(m)
+			.setSelectable(new nRunnable(m) { public void run() {
+				selected_sheet.addByType(((String)builder)); 
+			}});
+	     selector_list.end_complexe_entry();
+	  }
   }
   
-  ArrayList<String> selector_entry;
-  ArrayList<nCursor> selector_value;
-  nCursor selected_value;
-  String selected_entry;
-  nList selector_list;
+  ArrayList<MAbstract_Builder> shown_type_list = new ArrayList<MAbstract_Builder>();
+  nBetterList selector_list;
 
   
   void new_tmpl() {
@@ -601,7 +555,7 @@ nExplorer sheet_explorer;
 //    if (selected_macro.size() > 0) { //use last selected med pos
 //      prevs_gr_p.set(select_grab_widg.getX(), select_grab_widg.getY());
 //      prevs_gr_p = inter.cam.screen_to_cam(prevs_gr_p);
-//    } else 
+//    } else {
 //    	if (show_macro.get() && !to_empty_sheet) { //use screen point
       PVector sc_pos = new PVector(mmain().screen_gui.view.pos.x + mmain().screen_gui.view.size.x * 1.0F / 2.0F, 
                                    mmain().screen_gui.view.pos.y + mmain().screen_gui.view.size.y / 2.0F);
@@ -640,7 +594,8 @@ nExplorer sheet_explorer;
     float phf = 0.0F;
     float move_fct = Math.max(select_bound_widg.getPhantomRect().size.x, select_bound_widg.getPhantomRect().size.y);
     move_fct /= ref_size;
-    move_fct = move_fct - move_fct%GRID_SNAP_FACT + 2 * GRID_SNAP_FACT;
+    move_fct = move_fct + 2 * GRID_SNAP_FACT;
+    move_fct = move_fct - move_fct%GRID_SNAP_FACT;
     boolean found = false;
     while (!found) {
       boolean col = false;
@@ -748,13 +703,17 @@ nExplorer sheet_explorer;
 	      show_macro.set(((sBoo)b.getValue("show_macro")).get());
 	    if (b.getValue("show_build_tool") != null) 
 	      show_build_tool.set(((sBoo)b.getValue("show_build_tool")).get());
-	    if (b.getValue("show_sheet_tool") != null) 
-	      show_sheet_tool.set(((sBoo)b.getValue("show_sheet_tool")).get());
+//	    if (b.getValue("show_sheet_tool") != null) 
+//	      show_sheet_tool.set(((sBoo)b.getValue("show_sheet_tool")).get());
 	    if (b.getValue("show_macro_tool") != null) 
 	      show_macro_tool.set(((sBoo)b.getValue("show_macro_tool")).get());
 	    
 	    if (sheet_explorer != null) sheet_explorer.update();
-	    inter.addEventTwoFrame(new nRunnable() { public void run() { is_paste_loading = false; select(); szone_clear_select(); } } );
+	    inter.addEventTwoFrame(new nRunnable() { public void run() { 
+	    	is_paste_loading = false; select(); szone_clear_select(); 
+	    	build_sheet_menu();
+	    	sheet_front.clear(); sheet_front = null;
+	    } } );
 	      
 	    szone_clear_select();
 	    is_setup_loading = false;
@@ -929,8 +888,9 @@ nExplorer sheet_explorer;
   sFlt packpross_by_frame;
   nRunnable packet_frame_run;
   
-  sBoo show_gui, show_macro, show_build_tool, show_sheet_tool, show_macro_tool, do_packet;
-  sStr new_temp_name, database_path; sRun del_select_run, copy_run, paste_run, reduc_run;
+  //, show_sheet_tool
+  sBoo show_gui, show_macro, show_build_tool, show_macro_tool, do_packet;
+  sStr new_temp_name, database_path, shown_builder; sRun del_select_run, copy_run, paste_run, reduc_run;
   public sInterface inter;
   Rapp app;
   public sValueBloc saved_template;
@@ -948,16 +908,16 @@ Macro_Sheet search_sheet = this;
   int loading_delay = 0;
   String access;
   public boolean canAccess(String a) { return inter.canAccess(a); }
-  String last_created_link = "";
   ArrayList<MChan> chan_macros = new ArrayList<MChan>();
   ArrayList<MMIDI> midi_macros = new ArrayList<MMIDI>();
   ArrayList<MPanel> pan_macros = new ArrayList<MPanel>();
   ArrayList<MTool> tool_macros = new ArrayList<MTool>();
-  
   ArrayList<nCursor> cursors_list = new ArrayList<nCursor>();
-  
+  MPanel last_added_panel;
+  MTool last_added_tool;
   int pan_nb = 0, tool_nb = 0;
   Macro_Sheet last_link_sheet = null;
+  String last_created_link = "";
   
   void updateBack() { update_select_bound(); }
   
@@ -974,7 +934,6 @@ Macro_Sheet search_sheet = this;
   void add_bloc_builders(MAbstract_Builder m) {
     bloc_builders.add(m);
   }
-
 public Macro_Main(sInterface _int) {
     super(_int);
     app = _int.app;
@@ -992,7 +951,6 @@ public Macro_Main(sInterface _int) {
     saved_preset = inter.interface_bloc.newBloc("Preset");
     new_temp_name = setting_bloc.newStr("new_temp_name", "new_temp_name", "template");
     database_path = setting_bloc.newStr("database_path", "database_path", "database.sdata");
-    
     load_database();
     
     packpross_by_frame = newFlt(60, "packpross_by_frame", "packpross_by_frame");
@@ -1011,10 +969,9 @@ public Macro_Main(sInterface _int) {
     show_build_tool.addEventChange(new nRunnable(this) { public void run() { 
       if (build_tool != null && build_tool.hide == show_build_tool.get()) build_tool.reduc();
     }});
-    show_sheet_tool = setting_bloc.newBoo("show_sheet_tool", "sheet tool", true);
-    show_sheet_tool.addEventChange(new nRunnable(this) { public void run() { 
-      if (sheet_tool != null && sheet_tool.hide == show_sheet_tool.get()) sheet_tool.reduc();
-    }});
+
+    shown_builder = setting_bloc.newStr("shown_builder", "shown_builder", "");
+    
     show_macro_tool = setting_bloc.newBoo("show_macro_tool", "macro tool", true);
     show_macro_tool.addEventChange(new nRunnable(this) { public void run() { 
       if (macro_tool != null && macro_tool.hide == show_macro_tool.get()) macro_tool.reduc();
@@ -1041,23 +998,36 @@ public Macro_Main(sInterface _int) {
     
     
 
-
-    addSpecializedSheet(new SheetPrint());
-
-  //  add_bloc_builders(new MEEE.MEEE_Builder());
       add_bloc_builders(new Macro_Sheet.MSheet_Builder());
-      add_bloc_builders(new MSheetView.MSheetView_Builder());
-      add_bloc_builders(new MSheetObj.MSheetObj_Builder());
+      add_bloc_builders(new MSheetMain.MSheetMain_Builder());
+      add_bloc_builders(new MSheetCo.MSheetCo_Builder());
       add_bloc_builders(new MCursor.MCursor_Builder());
       add_bloc_builders(new MForm.MForm_Builder());
-      add_bloc_builders(new MCamera.MCam_Builder());
+      add_bloc_builders(new MCam.MCam_Builder());
       add_bloc_builders(new MStructure.MStructure_Builder());
       add_bloc_builders(new MTick.MTick_Builder());
       add_bloc_builders(new MPatern.MPatern_Builder());
       add_bloc_builders(new MCanvas.MCanvas_Builder());
-//      add_bloc_builders(new MCount.MCount_Builder());
-//      add_bloc_builders(new MMcomp.MMcomp_Builder());
+      add_bloc_builders(new MCounter.MCount_Builder());
+      add_bloc_builders(new MChan.MChan_Builder());
+      add_bloc_builders(new MGate.MGate_Builder());
+      add_bloc_builders(new MKeyboard.MKeyboard_Builder());
+      add_bloc_builders(new MMouse.MMouse_Builder());
+      add_bloc_builders(new MTrig.MTrig_Builder());
+      add_bloc_builders(new MSwitch.MSwitch_Builder());
+      add_bloc_builders(new MComment.MComment_Builder());
+      add_bloc_builders(new MFrame.MFrame_Builder());
+      add_bloc_builders(new MPulse.MPulse_Builder());
+      add_bloc_builders(new MRamp.MRamp_Builder());
+      add_bloc_builders(new MComp.MComp_Builder());
+      add_bloc_builders(new MCalc.MCalc_Builder());
+      add_bloc_builders(new MBool.MBool_Builder());
+      add_bloc_builders(new MRandom.MRandom_Builder());
+      add_bloc_builders(new MBin.MBin_Builder());
+      add_bloc_builders(new MNot.MNot_Builder());
+      add_bloc_builders(new MVar.MVar_Builder());
       add_bloc_builders(new MValue.MValue_Builder());
+      add_bloc_builders(new MSequance.MSequencor_Builder());
       add_bloc_builders(new MPoint.MPoint_Builder());
       
       
@@ -1117,13 +1087,14 @@ public Macro_Main(sInterface _int) {
     
     inter.addEventNextFrame(new nRunnable() { public void run() { 
       inter.cam.addEventMove(new nRunnable() { public void run() { update_select_bound(); } } );
-      build_macro_menus();
+//      build_macro_menus();
       inter.cam.cam_grid_spacing.set(ref_size*5*Macro_Main.GRID_SNAP_FACT*3);
     } } );
 
     
     inter.addEventTwoFrame(new nRunnable() { public void run() { 
         packpross_by_frame.set(packp_holder);
+//        update_bloc_selector_list();
         inter.addEventFrame(new nRunnable() { public void run() { frame(); } } );
       } } );
   }
@@ -1416,6 +1387,30 @@ public Macro_Main(sInterface _int) {
 	    .setPX(ref_size * 51 / 16)
 	    .setSize(ref_size*0.875, ref_size*0.75)
 	    );
+	  theme.addModel("MC_Element_Button_Selector_5", theme.newWidget("MC_Element_Button")
+	    .setPX(ref_size * 69 / 16)
+	    .setSize(ref_size*0.875, ref_size*0.75)
+	    );
+	  theme.addModel("MC_Element_Button_Selector_6", theme.newWidget("MC_Element_Button")
+	    .setPX(ref_size * 85 / 16)
+	    .setSize(ref_size*0.875, ref_size*0.75)
+	    );
+	  theme.addModel("MC_Element_XLButton_Selector_1", theme.newWidget("MC_Element_Button")
+	    .setPX(ref_size * 4 / 16)
+	    .setSize(ref_size*1.25, ref_size*0.75)
+	    );
+	  theme.addModel("MC_Element_XLButton_Selector_2", theme.newWidget("MC_Element_Button")
+	    .setPX(ref_size * (1.75+4 / 16))
+	    .setSize(ref_size*1.25, ref_size*0.75)
+	    );
+	  theme.addModel("MC_Element_XLButton_Selector_3", theme.newWidget("MC_Element_Button")
+	    .setPX(ref_size * (3.25+4 / 16))
+	    .setSize(ref_size*1.25, ref_size*0.75)
+	    );
+	  theme.addModel("MC_Element_XLButton_Selector_4", theme.newWidget("MC_Element_Button")
+	    .setPX(ref_size * (4.75+4 / 16))
+	    .setSize(ref_size*1.25, ref_size*0.75)
+			    );
 	  theme.addModel("MC_Grabber", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(80))
 	    .setHoveredColor(theme.app.color(120))
@@ -1508,7 +1503,7 @@ public Macro_Main(sInterface _int) {
 	    .setClickedColor(theme.app.color(180, 220))
 	    .setOutlineWeight(ref_size / 12)
 	    .setOutline(true)
-	    .setOutlineColor(theme.app.color(220, 170, 25))
+	    .setOutlineColor(theme.app.color(220, 140, 25))
 	    .setRound(true)
 	    );
 	  theme.addModel("MC_Connect_Out_Passif", theme.newWidget("mc_ref")
@@ -1526,7 +1521,7 @@ public Macro_Main(sInterface _int) {
 	    .setClickedColor(theme.app.color(180, 220))
 	    .setOutlineWeight(ref_size / 12)
 	    .setOutline(true)
-	    .setOutlineColor(theme.app.color(220, 170, 25))
+	    .setOutlineColor(theme.app.color(220, 200, 25))
 	    .setRound(true)
 	    );
 	  theme.addModel("MC_Connect_In_Passif", theme.newWidget("mc_ref")
@@ -1538,11 +1533,22 @@ public Macro_Main(sInterface _int) {
 	    .setOutlineColor(theme.app.color(60))
 	    .setRound(true)
 	    );
+	  theme.addModel("MC_Connect_Linkable", theme.newWidget("mc_ref")
+	    .setStandbyColor(theme.app.color(140, 140))
+	    .setHoveredColor(theme.app.color(180, 180))
+	    .setClickedColor(theme.app.color(180, 220))
+	    .setOutlineWeight(ref_size / 12)
+	    .setOutline(true)
+	    .setOutlineColor(theme.app.color(25, 180, 240))
+	    .setRound(true)
+	    );
 	  theme.addModel("MC_Connect_Link", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(200))
 	    .setHoveredColor(theme.app.color(205, 205, 200))
-	    .setClickedColor(theme.app.color(220, 220, 200))
+//	    .setClickedColor(theme.app.color(220, 220, 200))
 	    .setOutlineColor(theme.app.color(200, 100, 100))
+	    .setClickedColor(theme.app.color(10, 110, 250))
+	    .setLabelColor  (theme.app.color(20, 180, 240))
 	    .setOutlineSelectedColor(theme.app.color(200, 200, 0))
 	    .setOutlineWeight(ref_size / 10)
 	    .setOutline(true)

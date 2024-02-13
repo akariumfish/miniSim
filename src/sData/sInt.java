@@ -28,9 +28,11 @@ public class sInt extends sValue {
 	  public float ctrl_factor = 2;
 	  public sInt(sValueBloc b, int v, String n, String s) { super(b, "int", n, s); val = v; def = val; }
 	  public int get() { return val; }
+	  public void set(double v) { set((int)v); }
+	  public void set(float v) { set((int)v); }
 	  public void set(int v) { 
-	    if (limited_max && v > max) v = max; if (limited_min && v < min) v = min;
-	    if (v != val) { val = v; doChange(); } }
+		    if (limited_max && v > max) v = max; if (limited_min && v < min) v = min;
+		    if (v != val) { val = v; doChange(); } }
 	  void save_to_bloc(Save_Bloc svb) { super.save_to_bloc(svb);
 	    svb.newData("val", val);
 	    svb.newData("min", min);

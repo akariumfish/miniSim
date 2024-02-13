@@ -8,11 +8,6 @@ import sData.nRunnable;
 
 public class nList extends nDrawer {
 	  
-	  //nPanelDrawer panel_drawer = null;
-	  //nList setPanelDrawer(nPanelDrawer d) { panel_drawer = d; return this; }
-	  //nPanelDrawer getPanelDrawer() { return panel_drawer; }
-	  
-	  //nGUI gui;
 	  ArrayList<nWidget> listwidgets = new ArrayList<nWidget>();
 	  ArrayList<String> entrys = new ArrayList<String>();
 	  nWidget back, last_choice_widget;
@@ -28,23 +23,22 @@ public class nList extends nDrawer {
 	  ArrayList<nRunnable> eventChangeRun = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventScrollRun = new ArrayList<nRunnable>();
 	  public nList addEventScroll(nRunnable r)       { eventScrollRun.add(r); return this; }
-	  
 	  public nList addEventChange(nRunnable r)       { eventChangeRun.add(r); return this; }
-	  
 	  public nList addEventChange_Builder(nRunnable r) { eventChangeRun.add(r); r.builder = this; return this; }
 	  
-	  public nWidget getRefWidget() { return back; }
+//	  public nWidget getRefWidget() { return back; }
 	  
 	  int layer = 0;
 	  
-	  public nList setLayer(int l) {
-	    super.setLayer(l); 
-	    layer = l;
-	    scroll.setLayer(l);
-	    back.setLayer(l);
-	    for (nWidget w : listwidgets) w.setLayer(l);
-	    return this;
-	  }
+//	  public nList setLayer(int l) {
+//	    super.setLayer(l); 
+//	    layer = l;
+//	    scroll.setLayer(l);
+//	    back.setLayer(l);
+//	    for (nWidget w : listwidgets) w.setLayer(l);
+//	    for (nWidget w : listoptions) w.setLayer(l);
+//	    return this;
+//	  }
 	  public nList toLayerTop() {
 	    super.toLayerTop();
 	    back.toLayerTop();
@@ -60,7 +54,7 @@ public class nList extends nDrawer {
 	    return this;
 	  }
 	  int align = PApplet.CENTER;
-	  nList setTextAlign(int a) { align = a; setListLength(list_widget_nb); return this; }
+	  public nList setTextAlign(int a) { align = a; setListLength(list_widget_nb); return this; }
 	  nList(nShelf _sh, int _ent_nb, float _rs, float _lf, float _hf) {
 	    super(_sh, _rs*_lf, _rs*_hf*_ent_nb);
 	    list_widget_nb = _ent_nb;
@@ -84,14 +78,7 @@ public class nList extends nDrawer {
 	    scroll.getRefWidget().setParent(back);
 	    scroll.setView(list_widget_nb)
 	      .addEventChange(new nRunnable() { public void run() {
-	        //int mov = scroll.entry_pos - entry_pos;
-	        //if (mov != 0 && last_choice_index >= 0 && last_choice_index < listwidgets.size()) 
-	        //  listwidgets.get(last_choice_index).setOff();
 	        entry_pos = scroll.entry_pos;
-	        //last_choice_index -= mov;
-	        //if (mov != 0 && last_choice_index >= 0 && last_choice_index < listwidgets.size()) { event_active = false;
-	        //  listwidgets.get(last_choice_index).setOn(); event_active = true; }
-	        
 	        update_list();
 	        runEvents(eventScrollRun);
 	      }});
@@ -128,12 +115,10 @@ public class nList extends nDrawer {
 	    }
 	  }
 	  public nList setEntrys(ArrayList<String> l) {
-	  //nList setEntrys(String[] l) {
 	    entrys.clear();
 	    for (String s : l) entrys.add(RConst.copy(s));
 	    scroll.setPos(0);
 	    scroll.setEntryNb(l.size());
-	    //scroll.setEntryNb(l.length);
 
 	    scroll.setView(list_widget_nb);
 	    entry_pos = 0; 
@@ -163,11 +148,6 @@ public class nList extends nDrawer {
 	    }
 	    for (nWidget w : listwidgets) w.toLayerTop();
 	    
-	    for (nWidget w : listwidgets) 
-	      for (nWidget w2 : listwidgets)
-	        if (w != w2) ;
-	          //w.addExclude(w2);
-	    
 	    scroll.setPos(0);
 	    scroll.setEntryNb(entrys.size());
 	    scroll.setView(list_widget_nb);
@@ -190,6 +170,11 @@ public class nList extends nDrawer {
 	    return this;
 	  }
 	}
+
+
+
+
+
 
 	class nScroll {
 	  nGUI gui;

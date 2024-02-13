@@ -18,22 +18,22 @@ public class nColorPanel extends nWindowPanel {
 	      .addDrawer(10.25F, 1)
 	        .addWidget(new nSlide(gui, ref_size*7.375F, ref_size).setValue(cval.getred() / 255)
 	          .addEventSlide(new nRunnable() { public void run(float v) { 
-	            red = v*255; update(); red_widget.setText(RConst.trimStringFloat(red)); } } )
+	            red = v*255; update(); red_widget.setText(RConst.trimFlt(red)); } } )
 	          .setPosition(0, 0) ).getShelf()
 	      .addDrawer(10.25F, 1)
 	        .addWidget(new nSlide(gui, ref_size*7.375F, ref_size).setValue(cval.getgreen() / 255)
 	          .addEventSlide(new nRunnable() { public void run(float v) { 
-	            gre = v*255; update(); gre_widget.setText(RConst.trimStringFloat(gre)); } } )
+	            gre = v*255; update(); gre_widget.setText(RConst.trimFlt(gre)); } } )
 	          .setPosition(0, 0) ).getShelf()
 	      .addDrawer(10.25F, 1)
 	        .addWidget(new nSlide(gui, ref_size*7.375F, ref_size).setValue(cval.getblue() / 255)
 	          .addEventSlide(new nRunnable() { public void run(float v) { 
-	            blu = v*255; update(); blu_widget.setText(RConst.trimStringFloat(blu)); } } )
+	            blu = v*255; update(); blu_widget.setText(RConst.trimFlt(blu)); } } )
 	          .setPosition(0, 0) ).getShelf()
 	      .addDrawer(10.25F, 1)
 	        .addWidget(new nSlide(gui, ref_size*7.375F, ref_size).setValue(cval.getalpha() / 255)
 	          .addEventSlide(new nRunnable() { public void run(float v) { 
-	            alp = v*255; update(); alp_widget.setText(RConst.trimStringFloat(alp)); } } )
+	            alp = v*255; update(); alp_widget.setText(RConst.trimFlt(alp)); } } )
 	          .setPosition(0, 0) ).getShelf()
 	      .addDrawer(10.25F, 1)
 	        .addCtrlModel("Button-S2-P3", "OK")

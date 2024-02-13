@@ -3,22 +3,6 @@ package UI;
 
 import RApplet.Rapp;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //manage look
 //class sLook extends sValue {
 //  String getString() { return ""; }

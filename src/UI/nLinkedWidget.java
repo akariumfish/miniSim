@@ -64,10 +64,10 @@ public class nLinkedWidget extends nWidget {
 	    return this; }
 	  nLinkedWidget setLinkedValue(sFlt b) { 
 	    fval = b;
-	    setText(RConst.trimStringFloat(fval.get()));
+	    setText(RConst.trimFlt(fval.get()));
 	    //println(fval.get());
 	    val_run = new nRunnable(this) { public void run() { 
-	      ((nLinkedWidget)builder).changeText(RConst.trimStringFloat(fval.get()));  } };
+	      ((nLinkedWidget)builder).changeText(RConst.trimFlt(fval.get()));  } };
 	    b.addEventChange(val_run);
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 

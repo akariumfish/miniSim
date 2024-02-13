@@ -24,7 +24,7 @@ public class sFlt extends sValue implements RConst {
 	  
 	  public float asFloat() { return val; }
 	  
-	  public String getString() { return RConst.trimStringFloat(val); }
+	  public String getString() { return RConst.trimFlt(val); }
 	  public void clear() { super.clear(); val = def; }
 	  float val = 0, def;
 	  public float ctrl_factor = 2;

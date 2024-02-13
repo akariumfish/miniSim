@@ -2,27 +2,63 @@ package Macro;
 
 import java.util.ArrayList;
 
-import UI.nCtrlWidget;
-import UI.nDrawer;
-import UI.nLinkedWidget;
-import UI.nWidget;
-import sData.nRunnable;
-import sData.sBoo;
-import sData.sObj;
+import UI.*;
+import sData.*;
 
 public class Macro_Element extends nDrawer implements Macro_Interf {
 	
-	//Macro_Connexion addLinkedInput(int c, String l, sValue v) {
-	//
-	//}
+	nCtrlWidget addValuePanel(sValue v) {
+		nCtrlWidget w = addCtrlModel("MC_Element_MiniButton")
+	  	.setRunnable(new nRunnable(v) { public void run() {
+		  sValue cible = (sValue)builder;
+		  if (cible != null) {
+	        if (cible.type.equals("str")) { 
+	          new nTextPanel(bloc.mmain().screen_gui, bloc.mmain().inter.taskpanel, (sStr)cible);
+	        } else if (cible.type.equals("flt")) { 
+	          new nNumPanel(bloc.mmain().screen_gui, bloc.mmain().inter.taskpanel, (sFlt)cible);
+	        } else if (cible.type.equals("int")) { 
+	          new nNumPanel(bloc.mmain().screen_gui, bloc.mmain().inter.taskpanel, (sInt)cible);
+	        } else if (cible.type.equals("boo")) { 
+	          new nBinPanel(bloc.mmain().screen_gui, bloc.mmain().inter.taskpanel, (sBoo)cible);
+	        } else if (cible.type.equals("col")) { 
+	          new nColorPanel(bloc.mmain().screen_gui, bloc.mmain().inter.taskpanel, (sCol)cible);
+	        } else if (cible.type.equals("vec")) { 
+	          new nVecPanel(bloc.mmain().screen_gui, bloc.mmain().inter.taskpanel, (sVec)cible);
+	        }
+	      }
+	  	}});
+		return w;
+	}
 
-	  nCtrlWidget addTrigS(int c, String l, nRunnable r) { 
+	  nCtrlWidget addTrigS(String l, nRunnable r) { 
 		    return addCtrlModel("MC_Element_SButton", l).setRunnable(r);
 		  }
-	  nLinkedWidget addSwitchS(int c, String l, sBoo r) { 
+	  Macro_Element addTrigSelector(int select_nb, String l, nRunnable r) { 
+		addCtrlModel("MC_Element_Button_Selector_"+select_nb, l).setRunnable(r);
+	    return this;
+	  }
+	  Macro_Element addTrigSelector(int select_nb, String l, String inf, nRunnable r) { 
+		addCtrlModel("MC_Element_Button_Selector_"+select_nb, l)
+			.setRunnable(r).setInfo(inf);
+	    return this;
+	  }
+	  Macro_Element addSwitchSelector(int select_nb, String l, String inf, sBoo r) { 
+		addLinkedModel("MC_Element_Button_Selector_"+select_nb, l)
+			.setLinkedValue(r).setInfo(inf);
+	    return this;
+	  }
+	  Macro_Element addSwitchXLSelector(int select_nb, String l, String inf, sBoo r) { 
+		addLinkedModel("MC_Element_XLButton_Selector_"+select_nb, l)
+			.setLinkedValue(r).setInfo(inf);
+	    return this;
+	  }
+	  nLinkedWidget addSwitchS(String l, sBoo r) { 
 		    return addLinkedModel("MC_Element_SButton", l).setLinkedValue(r);
 		  }
-	  nCtrlWidget addTrigSwtchS(int c, String sw_txt, sBoo vb, String bp_txt, nRunnable r) { 
+	  nLinkedWidget addLinkedMiniSwitch(String l, sBoo r) { 
+		    return addLinkedModel("MC_Element_MiniButton", l).setLinkedValue(r);
+		  }
+	  nCtrlWidget addTrigSwtchS(String sw_txt, sBoo vb, String bp_txt, nRunnable r) { 
 	    nCtrlWidget cw = addCtrlModel("MC_Element_SButton", bp_txt).setRunnable(r);
 	    addLinkedModel("MC_Element_MiniButton", sw_txt).setLinkedValue(vb);
 	    return cw;

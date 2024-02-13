@@ -3,13 +3,9 @@ package Macro;
 import java.util.ArrayList;
 
 import RApplet.RConst;
-import UI.nCtrlWidget;
-import UI.nLinkedWidget;
-import UI.nWidget;
+import UI.*;
 import processing.core.PApplet;
-import sData.nRunnable;
-import sData.sBoo;
-import sData.sValueBloc;
+import sData.*;
 
 /*
 
@@ -18,6 +14,14 @@ import sData.sValueBloc;
  methods to add and manipulate element for easy macro building
  
  */
+
+//class Connexion_Value_Pair {
+//	sValue val; Macro_Connexion co;
+//}
+//class Run_Value_Pair {
+//	sValue val; nRunnable run;
+//}
+
 public class Macro_Bloc extends Macro_Abstract {
 	nCtrlWidget param_open;
 	  Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
@@ -32,15 +36,226 @@ public class Macro_Bloc extends Macro_Abstract {
 		    addShelf(); 
 		    addShelf();
 		  }
-  
-  nCtrlWidget get_param_openner() {
-	  if (param_open == null) {
-		  param_open = addCtrlModel("MC_Param", "P");
-		  param_open.setParent(panel).setInfo("show/hide param");
-	  }
-	  return param_open;
-  }
 
+	  nCtrlWidget get_param_openner() {
+		  if (param_open == null) {
+			  param_open = addCtrlModel("MC_Param", "P");
+			  param_open.setParent(panel).setInfo("show/hide param");
+		  }
+		  return param_open;
+	  }
+	  Macro_Bloc set_param_action(nRunnable r) {
+		  get_param_openner().setRunnable(r);
+		  return this;
+	  }
+
+	Macro_Connexion addInputToValue(int c, sValue v) { 
+	  Macro_Connexion in = addInput(0, v.ref);
+	  linkInputToValue(in, v);
+	  return in;
+	}
+	Macro_Connexion linkInputToValue(Macro_Connexion in, sValue v) { 
+      nObjectPair pin = new nObjectPair();
+      pin.obj1 = v; pin.obj2 = in;
+      if (v.type.equals("str")) { 
+          in.setFilterString()
+	        .addEventReceiveStr(new nRunnable(pin) { public void run() {
+	        	nObjectPair pair = ((nObjectPair)builder);
+	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+	    			  ((sStr)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asStr());
+	    	    }});
+        } else if (v.type.equals("flt")) { 
+            in.setFilterNumber()
+	        .addEventReceiveInt(new nRunnable(pin) { public void run() {
+	        	nObjectPair pair = ((nObjectPair)builder);
+	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+	    			  ((sFlt)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asInt());
+	    	    }}).addEventReceiveFloat(new nRunnable(pin) { public void run() {
+	    	    	nObjectPair pair = ((nObjectPair)builder);
+	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+	    			  ((sFlt)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asFloat());
+	    	    }});
+        } else if (v.type.equals("int")) { 
+	        in.setFilterNumber()
+	        	.addEventReceiveInt(new nRunnable(pin) { public void run() {
+	        		nObjectPair pair = ((nObjectPair)builder);
+	  		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+	  			  ((sInt)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asInt());
+	  	  }}).addEventReceiveFloat(new nRunnable(pin) { public void run() {
+	  		nObjectPair pair = ((nObjectPair)builder);
+	  		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+	  			  ((sInt)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asFloat());
+	  	  }});
+        } else if (v.type.equals("boo")) { 
+            in.setFilterBool()
+  	        .addEventReceiveBool(new nRunnable(pin) { public void run() {
+  	        	nObjectPair pair = ((nObjectPair)builder);
+  	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+  	    			  ((sBoo)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asBool());
+  	    	    }});
+        } else if (v.type.equals("col")) { 
+            in.setFilterColor()
+  	        .addEventReceiveCol(new nRunnable(pin) { public void run() {
+  	        	nObjectPair pair = ((nObjectPair)builder);
+  	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+  	    			  ((sCol)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asCol());
+  	    	    }});
+        } else if (v.type.equals("vec")) { 
+            in.setFilterVec()
+  	        .addEventReceiveVec(new nRunnable(pin) { public void run() {
+  	        	nObjectPair pair = ((nObjectPair)builder);
+  	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+  	    			  ((sVec)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asVec());
+  	    	    }});
+        }
+      return in; 
+    }
+	Macro_Connexion addValueToOutput(int c, sValue v) { 
+	  Macro_Connexion out = addOutput(2, v.ref);
+	  linkValueToOutput(out, v);
+	  return out;
+	}
+	Macro_Connexion linkValueToOutput(Macro_Connexion out, sValue v) { 
+	  nObjectPair pout = new nObjectPair();
+      pout.obj1 = v; pout.obj2 = out;
+      nRunnable val_run = new nRunnable(pout) { public void run() {
+    	  nObjectPair pair = ((nObjectPair)builder);
+  	  	((Macro_Connexion)pair.obj2).send(((sValue)pair.obj1).asPacket());
+	  }};
+	  v.addEventChange(val_run);
+	  nObjectPair pr = new nObjectPair();
+      pr.obj1 = v; pr.obj2 = val_run;
+      addEventClear(new nRunnable(pr) { public void run() {
+    	  nObjectPair pair = ((nObjectPair)builder);
+    	  	((sValue)pair.obj1).removeEventChange(((nRunnable)pair.obj2));
+	  }});
+      return out; 
+    }
+	nWidget addLinkedLWidget(Macro_Element e, sValue v) {
+	  if (v.type.equals("boo")) return addLinkedLSwitch(e, v);
+	  else if (v.type.equals("vec") || v.type.equals("col")) 
+		  return addLWatcher(e, v);
+	  else if (v.type.equals("obj") || v.type.equals("run")) 
+		  return e.addModel("MC_Element_Text", v.ref);
+	  else return addLinkedLField(e, v);
+	}
+	nLinkedWidget addLinkedLField(Macro_Element e, sValue v) {
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  return w;
+	}
+	nWatcherWidget addLWatcher(Macro_Element e, sValue v) {
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text", v.ref).setLinkedValue(v);
+	  w.setBackground();
+	  w.setInfo(v.ref);
+	  return w;
+	}
+	nLinkedWidget addLinkedLSwitch(Macro_Element e, sValue v) {
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Button", v.ref).setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  return w;
+	}
+	void addLinkedLWidget(int c, sValue v) {
+	  if (v.type.equals("boo")) addLinkedLSwitch(c, v);
+	  else if (v.type.equals("vec") || v.type.equals("col")) addLWatcher(c, v);
+	  else if (v.type.equals("obj") || v.type.equals("run")) addLabelL(c, v.ref);
+	  else addLinkedLField(c, v);
+	}
+	nLinkedWidget addLinkedLField(int c, sValue v) {
+	  Macro_Element e = addEmptyL(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	nWatcherWidget addLWatcher(int c, sValue v) {
+	  Macro_Element e = addEmptyL(c);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	nLinkedWidget addLinkedLSwitch(int c, sValue v) {
+	  Macro_Element e = addEmptyL(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Button").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	void addLinkedSWidget(int c, sValue v) {
+	  if (v.type.equals("boo")) addLinkedSSwitch(c, v);
+	  else if (v.type.equals("vec") || v.type.equals("col")) addSWatcher(c, v);
+	  else if (v.type.equals("obj") || v.type.equals("run")) addLabelS(c, v.ref);
+	  else addLinkedSField(c, v);
+	}
+	nLinkedWidget addLinkedSField(int c, sValue v) {
+	  Macro_Element e = addEmptyS(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_SField").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	nWatcherWidget addSWatcher(int c, sValue v) {
+	  Macro_Element e = addEmptyS(c);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_SText").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	nLinkedWidget addLinkedSSwitch(int c, sValue v) {
+	  Macro_Element e = addEmptyS(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_SButton").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	Macro_Bloc newRowValue(sValue v) {
+	  Macro_Connexion in = addInputToValue(0, v);
+	  addLinkedSWidget(1, v);
+	  Macro_Connexion out = addValueToOutput(2, v);
+	  in.addBangGet(v, out);
+	  return this;
+	}
+	Macro_Bloc newRowProtectedValue(sValue v) {
+	  Macro_Connexion in = addInput(0, "get "+v.ref);
+	  Macro_Element e = addEmptyS(1);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_SText").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  Macro_Connexion out = addValueToOutput(2, v);
+	  in.addBangGet(v, out);
+	  return this;
+	}
+    sInt newRowInt(int d, String r) {
+	  sInt v = newInt(d, r, r);
+	  newRowValue(v);
+	  return v;
+    }
+    sFlt newRowFlt(float d, String r) {
+  	  sFlt v = newFlt(d, r, r);
+	  newRowValue(v);
+	  return v;
+  }
+    sBoo newRowBoo(boolean d, String r) {
+    	  sBoo v = newBoo(d, r, r);
+    	  newRowValue(v);
+  	  return v;
+    }
+    sCol newRowColor(int d, String r) {
+    	  sCol v = newCol(d, r, r);
+    	  newRowValue(v);
+  	  return v;
+    }
+    sVec newRowVec(String r) {
+      sVec v = newVec(r, r);
+  	  newRowValue(v);
+    	  return v;
+    }
+    sStr newRowStr(String def, String ref) {
+    	  sStr v = newStr(ref, ref, def);
+  	  newRowValue(v);
+    	  return v;
+    }
+  
   Macro_Element addSelectS(int c, sBoo v1, sBoo v2, String s1, String s2) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
     addElement(c, m); 
@@ -76,6 +291,13 @@ public class Macro_Bloc extends Macro_Abstract {
 	    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
 	    addElement(c, m); 
 	    return m.addCtrlModel("MC_Element_SButton", l).setRunnable(r);
+	  }
+  nCtrlWidget addTrigS(int c, String l, String inf, nRunnable r) { 
+	    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
+	    addElement(c, m); 
+	    nCtrlWidget w = m.addCtrlModel("MC_Element_SButton", l).setRunnable(r);
+	    w.setInfo(inf);
+	    return w;
 	  }
   nLinkedWidget addSwitchS(int c, String l, sBoo r) { 
 	    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
@@ -127,14 +349,16 @@ public class Macro_Bloc extends Macro_Abstract {
   }
 
   nWidget addLabelS(int c, String t) { 
-    Macro_Element m = new Macro_Element(this, t, "MC_Element_Single", null, NO_CO, NO_CO, true);
+    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
     addElement(c, m); 
-    return m.back;
+    nWidget w = m.addModel("MC_Element_SText", t);
+    return w;
   }
   nWidget addLabelL(int c, String t) { 
-    Macro_Element m = new Macro_Element(this, t, "MC_Element_Double", null, NO_CO, NO_CO, false);
+    Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);
     addElement(c, m); 
-    return m.back;
+    nWidget w = m.addModel("MC_Element_Text", t);
+    return w;
   }
 
   Macro_Connexion addInput(int c, String t) { 
@@ -165,6 +389,9 @@ public class Macro_Bloc extends Macro_Abstract {
 
   Macro_Connexion addInputFloat(int c, String t, nRunnable r) { 
     return addInput(c, t).setFilterFloat().addEventReceiveFloat(r); }
+
+  Macro_Connexion addInputInt(int c, String t, nRunnable r) { 
+    return addInput(c, t).setFilterInt().addEventReceiveInt(r); }
   
   Macro_Element addSheetInput(int c, String t) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", t, OUTPUT, INPUT, true);
@@ -201,10 +428,6 @@ public class Macro_Bloc extends Macro_Abstract {
         r += co.descr + INFO_TOKEN + m.connect.descr + OBJ_TOKEN;
       if (m.connect != null) for (Macro_Connexion co : m.connect.connected_outputs) 
         r += m.connect.descr + INFO_TOKEN + co.descr + OBJ_TOKEN;
-      //if (m.sheet_connect != null) for (Macro_Connexion co : m.sheet_connect.connected_inputs) 
-      //  r += co.descr + INFO_TOKEN + m.sheet_connect.descr + OBJ_TOKEN;
-      //if (m.sheet_connect != null) for (Macro_Connexion co : m.sheet_connect.connected_outputs) 
-      //  r += m.sheet_connect.descr + INFO_TOKEN + co.descr + OBJ_TOKEN;
     }
     return r; 
   }
@@ -232,9 +455,14 @@ public class Macro_Bloc extends Macro_Abstract {
     if (param_open != null) param_open.toLayerTop();
     return this;
   }
+  
+
+  ArrayList<nRunnable> eventClearRun = new ArrayList<nRunnable>();
+  Macro_Bloc addEventClear(nRunnable r) { eventClearRun.add(r); return this; }
+  
   public Macro_Bloc clear() {
-    for (Macro_Element e : elements) e.clear();
-//    if (sheet.sheet_menu_bloc == this) sheet.sheet_menu_bloc = null;
+	    for (nRunnable e : eventClearRun) e.run();
+	    for (Macro_Element e : elements) e.clear();
     super.clear(); return this; }
 
   

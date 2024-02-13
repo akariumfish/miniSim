@@ -84,7 +84,12 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
             sheet.mmain().szone_clear_select();
             
             for (Macro_Connexion i : sheet.child_connect) 
-              if (i.type == INPUT) i.lens.setLook(gui.theme.getLook("MC_Connect_In_Actif")).setTrigger(); 
+              if (i.type == INPUT) { 
+            	  if (linkable && i.linkable) 
+            	  	  i.lens.setLook(gui.theme.getLook("MC_Connect_Linkable")).setTrigger(); 
+            	  else 
+                	  i.lens.setLook(gui.theme.getLook("MC_Connect_In_Actif")).setTrigger(); 
+              }
               else if (i.type == OUTPUT && i != (Macro_Connexion)builder) 
                 i.lens.setLook(gui.theme.getLook("MC_Connect_Out_Passif")).setBackground(); 
               else if (i.type == OUTPUT && i == (Macro_Connexion)builder) 
@@ -96,7 +101,12 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
             sheet.mmain().szone_clear_select();
             
             for (Macro_Connexion i : sheet.child_connect) 
-              if (i.type == OUTPUT) i.lens.setLook(gui.theme.getLook("MC_Connect_Out_Actif")).setTrigger(); 
+              if (i.type == OUTPUT) { 
+            	  if (linkable && i.linkable) 
+            	  	  i.lens.setLook(gui.theme.getLook("MC_Connect_Linkable")).setTrigger(); 
+            	  else 
+            		  i.lens.setLook(gui.theme.getLook("MC_Connect_Out_Actif")).setTrigger(); 
+              }
               else if (i.type == INPUT && i != (Macro_Connexion)builder) 
                 i.lens.setLook(gui.theme.getLook("MC_Connect_In_Passif")).setBackground(); 
               else if (i.type == INPUT && i == (Macro_Connexion)builder) 
@@ -153,9 +163,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     ref_draw = new Drawable(gui.drawing_pile, 0) { 
       public void drawing() {
         //logln("draw " + descr + " sheet " + sheet.value_bloc.ref + " op " + sheet.openning.get());
-        if (ref.isViewable() && 
-            isDraw()
-            ) {
+        if (ref.isViewable() && isDraw() ) {
           if (lens.isClicked) app.fill(ref.look.pressColor);
           else if (lens.isHovered) app.fill(ref.look.hoveredColor);
           else if (hasSend > 0 || hasReceived > 0) app.fill(ref.look.outlineColor);
@@ -165,8 +173,11 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           if (lens.isClicked) app.stroke(ref.look.pressColor);
           else if (lens.isHovered) app.stroke(ref.look.hoveredColor);
           else if (hasSend > 0 || hasReceived > 0) app.stroke(ref.look.outlineColor);
+          else if (linking_connections.size() > 0) app.stroke(ref.look.textColor);
           else app.noStroke();
-          app.noFill(); app.strokeWeight(ref.look.outlineWeight/4);
+          app.noFill(); 
+          if (linking_connections.size() > 0) app.strokeWeight(ref.look.outlineWeight*1.2F);
+          else app.strokeWeight(ref.look.outlineWeight/4);
           app.ellipse(getCenter().x, getCenter().y, 
             ref.getLocalSX() + ref.look.outlineWeight * 2, ref.getLocalSY() + ref.look.outlineWeight * 2);
             
@@ -188,22 +199,29 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           
         }
         for (Macro_Connexion m : connected_inputs) {
-        if (gui.scale > 0.03 && 
-            m.isDraw()
-            ) {
+        if (gui.scale > 0.03 && m.isDraw() ) {
           if (RConst.distancePointToLine(elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
-              getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
-              3 * ref.look.outlineWeight / gui.scale) { 
-            if (pack_info != null && (hasSend > 0 || hasReceived > 0)) elem.bloc.mmain().info.showText(pack_info);
-            	  app.fill(ref.look.outlineSelectedColor); app.stroke(ref.look.outlineSelectedColor); } 
-	          else if (hasSend > 0 || hasReceived > 0) { app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); }
-	          else { app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); }
-	          app.strokeWeight(ref.look.outlineWeight);
-	          PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
-	          PVector lm = new PVector(l.x, l.y);
-	          lm.setMag(getSize()/2);
-	          app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
-	               getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
+	              getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
+	              3 * ref.look.outlineWeight / gui.scale) { 
+        	  if (pack_info != null && (hasSend > 0 || hasReceived > 0)) 
+        		  elem.bloc.mmain().info.showText(pack_info);
+        	  app.fill(ref.look.outlineSelectedColor); 
+        	  app.stroke(ref.look.outlineSelectedColor); } 
+          else if (linking_connections.contains(m)) { 
+        	  if (hasSend > 0 || hasReceived > 0) { 
+        		  app.fill(ref.look.pressColor); app.stroke(ref.look.textColor); }
+        	  else { 
+            	  app.fill(ref.look.textColor); app.stroke(ref.look.pressColor); } }
+          else if (hasSend > 0 || hasReceived > 0) { 
+        	  app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); }
+          else { 
+        	  app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); }
+          app.strokeWeight(ref.look.outlineWeight);
+          PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
+          PVector lm = new PVector(l.x, l.y);
+          lm.setMag(getSize()/2);
+          app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+               getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
           }
         }
         if (hasSend > 0) hasSend--;
@@ -232,7 +250,14 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     lens.setParent(ref);
     sheet.child_connect.add(this);
   }
-  
+
+  Macro_Connexion hide_msg() { 
+	  msg_view
+	    .setTextVisibility(false)
+	    .setStandbyColor(gui.app.color(0, 0, 0, 1))
+	    .setSize(ref_size*0.5, ref_size*0.75);
+    return this;
+  }
   Macro_Connexion upview() { 
     if (isDraw()) {
       ref.show(); 
@@ -325,6 +350,9 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       if (type == OUTPUT && m.type == INPUT && !connected_inputs.contains(m)) {
         connected_inputs.add(m);
         m.connected_outputs.add(this); 
+        if (linkable && m.linkable) { 
+        	linking_connections.add(m); m.linking_connections.add(this); 
+        }
         sheet.add_link(descr, m.descr);
         elem.bloc.mmain().last_link_sheet = sheet;
         elem.bloc.mmain().last_created_link = descr + INFO_TOKEN + m.descr;
@@ -332,6 +360,9 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       } else if (type == INPUT && m.type == OUTPUT && !connected_outputs.contains(m)) {
         connected_outputs.add(m);
         m.connected_inputs.add(this); 
+        if (linkable && m.linkable) { 
+        	linking_connections.add(m); m.linking_connections.add(this); 
+        }
         sheet.add_link(m.descr, descr);
         elem.bloc.mmain().last_link_sheet = sheet;
         elem.bloc.mmain().last_created_link = m.descr + INFO_TOKEN + descr;
@@ -352,6 +383,24 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       sheet.remove_link(m.descr, descr);
     }
   }
+
+  Macro_Connexion set_link() {
+	linkable = true;
+	if (direct_co != null) direct_co.set_link();
+	for (Macro_Connexion c : connected_inputs)
+		if (c.linkable && !linking_connections.contains(c)) {
+			linking_connections.add(c);
+			c.linking_connections.add(this);
+		}
+	for (Macro_Connexion c : connected_outputs)
+		if (c.linkable && !linking_connections.contains(c)) {
+			linking_connections.add(c);
+			c.linking_connections.add(this);
+		}
+    return this;
+  }
+  protected boolean linkable = false;
+  ArrayList<Macro_Connexion> linking_connections = new ArrayList<Macro_Connexion>();
   
   boolean buildingLine = false;
   PVector newLine = new PVector();
@@ -468,6 +517,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   
   void receive(Macro_Connexion s, Macro_Packet p) {
     if (filter == null || p.def.equals(filter) || 
+    		(filter_bang_pass && p.def.equals("bang")) || 
         (filter.equals("bin") && (p.def.equals("bool") || p.def.equals("bang"))) ||
         (filter.equals("num") && (p.def.equals("float") || p.def.equals("int"))) ||
         (filter.equals("val") && (p.def.equals("float") || p.def.equals("int") || 
@@ -506,6 +556,8 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           if (last_packet.isInt()) nRunnable.runEvents(eventReceiveIntRun);
           if (last_packet.isFloat()) nRunnable.runEvents(eventReceiveFloatRun);
           if (last_packet.isStr()) nRunnable.runEvents(eventReceiveStrRun);
+          if (last_packet.isVec()) nRunnable.runEvents(eventReceiveVecRun);
+          if (last_packet.isCol()) nRunnable.runEvents(eventReceiveColRun);
           
           if (direct_co != null && direct_co.type == OUTPUT) direct_co.send(last_packet);
           if (direct_co != null && direct_co.type == INPUT) direct_co.receive(packet_sender.get(i), last_packet);
@@ -546,12 +598,19 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 
   ArrayList<nRunnable> eventReceiveStrRun = new ArrayList<nRunnable>();
   Macro_Connexion addEventReceiveStr(nRunnable r)    { eventReceiveStrRun.add(r); return this; }
+
+  ArrayList<nRunnable> eventReceiveVecRun = new ArrayList<nRunnable>();
+  Macro_Connexion addEventReceiveVec(nRunnable r)    { eventReceiveVecRun.add(r); return this; }
+
+  ArrayList<nRunnable> eventReceiveColRun = new ArrayList<nRunnable>();
+  Macro_Connexion addEventReceiveCol(nRunnable r)    { eventReceiveColRun.add(r); return this; }
   
   
   Macro_Connexion direct_co = null;
   void direct_connect(Macro_Connexion o) { direct_co = o; }
   
   String filter = null;
+  boolean filter_bang_pass = false;
   
   Macro_Connexion setFilter(String f) {
     filter = RConst.copy(f);
@@ -562,9 +621,13 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     filter = null;
     return this; }
   Macro_Connexion setFilterBang() {
-    filter = "bang";
-    lens.setInfo(infoText+" "+filter);
-    return this; }
+	    filter = "bang";
+	    lens.setInfo(infoText+" "+filter);
+	    return this; }
+  Macro_Connexion addPassBang() {
+	  filter_bang_pass = true;
+	    lens.setInfo(infoText+" "+"bang-"+filter);
+	    return this; }
   Macro_Connexion setFilterInt() {
     filter = "int";
     lens.setInfo(infoText+" "+filter);
@@ -574,9 +637,13 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     lens.setInfo(infoText+" "+filter);
     return this; }
   Macro_Connexion setFilterNumber() { //int and float
-    filter = "num";
-    lens.setInfo(infoText+" "+filter);
-    return this; }
+	    filter = "num";
+	    lens.setInfo(infoText+" "+filter);
+	    return this; }
+  Macro_Connexion setFilterString() { //int and float
+	    filter = "str";
+	    lens.setInfo(infoText+" "+filter);
+	    return this; }
   Macro_Connexion setFilterBool() {
     filter = "bool";
     lens.setInfo(infoText+" "+filter);
@@ -590,9 +657,25 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     lens.setInfo(infoText+" "+filter);
     return this; }
   Macro_Connexion setFilterVec() { //bool int and float
-    filter = "vec";
-    lens.setInfo(infoText+" "+filter);
-    return this; }
+	    filter = "vec";
+	    lens.setInfo(infoText+" "+filter);
+	    return this; }
+  Macro_Connexion setFilterColor() { //bool int and float
+	    filter = "col";
+	    lens.setInfo(infoText+" "+filter);
+	    return this; }
+  
+
+	Macro_Connexion addBangGet(sValue v, Macro_Connexion out) {
+		addPassBang();
+		nObjectPair pout = new nObjectPair();
+		pout.obj1 = v; pout.obj2 = out;
+		addEventReceiveBang(new nRunnable(pout) { public void run() {
+			nObjectPair pair = ((nObjectPair)builder);
+	    		((Macro_Connexion)pair.obj2).send(((sValue)pair.obj1).asPacket());
+	    }});
+		return this;
+	}
 }
 
 /*

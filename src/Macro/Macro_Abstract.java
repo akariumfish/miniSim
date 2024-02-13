@@ -19,6 +19,21 @@ import sData.*;
 // can be selected and group dragged copy/pasted > template or deleted
 // 
 // */
+
+abstract class MAbstract_Builder {
+	boolean visible = true;
+	boolean show_in_buildtool = false;
+	String type, descr = ""; 
+	String title, category = "";
+	MAbstract_Builder(String t) { type = t; title = t; }
+	MAbstract_Builder(String t, String d) { type = t; title = t; descr = d; }
+	MAbstract_Builder(String t, String tl, String d) { 
+		type = t; title = tl; descr = d; }
+	MAbstract_Builder(String t, String tl, String d, String c) { 
+		type = t; title = tl; descr = d; category = c; }
+	Macro_Abstract build(Macro_Sheet s, sValueBloc b) { return null; }
+}
+
 public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
   
   Macro_Abstract deploy() { open(); return this; } //
@@ -105,7 +120,7 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
   Macro_Sheet sheet;    int sheet_depth = 0;
   boolean szone_selected = false, title_fixe = false;
 public boolean unclearable = false;
-boolean pos_given = false;
+boolean loading_from_bloc = false;
   public float ref_size = 40;
   sVec grab_pos; sStr val_type;
   public  sStr val_descr;
@@ -124,7 +139,6 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     sheet_depth = sheet.sheet_depth + 1;
     
     if (_bloc == null) {
-    	
       String n_suff = "";
       if (n == null || n.equals("")) n_suff = ty;
       else n_suff = n;
@@ -159,7 +173,10 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
 //      }
       value_bloc = sheet.value_bloc.newBloc(n_ref);
       
-    } else value_bloc = _bloc;
+    } else {
+    	loading_from_bloc = true;
+    	value_bloc = _bloc;
+    }
     
 //    mlogln("build abstract "+ty+" "+n+" "+ _bloc+"    as "+value_bloc.ref);
     
@@ -181,22 +198,23 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     if (val_title == null) val_title = setting_bloc.newStr("title", "ttl", value_bloc.ref);
     else val_title.set(value_bloc.ref);
     if (grab_pos == null) grab_pos = setting_bloc.newVec("position", "pos");
-    else pos_given = true;
+//    else pos_given = true;
     
-    if (!pos_given && sheet != this && !(sheet.child_macro.size() == 0) ) {
-      PVector sc_pos = new PVector((float)(mmain().screen_gui.view.pos.x + mmain().screen_gui.view.size.x * 1.0 / 2.0), 
-    		  					   (float)(mmain().screen_gui.view.pos.y + mmain().screen_gui.view.size.y / 3.0) );
-      sc_pos = mmain().inter.cam.screen_to_cam(sc_pos);
-      grab_pos.set(sc_pos.x - sheet.grabber.getX(), sc_pos.y - sheet.grabber.getY());
-      grab_pos.setx(grab_pos.x() - grab_pos.x()%(ref_size * GRID_SNAP_FACT));
-      grab_pos.sety(grab_pos.y() - grab_pos.y()%(ref_size * GRID_SNAP_FACT));
-    }
+//    if (!pos_given && sheet != this && !(sheet.child_macro.size() == 0) ) {
+//      PVector sc_pos = new PVector((float)(mmain().screen_gui.view.pos.x + mmain().screen_gui.view.size.x * 1.0 / 2.0), 
+//    		  					   (float)(mmain().screen_gui.view.pos.y + mmain().screen_gui.view.size.y / 3.0) );
+//      sc_pos = mmain().inter.cam.screen_to_cam(sc_pos);
+//      grab_pos.set(sc_pos.x - sheet.grabber.getX(), sc_pos.y - sheet.grabber.getY());
+//      grab_pos.setx(grab_pos.x() - grab_pos.x()%(ref_size * GRID_SNAP_FACT));
+//      grab_pos.sety(grab_pos.y() - grab_pos.y()%(ref_size * GRID_SNAP_FACT));
+//    }
     
     if (openning == null) openning = setting_bloc.newInt("open", "op", OPEN);
     if (openning_pre_hide == null) openning_pre_hide = setting_bloc.newInt("pre_open", "pop", OPEN);
     if (val_self == null) val_self = setting_bloc.newObj("self", this);
     else val_self.set(this);
     if (priority == null) priority = setting_bloc.newInt("priority", "prio", 0);
+    priority.set_limit(0, 9);
     build_ui();
   }
   Macro_Abstract(sInterface _int) { // FOR MACRO_MAIN ONLY
@@ -232,7 +250,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     openning_pre_hide = setting_bloc.newInt("pre_open", "pop", DEPLOY);
     val_self = setting_bloc.newObj("self", this);
     priority = setting_bloc.newInt("priority", "prio", 0);
-    
+    priority.set_limit(0, 9);
     //_int.addEventNextFrame(new Runnable() { public void run() { 
     //  openning.set(OPEN); 
     //  deploy();
@@ -337,7 +355,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
       else if (openning.get() == OPEN) { openning.set(REDUC); open(); }
       else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); hide(); }
       else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
-      if (!pos_given) find_place(panel); 
+      if (!loading_from_bloc) find_place(panel); 
       if (!is_cleared && openning.get() != HIDE && !mmain().is_paste_loading) { 
         mmain().szone_clear_select();
         szone_select();
@@ -449,8 +467,19 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
   public sBoo newBoo(boolean d, String r) { return newBoo(r, r, d); }
   public sBoo newBoo(String r, boolean d) { return newBoo(r, r, d); }
   public sInt newInt(int d, String r, String s) { return newInt(r, s, d); }
+  public sInt newInt(int d, String r) { return newInt(r, r, d); }
   public sFlt newFlt(float d, String r, String s) { return newFlt(r, s, d); }
+  public sFlt newFlt(float d, String r) { return newFlt(r, r, d); }
+  public sCol newCol(int d, String r, String s) { return newCol(r, s, d); }
+  public sCol newCol(int d, String r) { return newCol(r, r, d); }
+  public sCol newCol(String r) { return newCol(r, r, 0); }
+  public sVec newVec(String r) { return newVec(r, r); }
+  public sStr newStr(String r, String d) { return newStr(r, r, d); }
+  public sStr newStr(String r) { return newStr(r, r, ""); }
   public sRun newRun(nRunnable d, String r, String s) { return newRun(r, s, d); }
+  public sRun newRun(nRunnable d, String r) { return newRun(r, r, d); }
+  public sRun newRun(String r) { return newRun(r, r, null); }
+  public sObj newObj(String r) { return newObj(r, r); }
   
   public sBoo newBoo(String r, String s, boolean d) {
     sBoo v = ((sBoo)(value_bloc.getValue(r))); 

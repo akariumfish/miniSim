@@ -34,23 +34,15 @@ cant be grabbed when open
 */
 
 
-class SheetPrint extends Sheet_Specialize {
-  SheetPrint() { super("sheet", ""); }
-  public Macro_Sheet get_new(Macro_Sheet s, String n, sValueBloc b) { return new Macro_Sheet(s, n, b); }
-}
-
-
-abstract class MAbstract_Builder {
-  String type, descr; boolean show_in_buildtool = false;
-  MAbstract_Builder(String t, String d) { type = t; descr = d; }
-  Macro_Abstract build(Macro_Sheet s, sValueBloc b) { return null; }
-}
-
+//class SheetPrint extends Sheet_Specialize {
+//  SheetPrint() { super("sheet", ""); }
+//  public Macro_Sheet get_new(Macro_Sheet s, String n, sValueBloc b) { return new Macro_Sheet(s, n, b); }
+//}
 
 public class Macro_Sheet extends Macro_Abstract {
 	
 	class MSheet_Builder extends MAbstract_Builder {
-		MSheet_Builder() { super("sheet", "can contain blocs and organise them"); show_in_buildtool = true; }
+		MSheet_Builder() { super("sheet", "Sheet", "can contain blocs and organise them", "Sheet"); }
 		Macro_Sheet build(Macro_Sheet s, sValueBloc b) { return new Macro_Sheet(s, type, b); }
 	}
   
@@ -591,22 +583,27 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     
   }
 	public void init_end() {
-		  if (openning.get() == REDUC) { openning.set(OPEN); reduc(); }
-	      else if (openning.get() == OPEN) { openning.set(REDUC); open(); }
-	      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); hide(); }
-	      else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
-			if (!pos_given) { 
-				deploy();
-				sheet.select();
-				find_place(back);
-				if (!pos_given) select();
-			}
-	      if (!mmain().show_macro.get()) hide();
-	      
-	      if (mmain().sheet_explorer != null) mmain().sheet_explorer.update(); 
-	      nRunnable.runEvents(eventsSetupLoad); 
-	      toLayerTop(); 
-		}
+	  if (openning.get() == REDUC) { openning.set(OPEN); reduc(); }
+      else if (openning.get() == OPEN) { openning.set(REDUC); open(); }
+      else if (openning.get() == HIDE) { openning.set(openning_pre_hide.get()); hide(); }
+      else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
+	  if (!loading_from_bloc) { 
+		deploy();
+		mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { 
+			MSheetMain m = new MSheetMain(((Macro_Sheet)builder), null);
+			m.init_end();
+			m.grabber.setPosition(ref_size*8, 0);
+			updateBack();
+		}});
+		sheet.select();
+		find_place(back);
+		select();
+	  }
+      if (!mmain().show_macro.get()) hide();
+      if (mmain().sheet_explorer != null) mmain().sheet_explorer.update(); 
+      nRunnable.runEvents(eventsSetupLoad); 
+      toLayerTop(); 
+	}
   
   public Macro_Sheet clear() {
     //an unclearable sheet still need to clear child macro
@@ -655,19 +652,20 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   
   public ArrayList<Macro_Bloc> sheet_unique_bloc = new ArrayList<Macro_Bloc>();
   
-  protected MMenu sheet_menu_bloc = null;
+//  protected MMenu sheet_menu_bloc = null;
   
   int cursor_count = 0;
   nCursor newCursor(String r, boolean b) {
 	    cursor_count++;
 	    nCursor c = new nCursor(this, r, r, b);
 	    mmain().cursors_list.add(c);
-	    mmain().update_cursor_selector_list();
+//	    mmain().update_cursor_selector_list();
 	    sheet_cursors_list.add(c);
 	    c.addEventClear(new nRunnable(c) { public void run() { 
 	        sheet_cursors_list.remove(((nCursor)builder));
 	      mmain().cursors_list.remove(((nCursor)builder)); 
-	      mmain().update_cursor_selector_list(); }});
+//	      mmain().update_cursor_selector_list(); 
+	    }});
 	    return c;
 	  }
 
@@ -682,7 +680,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 	    sheetCursor_dval = newVec("dir", "dir");
 	    sheetCursor = new nCursor(mmain(), value_bloc, true);
 	    mmain().cursors_list.add(sheetCursor);
-	    mmain().update_cursor_selector_list();
+//	    mmain().update_cursor_selector_list();
 	    sheet.sheet_cursors_list.add(sheetCursor);
 	    sheet.cursor_count++;
 	    
@@ -694,7 +692,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 	        sheet.sheet_cursors_list.remove(((nCursor)builder));
 	      mmain().cursors_list.remove(((nCursor)builder)); 
 	      sheet.cursor_count--;
-	      mmain().update_cursor_selector_list(); }});
+//	      mmain().update_cursor_selector_list(); 
+	      }});
 	    
 	    grabber.addEventDrag(new nRunnable() { public void run() {
 	    	if (sheetCursor.pval != null) sheetCursor.pval.set(grabber.getX(), grabber.getY());
@@ -858,7 +857,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   }
   
   nFrontPanel sheet_front;  
-  nExplorer sheet_viewer, preset_explorer;
+  nExplorer preset_explorer;//sheet_viewer, 
   sStr new_preset_name;
   nWidget match_flag;
   
@@ -869,23 +868,23 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     if (sheet_front == null) {
       sheet_front = new nFrontPanel(mmain().screen_gui, mmain().inter.taskpanel, val_title.get());
       
-      sheet_front.addTab("View").getShelf()
-        .addSeparator(0.125)
-        .addDrawer(10.25, 1).addModel("Label-S3", "sheet view :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getShelf()
-        .addSeparator()
-        ;
-      sheet_viewer = sheet_front.getTab(0).getShelf(0)
-        .addSeparator()
-        .addExplorer()
-          .setChildAccess(false)
-          .setStrtBloc(value_bloc)
-          .addValuesModifier(mmain().inter.taskpanel)
-          .addEventChange(new nRunnable() { public void run() { 
-              if (sheet_viewer.explored_bloc != value_bloc) {
-                sheet_viewer.setStrtBloc(value_bloc);
-              }
-          } } )
-          ;
+//      sheet_front.addTab("View").getShelf()
+//        .addSeparator(0.125)
+//        .addDrawer(10.25, 1).addModel("Label-S3", "sheet view :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getShelf()
+//        .addSeparator()
+//        ;
+//      sheet_viewer = sheet_front.getTab(0).getShelf(0)
+//        .addSeparator()
+//        .addExplorer()
+//          .setChildAccess(false)
+//          .setStrtBloc(value_bloc)
+//          .addValuesModifier(mmain().inter.taskpanel)
+//          .addEventChange(new nRunnable() { public void run() { 
+//              if (sheet_viewer.explored_bloc != value_bloc) {
+//                sheet_viewer.setStrtBloc(value_bloc);
+//              }
+//          } } )
+//          ;
       match_flag = sheet_front.addTab("Preset").getShelf()
         .addSeparator(0.125)
         .addDrawer(10.25, 1).addModel("Label-S3", "Presets :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
@@ -899,7 +898,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       match_flag.getShelf()
         .addSeparator()
         ;
-      preset_explorer = sheet_front.getTab(1).getShelf(0)
+      preset_explorer = sheet_front.getTab(0).getShelf(0)
         .addSeparator()
         .addExplorer()
           .setStrtBloc(mmain().saved_preset)
@@ -933,15 +932,16 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       //  screen_gui.view.pos.x + screen_gui.view.size.x - sheet_front.grabber.getLocalSX() - ref_size * 3, 
       //  screen_gui.view.pos.y + ref_size * 2 );
       
-      custom_tab = sheet_front.addTab("Control");
-
-      custom_tab.getShelf()
-        .addDrawer(10.25, 0.75)
-        .addModel("Label-S10/0.75", "-  Control  -").setFont((int)(ref_size/1.5)).getShelf()
-        .addSeparator(0.125)
-        ;
-      nRunnable.runEvents(eventsBuildMenu);
       
+      if (eventsBuildMenu.size() > 0) {
+	      custom_tab = sheet_front.addTab("Control");
+	      custom_tab.getShelf()
+	        .addDrawer(10.25, 0.75)
+	        .addModel("Label-S10/0.75", "-  Control  -").setFont((int)(ref_size/1.5)).getShelf()
+	        .addSeparator(0.125)
+	        ;
+	      nRunnable.runEvents(eventsBuildMenu);
+      }
       build_custom_menu(sheet_front);
       
       sheet_front.addEventClose(new nRunnable(this) { public void run() { 
@@ -1283,34 +1283,34 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 	  Macro_Abstract nm = null;
     for (MAbstract_Builder m : mmain().bloc_builders)
       if (t.equals(m.type)) nm = m.build(this, b);
-    if (t.equals("data")) nm = addData(b);
-    else if (t.equals("in")) nm = addSheetIn(b);
-    else if (t.equals("out")) nm = addSheetOut(b);
-    else if (t.equals("keyb")) nm = addKey(b);
-    else if (t.equals("switch")) nm = addSwitch(b);
-    else if (t.equals("trig")) nm = addTrig(b);
-    else if (t.equals("bswitch")) nm = addBigSwitch(b);
+//    if (t.equals("data")) nm = addData(b);
+//    if (t.equals("in")) nm = addSheetIn(b);
+//    else if (t.equals("out")) nm = addSheetOut(b);
+//    else if (t.equals("keyb")) nm = addKey(b);
+//    else if (t.equals("switch")) nm = addSwitch(b);
+//    else if (t.equals("trig")) nm = addTrig(b);
+    if (t.equals("bswitch")) nm = addBigSwitch(b);
     else if (t.equals("btrig")) nm = addBigTrig(b);
-    else if (t.equals("gate")) nm = addGate(b);
-    else if (t.equals("not")) nm = addNot(b);
-    else if (t.equals("bin")) nm = addBin(b);
-    else if (t.equals("bool")) nm = addBool(b);
-    else if (t.equals("var")) nm = addVar(b);
-    else if (t.equals("pulse")) nm = addPulse(b);
-    else if (t.equals("calc")) nm = addCalc(b);
-    else if (t.equals("comp")) nm = addComp(b);
-    else if (t.equals("chan")) nm = addChan(b);
+//    else if (t.equals("gate")) nm = addGate(b);
+//    else if (t.equals("not")) nm = addNot(b);
+//    else if (t.equals("bin")) nm = addBin(b);
+//    else if (t.equals("bool")) nm = addBool(b);
+////    else if (t.equals("var")) nm = addVar(b);
+//    else if (t.equals("pulse")) nm = addPulse(b);
+//    else if (t.equals("calc")) nm = addCalc(b);
+//    else if (t.equals("comp")) nm = addComp(b);
+//    else if (t.equals("chan")) nm = addChan(b);
     else if (t.equals("vecXY")) nm = addVecXY(b);
     else if (t.equals("vecMD")) nm = addVecMD(b);
-    else if (t.equals("frame")) nm = addFrame(b);
+//    else if (t.equals("frame")) nm = addFrame(b);
     else if (t.equals("numCtrl")) nm = addNumCtrl(b);
     else if (t.equals("vecCtrl")) nm = addVecCtrl(b);
-    else if (t.equals("rng")) nm = addRng(b);
-    else if (t.equals("mouse")) nm = addMouse(b);
-    else if (t.equals("com")) nm = addComment(b);
+//    else if (t.equals("rng")) nm = addRng(b);
+//    else if (t.equals("mouse")) nm = addMouse(b);
+//    else if (t.equals("com")) nm = addComment(b);
     else if (t.equals("preset")) nm = addPrst(b);
     else if (t.equals("midi")) nm = addMidi(b);
-    else if (t.equals("menu")) nm = addMenu(b);
+////    else if (t.equals("menu")) nm = addMenu(b);
     else if (t.equals("tool")) nm = addTool(b);
     else if (t.equals("toolbin")) nm = addToolBin(b);
     else if (t.equals("tooltri")) nm = addToolTri(b);
@@ -1319,73 +1319,77 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     else if (t.equals("panbin")) nm = addPanBin(b);
     else if (t.equals("pansld")) nm = addPanSld(b);
     else if (t.equals("pangrph")) nm = addPanGrph(b);
-    else if (t.equals("ramp")) nm = addRamp(b);
+//    else if (t.equals("ramp")) nm = addRamp(b);
     else if (t.equals("crossVec")) nm = addCrossVec(b);
     else if (t.equals("colRGB")) nm = addColRGB(b);
     if (nm != null) nm.init_end();
     return nm;
   }
   
-  MData addData(sValueBloc b) { MData m = null;
-    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
-      m = new MData(this, b, sheet_viewer.selected_value);
-      sheet_viewer.update(); }
-    else if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
-             mmain().sheet_explorer.selected_value != null) {
-      m = new MData(this, b, mmain().sheet_explorer.selected_value);
-      mmain().sheet_explorer.update(); }
-    else m = new MData(this, b, null); return m; }
-  MSheetIn addSheetIn(sValueBloc b) { MSheetIn m = new MSheetIn(this, b); return m; }
-  MSheetOut addSheetOut(sValueBloc b) { MSheetOut m = new MSheetOut(this, b); return m; }
-  MKeyboard addKey(sValueBloc b) { MKeyboard m = new MKeyboard(this, b); return m; }
-  MSwitch addSwitch(sValueBloc b) { MSwitch m = new MSwitch(this, b); return m; }
-  MTrig addTrig(sValueBloc b) { MTrig m = new MTrig(this, b); return m; }
+//  MData addData(sValueBloc b) { MData m = null;
+////    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
+////      m = new MData(this, b, sheet_viewer.selected_value);
+////      sheet_viewer.update(); }
+////    else 
+//    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
+//             mmain().sheet_explorer.selected_value != null) {
+//      m = new MData(this, b, mmain().sheet_explorer.selected_value);
+//      mmain().sheet_explorer.update(); }
+//    else m = new MData(this, b, null); return m; }
+//  MSheetIn addSheetIn(sValueBloc b) { MSheetIn m = new MSheetIn(this, b); return m; }
+//  MSheetOut addSheetOut(sValueBloc b) { MSheetOut m = new MSheetOut(this, b); return m; }
+//  MKeyboard addKey(sValueBloc b) { MKeyboard m = new MKeyboard(this, b); return m; }
+//  MSwitch addSwitch(sValueBloc b) { MSwitch m = new MSwitch(this, b); return m; }
+//  MTrig addTrig(sValueBloc b) { MTrig m = new MTrig(this, b); return m; }
   MBigSwitch addBigSwitch(sValueBloc b) { MBigSwitch m = new MBigSwitch(this, b); return m; }
   MBigTrig addBigTrig(sValueBloc b) { MBigTrig m = new MBigTrig(this, b); return m; }
-  MGate addGate(sValueBloc b) { MGate m = new MGate(this, b); return m; }
-  MNot addNot(sValueBloc b) { MNot m = new MNot(this, b); return m; }
-  MBin addBin(sValueBloc b) { MBin m = new MBin(this, b); return m; }
-  MBool addBool(sValueBloc b) { MBool m = new MBool(this, b); return m; }
-  MVar addVar(sValueBloc b) { MVar m = new MVar(this, b); return m; }
-  MPulse addPulse(sValueBloc b) { MPulse m = new MPulse(this, b); return m; }
-  MCalc addCalc(sValueBloc b) { MCalc m = new MCalc(this, b); return m; }
-  MComp addComp(sValueBloc b) { MComp m = new MComp(this, b); return m; }
-  MChan addChan(sValueBloc b) { MChan m = new MChan(this, b); return m; }
+//  MGate addGate(sValueBloc b) { MGate m = new MGate(this, b); return m; }
+//  MNot addNot(sValueBloc b) { MNot m = new MNot(this, b); return m; }
+//  MBin addBin(sValueBloc b) { MBin m = new MBin(this, b); return m; }
+//  MBool addBool(sValueBloc b) { MBool m = new MBool(this, b); return m; }
+//  MVar addVar(sValueBloc b) { MVar m = new MVar(this, b); return m; }
+//  MPulse addPulse(sValueBloc b) { MPulse m = new MPulse(this, b); return m; }
+//  MCalc addCalc(sValueBloc b) { MCalc m = new MCalc(this, b); return m; }
+//  MComp addComp(sValueBloc b) { MComp m = new MComp(this, b); return m; }
+//  MChan addChan(sValueBloc b) { MChan m = new MChan(this, b); return m; }
   MVecXY addVecXY(sValueBloc b) { MVecXY m = new MVecXY(this, b); return m; }
   MVecMD addVecMD(sValueBloc b) { MVecMD m = new MVecMD(this, b); return m; }
-  MFrame addFrame(sValueBloc b) { MFrame m = new MFrame(this, b); return m; }
+//  MFrame addFrame(sValueBloc b) { MFrame m = new MFrame(this, b); return m; }
   MNumCtrl addNumCtrl(sValueBloc b) { MNumCtrl m = null;
-    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
-      m = new MNumCtrl(this, b, sheet_viewer.selected_value);
-      sheet_viewer.update(); }
-    else if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
+//    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
+//      m = new MNumCtrl(this, b, sheet_viewer.selected_value);
+//      sheet_viewer.update(); }
+//    else 
+    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
              mmain().sheet_explorer.selected_value != null) {
       m = new MNumCtrl(this, b, mmain().sheet_explorer.selected_value);
       mmain().sheet_explorer.update(); }
     else m = new MNumCtrl(this, b, null); return m; }
   MVecCtrl addVecCtrl(sValueBloc b) { MVecCtrl m = null;
-    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
-      m = new MVecCtrl(this, b, sheet_viewer.selected_value);
-      sheet_viewer.update(); }
-    else if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
+//    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
+//      m = new MVecCtrl(this, b, sheet_viewer.selected_value);
+//      sheet_viewer.update(); }
+//    else 
+    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
              mmain().sheet_explorer.selected_value != null) {
       m = new MVecCtrl(this, b, mmain().sheet_explorer.selected_value);
       mmain().sheet_explorer.update(); }
     else m = new MVecCtrl(this, b, null); return m; }
-  MRandom addRng(sValueBloc b) { MRandom m = new MRandom(this, b); return m; }
-  MMouse addMouse(sValueBloc b) { MMouse m = new MMouse(this, b); return m; }
-  MComment addComment(sValueBloc b) { MComment m = new MComment(this, b); return m; }
+//  MRandom addRng(sValueBloc b) { MRandom m = new MRandom(this, b); return m; }
+//  MMouse addMouse(sValueBloc b) { MMouse m = new MMouse(this, b); return m; }
+//  MComment addComment(sValueBloc b) { MComment m = new MComment(this, b); return m; }
   MPreset addPrst(sValueBloc b) { MPreset m = new MPreset(this, b); return m; }
   MMIDI addMidi(sValueBloc b) { MMIDI m = new MMIDI(this, b); return m; }
-  MMenu addMenu(sValueBloc b) { MMenu m = new MMenu(this, b); return m; }
+//  MMenu addMenu(sValueBloc b) { MMenu m = new MMenu(this, b); return m; }
   MTool addTool(sValueBloc b) { MTool m = new MTool(this, b); return m; }
   MToolBin addToolBin(sValueBloc b) { MToolBin m = new MToolBin(this, b); return m; }
   MToolTri addToolTri(sValueBloc b) { MToolTri m = new MToolTri(this, b); return m; }
   MToolNCtrl addToolNCtrl(sValueBloc b) { MToolNCtrl m = null;
-    if (sheet_viewer != null && sheet_viewer.selected_value != null) { 
-      m = new MToolNCtrl(this, b, sheet_viewer.selected_value);
-      sheet_viewer.update(); }
-    else if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
+//    if (sheet_viewer != null && sheet_viewer.selected_value != null) { 
+//      m = new MToolNCtrl(this, b, sheet_viewer.selected_value);
+//      sheet_viewer.update(); }
+//    else 
+    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
              mmain().sheet_explorer.selected_value != null) { 
       m = new MToolNCtrl(this, b, mmain().sheet_explorer.selected_value);
       mmain().sheet_explorer.update(); }
@@ -1395,7 +1399,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   MPanSld addPanSld(sValueBloc b) { MPanSld m = new MPanSld(this, b); return m; }
   MPanGrph addPanGrph(sValueBloc b) { MPanGrph m = new MPanGrph(this, b); return m; }
   //MPanCstm addPanCstm(sValueBloc b) { MPanCstm m = new MPanCstm(this, b); return m; }
-  MRamp addRamp(sValueBloc b) { MRamp m = new MRamp(this, b); return m; }
+//  MRamp addRamp(sValueBloc b) { MRamp m = new MRamp(this, b); return m; }
   MCrossVec addCrossVec(sValueBloc b) { MCrossVec m = new MCrossVec(this, b); return m; }
   MColRGB addColRGB(sValueBloc b) { MColRGB m = new MColRGB(this, b); return m; }
   

@@ -9,43 +9,54 @@ public class miniSim {
 /* DONT HIT ENTER HERE FFS!!
 
 
-		MACRO BLOC
-trig switch bin not gate OK!
+		MACRO BLOC review
 
-general bloc capability
-	send something at startup
-	can open a menupanel
-	can rebuild itself
+Action missing:
+	add/sub/mult/div cible
+	pow sqrt min/max 
+	vec mag heading
+	color filter
 	
-method build ui :
-	2 bp add/sub + 1 val_view in line > sInt
-	in to value : get sValue : custom filters
-		filter doublon
-		limits, set/reset ...
-	self valuebloc out
+	vec operation : add, normalize, mirror, rot toward
+		inercial accelerations
+
+All:
+Control:"chan", "gate", "not", "bin", counter					OK
+	setreset, multigate, typefilter 			todo
+
+Inputs:"keyb", "crossVec", "mouse"						merge/clean
+
+Time: "ramp"					ok
+	"pulse", 					ok
+	"frame"									merge some
+	sequance
+	frame delay / tick delay / packet process delay
+
+Sheet: Macro_Sheet, MSheetMain, sheet co, MCursor
+
+Variables:
+	Stock/access : MVar, MValue							ok
+	Transform: "colRGB", "vecXY", "vecMD"				clean / merge
+	Modify Complexe: "vecCtrl", "numCtrl"				redo / delete
+	Modify Simple:"calc", "comp", "bool", "rng"			clean
+
+Cam GUI:
+	"btrig", "bswitch", "trig", "switch"					merge
+	"com"	
+Screen GUI:											redo all
+	"pan", "panbin", "pansld", "pangrph"
+	"tool", "tooltri", "toolbin", "toolNC"
+
+Working:
+Environment:MCamera, MCanvas, MTick
+Actifs:MStructure, MForm, MPatern
+
+Other:
+MPoint, "midi", "preset"
+
 		
 
 		NEW STRUCTURE 
-
-
-Make sim and all macro bloc !!
-	in and/or out plus label name for each svalue > fat bloc, better inside a sheet
-	
-	menu bp + in + startup to open . tabs:
-		view : list all value + direct control
-		preset
-		the rest is added by a custom methods
-	
-	mmain will need a bloc
-	
-sheet menu : 
-	cursors
-
-main menu :
-	explorer templates
-
-
-
 
 Collection de position : cursors in a sheet
 	position, dir and scale
@@ -94,30 +105,9 @@ number formating!!!
 		
 
 
-sheetobj in 2 line + add ctrl for deploy/open/reduc
-
-Merge MData n MVar in MValue
-	will be abel to access sval of any type from sheet or parent sheet
-	MValue add watcherwidget for val.ref
-	can get a valuebloc as message : will search inside
-	
-	field search_place 2, ref 3, value 3
-	bp picker
-	bp panel
-	in bang bool nul vec col : if val set > set val
-	in new co : if not set > as search place
-	out
-
-
-
 in bin menu can choose to "double" it > like if msg go through 2 bin >
 	filter bool false packet
 	
-add sheetview menu et sheetobj par def dans spe sheet
-	> default sheet front
-	
-bloc can has mode unique, cad only one of a type by sheet
-
 to big trig n switch : 
 	when too dezoomed show a screen widget (on/off)
 	on param view : 
@@ -125,19 +115,13 @@ to big trig n switch :
 	bp incremental for size
 	picker for bp color
 
-
-when adding tool or pan rows auto cible last master build
-
+MComment can log auto text format with insertion token??
 
 output who send pre given packet auto when new co is made
-co who run event when co is created / deleted 
-	
+co who run event when link is created / deleted 
+
 link are lightened gradually when packet process slowly to show progression
 	see top of Macro_Connexion . send() for methods. 
-
-auto spot : bloc auto add some of his elem to sheet spots at creation
-
-nExplorer : more entry and smaller height
 
 trad README French
 
@@ -151,6 +135,7 @@ conf file with general param loaded once at start
 	fullscreen on/off
 	autoload
 	file to open (last openned)
+	buil panel constitution
 
 keep your mouse on a cursor for 0.5s > a bar appear under it, 
 	its a slider to change scale, 
@@ -158,18 +143,11 @@ keep your mouse on a cursor for 0.5s > a bar appear under it,
 	ephemere : will disappear if mouse stop hovering it or the cursor
 	
 cursor pointer in losange, point in direction > need custom drawable
-	correct centering error on pointer widget
 
 distence mesuring tool
 
-bloc node : one point in and out at the same time
-use a custom macro_connect
-created by leftclick on empty space
-
-its needed to group shapes to limit object nb
-
-open finished bp, search file in sub folder, cant save on it again
-save final bp to save in this folder (verify if new file name is existing to stop you from overwriting)
+'open finished' bp, search file in sub folder, cant save on it again
+'save final' bp to save in this folder (verify if new file name is existing to stop you from overwriting)
 
 for macro main toolpanel bp and basic sim features add shortcut menu
 
@@ -183,38 +161,13 @@ sujet principaux dans la doc
 
 mesure and store the relative process time used by each special sheet
 
-when selecting a preset auto hide uncompatible widget ? > need to redo explorer
-
-co element made to auto add themself as spot
+when selecting a preset auto hide uncompatible ? > need to redo explorer
 
 
 
 
 
-		BLOC TO CREATE
-		
-cursor bloc : 
-	(like menu) named, listed in mmain so global, 
-	the bloc point to an existing cursor or can build a new
-	custom setlinkedPosition(svec) setlinkedDir(svec) setlinkedShow(sboo)
-	constrain (dir pos mag ..)
-	registered independently from theirs sheet and easily accessible for
-	new comus start
-	global effect field
-	multi comu objectif
 
-	auto follow / point to objects, instent or chasing
-	memorize path for display
-	dif shape / look
-MVar
-	add a hideable (like com) param drawer : select variable type
-	int str and vec better handling 
-MComment can log auto text format with insertion token??
-camview
-	like a menu, name, click to go, 3 field for values, 
-	when selected capture n store cam pos / scale
-frame delay / tick delay / packet process delay
-setreset, counter, sequance, multigate 
 
 
 
@@ -231,7 +184,7 @@ setreset, counter, sequance, multigate
 
 		R & D
 
-bool has_been_cleared flag destroyed widgets
+bool has_been_cleared flag for destroyed widgets
 
 logarythmic slides
 

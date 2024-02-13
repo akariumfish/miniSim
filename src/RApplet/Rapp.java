@@ -48,13 +48,13 @@ public class Rapp extends PApplet implements RConst {
 	sInterface interf;
 	
 	public void settings() {
+//		  size(1600, 900);//taille de l'ecran
 		fullScreen();
 		noSmooth();
 //		  smooth();//anti aliasing
 	}
 	
 	public void setup() {
-	  //size(1600, 900);//taille de l'ecran
 		  surface.setResizable(true);
 		
 		frameRate(60);
@@ -129,6 +129,11 @@ public class Rapp extends PApplet implements RConst {
 				  surface.setLocation(100, 50); } } );
 		  }
 		  logln("init end");
+	}
+	
+	public void exit() {
+		interf.conf_close();
+		super.exit();
 	}
 	
 	nWidget app_grab, app_close;

@@ -9,10 +9,13 @@ public class nFrontTab extends nShelfPanel {
 	  
 	  ArrayList<nRunnable> eventOpen = new ArrayList<nRunnable>();
 	  nFrontTab addEventOpen(nRunnable r)       { eventOpen.add(r); return this; }
-	  
+
+	  public nFrontTab setName(String s) { 
+		if (tabbutton != null) tabbutton.setText(s);
+	    return this;
+	  }
 	  public nFrontTab toLayerTop() { 
 	    super.toLayerTop(); 
-	    
 	    return this;
 	  }
 	  nFrontTab show() {
@@ -27,13 +30,13 @@ public class nFrontTab extends nShelfPanel {
 	    return this; }
 	  
 	  nFrontPanel front;
-	  String name;
+//	  String name;
 	  nWidget tabbutton;
 	  int id = 0;
 	  nFrontTab(nFrontPanel _front, String ti) { 
 	    super(_front.gui, _front.ref_size, _front.space_factor); 
 	    front = _front;
-	    name = ti;
+//	    name = ti;
 	    fronttab = this;
 	    addShelf().addDrawer((front.grabber.getLocalSX() / front.ref_size) - 2*front.space_factor, 0);
 	  } 

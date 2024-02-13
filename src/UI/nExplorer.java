@@ -13,8 +13,8 @@ public class nExplorer extends nDrawer {
 	  ArrayList<sValueBloc> explorer_blocs;
 	  ArrayList<sValue> explorer_values;
 	  public sValueBloc explored_bloc;
-	public sValueBloc selected_bloc;
-	public sValueBloc starting_bloc;
+	  public sValueBloc selected_bloc;
+	  public sValueBloc starting_bloc;
 	  public sValue selected_value;
 	  int selected_bloc_index = 0, selected_value_index = 0;
 	  public nList explorer_list;

@@ -9,8 +9,10 @@ public class Consol {
 
 	static void prt(float i) {
 		PApplet.println("for : " + PApplet.str(i));
-		for (int tn = 1 ; tn < 5 ; tn++)
-			PApplet.print("" + tn + " : " + RConst.trimStringFloat(i, tn) + "    ");
+		for (int tn = 2 ; tn < 6 ; tn++) {
+//			PApplet.print("" + tn + " : " + RConst.trimFlt(i, tn) + "    ");
+//			PApplet.print("" + tn + " : " + RConst.trimStringFloat(i, tn) + "    ");
+		}
 		PApplet.println();
 		
 	}

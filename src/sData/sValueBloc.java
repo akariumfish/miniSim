@@ -129,7 +129,7 @@ public class sValueBloc {
 	  //sBlc newBlc(String n, String s) { return new sBlc(this, n, s); }
 	  public sObj newObj(String n, Object v) { return new sObj(this, n, v); }
 	  
-	  Macro_Packet asPacket() { return new Macro_Packet("bloc").setBloc(this); }
+//	  Macro_Packet asPacket() { return new Macro_Packet("bloc").setBloc(this); }
 	  
 	  public DataHolder data; public sValueBloc parent = null, last_created_bloc = null; 
 	  public sValue last_created_value = null;

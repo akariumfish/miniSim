@@ -33,7 +33,7 @@ public static class FacePrint extends Sheet_Specialize {
   public void build_custom_menu(nFrontPanel sheet_front) {
     if (sheet_front != null) {
       
-      sheet_front.getTab(2).getShelf()
+      sheet_front.getTab(1).getShelf()
         .addSeparator(0.125)
         .addDrawerFactValue(val_dens, 2, 10, 1)
         .addSeparator(0.125)

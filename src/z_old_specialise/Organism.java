@@ -65,15 +65,15 @@ public class Organism extends Macro_Sheet {
 	}
 
   public void build_custom_menu(nFrontPanel sheet_front) {
-    if (sheet_front != null) {
-      
-      sheet_front.getTab(2).getShelf()
-        .addSeparator(0.125)
-        .addDrawerButton(adding_cursor.show, 10, 1)
-        .addSeparator(0.125);
-        
-      sheet_front.toLayerTop();
-    }
+//    if (sheet_front != null) {
+//      
+//      sheet_front.getTab(2).getShelf()
+//        .addSeparator(0.125)
+//        .addDrawerButton(adding_cursor.show, 10, 1)
+//        .addSeparator(0.125);
+//        
+//      sheet_front.toLayerTop();
+//    }
   }
 
   sRun srun_duplic;

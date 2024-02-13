@@ -354,7 +354,7 @@ public class Simulation extends Macro_Sheet {
   //}
   
   public void build_custom_menu(nFrontPanel sheet_front) {
-    nFrontTab tab = sheet_front.getTab(2);
+    nFrontTab tab = sheet_front.addTab("Control");
 
     tab.getShelf()
       .addDrawer(10.25, 0.6)
@@ -378,45 +378,45 @@ public class Simulation extends Macro_Sheet {
       .addSeparator(0.125)
       ;
     
-    tab.getShelf(0).addSeparator(0.25)
-      .addDrawer(10.25, 0.75)
-      .addModel("Label-SS4", "- Active Community -").setFont((int)(ref_size/1.5)).getShelf()
-      ;
-      
-    selector_list = tab.getShelf(0)
-      .addSeparator(0.25)
-      .addList(5, 10, 1);
-    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
-      nList sl = ((nList)builder); 
-      if (sl.last_choice_index < list.size()) 
-        list.get(sl.last_choice_index).build_sheet_menu();
-    } } );
-    
-    selector_list.getShelf()
-      .addSeparator(0.0625)
-      ;
-    
-    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
-    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
-  
-    update_com_selector_list();
+//    tab.getShelf(0).addSeparator(0.25)
+//      .addDrawer(10.25, 0.75)
+//      .addModel("Label-SS4", "- Active Community -").setFont((int)(ref_size/1.5)).getShelf()
+//      ;
+//      
+//    selector_list = tab.getShelf(0)
+//      .addSeparator(0.25)
+//      .addList(5, 10, 1);
+//    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
+//      nList sl = ((nList)builder); 
+//      if (sl.last_choice_index < list.size()) 
+//        list.get(sl.last_choice_index).build_sheet_menu();
+//    } } );
+//    
+//    selector_list.getShelf()
+//      .addSeparator(0.0625)
+//      ;
+//    
+//    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
+//    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
+//  
+//    update_com_selector_list();
     sheet_front.toLayerTop();
   }
-  void update_com_selector_list() {
-    selector_entry.clear();
-    selector_value.clear();
-    for (Community v : list) { 
-      selector_entry.add(v.name); 
-      selector_value.add(v);
-    }
-    if (selector_list != null) selector_list.setEntrys(selector_entry);
-  }
+//  void update_com_selector_list() {
+//    selector_entry.clear();
+//    selector_value.clear();
+//    for (Community v : list) { 
+//      selector_entry.add(v.name); 
+//      selector_value.add(v);
+//    }
+//    if (selector_list != null) selector_list.setEntrys(selector_entry);
+//  }
 
-  ArrayList<String> selector_entry;
-  ArrayList<Community> selector_value;
-  Community selected_value;
-  String selected_entry;
-  nList selector_list;
+//  ArrayList<String> selector_entry;
+//  ArrayList<Community> selector_value;
+//  Community selected_value;
+//  String selected_entry;
+//  nList selector_list;
 
   sInterface inter;
   sValueBloc sbloc;

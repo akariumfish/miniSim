@@ -14,6 +14,9 @@ public abstract class Sheet_Specialize {
 	  public String name, build_access = "all";
 	  public int sheet_count = -1;
 	  public boolean unique = false;
+	  public boolean show_in_buildtool = false;
+	  public boolean visible = true;
+	  
 	  
 	  public Sheet_Specialize(String n) { name = n;  
 	    prints.add(this); 
@@ -38,14 +41,14 @@ public abstract class Sheet_Specialize {
 	        m.sheet_specialize = this; m.specialize.set(name); if (unique) m.unclearable = true;
 //	        m.open();
 	  		if (b == null) m.init_end(); 
-	        if (b == null && default_template.length() > 0 && mmain.saved_template.getBloc(default_template) != null) {
-	          Macro_Sheet prev_select = mmain.selected_sheet;
-	          m.select();
-	          mmain.paste_tmpl(mmain.saved_template.getBloc(default_template));
-	          prev_select.select();
-//	          m.delayed_open();
-	        }
-	        if (unique || b != null) { m.open(); }
+//	        if (b == null && default_template.length() > 0 && mmain.saved_template.getBloc(default_template) != null) {
+//	          Macro_Sheet prev_select = mmain.selected_sheet;
+//	          m.select();
+//	          mmain.paste_tmpl(mmain.saved_template.getBloc(default_template));
+//	          prev_select.select();
+////	          m.delayed_open();
+//	        }
+//	        if (unique || b != null) { m.open(); }
 	  		// !!! if build from bloc, need to do init elsewhere
 	      }
 	      return m; } 

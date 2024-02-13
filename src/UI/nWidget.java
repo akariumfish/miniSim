@@ -91,7 +91,7 @@ public class nWidget {
   public nWidget setTextAlignment(int sx, int sy) { textAlignX = sx; textAlignY = sy; return this; }
   public nWidget setTextVisibility(boolean s) { show_text = s; return this; }
   public nWidget setTextAutoReturn(boolean s) { auto_line_return = s; return this; }
-  public nWidget setInfo(String s) { if (s != null) { infoText = s; showInfo = true; } return this; }
+  public nWidget setInfo(String s) { if (s != null && s.length() > 0) { infoText = s; showInfo = true; } return this; }
   public nWidget setNoInfo() { showInfo = false; return this; }
   
   public nWidget setLook(nLook l) { look.copy(l); return this; }
@@ -305,7 +305,8 @@ public class nWidget {
   public nWidget stackLeft()  { alignX = false; stackX = true;  placeLeft = true;  placeRight = false; centerX = false; changePosition(); return this; }
   public nWidget stackRight() { alignX = false; stackX = true;  placeLeft = false; placeRight = true;  centerX = false; changePosition(); return this; }
   public nWidget centerX()    { alignX = false; stackX = false; placeLeft = false; placeRight = false; centerX = true;  changePosition(); return this; }
-  public nWidget centerY()    { alignX = false; stackX = false; placeLeft = false; placeRight = false; centerY = true;  changePosition(); return this; }
+  public nWidget centerY()    { alignY = false; stackY = false; placeUp   = false; placeDown  = false; centerY = true;  changePosition(); return this; }
+  public nWidget center()     { centerX(); centerY(); return this; }
   
   public nWidget setSwitchState(boolean s) { if (s) setOn(); else setOff(); return this; }
   public nWidget setOn() {
@@ -337,8 +338,8 @@ public class nWidget {
       } else if (stackX) {
         if (placeRight) return parent.getX() + parent.getSX() + localrect.pos.x;
         else if (placeLeft) return parent.getX() + localrect.pos.x - getSX();
-      } else return localrect.pos.x + parent.getX();
-      if (centerX) return parent.getX() + localrect.pos.x - getSX()/2;
+      } else if (centerX) return parent.getX() + localrect.pos.x - getSX()/2;
+      else return localrect.pos.x + parent.getX();
     } 
     if (alignX) {
       if (placeRight) return localrect.pos.x - getSX();
@@ -346,8 +347,7 @@ public class nWidget {
     } else if (stackX) {
       if (placeRight) return localrect.pos.x;
       else if (placeLeft) return localrect.pos.x - getSX();
-    } 
-    if (centerX) return localrect.pos.x - getSX()/2;
+    } else if (centerX) return localrect.pos.x - getSX()/2;
     return localrect.pos.x;
   }
   public float getY() { 
@@ -358,8 +358,8 @@ public class nWidget {
       } else if (stackY) {
         if (placeDown) return parent.getY() + parent.getSY() + localrect.pos.y;
         else if (placeUp) return parent.getY() + localrect.pos.y - getSY();
-      } else return localrect.pos.y + parent.getY();
-      if (centerY) return parent.getY() + localrect.pos.y - getSY()/2;
+      } else if (centerY) return parent.getY() + localrect.pos.y - getSY()/2;
+      else return localrect.pos.y + parent.getY();
     } 
     if (alignY) {
       if (placeDown) return localrect.pos.y - getSY();
@@ -367,8 +367,7 @@ public class nWidget {
     } else if (stackY) {
       if (placeDown) return localrect.pos.y;
       else if (placeUp) return localrect.pos.y - getSY();
-    }
-    if (centerY) return localrect.pos.y - getSY()/2;
+    } else if (centerY) return localrect.pos.y - getSY()/2;
     return localrect.pos.y;
   }
   public float getLocalX() { return localrect.pos.x; }

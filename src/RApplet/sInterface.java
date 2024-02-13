@@ -400,6 +400,7 @@ public class sInterface {
       file_savebloc.clear(); 
       interface_bloc.preset_to_save_bloc(file_savebloc); 
       file_savebloc.save_to(savepath_value.get());
+//      prev_savepth.set(savepath_value.get());
     } else {
       new nTextPop(screen_gui, taskpanel, "cant save on default file");
     } }
@@ -473,6 +474,9 @@ public class sInterface {
     input = new sInput(app);
     data = new DataHolder(app);
     interface_bloc = new sValueBloc(data, "Interface");
+    
+    conf_init();
+    
     gui_theme = new nTheme(app, ref_size);
     screen_gui = new nGUI(input, gui_theme, ref_size);
     screen_view = new Rect(app.screen_0_x, app.screen_0_y, 
@@ -528,6 +532,7 @@ public class sInterface {
       runEvents(screen_gui.eventsFullScreen); 
       runEvents(screen_gui.eventsFullScreen); 
       runEvents(eventsFullS); } } );
+    
     
   }
   
@@ -595,6 +600,38 @@ public sRun full_screen_run;
   }
   
   
+  String confpth = "conf.txt";
+  sValueBloc conf_bloc;
+  sStr prev_savepth;
+  void conf_init() {
+	  if (file_savebloc != null) file_savebloc.clear();
+	  file_savebloc = new Save_Bloc("fsb");
+      if (conf_bloc != null) conf_bloc.clear();
+      if (file_savebloc.load_from(confpth)) {
+    	  conf_bloc = data.newBloc(file_savebloc, "conf");
+    	  if (conf_bloc.getValue("prev_savepth") != null) {
+    		  prev_savepth = ((sStr)conf_bloc.getValue("prev_savepth"));
+    		  file_savebloc.clear();
+//    		  if (file_savebloc.load_from(prev_savepth.get())) 
+//    			  ;
+    	  } 
+      } else { 
+    	  conf_bloc = data.newBloc("conf");
+		  prev_savepth = new sStr(conf_bloc, "", "prev_savepth", "prev_savepth");
+    	  //fullscreen
+    	  //last file
+    	  //menu colors
+      }
+  }
+  void conf_close() {
+	  file_savebloc.clear();
+	  conf_bloc.preset_to_save_bloc(file_savebloc); 
+      file_savebloc.save_to(confpth);
+  }
+  
+  
+  
+  
   void addSpecializedSheet(Sheet_Specialize s) {
     macro_main.addSpecializedSheet(s); }
   Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
@@ -651,10 +688,10 @@ public sRun full_screen_run;
 //      app.textSize(18); 
       app.textAlign(PConstants.LEFT);
       app.text(framerate.get(), 10, app.window_head + 24 );
-      app.text(" C " + RConst.trimStringFloat(cam.mouse.x) + 
-        "," + RConst.trimStringFloat(cam.mouse.y), 40, app.window_head + 24 );
-      app.text("S " + RConst.trimStringFloat(input.mouse.x) + 
-        "," + RConst.trimStringFloat(input.mouse.y), 250, app.window_head + 24 );
+      app.text(" C " + RConst.trimFlt(cam.mouse.x) + 
+        "," + RConst.trimFlt(cam.mouse.y), 40, app.window_head + 24 );
+      app.text("S " + RConst.trimFlt(input.mouse.x) + 
+        "," + RConst.trimFlt(input.mouse.y), 250, app.window_head + 24 );
     }
     
     data.frame(); // reset flags
