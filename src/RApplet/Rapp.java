@@ -128,11 +128,6 @@ public class Rapp extends PApplet implements RConst {
 		  logln("init end");
 	}
 	
-	public void exit() {
-		interf.conf_close();
-		super.exit();
-	}
-	
 	nWidget app_grab, app_close;
 	public float window_head = 40;
 	float mx, my;

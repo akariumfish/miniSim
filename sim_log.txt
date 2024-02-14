@@ -1,8 +1,10 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-5240:- :full_data_save to save.sdata
-5280:- :exit
+273:  :setup_load from random_mouvement.sdata
+8037:  :full_data_save to random_mouvementFPS.sdata
+14663:  :full_data_save to random_mouvementFPS.sdata
+14727:  :exit
 null
 null
 null

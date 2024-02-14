@@ -838,7 +838,7 @@ class MPatern extends MBaseMenu {
 	Macro_Connexion in_tick, struct_order;
 	nRunnable tick_run;
 	sBoo auto_mode_val, mode_1, mode_2;
-	sFlt rot_speed;
+	sFlt rot_speed, col_grad;
 
 	sFlt nposx,nposy,nscale,nrot;
 	nRunnable up_npos;
@@ -857,8 +857,10 @@ class MPatern extends MBaseMenu {
 		auto_mode_val = newBoo(false, "auto_mode_val");
 		mode_1 = newBoo(false, "mode_1");
 		mode_2 = newBoo(false, "mode_2");
-		
+
 		rot_speed = menuFltSlide(0, -RConst.PI / 60, RConst.PI / 60, "rot_speed");
+
+		col_grad = menuFltSlide(0, 0, 1, "col_grad");
 
 		ask_add_run = newRun("ask_add_run", "ask_add_run", new nRunnable() { 
 		      public void run() { ask_add(); } } );
@@ -1086,8 +1088,8 @@ class MForm extends MBaseMenu {
 	
 	nBase shape;
 	sBoo is_line;
-	sFlt val_scale, vpax, vpay, vpbx, vpby, vpcx, vpcy, val_linew;
-	sCol val_fill, val_stroke;
+	sFlt val_scale, vpax, vpay, vpbx, vpby, vpcx, vpcy, val_linew, val_col_grad;
+	sCol val_fill1, val_fill2, val_stroke;
 	sInt val_draw_layer;
 
 	Macro_Connexion link;
@@ -1100,6 +1102,7 @@ class MForm extends MBaseMenu {
 	    val_scale = menuFltSlide(500, 1, 1000, "scale");
 	    shape.dir.setMag(val_scale.get());
 	    val_linew = menuFltSlide(0.05F, 0.01F, 1.0F, "line_weight");
+	    val_col_grad = menuFltSlide(0.0F, 0.0F, 1.0F, "val_col_grad");
 	    shape.line_w = val_linew.get();
 	    vpax = newFlt(shape.face.p1.x, "vpax", "vpax");
 	    vpay = newFlt(shape.face.p1.y, "vpay", "vpay");
@@ -1122,10 +1125,25 @@ class MForm extends MBaseMenu {
 	    shape.face.p3.y = vpcy.get();
 	    
 	    val_stroke = menuColor(gui.app.color(10, 190, 40), "val_stroke");
-	    val_fill = menuColor(gui.app.color(30, 90, 20), "val_fill");
 	    val_stroke.addEventChange(new nRunnable() { public void run() { shape.col_line = val_stroke.get(); }});
-	    val_fill.addEventChange(new nRunnable() { public void run() { shape.col_fill = val_fill.get(); }});
 	    
+	    val_fill1 = menuColor(gui.app.color(30, 90, 20), "val_fill1");
+	    val_fill2 = menuColor(gui.app.color(30, 90, 20), "val_fill2");
+	    val_fill1.addEventChange(new nRunnable() { public void run() { 
+    		float r = val_fill1.getred() * val_col_grad.get() + val_fill2.getred() * (1-val_col_grad.get());
+    		float g = val_fill1.getgreen() * val_col_grad.get() + val_fill2.getgreen() * (1-val_col_grad.get());
+    		float b = val_fill1.getblue() * val_col_grad.get() + val_fill2.getblue() * (1-val_col_grad.get());
+	    		shape.col_fill = gui.app.color(r,g,b); }});
+	    val_fill2.addEventChange(new nRunnable() { public void run() { 
+    		float r = val_fill1.getred() * val_col_grad.get() + val_fill2.getred() * (1-val_col_grad.get());
+    		float g = val_fill1.getgreen() * val_col_grad.get() + val_fill2.getgreen() * (1-val_col_grad.get());
+    		float b = val_fill1.getblue() * val_col_grad.get() + val_fill2.getblue() * (1-val_col_grad.get());
+	    		shape.col_fill = gui.app.color(r,g,b); }});
+	    val_col_grad.addEventChange(new nRunnable() { public void run() { 
+    		float r = val_fill1.getred() * val_col_grad.get() + val_fill2.getred() * (1-val_col_grad.get());
+    		float g = val_fill1.getgreen() * val_col_grad.get() + val_fill2.getgreen() * (1-val_col_grad.get());
+    		float b = val_fill1.getblue() * val_col_grad.get() + val_fill2.getblue() * (1-val_col_grad.get());
+	    		shape.col_fill = gui.app.color(r,g,b); }});
 	    val_scale.addEventChange(new nRunnable() { public void run() { shape.dir.setMag(val_scale.get()); }});
 	    val_linew.addEventChange(new nRunnable() { public void run() { shape.line_w = val_linew.get(); }});
 	//    

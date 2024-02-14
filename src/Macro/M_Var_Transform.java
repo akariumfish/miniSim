@@ -355,6 +355,7 @@ class MVar extends MBasic {
 		
 		in = addInput(0, "set", new nRunnable() { public void run() {
 			if (in.lastPack() != null)
+				if (in.lastPack().isBang() && cible != null) out.send(cible.asPacket());
 				if (in.lastPack().isBool()) { 
 					bval.set(in.lastPack().asBool()); chooseValue(bval); }
 				else if (in.lastPack().isFloat()) { 
@@ -654,7 +655,9 @@ class MValue extends MBasic {
     .getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
 		.setLinkedValue(setup_send); 
 	out = addOutput(2, "out");
-    in = addInput(0, "in");
+    in = addInput(0, "in", new nRunnable() { public void run() {
+        if (in.lastPack() != null && in.lastPack().isBang() && cible != null) out.send(cible.asPacket());
+      } });
 
     addEmpty(1); 
     addEmptyS(2).addCtrlModel("MC_Element_SButton", "Set")
@@ -846,6 +849,10 @@ class MValue extends MBasic {
 
 
 class MColRGB extends Macro_Bloc {
+	  static class MColRGB_Builder extends MAbstract_Builder {
+		  MColRGB_Builder() { super("colRGB", "colRGB", "", "Data"); }
+		  MColRGB build(Macro_Sheet s, sValueBloc b) { MColRGB m = new MColRGB(s, b); return m; }
+	  }
   Macro_Connexion in1,in2,in3,out1,out2,out3;
   float r = 0, g = 0, b = 0;
   int col = 0;
@@ -932,6 +939,10 @@ class MColRGB extends Macro_Bloc {
 
 
 class MVecXY extends Macro_Bloc {
+	  static class MVecXY_Builder extends MAbstract_Builder {
+		  MVecXY_Builder() { super("vecXY", "vecXY", "", "Data"); }
+		  MVecXY build(Macro_Sheet s, sValueBloc b) { MVecXY m = new MVecXY(s, b); return m; }
+	  }
   Macro_Connexion in1,in2,out1,out2;
   float x = 0, y = 0;
   PVector vec;
@@ -1021,6 +1032,10 @@ class MVecXY extends Macro_Bloc {
     super.clear(); return this; }
 }
 class MVecMD extends Macro_Bloc {
+	  static class MVecMD_Builder extends MAbstract_Builder {
+		  MVecMD_Builder() { super("vecMD", "vecMD", "", "Data"); }
+		  MVecMD build(Macro_Sheet s, sValueBloc b) { MVecMD m = new MVecMD(s, b); return m; }
+	  }
   Macro_Connexion in1,in2,out1,out2;
   float mag = 1, dir = 0;
   PVector vec;

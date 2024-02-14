@@ -969,8 +969,9 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   
   
   boolean canSetupFrom(sValueBloc bloc) {
-    return super.canSetupFrom(bloc) && 
-            ((sStr)bloc.getBloc("settings").getValue("specialize")).get().equals(specialize.get());
+    return (super.canSetupFrom(bloc) && bloc.getBloc("settings").getValue("specialize") != null && 
+            ((sStr)bloc.getBloc("settings").getValue("specialize")).get().equals(specialize.get()) ) ||
+    		(super.canSetupFrom(bloc) && bloc.getBloc("settings").getValue("specialize") == null);
   }
   
   void setupFromBloc(sValueBloc bloc) {
@@ -1300,8 +1301,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 //    else if (t.equals("calc")) nm = addCalc(b);
 //    else if (t.equals("comp")) nm = addComp(b);
 //    else if (t.equals("chan")) nm = addChan(b);
-    else if (t.equals("vecXY")) nm = addVecXY(b);
-    else if (t.equals("vecMD")) nm = addVecMD(b);
+//    else if (t.equals("vecXY")) nm = addVecXY(b);
+//    else if (t.equals("vecMD")) nm = addVecMD(b);
 //    else if (t.equals("frame")) nm = addFrame(b);
     else if (t.equals("numCtrl")) nm = addNumCtrl(b);
     else if (t.equals("vecCtrl")) nm = addVecCtrl(b);
@@ -1321,7 +1322,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     else if (t.equals("pangrph")) nm = addPanGrph(b);
 //    else if (t.equals("ramp")) nm = addRamp(b);
     else if (t.equals("crossVec")) nm = addCrossVec(b);
-    else if (t.equals("colRGB")) nm = addColRGB(b);
+//    else if (t.equals("colRGB")) nm = addColRGB(b);
     if (nm != null) nm.init_end();
     return nm;
   }
@@ -1352,8 +1353,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 //  MCalc addCalc(sValueBloc b) { MCalc m = new MCalc(this, b); return m; }
 //  MComp addComp(sValueBloc b) { MComp m = new MComp(this, b); return m; }
 //  MChan addChan(sValueBloc b) { MChan m = new MChan(this, b); return m; }
-  MVecXY addVecXY(sValueBloc b) { MVecXY m = new MVecXY(this, b); return m; }
-  MVecMD addVecMD(sValueBloc b) { MVecMD m = new MVecMD(this, b); return m; }
+//  MVecXY addVecXY(sValueBloc b) { MVecXY m = new MVecXY(this, b); return m; }
+//  MVecMD addVecMD(sValueBloc b) { MVecMD m = new MVecMD(this, b); return m; }
 //  MFrame addFrame(sValueBloc b) { MFrame m = new MFrame(this, b); return m; }
   MNumCtrl addNumCtrl(sValueBloc b) { MNumCtrl m = null;
 //    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
@@ -1401,7 +1402,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
   //MPanCstm addPanCstm(sValueBloc b) { MPanCstm m = new MPanCstm(this, b); return m; }
 //  MRamp addRamp(sValueBloc b) { MRamp m = new MRamp(this, b); return m; }
   MCrossVec addCrossVec(sValueBloc b) { MCrossVec m = new MCrossVec(this, b); return m; }
-  MColRGB addColRGB(sValueBloc b) { MColRGB m = new MColRGB(this, b); return m; }
+//  MColRGB addColRGB(sValueBloc b) { MColRGB m = new MColRGB(this, b); return m; }
   
 }
 

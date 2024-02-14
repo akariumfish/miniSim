@@ -394,13 +394,16 @@ public class sInterface {
   //}
 
   public void full_data_save() {
+
+		conf_save();
+		
     macro_main.saving_database();
     if (!savepath_value.get().equals("default.sdata")) {
   	  app.logln("full_data_save to "+savepath_value.get());
       file_savebloc.clear(); 
       interface_bloc.preset_to_save_bloc(file_savebloc); 
       file_savebloc.save_to(savepath_value.get());
-//      prev_savepth.set(savepath_value.get());
+      prev_savepth.set(savepath_value.get());
     } else {
       new nTextPop(screen_gui, taskpanel, "cant save on default file");
     } }
@@ -608,22 +611,22 @@ public sRun full_screen_run;
 	  file_savebloc = new Save_Bloc("fsb");
       if (conf_bloc != null) conf_bloc.clear();
       if (file_savebloc.load_from(confpth)) {
-    	  conf_bloc = data.newBloc(file_savebloc, "conf");
-    	  if (conf_bloc.getValue("prev_savepth") != null) {
-    		  prev_savepth = ((sStr)conf_bloc.getValue("prev_savepth"));
-    		  file_savebloc.clear();
-//    		  if (file_savebloc.load_from(prev_savepth.get())) 
-//    			  ;
-    	  } 
+	    	  	conf_bloc = data.newBloc(file_savebloc, "conf");
+	    	  	if (conf_bloc.getValue("prev_savepth") != null) {
+	    		  prev_savepth = ((sStr)conf_bloc.getValue("prev_savepth"));
+	    		  file_savebloc.clear();
+	//    		  if (file_savebloc.load_from(prev_savepth.get())) 
+	//    			  ;
+	    	  	} 
       } else { 
-    	  conf_bloc = data.newBloc("conf");
-		  prev_savepth = new sStr(conf_bloc, "", "prev_savepth", "prev_savepth");
-    	  //fullscreen
-    	  //last file
-    	  //menu colors
+	    	  conf_bloc = data.newBloc("conf");
+			  prev_savepth = new sStr(conf_bloc, "", "prev_savepth", "prev_savepth");
+	    	  //fullscreen
+	    	  //last file
+	    	  //menu colors
       }
   }
-  void conf_close() {
+  void conf_save() {
 	  file_savebloc.clear();
 	  conf_bloc.preset_to_save_bloc(file_savebloc); 
       file_savebloc.save_to(confpth);

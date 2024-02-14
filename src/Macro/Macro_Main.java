@@ -383,8 +383,11 @@ nExplorer sheet_explorer;
 	  selector_list.getShelf()
 	    .addSeparator(0.25F)
 	    ;
+	  if (catego == null) catego = new ArrayList<String>();
 	  update_bloc_selector_list();
   }
+
+	ArrayList<String> catego;
   void update_bloc_selector_list() {
 	  if (selector_list != null) {
 		selector_list.start_complexe_entry();
@@ -406,7 +409,6 @@ nExplorer sheet_explorer;
 		
 		build_buildtool();
 
-		ArrayList<String> catego = new ArrayList<String>();
 		for (MAbstract_Builder m : bloc_builders) {
 			String cat = m.category; boolean found = false;
 			for (String s : catego) if (s.equals(cat)) found = true;
@@ -1030,6 +1032,9 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MValue.MValue_Builder());
       add_bloc_builders(new MSequance.MSequencor_Builder());
       add_bloc_builders(new MPoint.MPoint_Builder());
+      add_bloc_builders(new MVecMD.MVecMD_Builder());
+      add_bloc_builders(new MVecXY.MVecXY_Builder());
+      add_bloc_builders(new MColRGB.MColRGB_Builder());
       
       
       
