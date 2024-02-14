@@ -60,6 +60,8 @@ public class Rapp extends PApplet implements RConst {
 		frameRate(60);
 		textSize(18);
 		
+		background(0);//fond noir
+		
 //		rectMode(PApplet.CENTER);
 //		ellipseMode(PApplet.RADIUS);
 //		blendMode(REPLACE);
@@ -74,10 +76,6 @@ public class Rapp extends PApplet implements RConst {
 		  
 		  
 
-//		  interf.addSpecializedSheet(new Simulation.SimPrint());
-//		  interf.addSpecializedSheet(new Canvas.CanvasPrint());
-//		  interf.addSpecializedSheet(new Face.FacePrint());
-//		  interf.addSpecializedSheet(new Organism.OrganismPrint());
 		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
 		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
 		  interf.addSpecializedSheet(new Face.FacePrint(canv));
@@ -90,7 +88,6 @@ public class Rapp extends PApplet implements RConst {
 		  //logln("end models: "+interf.gui_theme.models.size());
 		  
 		  
-		background(0);//fond noir
 		
 		
 		

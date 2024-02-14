@@ -12,6 +12,14 @@ public class miniSim {
 		MACRO BLOC review
 
 Action missing:
+	
+	un transformateur, recois une valeur et la transforme selon des parametre donné
+	un transf par type de donné
+	int/float
+		+ - *, /
+		limit scale 
+	vec
+	 	add, rot, point to, mag
 	add/sub/mult/div cible
 	pow sqrt min/max 
 	vec mag heading

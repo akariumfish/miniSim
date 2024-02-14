@@ -8,6 +8,5 @@ public interface Macro_Interf {
 	  
 	  final String[] bloc_types1 = {"vecXY", "vecMD", "vecCtrl", "numCtrl", "crossVec", 
 	                                "midi", "preset", "tool", "tooltri", "toolbin", 
-	                                "toolNC", "colRGB", "btrig", "bswitch", "pan", 
-              						"panbin", "pansld", "pangrph" };
+	                                "toolNC", "colRGB", "pan", "panbin", "pansld", "pangrph" };
 	}

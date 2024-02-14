@@ -28,9 +28,48 @@ public class M_GUI {}
 
 
 
+class MSlide extends MBasic {
+	  static class MSlide_Builder extends MAbstract_Builder {
+		  MSlide_Builder() { super("slide", "slide", "", "GUI"); }
+		  MSlide build(Macro_Sheet s, sValueBloc b) { MSlide m = new MSlide(s, b); return m; }
+	  }
+	  
+  MSlide(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "slide", _bloc); }
+  public void init() {
+	  
+  }
+  public void build_normal() {
+	    addEmpty(2);
+	    addEmpty(1);
+	    addEmptyXL(0);
+	    
+//	    slide = (nSlide)(dr.addWidget(new nSlide(front_panel.gui, ref_size * 6, ref_size * 0.75F)));
+//	      slide.setPosition(4*ref_size, ref_size * 2 / 16);
+//	      
+//	      slide.addEventSlide(new nRunnable(this) { public void run(float c) { 
+//	        flt = val_min.get() + c * (val_max.get() - val_min.get()); 
+//	        val_flt.set(flt);
+//	        
+//	        val_label.set(val_txt.get() + " " + RConst.trimFlt(flt) ); 
+//	        out.send(Macro_Packet.newPacketFloat(flt));
+//	      } } );
+//	      
+//	      slide.setValue((flt - val_min.get()) / (val_max.get() - val_min.get()));
+	      
+  }
+  public void build_param() {
+
+  }
+  public MSlide clear() {
+    super.clear(); return this; }
+}
 
 
-class MTrig extends Macro_Bloc {
+
+
+
+
+class MTrig extends MBasic {
 	  static class MTrig_Builder extends MAbstract_Builder {
 		  MTrig_Builder() { super("trig", "Trigger", "", "GUI"); }
 		  MTrig build(Macro_Sheet s, sValueBloc b) { MTrig m = new MTrig(s, b); return m; }
@@ -40,25 +79,53 @@ class MTrig extends Macro_Bloc {
   nCtrlWidget trig; 
   nLinkedWidget stp_view; sBoo setup_send;
   MTrig(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "trig", "trig", _bloc); 
-    setup_send = newBoo("stp_snd", "stp_snd", false);
-    
-    Macro_Element e = addEmptyS(0);
-    trig = e.addCtrlModel("MC_Element_SButton").setRunnable(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBang());
-    } });
-    e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
-    
-    out_t = addOutput(1, "trig")
-      .setDefBang();
-    if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBang());
-    } });
+    super(_sheet, "trig", _bloc); 
+  }
+  public void init() {
+	    setup_send = newBoo("stp_snd", "stp_snd", false);
+  }
+  public void build_param() {
+	    out_t = addOutput(1, "trig")
+	      .setDefBang();
+	    
+	    addEmptyS(0);
+	    
+	    Macro_Element e = addEmptyL(0);
+	    trig = e.addCtrlModel("MC_Element_Button").setRunnable(new nRunnable() { public void run() {
+	      out_t.send(Macro_Packet.newPacketBang());
+	    } });
+	    trig.setSY(ref_size*2).setPY(-ref_size*17/16);
+	    e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
+	    
+	    
+	    if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	      out_t.send(Macro_Packet.newPacketBang());
+	    } });
+  }
+  public void build_normal() {
+
+	    Macro_Element e = addEmptyS(0);
+	    trig = e.addCtrlModel("MC_Element_SButton").setRunnable(new nRunnable() { public void run() {
+	      out_t.send(Macro_Packet.newPacketBang());
+	    } });
+	    e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
+	    
+	    out_t = addOutput(1, "trig")
+	      .setDefBang();
+	    if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	      out_t.send(Macro_Packet.newPacketBang());
+	    } });
   }
   public MTrig clear() {
     super.clear(); return this; }
 }
-class MSwitch extends Macro_Bloc {
+
+
+
+
+
+
+class MSwitch extends MBasic {
 	  static class MSwitch_Builder extends MAbstract_Builder {
 		  MSwitch_Builder() { super("switch", "Switch", "", "GUI"); }
 		  MSwitch build(Macro_Sheet s, sValueBloc b) { MSwitch m = new MSwitch(s, b); return m; }
@@ -68,107 +135,72 @@ class MSwitch extends Macro_Bloc {
   nLinkedWidget swtch; 
   sBoo state;
   MSwitch(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "switch", "switch", _bloc); 
+    super(_sheet, "switch", _bloc); 
     
-    state = newBoo("state", "state", false);
-    
-    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isBang()) {
-    	  	state.swtch();
-    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
-      } 
-      if (in.lastPack() != null && in.lastPack().isBool()) {
-    	  	if(state.get() != in.lastPack().asBool()) {
-    	  		state.swtch();
-	    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
-    	  	}
-      } 
-    } });
-    nRunnable swt_run = new nRunnable() { public void run() {
-	    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	    		out_t.send(Macro_Packet.newPacketBool(state.get()));
-	    	}});
-	}};
+  }
+  public void init() {
+	    
+	    state = newBoo("state", "state", false);
+	  
+  }
+  public void build_param() {
 
-    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton").setLinkedValue(state);
-    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
-    
-    
-    out_t = addOutput(2, "out")
-      .setDefBool();
-    
-    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBool(state.get()));
-    } });
-    
+	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isBang()) {
+	        swtch.setSwitchState(!swtch.isOn());
+	      } 
+	      if (in.lastPack() != null && in.lastPack().isBool()) {
+	        swtch.setSwitchState(in.lastPack().asBool());
+	      } 
+	    } });
+	    addEmptyS(1);
+	    
+	    out_t = addOutput(1, "out")
+	      .setDefBool();
+	      
+	    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button").setLinkedValue(state);
+	    swtch.setSY(ref_size*2).setPY(-ref_size*17/16);
+	    
+	    state.addEventChange(new nRunnable() { public void run() {
+	      out_t.send(Macro_Packet.newPacketBool(state.get()));
+	    } });
+	    
+	    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	      out_t.send(Macro_Packet.newPacketBool(state.get()));
+	    } });
+  }
+  public void build_normal() {
+	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isBang()) {
+	    	  	state.swtch();
+	    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+	      } 
+	      if (in.lastPack() != null && in.lastPack().isBool()) {
+	    	  	if(state.get() != in.lastPack().asBool()) {
+	    	  		state.swtch();
+		    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+	    	  	}
+	      } 
+	    } });
+	    nRunnable swt_run = new nRunnable() { public void run() {
+		    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		    		out_t.send(Macro_Packet.newPacketBool(state.get()));
+		    	}});
+		}};
+
+	    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton").setLinkedValue(state);
+	    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+	    
+	    
+	    out_t = addOutput(2, "out")
+	      .setDefBool();
+	    
+	    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	      out_t.send(Macro_Packet.newPacketBool(state.get()));
+	    } });
+	    
   }
   public MSwitch clear() {
-    super.clear(); return this; }
-}
-
-class MBigTrig extends Macro_Bloc {
-  Macro_Connexion out_t;
-  nCtrlWidget trig; 
-  nLinkedWidget stp_view; sBoo setup_send;
-  MBigTrig(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "btrig", "btrig", _bloc); 
-    setup_send = newBoo("stp_snd", "stp_snd", false);
-    
-    out_t = addOutput(1, "trig")
-      .setDefBang();
-    
-    addEmptyS(0);
-    
-    Macro_Element e = addEmptyL(0);
-    trig = e.addCtrlModel("MC_Element_Button").setRunnable(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBang());
-    } });
-    trig.setSY(ref_size*2).setPY(-ref_size*17/16);
-    e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
-    
-    
-    if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBang());
-    } });
-  }
-  public MBigTrig clear() {
-    super.clear(); return this; }
-}
-class MBigSwitch extends Macro_Bloc {
-  Macro_Connexion in, out_t;
-  nLinkedWidget swtch; 
-  sBoo state;
-  MBigSwitch(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "bswitch", "bswitch", _bloc); 
-    
-    state = newBoo("state", "state", false);
-    
-    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isBang()) {
-        swtch.setSwitchState(!swtch.isOn());
-      } 
-      if (in.lastPack() != null && in.lastPack().isBool()) {
-        swtch.setSwitchState(in.lastPack().asBool());
-      } 
-    } });
-    addEmptyS(1);
-    
-    out_t = addOutput(1, "out")
-      .setDefBool();
-      
-    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button").setLinkedValue(state);
-    swtch.setSY(ref_size*2).setPY(-ref_size*17/16);
-    
-    state.addEventChange(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBool(state.get()));
-    } });
-    
-    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-      out_t.send(Macro_Packet.newPacketBool(state.get()));
-    } });
-    
-  }
-  public MBigSwitch clear() {
     super.clear(); return this; }
 }
 

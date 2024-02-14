@@ -352,6 +352,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         m.connected_outputs.add(this); 
         if (linkable && m.linkable) { 
         	linking_connections.add(m); m.linking_connections.add(this); 
+        	nRunnable.runEvents(eventLinkRun);
         }
         sheet.add_link(descr, m.descr);
         elem.bloc.mmain().last_link_sheet = sheet;
@@ -362,6 +363,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         m.connected_inputs.add(this); 
         if (linkable && m.linkable) { 
         	linking_connections.add(m); m.linking_connections.add(this); 
+        	nRunnable.runEvents(eventLinkRun);
         }
         sheet.add_link(m.descr, descr);
         elem.bloc.mmain().last_link_sheet = sheet;
@@ -382,6 +384,10 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       m.connected_inputs.remove(this); 
       sheet.remove_link(m.descr, descr);
     }
+    if (linking_connections.contains(m)) {
+    	linking_connections.remove(m);
+    	nRunnable.runEvents(eventUnLinkRun);
+    }
   }
 
   Macro_Connexion set_link() {
@@ -401,6 +407,13 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   }
   protected boolean linkable = false;
   ArrayList<Macro_Connexion> linking_connections = new ArrayList<Macro_Connexion>();
+  
+  ArrayList<nRunnable> eventUnLinkRun = new ArrayList<nRunnable>();
+  ArrayList<nRunnable> eventLinkRun = new ArrayList<nRunnable>();
+  Macro_Connexion addEventLink(nRunnable r) { eventLinkRun.add(r); return this; }
+  Macro_Connexion removeEventLink(nRunnable r) { eventLinkRun.remove(r); return this; }
+  Macro_Connexion addUnEventLink(nRunnable r) { eventUnLinkRun.add(r); return this; }
+  Macro_Connexion removeUnEventLink(nRunnable r) { eventUnLinkRun.remove(r); return this; }
   
   boolean buildingLine = false;
   PVector newLine = new PVector();

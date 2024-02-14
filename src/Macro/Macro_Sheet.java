@@ -1289,8 +1289,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 //    else if (t.equals("keyb")) nm = addKey(b);
 //    else if (t.equals("switch")) nm = addSwitch(b);
 //    else if (t.equals("trig")) nm = addTrig(b);
-    if (t.equals("bswitch")) nm = addBigSwitch(b);
-    else if (t.equals("btrig")) nm = addBigTrig(b);
+//    if (t.equals("bswitch")) nm = addBigSwitch(b);
+//    else if (t.equals("btrig")) nm = addBigTrig(b);
 //    else if (t.equals("gate")) nm = addGate(b);
 //    else if (t.equals("not")) nm = addNot(b);
 //    else if (t.equals("bin")) nm = addBin(b);
@@ -1341,8 +1341,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 //  MKeyboard addKey(sValueBloc b) { MKeyboard m = new MKeyboard(this, b); return m; }
 //  MSwitch addSwitch(sValueBloc b) { MSwitch m = new MSwitch(this, b); return m; }
 //  MTrig addTrig(sValueBloc b) { MTrig m = new MTrig(this, b); return m; }
-  MBigSwitch addBigSwitch(sValueBloc b) { MBigSwitch m = new MBigSwitch(this, b); return m; }
-  MBigTrig addBigTrig(sValueBloc b) { MBigTrig m = new MBigTrig(this, b); return m; }
+//  MBigSwitch addBigSwitch(sValueBloc b) { MBigSwitch m = new MBigSwitch(this, b); return m; }
+//  MBigTrig addBigTrig(sValueBloc b) { MBigTrig m = new MBigTrig(this, b); return m; }
 //  MGate addGate(sValueBloc b) { MGate m = new MGate(this, b); return m; }
 //  MNot addNot(sValueBloc b) { MNot m = new MNot(this, b); return m; }
 //  MBin addBin(sValueBloc b) { MBin m = new MBin(this, b); return m; }

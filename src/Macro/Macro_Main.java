@@ -1015,6 +1015,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MMouse.MMouse_Builder());
       add_bloc_builders(new MTrig.MTrig_Builder());
       add_bloc_builders(new MSwitch.MSwitch_Builder());
+      add_bloc_builders(new MSlide.MSlide_Builder());
       add_bloc_builders(new MComment.MComment_Builder());
       add_bloc_builders(new MFrame.MFrame_Builder());
       add_bloc_builders(new MPulse.MPulse_Builder());
@@ -1412,12 +1413,12 @@ public Macro_Main(sInterface _int) {
 	    .setSize(ref_size*1.25, ref_size*0.75)
 			    );
 	  theme.addModel("MC_Grabber", theme.newWidget("mc_ref")
-	    .setStandbyColor(theme.app.color(80))
-	    .setHoveredColor(theme.app.color(120))
-	    .setClickedColor(theme.app.color(150))
+	    .setStandbyColor(theme.app.color(70))
+	    .setHoveredColor(theme.app.color(100))
+	    .setClickedColor(theme.app.color(130))
 	    .setOutlineWeight(ref_size / 9F)
 	    .setOutline(true)
-	    .setOutlineColor(theme.app.color(160))
+	    .setOutlineColor(theme.app.color(180, 150, 150))
 	    .setLosange(true)
 	    .setSize(ref_size*1, ref_size*0.75)
 	    );
