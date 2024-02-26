@@ -10,7 +10,6 @@ public class miniSim {
 
 
 		MACRO BLOC review
-
 Blocs List :
 		DONE
 	Flux : point, chan, gate
@@ -27,7 +26,6 @@ Blocs List :
 	
 		TO DO
 	Transform/Filter Transform : col <> RGBA
-		
 	GUI : GUIPanel, GUILabel, GUIButton, GUIGraph, GUISlide
 	
 		FOR LATER
@@ -92,36 +90,28 @@ sujet principaux dans la doc
 
 
 		R & D
-
 logarythmic slides
-
 mtemplate : load / save bang > run
 sheet selector : select sheet choosen by name on bang
 pack / unpack > build complex packet
-
 save log at crash? how to detect crash?
 
 	-New Creating Process :
-
 Collection de position : cursors in a sheet
 	position, dir and scale
 		add scale value to MCursor or to nCursor ?
-		
 form : bloc
 	graphic object : line, trig, ellipse, rect, arrow...
 	axis aligned, normalized size, colors, line width
-	
 structure : bloc
 	list of replic : pos, dir, scale, line width multiplyer and color filter
 	replicate a given form
 	max_entity and active_entity tools here
-
 patern : bloc
 	apply a parametrable patern to a structure
 	patern can be driven by a given random seed
 	building can be driven by tick input << !! sim random seed will be used !!
 	modif continue : create movement by changing given structure replics position and direction
-	
 Camera : bloc
 	draw given shape to given cursors positions in camera view
 Canvas : bloc
@@ -130,7 +120,6 @@ Canvas : bloc
 	printing can be different things, add color as halo, modify, decay ...
 
 	-Hard to do:
-
 slow mo mode : permit interaction and observation > 
 	objectif no number no words just visual for organic learnning
 	permit to see the content sended through a link visualy

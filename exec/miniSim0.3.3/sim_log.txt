@@ -1,12 +1,12 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-5645:- :full_data_save to save.sdata
-5821:- :setup_load from exploding_struct.sdata
-6807:  :setup_load from random_mouvement.sdata
-15842:  :setup_load from save.sdata
-40297:  :full_data_save to save.sdata
-40907:  :exit
+466:  :setup_load from random_mouvement.sdata
+8529:  :setup_load from exploding_struct.sdata
+8851:  :setup_load from demo.sdata
+15319:  :full_data_save to spesheet.sdata
+33546:  :full_data_save to spesheet.sdata
+33860:  :exit
 null
 null
 null
