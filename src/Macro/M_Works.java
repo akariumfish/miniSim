@@ -34,7 +34,10 @@ class MCam extends MBaseMenu {
 	}
 	Drawable drawable;
 	Macro_Connexion struct_link, sheet_in;
-	Macro_Sheet cursor_sheet;
+	ArrayList<Macro_Sheet> csheets = new ArrayList<Macro_Sheet>();
+	ArrayList<MForm> forms = new ArrayList<MForm>();
+	ArrayList<MStructure> structs = new ArrayList<MStructure>();
+	nRunnable up_sheet_run, up_draw_run;
 	MCam(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "cam", _bloc); }
 	void init() {
 		super.init();   
@@ -48,60 +51,95 @@ class MCam extends MBaseMenu {
 	}
 	void build_normal() {
 		super.build_normal();
-		sheet_in = addInput(0,"sheet");
-		sheet_in.set_link();
-		struct_link = addInput(0,"link");
-		struct_link.set_link();
+		sheet_in = addInput(0, "sheet");
+		up_sheet_run = new nRunnable() { public void run() {
+			for (Macro_Sheet mf : csheets) mf.priority.removeEventChange(up_sheet_run);
+			csheets.clear();
+			int cnt = 0;
+			int prio = 100;
+			for (Macro_Connexion co : sheet_in.connected_outputs) {
+				if (co.elem.bloc.val_type.get().equals("sheetmain")) {
+					Macro_Sheet mf = ((Macro_Sheet)co.elem.bloc.sheet);
+					cnt++;
+					if (mf.priority.get() < prio) {
+						prio = mf.priority.get();
+					}
+				}
+			}
+			while(cnt > 0) {
+				for (Macro_Connexion co : sheet_in.connected_outputs) {
+					if (co.elem.bloc.val_type.get().equals("sheetmain")) {
+						Macro_Sheet mf = ((Macro_Sheet)co.elem.bloc.sheet);
+						if (mf.priority.get() == prio) {
+							csheets.add(mf);
+							mf.priority.addEventChange(up_sheet_run);
+							cnt--;
+						}
+					}
+				}
+				prio++;
+			}
+		}};
+		sheet_in.set_link().addEventLink(up_sheet_run).addEventUnLink(up_sheet_run);
+		struct_link = addInput(0, "link");
+		up_draw_run = new nRunnable() { public void run() {
+			forms.clear();
+			for (Macro_Connexion co : struct_link.connected_outputs) {
+				if (co.elem.bloc.val_type.get().equals("form")) {
+					MForm mf = ((MForm)co.elem.bloc);
+					forms.add(mf);
+				}
+			}
+			for (MStructure mf : structs) mf.priority.removeEventChange(up_draw_run);
+			structs.clear();
+			int cnt = 0;
+			int prio = 100;
+			for (Macro_Connexion co : struct_link.connected_outputs) {
+				if (co.elem.bloc.val_type.get().equals("struct")) {
+					MStructure mf = ((MStructure)co.elem.bloc);
+					cnt++;
+					if (mf.priority.get() < prio) {
+						prio = mf.priority.get();
+					}
+				}
+			}
+			while(cnt > 0) {
+				for (Macro_Connexion co : struct_link.connected_outputs) {
+					if (co.elem.bloc.val_type.get().equals("struct")) {
+						MStructure mf = ((MStructure)co.elem.bloc);
+						if (mf.priority.get() == prio) {
+							structs.add(mf);
+							mf.priority.addEventChange(up_draw_run);
+							cnt--;
+						}
+					}
+				}
+				prio++;
+			}
+		}};
+		struct_link.set_link().addEventLink(up_draw_run).addEventUnLink(up_draw_run);
 	}
 	public void build_custom_menu(nFrontPanel sheet_front) {
 		if (sheet_front != null) {
-			
 			sheet_front.toLayerTop();
 		}
 	}
 	public void draw_to_cam() {
-	    int prio = -1;
-		for (Macro_Connexion co : sheet_in.connected_outputs) {
-			if (co.elem.bloc.val_type.get().equals("sheetmain")) {
-				Macro_Sheet mf = ((Macro_Sheet)co.elem.bloc.sheet);
-				if (mf.priority.get() >= prio) {
-					cursor_sheet = mf;
-					prio = mf.priority.get();
-				}
-			}
-		}
-		if (cursor_sheet != null && cursor_sheet.sheet_cursors_list.size() > 0) {
-			for (nCursor cur : cursor_sheet.sheet_cursors_list) {
+		if (csheets.size() > 0) { 
+			for (Macro_Sheet mf : csheets) for (nCursor cur : mf.sheet_cursors_list) {
 				gui.app.pushMatrix();
 				gui.app.translate(cur.x(), cur.y());
 				gui.app.rotate(cur.dir().heading());
 				
-				for (Macro_Connexion co : struct_link.connected_outputs) {
-					if (co.elem.bloc.val_type.get().equals("form")) {
-						MForm mf = ((MForm)co.elem.bloc);
-						mf.draw(gui.app);
-					}
-					if (co.elem.bloc.val_type.get().equals("struct")) {
-						MStructure mf = ((MStructure)co.elem.bloc);
-						mf.draw(gui.app);
-					}
-				}
+				for (MForm m : forms) m.draw(gui.app);
+				for (MStructure m : structs) m.draw(gui.app);
 				
 				gui.app.popMatrix();
 			} 
 		} else {
-			for (Macro_Connexion c : struct_link.connected_outputs) {
-				if (c.elem.bloc.val_type.get().equals("form")) {
-					MForm mf = ((MForm)c.elem.bloc);
-					mf.draw(gui.app);
-				}
-				if (c.elem.bloc.val_type.get().equals("struct")) {
-					MStructure mf = ((MStructure)c.elem.bloc);
-					mf.draw(gui.app);
-				}
-			}
+			for (MForm m : forms) m.draw(gui.app);
+			for (MStructure m : structs) m.draw(gui.app);
 		}
-		cursor_sheet = null;
 	}
 	public MCam clear() {
 		super.clear(); 
@@ -606,10 +644,10 @@ class Replic implements Macro_Interf {
 	void from_str(String s) {
 		String[] l = PApplet.splitTokens(s, INFO_TOKEN);
 		if (l.length == 4) {
-			pos.x = PApplet.parseFloat(l[0]);
-			pos.y = PApplet.parseFloat(l[1]);
-			dir.x = PApplet.parseFloat(l[2]);
-			dir.y = PApplet.parseFloat(l[3]);
+			pos.x = Rapp.parseFlt(l[0]);
+			pos.y = Rapp.parseFlt(l[1]);
+			dir.x = Rapp.parseFlt(l[2]);
+			dir.y = Rapp.parseFlt(l[3]);
 		}
 	}
 }
@@ -1164,7 +1202,7 @@ class MForm extends MBaseMenu {
     	        .addDrawer(10.25, 6.25);
       
       graph = dr.addModel("Field");
-      graph.setPosition(ref_size * 2, ref_size * 2 / 16)
+      graph.setPosition(ref_size * 4, ref_size * 2 / 16)
         .setSize(ref_size * 6, ref_size * 6);
       
       g_draw = new Drawable(sheet_front.gui.drawing_pile, 0) { public void drawing() {
@@ -1191,23 +1229,43 @@ class MForm extends MBaseMenu {
       } };
       graph.setDrawable(g_draw);
       
-      dr.addLinkedModel("Field").setLinkedValue(vpax).setPosition(ref_size * 2 / 16, ref_size * (0+(4.0/16)))
-        .setSize(ref_size * 1.75, ref_size * 0.75);
-      dr.addLinkedModel("Field").setLinkedValue(vpay).setPosition(ref_size * 2 / 16, ref_size * (1+(4.0/16)))
-        .setSize(ref_size * 1.75, ref_size * 0.75);
-      dr.addLinkedModel("Field").setLinkedValue(vpbx).setPosition(ref_size * 2 / 16, ref_size * (2+(4.0/16)))
-        .setSize(ref_size * 1.75, ref_size * 0.75);
-      dr.addLinkedModel("Field").setLinkedValue(vpby).setPosition(ref_size * 2 / 16, ref_size * (3+(4.0/16)))
-        .setSize(ref_size * 1.75, ref_size * 0.75);
-      dr.addLinkedModel("Field").setLinkedValue(vpcx).setPosition(ref_size * 2 / 16, ref_size * (4+(4.0/16)))
-        .setSize(ref_size * 1.75, ref_size * 0.75);
-      dr.addLinkedModel("Field").setLinkedValue(vpcy).setPosition(ref_size * 2 / 16, ref_size * (5+(4.0/16)))
-        .setSize(ref_size * 1.75, ref_size * 0.75);
+      point_menu(dr, 0, vpax);
+      point_menu(dr, 1, vpay);
+      point_menu(dr, 2, vpbx);
+      point_menu(dr, 3, vpby);
+      point_menu(dr, 4, vpcx);
+      point_menu(dr, 5, vpcy);
+      
+      dr.getShelf().addSeparator(0.125).addDrawer(10.25, 1)
+  		.addCtrlModel("Button", "Center").setRunnable(new nRunnable(this) { public void run() { 
+  			PVector pa = new PVector(vpax.get(), vpay.get());
+  			PVector pb = new PVector(vpbx.get(), vpby.get());
+  			PVector pc = new PVector(vpcx.get(), vpcy.get());
+  			PVector m = new PVector((pa.x + pb.x + pc.x) / 3.0F, (pa.y + pb.y + pc.y) / 3.0F);
+  			vpax.set(pa.x - m.x); vpay.set(pa.y - m.y);
+  			vpbx.set(pb.x - m.x); vpby.set(pb.y - m.y);
+  			vpcx.set(pc.x - m.x); vpcy.set(pc.y - m.y);
+  		}})
+  		.setPosition(ref_size * 1.0, ref_size * 0.25)
+  		.setSize(ref_size * 3, ref_size * 0.75)
+  		.getDrawer()
+  		.addCtrlModel("Button", "Normalize").setRunnable(new nRunnable(this) { public void run() {
+  			
+  		}})
+  		.setPosition(ref_size * 6.0, ref_size * 0.25)
+  		.setSize(ref_size * 3, ref_size * 0.75)
+  		.getShelf()
+  	  .addSeparator(0.125);
       
       sheet_front.addEventClose(new nRunnable(this) { public void run() { 
         graph = null; g_draw.clear(); g_draw = null; } } );
       sheet_front.toLayerTop();
     }
+  }
+  
+  private void point_menu(nDrawer dr, int n, sFlt v) {
+      dr.addLinkedModel("Field").setLinkedValue(v).setPosition(ref_size * 18 / 16, ref_size * (n+(4.0/16)))
+      	.setSize(ref_size * 1.75, ref_size * 0.75);
   }
 
 	public void draw(Rapp a) { 	

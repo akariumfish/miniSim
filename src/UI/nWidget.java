@@ -447,7 +447,9 @@ public class nWidget {
   private boolean grabbable = false, constrainX = false, constrainY = false, constrainD = false;
   private float constrainDlength = 0;
   private boolean isSelectable = false, isField = false, showCursor = false;
-  private boolean showOutline = false, hoverOutline = false, constantOutlineWeight = false;
+  boolean showOutline = false;
+private boolean hoverOutline = false;
+boolean constantOutlineWeight = false;
   private boolean alignX = false, stackX = false, alignY = false, stackY = false;
   private boolean centerX = false, centerY = false;
   private boolean placeLeft = false, placeRight = false, placeUp = false, placeDown = false;
@@ -474,7 +476,7 @@ public class nWidget {
   ArrayList<nRunnable> eventFieldChangeRun = new ArrayList<nRunnable>();
   
   private nRunnable frame_run;
-  private Rapp app;
+  public Rapp app;
   void init(nGUI g) {
     gui = g; app = g.app;
     frame_run = new nRunnable() { public void run() { frame(); } };

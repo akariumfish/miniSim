@@ -5,13 +5,13 @@ public class Consol {
 	public static void main(String[] args) {
 		
 		test(1.23456F);
+		test(-1.23456F);
 	}
 
 	static void prt(float i) {
 		PApplet.println("for : " + PApplet.str(i));
 		for (int tn = 2 ; tn < 6 ; tn++) {
-//			PApplet.print("" + tn + " : " + RConst.trimFlt(i, tn) + "    ");
-//			PApplet.print("" + tn + " : " + RConst.trimStringFloat(i, tn) + "    ");
+			PApplet.print("" + tn + " : " + RConst.trimFlt(i, tn) + "    ");
 		}
 		PApplet.println();
 		

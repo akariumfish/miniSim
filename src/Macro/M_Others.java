@@ -15,7 +15,7 @@ public class M_Others {}
 
 class MPoint extends Macro_Bloc { 
   static class MPoint_Builder extends MAbstract_Builder {
-	  MPoint_Builder() { super("point", "connection node"); }
+	  MPoint_Builder() { super("point", "Point", "connection node", "Control"); }
       MPoint build(Macro_Sheet s, sValueBloc b) { MPoint m = new MPoint(s, b); return m; }
     }
   Macro_Connexion in, out; 

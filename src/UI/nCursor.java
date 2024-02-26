@@ -7,6 +7,7 @@ import Macro.Macro_Main;
 import Macro.Macro_Sheet;
 import RApplet.Camera;
 import RApplet.RConst;
+import RApplet.Rapp;
 import processing.core.PConstants;
 import processing.core.PVector;
 import sData.nRunnable;
@@ -136,11 +137,69 @@ public class nCursor extends nWidget implements Macro_Interf {
 	    	.setSize(ref_size/4, ref_size/4).hide();
 	    screenpoint_widget.setPosition(0, 0);
 	    screenpoint_widget.setParent(screen_ref_widget).setGrabbable()
-	    	.setConstrainDistance(ref_size).toLayerTop().center();
+	    		.setConstrainDistance(ref_size).toLayerTop().center();
+	    screenpoint_widget.setDrawable(
+	    	new Drawable(screenpoint_widget.gui.drawing_pile, 0) {public void drawing() {
+    	      if (screenpoint_widget.isViewable()) {
+    	    	  	nWidget w = screenpoint_widget;
+    	    	  	w.app.pushMatrix();
+    	    	  	w.app.translate(w.getX() + w.getSX()/2, w.getY() + w.getSY()/2);
+    	    	  	w.app.rotate(dval.get().heading());
+    	        if (w.isClicked) { w.app.fill(w.look.pressColor); } 
+    	        else if (w.isHovered) { w.app.fill(w.look.hoveredColor); } 
+    	        else { w.app.fill(w.look.standbyColor); }
+    	        w.app.noStroke();
+    	        w.app.ellipseMode(PConstants.CORNER);
+    	        w.app.quad(0, -w.getSY()/2, w.getSX()/2 , 0, 
+	    	        		   0,  w.getSY()/2, -w.getSX()/2, 0);
+    	        
+    	        w.app.noFill();
+    	        if (w.showOutline) w.app.stroke(w.look.outlineColor);
+    	        else w.app.noStroke();
+    	        if (w.constantOutlineWeight) { 
+    	        		w.app.strokeWeight(w.look.outlineWeight / w.gui.scale); 
+    	        	}
+    	        else w.app.strokeWeight(w.look.outlineWeight);
+    	        
+    	        w.app.quad(0, -w.getSY()/2, w.getSX()/2, 0, 
+ 	        		   0,  w.getSY()/2, -w.getSX()/2, 0);
+    	        
+	    	  	w.app.popMatrix();
+    	      }
+	    }});
 	    
 	    pointwidget = gui.theme.newWidget(gui, "Pointer").setPosition(0, 0).setSize(ref_size/2, ref_size/2);
 	    pointwidget.setParent(refwidget).setGrabbable()
 	        .setConstrainDistance(ref_size*2).hide().toLayerTop().center();
+	    pointwidget.setDrawable(
+	    	new Drawable(gui.drawing_pile, 0) {public void drawing() {
+    	      if (pointwidget.isViewable()) {
+    	    	  	nWidget w = pointwidget;
+    	    	  	w.app.pushMatrix();
+    	    	  	w.app.translate(w.getX() + w.getSX()/2, w.getY() + w.getSY()/2);
+    	    	  	w.app.rotate(dval.get().heading());
+    	        if (w.isClicked) { w.app.fill(w.look.pressColor); } 
+    	        else if (w.isHovered) { w.app.fill(w.look.hoveredColor); } 
+    	        else { w.app.fill(w.look.standbyColor); }
+    	        w.app.noStroke();
+    	        w.app.ellipseMode(PConstants.CORNER);
+    	        w.app.quad(0, -w.getSY()/2, w.getSX()/2 , 0, 
+	    	        		   0,  w.getSY()/2, -w.getSX()/2, 0);
+    	        
+    	        w.app.noFill();
+    	        if (w.showOutline) w.app.stroke(w.look.outlineColor);
+    	        else w.app.noStroke();
+    	        if (w.constantOutlineWeight) { 
+    	        		w.app.strokeWeight(w.look.outlineWeight / w.gui.scale); 
+    	        	}
+    	        else w.app.strokeWeight(w.look.outlineWeight);
+    	        
+    	        w.app.quad(0, -w.getSY()/2, w.getSX()/2 , 0, 
+ 	        		   0,  w.getSY()/2, -w.getSX()/2, 0);
+    	        
+	    	  	w.app.popMatrix();
+    	      }
+	    }});
 	    
 	    addEventDrag(new nRunnable() {public void run() { 
 //	    	if (grid_snapping) setPosition(getLocalX() - getLocalX()%(ref_size*GRID_SNAP_FACT), 
@@ -154,8 +213,8 @@ public class nCursor extends nWidget implements Macro_Interf {
 //	    			screen_widget.getLocalX()%(sc*ref_size*GRID_SNAP_FACT), 
 //	    			screen_widget.getLocalY() - 
 //	    			screen_widget.getLocalY()%(sc*ref_size*GRID_SNAP_FACT));
-	        PVector p = new PVector(screen_widget.getX(), 
-	        						screen_widget.getY());
+	        PVector p = new PVector(screen_ref_widget.getX(), 
+	        						   screen_ref_widget.getY());
 	        p = cam.screen_to_cam(p);
 	        pval.set(p.x, p.y);
 	    }});

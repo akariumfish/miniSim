@@ -11,8 +11,8 @@ public class M_Time {}
 
 
 class MSequance extends MBasic { 
-	  static class MSequencor_Builder extends MAbstract_Builder {
-		  MSequencor_Builder() { super("sequ", "Sequance", "usefull for ordering executions", "Time"); }
+	  static class Builder extends MAbstract_Builder {
+		  Builder() { super("sequ", "Sequance", "usefull for ordering executions", "Control"); }
 		  MSequance build(Macro_Sheet s, sValueBloc b) { MSequance m = new MSequance(s, b); return m; }
 	  }
 
@@ -21,11 +21,13 @@ class MSequance extends MBasic {
 	  sInt current_delay;	int counter = 0;
 	  Macro_Connexion current_out;
 	  int current_index;
-	  sInt row_nb; sBoo actif_val;
+	  sInt row_nb; sBoo actif_val, show_actif, show_delay;
 	  MSequance(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "sequ", _bloc); }
 	  void init() {
-		  row_nb = newInt(5, "row_nb");
+		  row_nb = newInt(3, "row_nb");
 		  actif_val = newBoo(true, "actif_val");
+		  show_actif = newBoo(false, "show_actif");
+		  show_delay = newBoo(false, "show_delay");
 		  ivals = new ArrayList<sInt>();
 		  connects = new ArrayList<Macro_Connexion>();
 	  }
@@ -35,15 +37,30 @@ class MSequance extends MBasic {
 		  addEmptyS(1).addWatcherModel("MC_Element_SField").setLinkedValue(row_nb);
 		  addTrigS(0, "del row", new nRunnable() { public void run() { 
 			  if (row_nb.get() > 2) row_nb.add(-1); rebuild(); }});
+		  addEmptyS(1); addEmptyS(2);
+		  addLinkedLSwitch(0, show_actif).setText("show_actif");
+		  show_actif.addEventChange(new nRunnable() { public void run() {
+			  if (!show_actif.get()) actif_val.set(true);
+			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  			  if (!rebuilding) rebuild(); }});
+		  	} });
+		  addEmptyS(1); addEmptyS(2);
+		  addLinkedLSwitch(0, show_delay).setText("show_delay");
+		  show_delay.addEventChange(new nRunnable() { public void run() {
+//			  if (!show_delay.get()) actif_val.set(true);
+			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  			  if (!rebuilding) rebuild(); }});
+		  	} });
 		  build_normal();
 	  }
 	  
 	  void build_normal() {
-
-		  addEmptyS(0).addLinkedModel("MC_Element_SButton").setLinkedValue(actif_val);
-		  addInputToValue(0, actif_val);
-		  
-		  addInputBang(0, "tick", new nRunnable() { public void run() { 
+		  if (show_actif.get()) {
+			  if (show_delay.get()) addEmptyS(2);
+			  addEmptyS(1).addLinkedModel("MC_Element_SButton", "ON").setLinkedValue(actif_val);
+		  	  addInputToValue(0, actif_val);
+		  }
+		  nRunnable tick_run = new nRunnable() { public void run() { 
 			  if (actif_val.get()) {
 				  counter++;
 				  if (counter >= current_delay.get()) {
@@ -55,27 +72,44 @@ class MSequance extends MBasic {
 					  counter = 0;
 				  }
 			  }
-		  }});
-
-		  addInputBang(0, "reset", new nRunnable() { public void run() { 
+		  }};
+		  nRunnable rst_run = new nRunnable() { public void run() { 
 			  if (ivals.size() > 0) current_delay = ivals.get(0);
 			  current_index = 0;
 			  if (connects.size() > 0) current_out = connects.get(0);
 			  counter = 0;
-		  }});
+		  }};
+		  addInputBang(0, "tick", tick_run).hide_msg()
+		  	  .elem.addCtrlModel("MC_Element_SButton", "tick")
+		      .setRunnable(tick_run);
+
+		  addInputBang(0, "reset", rst_run).hide_msg()
+	  	  .elem.addCtrlModel("MC_Element_SButton", "reset")
+	      .setRunnable(tick_run);
 		  
 		  for (int i = 0 ; i < row_nb.get() ; i++) {
-			  sInt v = newInt(100, "delay"+i, "delay"+i);
+			  sInt v = newInt(0, "delay"+i, "delay"+i);
 			  if (!ivals.contains(v)) ivals.add(v);
-			  addEmptyS(1).addLinkedModel("MC_Element_SField")
-					  .setLinkedValue(v);
-			  Macro_Connexion out = addOutput(2, "out"+i);
-			  connects.add(out);
-			  if (current_delay == null || current_out == null) {
-				  current_delay = v;
-				  current_out = out;
-				  current_index = i;
-				  counter = 0;
+			  if (show_delay.get()) {
+				  addEmptyS(1).addLinkedModel("MC_Element_SField")
+						  .setLinkedValue(v);
+				  Macro_Connexion out = addOutput(2, "out"+i);
+				  connects.add(out);
+				  if (current_delay == null || current_out == null) {
+					  current_delay = v;
+					  current_out = out;
+					  current_index = i;
+					  counter = 0;
+				  }
+			  } else {
+				  Macro_Connexion out = addOutput(1, "out"+i);
+				  connects.add(out);
+				  if (current_delay == null || current_out == null) {
+					  current_delay = v;
+					  current_out = out;
+					  current_index = i;
+					  counter = 0;
+				  }
 			  }
 		  }
 	  }
@@ -167,7 +201,7 @@ class MPulse extends Macro_Bloc { //let throug only 1 bang every <delay> bang
 
 class MRamp extends Macro_Bloc { 
 	  static class MRamp_Builder extends MAbstract_Builder {
-		  MRamp_Builder() { super("ramp", "Rampe", "", "Time"); }
+		  MRamp_Builder() { super("ramp", "Rampe", "", "Control"); }
 		  MRamp build(Macro_Sheet s, sValueBloc b) { MRamp m = new MRamp(s, b); return m; }
 	  }
   Macro_Connexion in_tick, in_start, in_stop, in_reset, out_val, out_end;

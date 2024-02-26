@@ -79,33 +79,41 @@ public class nShelf extends nBuilder {
 	    nDrawer d = addDrawer(w, h);
 	    d.addModel("Label_Small_Text-S1")
 	      .setText(val2.ref)
-	      .setPosition(ref_size*3.6F, 0)
+	      .setPosition(ref_size*4.375F, 0)
 	      .setTextAlignment(PApplet.LEFT, PApplet.CENTER)
 	      ;
 	    d.addWatcherModel("Auto_Watch_Label-S2")
 	      .setLinkedValue(val2)
-	      .setSize(ref_size*1.625F, ref_size*0.8F)
+	      .setSize(ref_size*2.0F, ref_size*0.8F)
 	      .setPosition(ref_size*2.25F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P1")
 	      .setLinkedValue(val2)
 	      .setIncrement(incr)
 	      .setText(RConst.trimFlt(incr))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*0.0F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P2")
 	      .setLinkedValue(val2)
 	      .setIncrement(incr/10)
 	      .setText(RConst.trimFlt(incr/10))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*0.0F, ref_size*0.5F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P8")
 	      .setLinkedValue(val2)
 	      .setIncrement(-incr/10)
 	      .setText(RConst.trimFlt(-incr/10))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*7.875F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P9")
 	      .setLinkedValue(val2)
 	      .setIncrement(-incr)
 	      .setText(RConst.trimFlt(-incr))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*7.875F, ref_size*0.5F)
 	      ;
 	    return this;
 	  }
@@ -114,13 +122,13 @@ public class nShelf extends nBuilder {
 	    nDrawer d = addDrawer(w, h);
 	    d.addModel("Label_Small_Text-S1")
 	      .setText(val2.ref)
-	      .setPosition(ref_size*4.3F, 0)
+	      .setPosition(ref_size*5.5F, 0)
 	      .setTextAlignment(PApplet.LEFT, PApplet.CENTER)
 	      ;
 	    d.addWatcherModel("Auto_Watch_Label")
 	      .setLinkedValue(val2)
-	      .setSize(ref_size*1.625F, ref_size*0.8F)
-	      .setPosition(ref_size*3.125F, ref_size*0.1F)
+	      .setSize(ref_size*2.0F, ref_size*0.8F)
+	      .setPosition(ref_size*3.375F, ref_size*0.1F)
 	      ;
 	    d.addLinkedModel("Button_Check-SS1-P3", "")
 	      .setLinkedValue(val1)
@@ -129,21 +137,29 @@ public class nShelf extends nBuilder {
 	      .setLinkedValue(val2)
 	      .setFactor(fact)
 	      .setText("x"+RConst.trimFlt(fact))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*0.0F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P2")
 	      .setLinkedValue(val2)
 	      .setFactor((float) Math.sqrt(fact))
 	      .setText("x"+RConst.trimFlt((float) Math.sqrt(fact)))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*0.0F, ref_size*0.5F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P8")
 	      .setLinkedValue(val2)
 	      .setFactor(1/(float) Math.sqrt(fact))
 	      .setText("/"+RConst.trimFlt(1/(float) Math.sqrt(fact)))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*7.875F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P9")
 	      .setLinkedValue(val2)
 	      .setFactor(1/fact)
 	      .setText("/"+RConst.trimFlt(fact))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*7.875F, ref_size*0.5F)
 	      ;
 	    return this;
 	  }
@@ -151,33 +167,41 @@ public class nShelf extends nBuilder {
 	    nDrawer d = addDrawer(w, h);
 	    d.addModel("Label_Small_Text-S1")
 	      .setText(val2.ref)
-	      .setPosition(ref_size*3.6F, 0)
+	      .setPosition(ref_size*4.375F, 0)
 	      .setTextAlignment(PApplet.LEFT, PApplet.CENTER)
 	      ;
 	    d.addWatcherModel("Auto_Watch_Label-S2")
 	      .setLinkedValue(val2)
-	      .setSize(ref_size*1.625F, ref_size*0.8F)
+	      .setSize(ref_size*2.0F, ref_size*0.8F)
 	      .setPosition(ref_size*2.25F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P1")
 	      .setLinkedValue(val2)
 	      .setFactor(fact)
 	      .setText("x"+RConst.trimFlt(fact))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*0.0F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P2")
 	      .setLinkedValue(val2)
 	      .setFactor((float) Math.sqrt(fact))
 	      .setText("x"+RConst.trimFlt((float) Math.sqrt(fact)))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*0.0F, ref_size*0.5F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P8")
 	      .setLinkedValue(val2)
 	      .setFactor(1/(float) Math.sqrt(fact))
 	      .setText("/"+RConst.trimFlt(1/(float) Math.sqrt(fact)))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*7.875F, ref_size*0.1F)
 	      ;
 	    d.addCtrlModel("Auto_Ctrl_Button-S1-P9")
 	      .setLinkedValue(val2)
 	      .setFactor(1/fact)
 	      .setText("/"+RConst.trimFlt(fact))
+	      .setSize(ref_size*2.125F, ref_size*0.4F)
+	      .setPosition(ref_size*7.875F, ref_size*0.5F)
 	      ;
 	    return this;
 	  }

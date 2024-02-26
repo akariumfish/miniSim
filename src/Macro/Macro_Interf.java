@@ -6,7 +6,6 @@ public interface Macro_Interf {
 	  static final int HIDE = 0, REDUC = 1, OPEN = 2, DEPLOY = 3;
 	  static final String OBJ_TOKEN = "@", GROUP_TOKEN = "¤", INFO_TOKEN = "#", BLOC_TOKEN = "~";
 	  
-	  final String[] bloc_types1 = {"vecXY", "vecMD", "vecCtrl", "numCtrl", "crossVec", 
-	                                "midi", "preset", "tool", "tooltri", "toolbin", 
-	                                "toolNC", "colRGB", "pan", "panbin", "pansld", "pangrph" };
+	  final String[] bloc_types1 = {"vecCtrl", "numCtrl", "crossVec", 
+	                                "midi", "preset", "toolNC" };
 	}

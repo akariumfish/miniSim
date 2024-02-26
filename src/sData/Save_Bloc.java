@@ -48,12 +48,12 @@ public class Save_Bloc {
 	  
 	  String getData(String n) { for (Save_Data sd : datas) if (sd.name.equals(n)) return sd.get(); return ""; }
 	  int getInt(String n) { 
-		  float f = PApplet.parseFloat(getData(n));
+		  float f = Rapp.parseFlt(getData(n));
 		  if (!PApplet.str(f).equals("NaN"))
 			  return PApplet.parseInt(f); 
 		  else return 0; }
 	  float getFloat(String n) { 
-		  float f = PApplet.parseFloat(getData(n));
+		  float f = Rapp.parseFlt(getData(n));
 		  if (!PApplet.str(f).equals("NaN")) return f; 
 		  else return 0; }
 	  boolean getBoolean(String n) { if (getData(n).equals("1")) return true; else return false; }
@@ -172,7 +172,7 @@ class Save_List {
     return list[index-1]; }
     else return "";
   }
-  int getInt(String log) { return (int)PApplet.parseFloat(get(log)); }
+  int getInt(String log) { return (int)Rapp.parseFlt(get(log)); }
   
   void init(int size) { list = new String[size]; index = 0; }
   void init(String[] l) { list = l; index = 0; }

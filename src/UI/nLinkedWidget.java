@@ -1,6 +1,7 @@
 package UI;
 
 import RApplet.RConst;
+import RApplet.Rapp;
 import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sBoo;
@@ -72,8 +73,8 @@ public class nLinkedWidget extends nWidget {
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 
 	      String s = ((nLinkedWidget)builder).getText();
-	      if (s.length() > 0 && !PApplet.str(PApplet.parseFloat(s)).equals("NaN")) 
-	    	  	fval.set(PApplet.parseFloat(s)); } } );//Float.parseFloat(s)
+	      if (s.length() > 0 && !PApplet.str(Rapp.parseFlt(s)).equals("NaN")) 
+	    	  	fval.set(Rapp.parseFlt(s)); } } );//Float.parseFloat(s)
 	      //!(s.length() > 0 && float(s) == 0) && 
 	    return this; }
 	  nLinkedWidget setLinkedValue(sVec b) { 

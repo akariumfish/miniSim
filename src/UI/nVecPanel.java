@@ -1,6 +1,7 @@
 package UI;
 
 import RApplet.RConst;
+import RApplet.Rapp;
 import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sVec;
@@ -17,13 +18,13 @@ public class nVecPanel extends nWindowPanel {
 
     field1_run = new nRunnable() { public void run() { 
       String s = field1_widget.getText();
-      if (s.length() > 0 && !PApplet.str(PApplet.parseFloat(s)).equals("NaN")) 
-        val.setx(PApplet.parseFloat(s)); 
+      if (s.length() > 0 && !PApplet.str(Rapp.parseFlt(s)).equals("NaN")) 
+        val.setx(Rapp.parseFlt(s)); 
     } };
     field2_run = new nRunnable() { public void run() { 
         String s = field2_widget.getText();
-        if (s.length() > 0 && !PApplet.str(PApplet.parseFloat(s)).equals("NaN")) 
-          val.sety(PApplet.parseFloat(s)); 
+        if (s.length() > 0 && !PApplet.str(Rapp.parseFlt(s)).equals("NaN")) 
+          val.sety(Rapp.parseFlt(s)); 
       } };
     
     getShelf().addDrawer(10.25F, 1).getShelf()

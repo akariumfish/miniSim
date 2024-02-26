@@ -259,15 +259,17 @@ protected sFlt menuFltSlide(float v, float _min, float _max, String r) {
 	    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
 	  .addWatcherModel("Auto_Watch_Label-S1-P3")
 	    .setLinkedValue(((sFlt)builder))
+        .setSX(ref_size*2.0)
+        .setPX(ref_size*2.875)
 	    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
-	  .addWidget(new nSlide(custom_tab.gui, ref_size * 6, ref_size * 0.75F)
+	  .addWidget(new nSlide(custom_tab.gui, ref_size * 5, ref_size * 0.75F)
 	    .setValue( ( ((sFlt)builder).get() - ((sFlt)builder).getmin() ) / 
 	               ( ((sFlt)builder).getmax() - ((sFlt)builder).getmin() ) )
 	    .addEventSlide(new nRunnable(((sFlt)builder)) { public void run(float c) { 
 	      ((sFlt)builder).set( ((sFlt)builder).getmin() + 
 	                           c * (((sFlt)builder).getmax() - ((sFlt)builder).getmin()) ); 
 	    } } )
-	    .setPosition(4*ref_size, ref_size * 2 / 16) ).getShelf()
+	    .setPosition(5*ref_size, ref_size * 2 / 16) ).getShelf()
 	  .addSeparator(0.125);
 	} });
 	return f;
@@ -536,7 +538,7 @@ class MSheetCo extends MBasic {
 class MSheetMain extends MBasic { 
 	static class MSheetMain_Builder extends MAbstract_Builder {
 		MSheetMain_Builder() { 
-			super("sheetmain", "Sheet Bloc", "sheet mains tools", "Sheet"); 
+			super("sheetmain", "SheetMain", "sheet mains tools", "Sheet"); 
 //			visible = false;
 			show_in_buildtool = false; }
 		MSheetMain build(Macro_Sheet s, sValueBloc b) { MSheetMain m = new MSheetMain(s, b); return m; }
@@ -627,7 +629,7 @@ class MSheetMain extends MBasic {
 	    		new nRunnable() { public void run() { sheet.reduc(); }});
 	    
 	    newRowProtectedValue(sheet.val_self);
-	    newRowValue(sheet.priority);
+	    newRowValue_Pan(sheet.priority);
 
 //	    newRowValue(sheet.grab_pos);
 	}
@@ -667,7 +669,7 @@ class MSheetMain extends MBasic {
 		  newRowProtectedValue(sheet.val_self);
 	    }
 	    if (show4.get()) {
-	    		newRowValue(sheet.priority);
+	    		newRowValue_Pan(sheet.priority);
 	    }
 	}
 	void menu() {

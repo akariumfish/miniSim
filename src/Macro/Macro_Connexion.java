@@ -200,28 +200,52 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         }
         for (Macro_Connexion m : connected_inputs) {
         if (gui.scale > 0.03 && m.isDraw() ) {
+        	  
+		  app.strokeWeight(ref.look.outlineWeight);
+		  PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
+		  PVector lm = new PVector(l.x, l.y);
+		  lm.setMag(getSize()/2);
+		  
           if (RConst.distancePointToLine(elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
 	              getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
 	              3 * ref.look.outlineWeight / gui.scale) { 
-        	  if (pack_info != null && (hasSend > 0 || hasReceived > 0)) 
-        		  elem.bloc.mmain().info.showText(pack_info);
-        	  app.fill(ref.look.outlineSelectedColor); 
-        	  app.stroke(ref.look.outlineSelectedColor); } 
+	        	  if (pack_info != null && (hasSend > 0 || hasReceived > 0)) 
+	        		  elem.bloc.mmain().info.showText(pack_info);
+	        	  app.fill(ref.look.outlineSelectedColor); 
+	        	  app.stroke(ref.look.outlineSelectedColor); 
+	        	  
+              app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+                      getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y); } 
           else if (linking_connections.contains(m)) { 
-        	  if (hasSend > 0 || hasReceived > 0) { 
-        		  app.fill(ref.look.pressColor); app.stroke(ref.look.textColor); }
-        	  else { 
-            	  app.fill(ref.look.textColor); app.stroke(ref.look.pressColor); } }
+	        	  if (hasSend > 0 || hasReceived > 0) { 
+	        		  app.fill(ref.look.pressColor); app.stroke(ref.look.textColor); }
+	        	  else { 
+	            	  app.fill(ref.look.textColor); app.stroke(ref.look.pressColor); } 
+
+              app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+                   getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);}
           else if (hasSend > 0 || hasReceived > 0) { 
-        	  app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); }
+        	  	  if (sheet.mmain().packpross_by_frame.get() >= 1 / 
+        	  			  sheet.mmain().inter.framerate.median_framerate.get()) {
+	        	  	  app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); 
+    	              app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+    		                   getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
+        	  	  } else {
+	        	  	  app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); 
+	              app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+	                   getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
+	              
+	        	  	  app.fill(ref.look.outlineColor); app.stroke(ref.look.outlineColor); 
+	              l.set(l.x - 2*lm.x, l.y - 2*lm.y);
+	              l.setMag(sheet.mmain().packpross_pile*l.mag());
+	              app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+	                      getCenter().x+l.x, getCenter().y+l.y); 
+	              }
+          	  }
           else { 
-        	  app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); }
-          app.strokeWeight(ref.look.outlineWeight);
-          PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
-          PVector lm = new PVector(l.x, l.y);
-          lm.setMag(getSize()/2);
-          app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
-               getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y);
+        	  	  app.fill(ref.look.standbyColor); app.stroke(ref.look.standbyColor); 
+              app.line(getCenter().x+lm.x, getCenter().y+lm.y, 
+                      getCenter().x+l.x-lm.x, getCenter().y+l.y-lm.y); }
           }
         }
         if (hasSend > 0) hasSend--;
@@ -350,44 +374,48 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       if (type == OUTPUT && m.type == INPUT && !connected_inputs.contains(m)) {
         connected_inputs.add(m);
         m.connected_outputs.add(this); 
-        if (linkable && m.linkable) { 
-        	linking_connections.add(m); m.linking_connections.add(this); 
-        	nRunnable.runEvents(eventLinkRun);
-        }
         sheet.add_link(descr, m.descr);
         elem.bloc.mmain().last_link_sheet = sheet;
         elem.bloc.mmain().last_created_link = descr + INFO_TOKEN + m.descr;
+        if (linkable && m.linkable) { 
+	        	linking_connections.add(m); m.linking_connections.add(this); 
+	        	nRunnable.runEvents(eventLinkRun);
+	        	nRunnable.runEvents(m.eventLinkRun);
+        }
         return true;
       } else if (type == INPUT && m.type == OUTPUT && !connected_outputs.contains(m)) {
         connected_outputs.add(m);
         m.connected_inputs.add(this); 
-        if (linkable && m.linkable) { 
-        	linking_connections.add(m); m.linking_connections.add(this); 
-        	nRunnable.runEvents(eventLinkRun);
-        }
         sheet.add_link(m.descr, descr);
         elem.bloc.mmain().last_link_sheet = sheet;
         elem.bloc.mmain().last_created_link = m.descr + INFO_TOKEN + descr;
+        if (linkable && m.linkable) { 
+	        	linking_connections.add(m); m.linking_connections.add(this); 
+	        	nRunnable.runEvents(eventLinkRun);
+	        	nRunnable.runEvents(m.eventLinkRun);
+        }
         return true;
       } 
     }
     return false;
   }
   void disconnect_from(Macro_Connexion m) {
-    if (m != null) {// && connected_inputs.contains(m)
-      connected_inputs.remove(m);
-      m.connected_outputs.remove(this); 
-      sheet.remove_link(descr, m.descr);
-    } 
-    if (m != null) {// && connected_outputs.contains(m)
-      connected_outputs.remove(m);
-      m.connected_inputs.remove(this); 
-      sheet.remove_link(m.descr, descr);
-    }
-    if (linking_connections.contains(m)) {
-    	linking_connections.remove(m);
-    	nRunnable.runEvents(eventUnLinkRun);
-    }
+//    if (m != null) {// && connected_inputs.contains(m)
+    		connected_inputs.remove(m);
+      	m.connected_outputs.remove(this); 
+      	sheet.remove_link(descr, m.descr);
+//    } 
+//    if (m != null) {// && connected_outputs.contains(m)
+    		connected_outputs.remove(m);
+		m.connected_inputs.remove(this); 
+		sheet.remove_link(m.descr, descr);
+//    }
+//    if (linking_connections.contains(m)) {
+	    	linking_connections.remove(m);
+	    	m.linking_connections.remove(this);
+	    	nRunnable.runEvents(eventUnLinkRun);
+	    	nRunnable.runEvents(m.eventUnLinkRun);
+//    }
   }
 
   Macro_Connexion set_link() {
@@ -397,11 +425,13 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 		if (c.linkable && !linking_connections.contains(c)) {
 			linking_connections.add(c);
 			c.linking_connections.add(this);
+	    		nRunnable.runEvents(eventLinkRun);
 		}
 	for (Macro_Connexion c : connected_outputs)
 		if (c.linkable && !linking_connections.contains(c)) {
 			linking_connections.add(c);
 			c.linking_connections.add(this);
+    			nRunnable.runEvents(eventLinkRun);
 		}
     return this;
   }
@@ -412,8 +442,8 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   ArrayList<nRunnable> eventLinkRun = new ArrayList<nRunnable>();
   Macro_Connexion addEventLink(nRunnable r) { eventLinkRun.add(r); return this; }
   Macro_Connexion removeEventLink(nRunnable r) { eventLinkRun.remove(r); return this; }
-  Macro_Connexion addUnEventLink(nRunnable r) { eventUnLinkRun.add(r); return this; }
-  Macro_Connexion removeUnEventLink(nRunnable r) { eventUnLinkRun.remove(r); return this; }
+  Macro_Connexion addEventUnLink(nRunnable r) { eventUnLinkRun.add(r); return this; }
+  Macro_Connexion removeEventUnLink(nRunnable r) { eventUnLinkRun.remove(r); return this; }
   
   boolean buildingLine = false;
   PVector newLine = new PVector();
@@ -452,6 +482,8 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 	    // a afficher par frame a l'actuelle vitesse de process
 	    // le compte des fraction de longueur deja affiché est donné par 
 	    // mmain . packpross_pile
+	    
+	    
 	    if (sheet.mmain().loading_delay == 0)
 		    hasSend = Math.max(6, PApplet.parseInt( Math.min( 
 		    		sheet.mmain().inter.framerate.median_framerate.get(), 

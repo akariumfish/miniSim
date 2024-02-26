@@ -1,10 +1,9 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-273:  :setup_load from random_mouvement.sdata
-8037:  :full_data_save to random_mouvementFPS.sdata
-14663:  :full_data_save to random_mouvementFPS.sdata
-14727:  :exit
+266:  :setup_load from exploding_struct.sdata
+1190:  :full_data_save to exploding_struct.sdata
+1253:  :exit
 null
 null
 null

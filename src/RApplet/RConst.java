@@ -13,37 +13,33 @@ public interface RConst {
 	
 	static public String trimFlt(float f) { return trimFlt(f, 3); }
 	static public String trimFlt(float f, int p) {
-		String s;
-		  if (f%1.0 == 0.0) s = PApplet.nfc((int)(f)); else s = PApplet.str(f);
-		  String end = "";
-		  for (int i = s.length()-1; i > 0 ; i--) {
-		    if (s.charAt(i) == 'E') {
-		      end = s.substring(i, s.length());
-		    }
-		  }
-		  for (int i = 0; i < s.length() ; i++) {
-		    if (s.charAt(i) == '.' && s.length() - i > p) {
-		      int m = p;
-		      for (int c = 0 ; c < p ; c++) {
-		        if (f >= PApplet.pow(10, c+1)) m -= 1;
-		        if (f >= PApplet.pow(10, c+1) && (c+1)%3 == 0) m -= 1;
-		      }
-		      //if (f >= 10) m -= 1;
-		      //if (f >= 100) m -= 1;
-		      //if (f >= 1000) m -= 2;
-		      s = s.substring(0, i+m);
-		      s = s + end;
-		      return s;
-		    }
-		  }
-		  return s;
-//		int dec_m = 0;
-//		while (f > 10) { f /= 10; dec_m++; }
-//		while (f < 1) { f *= 10; dec_m--; }
-//		String s = PApplet.str(f);
-//		s = s.substring(0, p+1);
-//		s += "E"+dec_m;
-//		return s;
+		int dec_m = 0;
+		float abs = PApplet.abs(f);
+		if (f != 0) {
+			if (abs >= PApplet.pow(10, p-1)) { 
+				dec_m = p-1;
+				while (abs > PApplet.pow(10, dec_m)) { dec_m++; }
+				dec_m -= p-1;
+				f /= PApplet.pow(10, dec_m);
+			}
+			if (abs < PApplet.pow(10, -(p-2))) { 
+				dec_m = -(p-2);
+				while (abs < PApplet.pow(10, dec_m)) { dec_m--; }
+				dec_m -= -(p-2);
+				f /= PApplet.pow(10, dec_m);
+			}
+		}
+		String s = PApplet.str(f);
+		
+		if (f >= 0) {
+			if (abs >= PApplet.pow(10, p-1)) s = s.substring(0, PApplet.min(s.length(), p));
+			s = s.substring(0, PApplet.min(s.length(), p+1));
+		} else {
+			if (abs >= PApplet.pow(10, p-1)) s = s.substring(0, PApplet.min(s.length(), p+1));
+			s = s.substring(0, PApplet.min(s.length(), p+2));
+		}
+		if (dec_m != 0) s += "E"+dec_m;
+		return s;
 	}
 	
 	static float soothedcurve(float rad, float dst) {

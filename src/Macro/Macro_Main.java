@@ -248,7 +248,7 @@ nExplorer sheet_explorer;
 	    for (int i = 0 ; i < bloc_builders.size() ; i++) 
 	    if (bloc_builders.get(i).show_in_buildtool && bloc_builders.get(i).visible) {
 	    	row_count++;
-	    	if (row_count > 20) {
+	    	if (row_count > 18) {
 //	    		shelf_cible++; 
 	    		row_count = 0;
 	    		sh = build_tool.addShelf();
@@ -264,7 +264,7 @@ nExplorer sheet_explorer;
 	    for (Sheet_Specialize t : Sheet_Specialize.prints) 
 	    if (!t.unique && t.visible && t.show_in_buildtool) {
 	    	row_count++;
-			if (row_count > 20) {
+			if (row_count > 18) {
 //				shelf_cible++; 
 				row_count = 0;
 				sh = build_tool.addShelf();
@@ -452,12 +452,12 @@ nExplorer sheet_explorer;
 				build_buildtool();
 			}});
 
-		selector_list.new_comp_entry("            --- Old Blocs ---");
-	    for (String m : bloc_types1) 
-			selector_list.new_comp_entry(" - "+m).setBuilder(m)
-			.setSelectable(new nRunnable(m) { public void run() {
-				selected_sheet.addByType(((String)builder)); 
-			}});
+//		selector_list.new_comp_entry("            --- Old Blocs ---");
+//	    for (String m : bloc_types1) 
+//			selector_list.new_comp_entry(" - "+m).setBuilder(m)
+//			.setSelectable(new nRunnable(m) { public void run() {
+//				selected_sheet.addByType(((String)builder)); 
+//			}});
 	     selector_list.end_complexe_entry();
 	  }
   }
@@ -892,7 +892,7 @@ nExplorer sheet_explorer;
   
   //, show_sheet_tool
   sBoo show_gui, show_macro, show_build_tool, show_macro_tool, do_packet;
-  sStr new_temp_name, database_path, shown_builder; sRun del_select_run, copy_run, paste_run, reduc_run;
+  sStr new_temp_name, database_path, shown_builder, shown_spe; sRun del_select_run, copy_run, paste_run, reduc_run;
   public sInterface inter;
   Rapp app;
   public sValueBloc saved_template;
@@ -973,6 +973,7 @@ public Macro_Main(sInterface _int) {
     }});
 
     shown_builder = setting_bloc.newStr("shown_builder", "shown_builder", "");
+    shown_spe = setting_bloc.newStr("shown_spe", "shown_spe", "");
     
     show_macro_tool = setting_bloc.newBoo("show_macro_tool", "macro tool", true);
     show_macro_tool.addEventChange(new nRunnable(this) { public void run() { 
@@ -1010,32 +1011,50 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MTick.MTick_Builder());
       add_bloc_builders(new MPatern.MPatern_Builder());
       add_bloc_builders(new MCanvas.MCanvas_Builder());
-      add_bloc_builders(new MCounter.MCount_Builder());
+      add_bloc_builders(new MPoint.MPoint_Builder());
       add_bloc_builders(new MChan.MChan_Builder());
       add_bloc_builders(new MGate.MGate_Builder());
-      add_bloc_builders(new MKeyboard.MKeyboard_Builder());
-      add_bloc_builders(new MMouse.MMouse_Builder());
-      add_bloc_builders(new MTrig.MTrig_Builder());
-      add_bloc_builders(new MSwitch.MSwitch_Builder());
+      add_bloc_builders(new MRamp.MRamp_Builder());
+      add_bloc_builders(new MCounter.MCount_Builder());
+      add_bloc_builders(new MSequance.Builder());
+      add_bloc_builders(new MSetReset.Builder());
+      add_bloc_builders(new MInput.Builder());
+      add_bloc_builders(new MButton.Builder());
       add_bloc_builders(new MSlide.MSlide_Builder());
       add_bloc_builders(new MComment.MComment_Builder());
-      add_bloc_builders(new MFrame.MFrame_Builder());
-      add_bloc_builders(new MPulse.MPulse_Builder());
-      add_bloc_builders(new MRamp.MRamp_Builder());
-      add_bloc_builders(new MComp.MComp_Builder());
-      add_bloc_builders(new MCalc.MCalc_Builder());
-      add_bloc_builders(new MBool.MBool_Builder());
-      add_bloc_builders(new MRandom.MRandom_Builder());
-      add_bloc_builders(new MBin.MBin_Builder());
-      add_bloc_builders(new MNot.MNot_Builder());
       add_bloc_builders(new MVar.MVar_Builder());
       add_bloc_builders(new MValue.MValue_Builder());
-      add_bloc_builders(new MSequance.MSequencor_Builder());
-      add_bloc_builders(new MPoint.MPoint_Builder());
-      add_bloc_builders(new MVecMD.MVecMD_Builder());
-      add_bloc_builders(new MVecXY.MVecXY_Builder());
+      add_bloc_builders(new MRandom.MRandom_Builder());
+      add_bloc_builders(new MVecCalc.MVecCalc_Builder());
+      add_bloc_builders(new MBoolCalc.Builder());
+      add_bloc_builders(new MNumCalc.Builder());
+      add_bloc_builders(new MTransform.Builder());
+
       add_bloc_builders(new MColRGB.MColRGB_Builder());
+      add_bloc_builders(new MToolBin.MToolBin_Builder());
+      add_bloc_builders(new MToolTri.MToolTri_Builder());
+      add_bloc_builders(new MTool.MTool_Builder());
+      add_bloc_builders(new MPanGrph.MPanGrph_Builder());
+      add_bloc_builders(new MPanSld.MPanSld_Builder());
+      add_bloc_builders(new MPanBin.MPanBin_Builder());
+      add_bloc_builders(new MPanel.MPanel_Builder());
+
       
+      
+
+//    add_bloc_builders(new MKeyboard.MKeyboard_Builder());
+//    add_bloc_builders(new MMouse.MMouse_Builder());
+//    add_bloc_builders(new MTrig.MTrig_Builder());
+//    add_bloc_builders(new MSwitch.MSwitch_Builder());
+//    add_bloc_builders(new MFrame.MFrame_Builder());
+//    add_bloc_builders(new MPulse.MPulse_Builder());
+//    add_bloc_builders(new MComp.MComp_Builder());
+//    add_bloc_builders(new MBool.MBool_Builder());
+//    add_bloc_builders(new MCalc.MCalc_Builder());
+//    add_bloc_builders(new MBin.MBin_Builder());
+//    add_bloc_builders(new MNot.MNot_Builder());
+//    add_bloc_builders(new MVecMD.MVecMD_Builder());
+//    add_bloc_builders(new MVecXY.MVecXY_Builder());
       
       
     
@@ -1372,6 +1391,10 @@ public Macro_Main(sInterface _int) {
 	    //.setPX(-ref_size*0.25)
 	    .setSize(ref_size*1.375, ref_size*0.75)
 	    );
+	  theme.addModel("MC_Element_LButton", theme.newWidget("MC_Element_Button")
+	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
+	    .setSize(ref_size*5.25, ref_size*0.75)
+	    );
 	  theme.addModel("MC_Element_MiniButton", theme.newWidget("MC_Element_Button")
 	    .setPosition(ref_size*1 / 16, ref_size * 4 / 16)
 	    .setSize(ref_size*6 / 16, ref_size*0.5)
@@ -1480,6 +1503,9 @@ public Macro_Main(sInterface _int) {
 	    .setSize(ref_size*0.75, ref_size*0.5)
 	    );
 	  theme.addModel("MC_Prio_View", theme.newWidget("MC_Prio")
+	    .setStandbyColor(theme.app.color(40))
+	    .setOutlineWeight(ref_size / 18)
+	    .setOutlineColor(theme.app.color(110))
 	    .setPosition(ref_size*0.125, ref_size*0.125).setBackground()
 	    );
 	  theme.addModel("MC_Prio_Sub", theme.newWidget("MC_Prio")

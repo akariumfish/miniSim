@@ -201,8 +201,16 @@ public class Rapp extends PApplet implements RConst {
 	    //#######################################################################
 		//##                         METHODES UTILES                           ##
 		//#######################################################################
-		
-		
+
+
+	public static float parseFlt(String s) {
+		for (int i = s.length() - 1 ; i >= 0 ; i--) 
+			if (s.charAt(i) == 'E') {
+				float fct = PApplet.parseFloat(s.substring(i+1, s.length()));
+				return PApplet.parseFloat(s.substring(0, i)) * PApplet.pow(10, fct);
+			}
+		return PApplet.parseFloat(s);
+	}
 		
 
 	public float crandom(float d) { return pow(random((float) 1.0), d); }
@@ -254,7 +262,7 @@ public class Rapp extends PApplet implements RConst {
 		boolean DEBUG = true, save_log_exit = false, save_log_all = false;
 		String logpath = "sim_log.txt";
 		
-		int global_frame_count = 0;
+		public int global_frame_count = 0;
 		ArrayList<String> logs = new ArrayList<String>();
 		String current_log = "";
 		String[] loglist;
@@ -318,7 +326,32 @@ public class Rapp extends PApplet implements RConst {
 			  if (save_log_all) savelog_all();
 		  }
 		}
-		
+
+		boolean DEBUG_CTRL = true;
+		public void clog(String s) {
+			if (interf.input.keyCtrl.state) {
+				String mark = global_frame_count+fMrk("M");
+				if (DEBUG && DEBUG_CTRL && current_log.length() == 0) print(mark);
+				if (DEBUG && DEBUG_CTRL) print(s);
+				if (current_log.length() == 0 && DEBUG_CTRL) current_log += mark;
+				if (DEBUG_CTRL) current_log += s;
+			}
+		}
+		public void clogln(String s) {
+			if (interf.input.keyCtrl.state) {
+				String mark = global_frame_count+fMrk("C");
+				if (DEBUG && DEBUG_CTRL && current_log.length() == 0) print(mark);
+				if (DEBUG && DEBUG_CTRL) println(s);
+				if (current_log.length() == 0 && DEBUG_CTRL) current_log += mark;
+				if (DEBUG_CTRL) { 
+					current_log += s;
+					log_line_count++;
+					logs.add(RConst.copy(current_log));
+					current_log = "";
+					if (save_log_all) savelog_all();
+				}
+			}
+		}
 		
 
 		boolean DEBUG_PACKET = false;

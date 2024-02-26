@@ -49,6 +49,9 @@ public class Macro_Bloc extends Macro_Abstract {
 		  return this;
 	  }
 
+	  
+	  
+	  
 	Macro_Connexion addInputToValue(int c, sValue v) { 
 	  Macro_Connexion in = addInput(0, v.ref);
 	  linkInputToValue(in, v);
@@ -110,6 +113,11 @@ public class Macro_Bloc extends Macro_Abstract {
         }
       return in; 
     }
+	
+	
+	
+	
+	
 	Macro_Connexion addValueToOutput(int c, sValue v) { 
 	  Macro_Connexion out = addOutput(2, v.ref);
 	  linkValueToOutput(out, v);
@@ -131,6 +139,11 @@ public class Macro_Bloc extends Macro_Abstract {
 	  }});
       return out; 
     }
+	
+	
+	
+	
+	
 	nWidget addLinkedLWidget(Macro_Element e, sValue v) {
 	  if (v.type.equals("boo")) return addLinkedLSwitch(e, v);
 	  else if (v.type.equals("vec") || v.type.equals("col")) 
@@ -155,6 +168,36 @@ public class Macro_Bloc extends Macro_Abstract {
 	  w.setInfo(v.ref);
 	  return w;
 	}
+	
+	
+	void addLinkedLWidget_Pan(int c, sValue v) {
+	  if (v.type.equals("boo")) addLinkedLSwitch_Pan(c, v);
+	  else if (v.type.equals("vec") || v.type.equals("col")) addLWatcher_Pan(c, v);
+	  else if (v.type.equals("obj") || v.type.equals("run")) addLabelL(c, v.ref);
+	  else addLinkedLField_Pan(c, v);
+	}
+	nLinkedWidget addLinkedLField_Pan(int c, sValue v) {
+	  Macro_Element e = addEmptyL(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	nWatcherWidget addLWatcher_Pan(int c, sValue v) {
+	  Macro_Element e = addEmptyL(c);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	nLinkedWidget addLinkedLSwitch_Pan(int c, sValue v) {
+	  Macro_Element e = addEmptyL(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Button").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+
 	void addLinkedLWidget(int c, sValue v) {
 	  if (v.type.equals("boo")) addLinkedLSwitch(c, v);
 	  else if (v.type.equals("vec") || v.type.equals("col")) addLWatcher(c, v);
@@ -165,23 +208,51 @@ public class Macro_Bloc extends Macro_Abstract {
 	  Macro_Element e = addEmptyL(c);
 	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
 	  w.setInfo(v.ref);
-	  e.addValuePanel(v);
 	  return w;
 	}
 	nWatcherWidget addLWatcher(int c, sValue v) {
 	  Macro_Element e = addEmptyL(c);
 	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text").setLinkedValue(v);
 	  w.setInfo(v.ref);
-	  e.addValuePanel(v);
 	  return w;
 	}
 	nLinkedWidget addLinkedLSwitch(int c, sValue v) {
 	  Macro_Element e = addEmptyL(c);
 	  nLinkedWidget w = e.addLinkedModel("MC_Element_Button").setLinkedValue(v);
 	  w.setInfo(v.ref);
+	  return w;
+	}
+	
+	
+	void addLinkedSWidget_Pan(int c, sValue v) {
+	  if (v.type.equals("boo")) addLinkedSSwitch_Pan(c, v);
+	  else if (v.type.equals("vec") || v.type.equals("col")) addSWatcher_Pan(c, v);
+	  else if (v.type.equals("obj") || v.type.equals("run")) addLabelS(c, v.ref);
+	  else addLinkedSField_Pan(c, v);
+	}
+	nLinkedWidget addLinkedSField_Pan(int c, sValue v) {
+	  Macro_Element e = addEmptyS(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_SField").setLinkedValue(v);
+	  w.setInfo(v.ref);
 	  e.addValuePanel(v);
 	  return w;
 	}
+	nWatcherWidget addSWatcher_Pan(int c, sValue v) {
+	  Macro_Element e = addEmptyS(c);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_SText").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+	nLinkedWidget addLinkedSSwitch_Pan(int c, sValue v) {
+	  Macro_Element e = addEmptyS(c);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_SButton").setLinkedValue(v);
+	  w.setInfo(v.ref);
+	  e.addValuePanel(v);
+	  return w;
+	}
+
+	
 	void addLinkedSWidget(int c, sValue v) {
 	  if (v.type.equals("boo")) addLinkedSSwitch(c, v);
 	  else if (v.type.equals("vec") || v.type.equals("col")) addSWatcher(c, v);
@@ -192,26 +263,34 @@ public class Macro_Bloc extends Macro_Abstract {
 	  Macro_Element e = addEmptyS(c);
 	  nLinkedWidget w = e.addLinkedModel("MC_Element_SField").setLinkedValue(v);
 	  w.setInfo(v.ref);
-	  e.addValuePanel(v);
 	  return w;
 	}
 	nWatcherWidget addSWatcher(int c, sValue v) {
 	  Macro_Element e = addEmptyS(c);
 	  nWatcherWidget w = e.addWatcherModel("MC_Element_SText").setLinkedValue(v);
 	  w.setInfo(v.ref);
-	  e.addValuePanel(v);
 	  return w;
 	}
 	nLinkedWidget addLinkedSSwitch(int c, sValue v) {
 	  Macro_Element e = addEmptyS(c);
 	  nLinkedWidget w = e.addLinkedModel("MC_Element_SButton").setLinkedValue(v);
 	  w.setInfo(v.ref);
-	  e.addValuePanel(v);
 	  return w;
 	}
+	
+	
+	
+	
 	Macro_Bloc newRowValue(sValue v) {
 	  Macro_Connexion in = addInputToValue(0, v);
 	  addLinkedSWidget(1, v);
+	  Macro_Connexion out = addValueToOutput(2, v);
+	  in.addBangGet(v, out);
+	  return this;
+	}
+	Macro_Bloc newRowValue_Pan(sValue v) {
+	  Macro_Connexion in = addInputToValue(0, v);
+	  addLinkedSWidget_Pan(1, v);
 	  Macro_Connexion out = addValueToOutput(2, v);
 	  in.addBangGet(v, out);
 	  return this;
@@ -225,37 +304,107 @@ public class Macro_Bloc extends Macro_Abstract {
 	  in.addBangGet(v, out);
 	  return this;
 	}
+	
+	
+	
+	
+	
     sInt newRowInt(int d, String r) {
 	  sInt v = newInt(d, r, r);
-	  newRowValue(v);
+	  newRowValue_Pan(v);
 	  return v;
     }
     sFlt newRowFlt(float d, String r) {
   	  sFlt v = newFlt(d, r, r);
-	  newRowValue(v);
+	  newRowValue_Pan(v);
 	  return v;
-  }
+    }
     sBoo newRowBoo(boolean d, String r) {
     	  sBoo v = newBoo(d, r, r);
-    	  newRowValue(v);
+    	  newRowValue_Pan(v);
   	  return v;
     }
     sCol newRowColor(int d, String r) {
     	  sCol v = newCol(d, r, r);
-    	  newRowValue(v);
+    	  newRowValue_Pan(v);
   	  return v;
     }
     sVec newRowVec(String r) {
       sVec v = newVec(r, r);
-  	  newRowValue(v);
+  	  newRowValue_Pan(v);
     	  return v;
     }
     sStr newRowStr(String def, String ref) {
     	  sStr v = newStr(ref, ref, def);
-  	  newRowValue(v);
+  	  newRowValue_Pan(v);
     	  return v;
     }
   
+    
+    
+    
+    
+
+    sBoo newSSwitchBoo(int c, boolean d, String r) {
+    		sBoo v = newBoo(d, r, r);
+    		Macro_Element e = addEmptyS(c);
+    		nLinkedWidget w = e.addLinkedModel("MC_Element_SButton").setLinkedValue(v);
+    		w.setInfo(v.ref);
+    		return v;
+    }
+    sBoo newSwitchBoo(int c, boolean d, String r) {
+		sBoo v = newBoo(d, r, r);
+		addEmpty(c+1);
+		Macro_Element e = addEmptyL(c);
+		nLinkedWidget w = e.addLinkedModel("MC_Element_Button", v.ref).setLinkedValue(v);
+		return v;
+    }
+    sInt newSFieldInt(int c, int d, String r) {
+	    	sInt v = newInt(d, r, r);
+	    	addLinkedSWidget_Pan(c, v);
+	    	return v;
+    }
+    sFlt newSFieldFlt(int c, float d, String r) {
+	    	sFlt v = newFlt(d, r, r);
+	    	addLinkedSWidget_Pan(c, v);
+		return v;
+	}
+    sFlt newFieldFlt(int c, float d, String r) {
+	    	sFlt v = newFlt(d, r, r);
+	    	addLinkedLWidget_Pan(c, v);
+		return v;
+	}
+    sStr newFieldStr(int c, String d, String r) {
+	    	sStr v = newStr(d, r, r);
+	    	addEmpty(c+1);
+  	  	Macro_Element e = addEmptyL(c);
+  	  	nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
+	  	w.setInfo(v.ref);
+	  	return v;
+	}
+    Macro_Element addSelectToInt(int c, sInt v) {
+	    	addEmpty(c+1);
+	    	Macro_Element e = addEmptyL(c);
+	    	nWatcherWidget w = e.addWatcherModel("MC_Element_SField").setLinkedValue(v);
+	    	w.setInfo(v.ref).setPX(ref_size*1.375);
+	    	e.addCtrlModel("MC_Element_SButton", "-").setRunnable(new nRunnable(v) { public void run() {
+	    		((sInt)builder).set(((sInt)builder).get()-1);
+	    	}}).setPX(ref_size*0.125).setSX(ref_size*0.75);
+	    	e.addCtrlModel("MC_Element_SButton", "+").setRunnable(new nRunnable(v) { public void run() {
+	    		((sInt)builder).set(((sInt)builder).get()+1);
+	    	}}).setPX(ref_size*3.25).setSX(ref_size*0.75);
+    		return e;
+    }
+    sInt newSelectInt(int c, int d, String r) {
+	    	sInt v = newInt(d, r, r);
+	    	addSelectToInt(c, v);
+	    	return v;
+    }
+    
+    
+    
+    
+    
   Macro_Element addSelectS(int c, sBoo v1, sBoo v2, String s1, String s2) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
     addElement(c, m); 
@@ -266,7 +415,19 @@ public class Macro_Bloc extends Macro_Abstract {
     return m;
   }
   
-
+  Macro_Element addSelectL(int c, sBoo v1, sBoo v2, sBoo v3, 
+                           String s1, String s2, String s3) { 
+    Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);
+    addElement(c, m); 
+    nWidget w1 = m.addLinkedModel("MC_Element_Button_Selector_1", s1).setLinkedValue(v1);
+    nWidget w2 = m.addLinkedModel("MC_Element_Button_Selector_2", s2).setLinkedValue(v2);
+    nWidget w3 = m.addLinkedModel("MC_Element_Button_Selector_3", s3).setLinkedValue(v3);
+    w1.addExclude(w2).addExclude(w3);
+    w2.addExclude(w1).addExclude(w3);
+    w3.addExclude(w2).addExclude(w1);
+    return m;
+  }
+  
   Macro_Element addSelectL(int c, sBoo v1, sBoo v2, sBoo v3, sBoo v4, 
                            String s1, String s2, String s3, String s4) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);

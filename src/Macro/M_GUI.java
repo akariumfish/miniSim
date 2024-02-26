@@ -3,6 +3,7 @@ package Macro;
 import java.util.ArrayList;
 
 import RApplet.RConst;
+import RApplet.Rapp;
 import UI.Drawable;
 import UI.nCtrlWidget;
 import UI.nDrawer;
@@ -12,7 +13,6 @@ import UI.nToolPanel;
 import UI.nWatcherWidget;
 import UI.nWidget;
 import UI.nWindowPanel;
-import processing.core.PApplet;
 import processing.core.PConstants;
 import sData.nRunnable;
 import sData.sBoo;
@@ -33,32 +33,60 @@ class MSlide extends MBasic {
 		  MSlide_Builder() { super("slide", "slide", "", "GUI"); }
 		  MSlide build(Macro_Sheet s, sValueBloc b) { MSlide m = new MSlide(s, b); return m; }
 	  }
-	  
+  nSlide slide;
+  sFlt val_min, val_max, val_flt;
+  nRunnable up_run;
+  float sld_fct = 0;
   MSlide(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "slide", _bloc); }
   public void init() {
-	  
+	  val_min = newFlt(0, "val_min", "val_min");
+	  val_max = newFlt(1, "val_max", "val_max");
+	  val_flt = newFlt(0, "val_flt", "val_flt");
   }
   public void build_normal() {
-	    addEmpty(2);
-	    addEmpty(1);
-	    addEmptyXL(0);
-	    
-//	    slide = (nSlide)(dr.addWidget(new nSlide(front_panel.gui, ref_size * 6, ref_size * 0.75F)));
-//	      slide.setPosition(4*ref_size, ref_size * 2 / 16);
-//	      
-//	      slide.addEventSlide(new nRunnable(this) { public void run(float c) { 
-//	        flt = val_min.get() + c * (val_max.get() - val_min.get()); 
-//	        val_flt.set(flt);
-//	        
-//	        val_label.set(val_txt.get() + " " + RConst.trimFlt(flt) ); 
-//	        out.send(Macro_Packet.newPacketFloat(flt));
-//	      } } );
-//	      
-//	      slide.setValue((flt - val_min.get()) / (val_max.get() - val_min.get()));
-	      
+    addEmpty(2);
+    addEmpty(1);
+    nDrawer dr = addEmptyXL(0);
+    
+    slide = (nSlide)(dr.addWidget(new nSlide(gui, ref_size * 6, ref_size * 0.75F)));
+    slide.setPosition(ref_size * 2 / 16, ref_size * 2 / 16);
+    sld_fct = (val_flt.get() - val_min.get()) / (val_max.get() - val_min.get());
+    slide.setValue(sld_fct);
+    
+    newRowValue(val_flt);
+    newRowValue(val_min);
+    newRowValue(val_max);
+    
+    slide.addEventSlide(new nRunnable(this) { public void run(float c) { 
+    		sld_fct = c;
+        val_flt.set(val_min.get() + c * (val_max.get() - val_min.get()));
+    } } );
+    up_run = new nRunnable(this) { public void run() { 
+        val_flt.set(val_min.get() + sld_fct * (val_max.get() - val_min.get()));
+    } } ;
+    val_min.addEventChange(up_run);
+    val_max.addEventChange(up_run);
   }
   public void build_param() {
+    addEmpty(2);
+    addEmpty(1);
+    nDrawer dr = addEmptyXL(0);
+    
+    slide = (nSlide)(dr.addWidget(new nSlide(gui, ref_size * 6, ref_size * 0.75F)));
+    slide.setPosition(ref_size * 2 / 16, ref_size * 2 / 16);
+    slide.setValue((val_flt.get() - val_min.get()) / (val_max.get() - val_min.get()));
 
+    newRowValue_Pan(val_flt);
+
+    slide.addEventSlide(new nRunnable(this) { public void run(float c) { 
+    		sld_fct = c;
+        val_flt.set(val_min.get() + c * (val_max.get() - val_min.get()));
+    } } );
+    up_run = new nRunnable(this) { public void run() { 
+        val_flt.set(val_min.get() + sld_fct * (val_max.get() - val_min.get()));
+    } } ;
+    val_min.addEventChange(up_run);
+    val_max.addEventChange(up_run);
   }
   public MSlide clear() {
     super.clear(); return this; }
@@ -68,56 +96,158 @@ class MSlide extends MBasic {
 
 
 
+class MButton extends MBasic {
+	static class Builder extends MAbstract_Builder {
+		Builder() { super("button", "Button", "", "GUI"); }
+		MButton build(Macro_Sheet s, sValueBloc b) { MButton m = new MButton(s, b); return m; }
+	}
+	sBoo mode;
+	Macro_Connexion in, out_t;
+	nLinkedWidget swtch, wMode; 
+	sBoo state;
+	nCtrlWidget trig; 
+	sBoo setup_send;
+	sInt size;
+	sStr label;
+	MButton(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "button", _bloc); }
+	public void init() {}
+	public void build_param() {
+		mode = newBoo(false, "mode");
+		addEmpty(1);
+		wMode = addEmptyL(0).addLinkedModel("MC_Element_Button").setLinkedValue(mode);
+		mode.addEventChange(new nRunnable() { public void run() { 
+			if (mode.get()) wMode.setText("Switch");
+			else wMode.setText("Trigger");
+		}});
+		
+		size = newSelectInt(0, 1, "size");
+		size.set_limit(1, 2);
+		label = newFieldStr(0, "label", "");
+		setup_send = newSwitchBoo(0, false, "stp_snd");
+	}
+	public void build_normal() {
+		mode = newBoo("mode", "mode", false);
+		size = newInt(1, "size");
+	  	label = newStr("label", "");
+	  	setup_send = newBoo("stp_snd", "stp_snd", false);
+	  	state = newBoo("state", "state", false);
+	  	if (!mode.get()) {
+		 	if (size.get() == 1) {
+			  	Macro_Element e = addEmptyS(0);
+			  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
+				  	out_t.send(Macro_Packet.newPacketBang());
+			  	} });
+		    
+			  	out_t = addOutput(1, "trig").setDefBang();
+		  	} else {
+			  	out_t = addOutput(1, "trig").setDefBang();
+	
+			  	addEmptyS(0);
+			  	Macro_Element e = addEmptyL(0);
+			  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
+			  		out_t.send(Macro_Packet.newPacketBang());
+			  	} });
+			  	trig.setSY(ref_size*2).setPY(-ref_size*17/16);
+		  	}
+		 	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+		 		.setLinkedValue(setup_send);
+		  	if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+			  	out_t.send(Macro_Packet.newPacketBang());
+		  	} });
+	  	} else {
+		    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+			    	if (in.lastPack() != null && in.lastPack().isBang()) {
+			    		state.swtch();
+			    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+			    	} 
+			    	if (in.lastPack() != null && in.lastPack().isBool()) {
+	    	  			if(state.get() != in.lastPack().asBool()) {
+			    	  		state.swtch();
+				    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+		    	  		}
+			    	} 
+		    } });
+		    nRunnable swt_run = new nRunnable() { public void run() {
+			    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+			    		out_t.send(Macro_Packet.newPacketBool(state.get()));
+			    	}});
+			}};
+	  		if (size.get() == 2) {
+	  		    addEmptyS(1);
+	  		    out_t = addOutput(1, "out")
+	  		    		.setDefBool();
+	  		    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button", label.get()).setLinkedValue(state);
+	  		    swtch.setSY(ref_size*2).setPY(-ref_size*17/16);
+			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+	  		} else {
+			    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton", label.get()).setLinkedValue(state);
+			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+			    out_t = addOutput(2, "out")
+			    		.setDefBool();
+	  		}
+	  		swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+		 		.setLinkedValue(setup_send);
+  		    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		    		out_t.send(Macro_Packet.newPacketBool(state.get()));
+		    } });
+	  	}
+	}
+	public MButton clear() {
+		super.clear(); return this; }
+}
+
+
+
+
 
 class MTrig extends MBasic {
-	  static class MTrig_Builder extends MAbstract_Builder {
-		  MTrig_Builder() { super("trig", "Trigger", "", "GUI"); }
-		  MTrig build(Macro_Sheet s, sValueBloc b) { MTrig m = new MTrig(s, b); return m; }
-	  }
+	static class MTrig_Builder extends MAbstract_Builder {
+		MTrig_Builder() { super("trig", "Trigger", "", "GUI"); }
+		MTrig build(Macro_Sheet s, sValueBloc b) { MTrig m = new MTrig(s, b); return m; }
+	}
 	  
-  Macro_Connexion out_t;
-  nCtrlWidget trig; 
-  nLinkedWidget stp_view; sBoo setup_send;
-  MTrig(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "trig", _bloc); 
-  }
-  public void init() {
-	    setup_send = newBoo("stp_snd", "stp_snd", false);
-  }
-  public void build_param() {
-	    out_t = addOutput(1, "trig")
-	      .setDefBang();
+	Macro_Connexion out_t;
+	nCtrlWidget trig; 
+	sBoo setup_send;
+	sInt size;
+	sStr label;
+	MTrig(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "trig", _bloc); }
+	public void init() {
+		
+	}
+	public void build_param() {
+		size = newSelectInt(0, 1, "size");
+		size.set_limit(1, 2);
+		label = newFieldStr(0, "label", "");
+		setup_send = newSwitchBoo(0, false, "stp_snd");
+	}
+	public void build_normal() {
+		size = newInt(1, "size");
+	  	label = newStr("label", "");
+	  	setup_send = newBoo("stp_snd", "stp_snd", false);
+	 	if (size.get() == 1) {
+		  	Macro_Element e = addEmptyS(0);
+		  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
+			  	out_t.send(Macro_Packet.newPacketBang());
+		  	} });
 	    
-	    addEmptyS(0);
-	    
-	    Macro_Element e = addEmptyL(0);
-	    trig = e.addCtrlModel("MC_Element_Button").setRunnable(new nRunnable() { public void run() {
-	      out_t.send(Macro_Packet.newPacketBang());
-	    } });
-	    trig.setSY(ref_size*2).setPY(-ref_size*17/16);
-	    e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
-	    
-	    
-	    if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	      out_t.send(Macro_Packet.newPacketBang());
-	    } });
-  }
-  public void build_normal() {
+		  	out_t = addOutput(1, "trig").setDefBang();
+	  	} else {
+		  	out_t = addOutput(1, "trig").setDefBang();
 
-	    Macro_Element e = addEmptyS(0);
-	    trig = e.addCtrlModel("MC_Element_SButton").setRunnable(new nRunnable() { public void run() {
-	      out_t.send(Macro_Packet.newPacketBang());
-	    } });
-	    e.addLinkedModel("MC_Element_MiniButton", "st").setLinkedValue(setup_send);
-	    
-	    out_t = addOutput(1, "trig")
-	      .setDefBang();
-	    if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	      out_t.send(Macro_Packet.newPacketBang());
-	    } });
-  }
-  public MTrig clear() {
-    super.clear(); return this; }
+		  	addEmptyS(0);
+		  	Macro_Element e = addEmptyL(0);
+		  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
+		  		out_t.send(Macro_Packet.newPacketBang());
+		  	} });
+		  	trig.setSY(ref_size*2).setPY(-ref_size*17/16);
+	  	}
+	  	if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  	out_t.send(Macro_Packet.newPacketBang());
+	  	} });
+	}
+	public MTrig clear() {
+		super.clear(); return this; }
 }
 
 
@@ -126,24 +256,19 @@ class MTrig extends MBasic {
 
 
 class MSwitch extends MBasic {
-	  static class MSwitch_Builder extends MAbstract_Builder {
-		  MSwitch_Builder() { super("switch", "Switch", "", "GUI"); }
-		  MSwitch build(Macro_Sheet s, sValueBloc b) { MSwitch m = new MSwitch(s, b); return m; }
-	  }
+	static class MSwitch_Builder extends MAbstract_Builder {
+		MSwitch_Builder() { super("switch", "Switch", "", "GUI"); }
+		MSwitch build(Macro_Sheet s, sValueBloc b) { MSwitch m = new MSwitch(s, b); return m; }
+	}
 	  
-  Macro_Connexion in, out_t;
-  nLinkedWidget swtch; 
-  sBoo state;
-  MSwitch(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "switch", _bloc); 
-    
-  }
-  public void init() {
-	    
+	Macro_Connexion in, out_t;
+	nLinkedWidget swtch; 
+	sBoo state;
+	MSwitch(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "switch", _bloc); }
+	public void init() {
 	    state = newBoo("state", "state", false);
-	  
-  }
-  public void build_param() {
+	}
+	public void build_param() {
 
 	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
 	      if (in.lastPack() != null && in.lastPack().isBang()) {
@@ -168,8 +293,8 @@ class MSwitch extends MBasic {
 	    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
 	      out_t.send(Macro_Packet.newPacketBool(state.get()));
 	    } });
-  }
-  public void build_normal() {
+	}
+	public void build_normal() {
 	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
 	      if (in.lastPack() != null && in.lastPack().isBang()) {
 	    	  	state.swtch();
@@ -199,9 +324,9 @@ class MSwitch extends MBasic {
 	      out_t.send(Macro_Packet.newPacketBool(state.get()));
 	    } });
 	    
-  }
-  public MSwitch clear() {
-    super.clear(); return this; }
+	}
+	public MSwitch clear() {
+		super.clear(); return this; }
 }
 
 
@@ -396,7 +521,7 @@ class MToolNCtrl extends MToolRow {
     String t = val_mod.get();
     if (t.length() > 0) {
       if (t.equals("0") || t.equals("0.0")) { mod = 0; }
-      else if (PApplet.parseFloat(t) != 0) { mod = PApplet.parseFloat(t); }
+      else if (Rapp.parseFlt(t) != 0) { mod = Rapp.parseFlt(t); }
     }
     
     ref_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
@@ -420,7 +545,7 @@ class MToolNCtrl extends MToolRow {
       String t = mod_view.getText();
       if (t.length() > 0) {
         if (t.equals("0") || t.equals("0.0")) { mod = 0; }
-        else if (PApplet.parseFloat(t) != 0) { mod = PApplet.parseFloat(t); }
+        else if (Rapp.parseFlt(t) != 0) { mod = Rapp.parseFlt(t); }
       }
     } });
     
@@ -444,7 +569,13 @@ class MToolNCtrl extends MToolRow {
     super.clear(); return this; }
 }
 
+
+
 class MToolBin extends MToolRow {  
+	static class MToolBin_Builder extends MAbstract_Builder {
+		MToolBin_Builder() { super("toolbin", "toolbin", "", "GUI"); }
+		MToolBin build(Macro_Sheet s, sValueBloc b) { MToolBin m = new MToolBin(s, b); return m; }
+	}
   nDrawer dr;
   nWidget trig1, trig2, trig3; 
   nWatcherWidget pan_label;
@@ -600,7 +731,14 @@ class MToolBin extends MToolRow {
   public MToolBin clear() {
     super.clear(); return this; }
 }
-class MToolTri extends MToolRow {  
+
+
+
+class MToolTri extends MToolRow {    
+	static class MToolTri_Builder extends MAbstract_Builder {
+		MToolTri_Builder() { super("tooltri", "tooltri", "", "GUI"); }
+		MToolTri build(Macro_Sheet s, sValueBloc b) { MToolTri m = new MToolTri(s, b); return m; }
+	}
   nDrawer dr;
   nWidget trig1, trig2, trig3; 
   nWatcherWidget pan_label;
@@ -745,6 +883,9 @@ class MToolTri extends MToolRow {
   public MToolTri clear() {
     super.clear(); return this; }
 }
+
+
+
 abstract class MToolRow extends Macro_Bloc {  
   abstract void build_front_panel(nToolPanel front_panel);
   
@@ -789,7 +930,13 @@ abstract class MToolRow extends Macro_Bloc {
     super.clear(); return this; }
 }
 
-class MTool extends Macro_Bloc {  
+
+
+class MTool extends Macro_Bloc {      
+	static class MTool_Builder extends MAbstract_Builder {
+		MTool_Builder() { super("tool", "tool", "", "GUI"); }
+		MTool build(Macro_Sheet s, sValueBloc b) { MTool m = new MTool(s, b); return m; }
+	}
   nToolPanel front_panel = null;  
   
   nLinkedWidget stp_view, title_field; 
@@ -898,7 +1045,11 @@ class MTool extends Macro_Bloc {
 
 
 
-class MPanGrph extends MPanTool { 
+class MPanGrph extends MPanTool {     
+	static class MPanGrph_Builder extends MAbstract_Builder {
+		MPanGrph_Builder() { super("pangrph", "pangrph", "", "GUI"); }
+		MPanGrph build(Macro_Sheet s, sValueBloc b) { MPanGrph m = new MPanGrph(s, b); return m; }
+	}
   
   nWatcherWidget pan_label;
   nWidget graph;
@@ -1004,6 +1155,10 @@ class MPanGrph extends MPanTool {
 
 
 class MPanSld extends MPanTool { 
+	static class MPanSld_Builder extends MAbstract_Builder {
+		MPanSld_Builder() { super("pansld", "pansld", "", "GUI"); }
+		MPanSld build(Macro_Sheet s, sValueBloc b) { MPanSld m = new MPanSld(s, b); return m; }
+	}
   
   nWatcherWidget pan_label;
   nSlide slide;
@@ -1088,7 +1243,14 @@ class MPanSld extends MPanTool {
     super.clear(); return this; }
 }
 
+
+
+
 class MPanBin extends MPanTool {  
+	static class MPanBin_Builder extends MAbstract_Builder {
+		MPanBin_Builder() { super("panbin", "panbin", "", "GUI"); }
+		MPanBin build(Macro_Sheet s, sValueBloc b) { MPanBin m = new MPanBin(s, b); return m; }
+	}
   nWidget pan_button; 
   nWatcherWidget pan_label;
   
@@ -1218,6 +1380,9 @@ class MPanBin extends MPanTool {
   public MPanBin clear() {
     super.clear(); return this; }
 }
+
+
+
 abstract class MPanTool extends Macro_Bloc {  
   abstract void build_front_panel(nWindowPanel front_panel);
   
@@ -1262,7 +1427,14 @@ abstract class MPanTool extends Macro_Bloc {
     super.clear(); return this; }
 }
 
-class MPanel extends Macro_Bloc {  
+
+
+
+class MPanel extends Macro_Bloc {   
+	static class MPanel_Builder extends MAbstract_Builder {
+		MPanel_Builder() { super("pan", "pan", "", "GUI"); }
+		MPanel build(Macro_Sheet s, sValueBloc b) { MPanel m = new MPanel(s, b); return m; }
+	}
   nWindowPanel front_panel = null;  
   
   nLinkedWidget stp_view, title_field; 

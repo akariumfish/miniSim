@@ -620,7 +620,7 @@ public sRun full_screen_run;
 	    	  	} 
       } else { 
 	    	  conf_bloc = data.newBloc("conf");
-			  prev_savepth = new sStr(conf_bloc, "", "prev_savepth", "prev_savepth");
+	    	  prev_savepth = new sStr(conf_bloc, "", "prev_savepth", "prev_savepth");
 	    	  //fullscreen
 	    	  //last file
 	    	  //menu colors

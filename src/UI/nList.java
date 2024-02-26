@@ -42,8 +42,8 @@ public class nList extends nDrawer {
 	  public nList toLayerTop() {
 	    super.toLayerTop();
 	    back.toLayerTop();
-	    scroll.toLayerTop();
 	    for (nWidget w : listwidgets) w.toLayerTop();
+	    scroll.toLayerTop();
 	    return this;
 	  }
 	  public nList clear() {
@@ -232,14 +232,14 @@ public class nList extends nDrawer {
 	    gui = _gui;
 	    larg = w; haut = h;
 	    back = new nWidget(gui, x, y, w, h)
-//	        .setStandbyColor(color(70))
+	        .setStandbyColor(gui.app.color(70))
 	        .toLayerTop()
 	        ;
 	    up = new nWidget(gui, "^", (int)(w/1.5), 0, 0, w, w)
 	        .setParent(back)
 	        .toLayerTop()
-//	        .setOutlineColor(color(100))
-//	        .setLabelColor(color(180))
+	        .setOutlineColor(gui.app.color(100))
+	        .setLabelColor(gui.app.color(180))
 	        .setTextAlignment(PApplet.CENTER, PApplet.BOTTOM)
 	        .setOutlineWeight(w / 16)
 	        .setOutline(true)
@@ -259,8 +259,8 @@ public class nList extends nDrawer {
 	    down = new nWidget(gui, "v", (int)(w/2.0), 0, 0, w, w)
 	        .setParent(back)
 	        .toLayerTop()
-//	        .setOutlineColor(color(100))
-//	        .setLabelColor(color(180))
+	        .setOutlineColor(gui.app.color(100))
+	        .setLabelColor(gui.app.color(180))
 	        .setOutlineWeight(w / 16)
 	        .setOutline(true)
 	        .alignDown()
@@ -273,8 +273,23 @@ public class nList extends nDrawer {
 	        .setParent(up)
 	        .toLayerTop()
 	        .stackDown()
-//	        .setStandbyColor(color(100))
+	        .setGrabbable()
+	        .setConstrainX(true)
+	        .addEventDrag(new nRunnable() {public void run() {
+	        		float h = haut - (larg*2);
+	        		float d = h / entry_nb;
+	        		if (curs.getLocalY() < 0) curs.setPY(0);
+	        		if (curs.getLocalY() > h - d*entry_view) curs.setPY(h - d*entry_view);
+	        		entry_pos = (int) PApplet.abs(curs.getLocalY() / d);
+	        		if (entry_pos > PApplet.max(0, entry_nb - entry_view)) 
+	        			entry_pos = PApplet.max(0, entry_nb - entry_view);
+	        	    update_cursor();
+	        	    nRunnable.runEvents(eventChangeRun);
+	        }})
+	        .setStandbyColor(gui.app.color(100))
 	        ;
+
+	    toLayerTop();
 	  }
 	  void go_up() {
 	    if (entry_pos > 0) entry_pos--;

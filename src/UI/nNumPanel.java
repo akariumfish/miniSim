@@ -1,6 +1,7 @@
 package UI;
 
 import RApplet.RConst;
+import RApplet.Rapp;
 import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sFlt;
@@ -15,8 +16,8 @@ public class nNumPanel extends nWindowPanel {
 	    fval = _cv; if (fval == null) clear();
 	    field_run = new nRunnable() { public void run() { 
 	      String s = field_widget.getText();
-	      if (s.length() > 0 && !PApplet.str(PApplet.parseFloat(s)).equals("NaN")) 
-	        fval.set(PApplet.parseFloat(s)); 
+	      if (s.length() > 0 && !PApplet.str(Rapp.parseFlt(s)).equals("NaN")) 
+	        fval.set(Rapp.parseFlt(s)); 
 	    } };
 	    build_ui(fval);
 	  } 
