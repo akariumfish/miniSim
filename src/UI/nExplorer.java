@@ -87,6 +87,8 @@ public class nExplorer extends nDrawer {
 	            new nColorPanel(gui, task, (sCol)clicked_val);
 	          } else if (clicked_val.type.equals("run")) { 
 		        new nBinPanel(gui, task, (sRun)clicked_val);
+	          } else if (clicked_val.type.equals("obj")) { 
+		        new nObjectPanel(gui, task, (sObj)clicked_val);
 	          }
 	        } 
 	      }});
@@ -97,7 +99,8 @@ public class nExplorer extends nDrawer {
 		            ind - explorer_blocs.size() < explorer_values.size()+gobackspace) {
 		          sValue val = explorer_values.get(ind-gobackspace - explorer_blocs.size());
 		          if (val.type.equals("str") || val.type.equals("col") || val.type.equals("run") || 
-		              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo")) 
+		              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo") ||
+		              val.type.equals("obj")) 
 		                ((nCtrlWidget)builder).show();
 		          else { ((nCtrlWidget)builder).hide(); }
 		        } else { ((nCtrlWidget)builder).hide(); }
@@ -123,8 +126,9 @@ public class nExplorer extends nDrawer {
 	        if (ind != gobackindex && ind > explorer_blocs.size() && 
 	            ind - explorer_blocs.size() < explorer_values.size()+gobackspace) {
 	          sValue val = explorer_values.get(ind-gobackspace - explorer_blocs.size());
-	          if (val.type.equals("str") || val.type.equals("col") || 
-	              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo")) values_button.get(i).show();
+	          if (val.type.equals("str") || val.type.equals("col") || val.type.equals("obj") ||
+	              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo") || 
+	              val.type.equals("run")) values_button.get(i).show();
 	          else values_button.get(i).hide();
 	        } else values_button.get(i).hide();
 	      }

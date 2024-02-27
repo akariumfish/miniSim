@@ -28,6 +28,62 @@ public class M_GUI {}
 
 
 
+class MQuickFloat extends MBasic {
+	static class Builder extends MAbstract_Builder {
+		Builder() { super("quickFlt", "QuickFloat", "", "Data"); }
+		MQuickFloat build(Macro_Sheet s, sValueBloc b) { MQuickFloat m = new MQuickFloat(s, b); return m; }
+	}
+	Macro_Connexion out;
+	sFlt val_fact; sBoo val_neg;
+	MQuickFloat(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "quickFlt", _bloc); }
+	public void init() {
+		val_fact = newFlt(1, "val_fact");
+		val_neg = newBoo(false, "val_neg");
+	}
+	public void build_normal() {
+		build_param();
+	}
+	public void build_param() { 
+		Macro_Element e = addEmptyL(0);
+		e.addCtrlModel("MC_Element_Button_Selector_1", "0.1")
+		.setRunnable(new nRunnable() { public void run() { val_fact.set(0.1); } });
+		e.addCtrlModel("MC_Element_Button_Selector_2", "1")
+		.setRunnable(new nRunnable() { public void run() {val_fact.set(1); } });
+		e.addCtrlModel("MC_Element_Button_Selector_3", "10")
+		.setRunnable(new nRunnable() { public void run() {val_fact.set(10); } });
+		e.addCtrlModel("MC_Element_Button_Selector_4", "100")
+		.setRunnable(new nRunnable() { public void run() {val_fact.set(100); } });
+		addLinkedSWidget(2, val_fact);
+		addEmpty(1); e = addEmptyL(0); line(e, 1);
+		e.addLinkedModel("MC_Element_Button_Selector_4", "-")
+		.setLinkedValue(val_neg);
+		addEmpty(1); e = addEmptyL(0); line(e, 4);
+		e.addCtrlModel("MC_Element_Button_Selector_4", "0")
+		.setRunnable(new nRunnable() { public void run() { out.sendFloat(0); } });
+		addEmpty(1); e = addEmptyL(0); line(e, 7);
+	  	out = addOutput(2, "out").setDefFloat();
+	}
+	private void line(Macro_Element e, int r) {
+		e.addCtrlModel("MC_Element_Button_Selector_1", ""+r)
+		.setRunnable(new nRunnable() { public void run() {
+			int s = 1; if (val_neg.get()) s = -1;
+			out.sendFloat(val_fact.get()*r*s); } });
+		e.addCtrlModel("MC_Element_Button_Selector_2", ""+(r+1))
+		.setRunnable(new nRunnable() { public void run() {
+			int s = 1; if (val_neg.get()) s = -1;
+			out.sendFloat(val_fact.get()*(r+1)*s); } });
+		e.addCtrlModel("MC_Element_Button_Selector_3", ""+(r+2))
+		.setRunnable(new nRunnable() { public void run() {
+			int s = 1; if (val_neg.get()) s = -1;
+			out.sendFloat(val_fact.get()*(r+2)*s); } });
+	}
+	public MQuickFloat clear() {
+		super.clear(); return this; }
+}
+
+
+
+
 class MSlide extends MBasic {
 	  static class MSlide_Builder extends MAbstract_Builder {
 		  MSlide_Builder() { super("slide", "slide", "", "GUI"); }
@@ -1529,3 +1585,9 @@ class MPanel extends Macro_Bloc {
     mmain().pan_macros.remove(this);
     super.clear(); return this; }
 }
+
+
+
+
+
+   

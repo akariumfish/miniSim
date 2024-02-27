@@ -147,7 +147,8 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           if (RConst.distancePointToLine(gui.mouseVector.x, gui.mouseVector.y, 
               getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) 
               < 
-              3 * ref.look.outlineWeight / gui.scale) {
+              3 * ref.look.outlineWeight / gui.scale
+              && (sheet.mmain().show_link.get() || lens.isHovered || m.lens.isHovered) ) {
                 
                 
                 
@@ -198,8 +199,9 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           }
           
         }
-        for (Macro_Connexion m : connected_inputs) {
-        if (gui.scale > 0.03 && m.isDraw() ) {
+        if (gui.scale > 0.03) 
+        	for (Macro_Connexion m : connected_inputs) {
+        if (m.isDraw() && (sheet.mmain().show_link.get() || lens.isHovered || m.lens.isHovered) ) {
         	  
 		  app.strokeWeight(ref.look.outlineWeight);
 		  PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);

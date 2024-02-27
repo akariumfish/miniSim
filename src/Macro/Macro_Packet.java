@@ -96,12 +96,12 @@ public class Macro_Packet {
                              RConst.trimFlt(app.green(asCol()))+","+
                              RConst.trimFlt(app.blue(asCol()));
     else if (isStr()) return asStr();
-    else if (isObj()) return "object";
+    else if (isObj()) return "object:"+asObj();
     return "";
   }
 
   Macro_Packet setObject(Object b) { pobj = b; return this; }
-  boolean isObj() { return def.equals("sheet"); }
+  boolean isObj() { return def.equals("obj"); }
   Object  asObj()   { if (isObj()) return pobj; else return null; }
   
 }

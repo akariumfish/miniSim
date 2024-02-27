@@ -168,17 +168,13 @@ nExplorer sheet_explorer;
   void build_macro_menus() {
     if (macro_tool != null) macro_tool.clear();
     macro_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
-    macro_tool.addShelf().addDrawer(4.375, 1)
-        .addLinkedModel("Menu_Button_Small_Outline-S1-P4", "P")
+    macro_tool.addShelf().addDrawer(2.125, 1)
+        .addLinkedModel("Menu_Button_Small_Outline-S1-P1", "P")
           .setLinkedValue(do_packet)
           .setInfo("do packet processing").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P1", "")
-//          .setRunnable(new nRunnable() { public void run() { 
-//        	  new nNumPanel(inter.screen_gui, inter.taskpanel, inter.framerate.median_framerate);
-////            if (selected_sheet != null) 
-////              new nTextPanel(inter.screen_gui, inter.taskpanel, selected_sheet.spots);
-//          }})
-          .setFont((int)(ref_size/1.9))
+        .addLinkedModel("Menu_Button_Small_Outline-S1-P2", "L")
+          .setLinkedValue(show_link)
+          .setInfo("show/hide links").setFont((int)(ref_size/1.9)).getDrawer()
           .getShelfPanel()
       .addShelf().addDrawer(4.375F, 1)
         .addLinkedModel("Menu_Button_Small_Outline-S1-P1", "S")
@@ -891,7 +887,7 @@ nExplorer sheet_explorer;
   nRunnable packet_frame_run;
   
   //, show_sheet_tool
-  sBoo show_gui, show_macro, show_build_tool, show_macro_tool, do_packet;
+  sBoo show_gui, show_macro, show_link, show_build_tool, show_macro_tool, do_packet;
   sStr new_temp_name, database_path, shown_builder, shown_spe; sRun del_select_run, copy_run, paste_run, reduc_run;
   public sInterface inter;
   Rapp app;
@@ -966,6 +962,7 @@ public Macro_Main(sInterface _int) {
       else for (Macro_Abstract m : child_macro) m.hide();
       update_select_bound();
     }});
+    show_link = setting_bloc.newBoo("show_link", "showL", true);
     
     show_build_tool = setting_bloc.newBoo("show_build_tool", "build tool", true);
     show_build_tool.addEventChange(new nRunnable(this) { public void run() { 
@@ -1029,6 +1026,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MBoolCalc.Builder());
       add_bloc_builders(new MNumCalc.Builder());
       add_bloc_builders(new MTransform.Builder());
+      add_bloc_builders(new MQuickFloat.Builder());
 
       add_bloc_builders(new MColRGB.MColRGB_Builder());
       add_bloc_builders(new MToolBin.MToolBin_Builder());

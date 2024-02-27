@@ -13,6 +13,7 @@ import sData.sValue;
 import sData.sVec;
 
 public class nLinkedWidget extends nWidget { 
+	public nLinkedWidget setFltPrecision(int b) { pres = b; return this; }
 	public nLinkedWidget setLinkedValue(sValue b) { 
 	    if (val != null) val.removeEventChange(val_run);
 	    val = b;
@@ -31,6 +32,7 @@ public class nLinkedWidget extends nWidget {
 	  sValue val;
 	  sBoo bval; sInt ival; sFlt fval; sStr sval; sRun rval; sVec vval;
 	  String base_text = "";
+	  int pres = 3;
 	  public nLinkedWidget(nGUI g) { super(g); }
 	  
 	  nLinkedWidget setLinkedValue(sRun b) { 
@@ -65,10 +67,10 @@ public class nLinkedWidget extends nWidget {
 	    return this; }
 	  nLinkedWidget setLinkedValue(sFlt b) { 
 	    fval = b;
-	    setText(RConst.trimFlt(fval.get()));
+	    setText(RConst.trimFlt(fval.get(), pres));
 	    //println(fval.get());
 	    val_run = new nRunnable(this) { public void run() { 
-	      ((nLinkedWidget)builder).changeText(RConst.trimFlt(fval.get()));  } };
+	      ((nLinkedWidget)builder).changeText(RConst.trimFlt(fval.get(), pres));  } };
 	    b.addEventChange(val_run);
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 

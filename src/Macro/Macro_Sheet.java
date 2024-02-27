@@ -501,7 +501,7 @@ public class Macro_Sheet extends Macro_Abstract {
   public sStr specialize;
   public Sheet_Specialize sheet_specialize = null;
   
-  
+  public sObj val_sheet;
   
   
  
@@ -524,6 +524,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     specialize = setting_bloc.newStr("specialize", "specialize", "");
     links = setting_bloc.newStr("links", "links", "");
     spots = setting_bloc.newStr("spots", "spots", OBJ_TOKEN+GROUP_TOKEN+OBJ_TOKEN);
+    val_sheet = setting_bloc.newObj("sheet_obj", "sheet_obj");
+    val_sheet.set(this);
     addShelf(); addShelf();
     left_spot_add = addModel("mc_ref");
     right_spot_add = addModel("mc_ref");
@@ -544,6 +546,10 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     if (new_preset_name == null) new_preset_name = setting_bloc.newStr("preset_name", "preset", "new");
     specialize = ((sStr)(setting_bloc.getValue("specialize"))); 
     if (specialize == null) specialize = setting_bloc.newStr("specialize", "specialize", "sheet");
+
+    val_sheet = ((sObj)(setting_bloc.getValue("sheet_obj"))); 
+    if (val_sheet == null) val_sheet = setting_bloc.newObj("sheet_obj", "sheet_obj");
+    val_sheet.set(this);
     
     back_front = addModel("MC_Front_Sheet")
       .clearParent().setPassif();

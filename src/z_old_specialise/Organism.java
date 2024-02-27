@@ -80,7 +80,7 @@ public class Organism extends Macro_Sheet {
   
   Simulation sim;
 
-  nRunnable tick_run, rst_run; //Drawable cam_draw;
+  nRunnable tick_run, rst_run; Drawable cam_draw;
   
   ArrayList<Cell> list = new ArrayList<Cell>(); //contien les objet
 
@@ -153,10 +153,10 @@ public class Organism extends Macro_Sheet {
     
     face_obj = newObj("face_obj", "face_obj");
     face_obj.addEventChange(new nRunnable() { public void run() {
-//      if (face_obj.isSheet()) {
-//        Macro_Sheet ms = face_obj.asSheet();
-//        if (ms.specialize.get().equals("Face")) face_source = (Face)ms;
-//      }
+      if (face_obj.isSheet()) {
+        Macro_Sheet ms = face_obj.asSheet();
+        if (ms.specialize.get().equals("Face")) face_source = (Face)ms;
+      }
     }});
     
     
@@ -168,21 +168,21 @@ public class Organism extends Macro_Sheet {
     
     tick_run = new nRunnable() { public void run() { tick(); } };
     rst_run = new nRunnable() { public void run() { reset(); } };
-    //cam_draw = new Drawable() { public void drawing() { 
-    //  draw_All(); } };
+    cam_draw = new Drawable() { public void drawing() { 
+      draw_All(); } };
     
-//    if (sim != null) sim.addEventTick(tick_run);
-//    //if (sim != null) sim.inter.addToCamDrawerPile(cam_draw);
-//    if (sim != null) sim.reset();
-//    if (sim != null) sim.addEventReset(rst_run);
+    if (sim != null) sim.addEventTick(tick_run);
+    if (sim != null) sim.inter.addToCamDrawerPile(cam_draw);
+    if (sim != null) sim.reset();
+    if (sim != null) sim.addEventReset(rst_run);
   }
 
   public Organism clear() {
-//    sim.organs.remove(this);
+    sim.organs.remove(this);
     this.destroy_All();
-//    sim.removeEventTick(tick_run);
-//    sim.removeEventReset(rst_run);
-    //cam_draw.clear();
+    sim.removeEventTick(tick_run);
+    sim.removeEventReset(rst_run);
+    cam_draw.clear();
     super.clear();
     return this;
   }
@@ -212,7 +212,6 @@ public class Organism extends Macro_Sheet {
   void tick() {
     active_entity.set(active_Entity_Nb());
     for (Cell e : list) if (e.active) e.tick();
-    
   }
 
   public void draw_All() { 
@@ -279,26 +278,26 @@ class Cell {
       active = true; 
       age = 0; 
       state = 0;
-//      shape = new nBase(com().gui.app);
-//      if (com().face_source != null) {
-//        nBase fb = com().face_source.shape;
-//        shape.face.p1.set(fb.face.p1.x, fb.face.p1.y * com().blarg.get());
-//        shape.face.p2.set(fb.face.p2.x, fb.face.p2.y * com().blarg.get());
-//        shape.face.p3.set(fb.face.p3.x, fb.face.p3.y * com().blarg.get());
-//      } else {
-//        shape.face.p1.set(1, 0);
-//        shape.face.p2.set(0, com().blarg.get());
-//        shape.face.p3.set(-1, -com().blarg.get());
-//      }
-//      shape.dir.setMag(com().lon.get());
-//      float inf = (float)(com().active_entity.get()) / (float)(com().max_entity.get());
-//      float inf2 = ((float)(com().max_entity.get()) - (float)(com().active_entity.get())) / 
-//    		  (float)(com().max_entity.get());
-//      float re = (com().val_fill2.getred() * inf + com().val_fill1.getred() * inf2) / 1.0F;
-//      float gr = (com().val_fill2.getgreen() * inf + com().val_fill1.getgreen()* inf2) / 1.0F;
-//      float bl = (com().val_fill2.getblue() * inf + com().val_fill1.getblue() * inf2) / 1.0F;
-//      shape.col_fill = com().gui.app.color(re, gr, bl);
-//      shape.col_line = com().val_stroke.get();
+      shape = new nBase(com().gui.app);
+      if (com().face_source != null) {
+        nBase fb = com().face_source.shape;
+        shape.face.p1.set(fb.face.p1.x, fb.face.p1.y * com().blarg.get());
+        shape.face.p2.set(fb.face.p2.x, fb.face.p2.y * com().blarg.get());
+        shape.face.p3.set(fb.face.p3.x, fb.face.p3.y * com().blarg.get());
+      } else {
+        shape.face.p1.set(1, 0);
+        shape.face.p2.set(0, com().blarg.get());
+        shape.face.p3.set(-1, -com().blarg.get());
+      }
+      shape.dir.setMag(com().lon.get());
+      float inf = (float)(com().active_entity.get()) / (float)(com().max_entity.get());
+      float inf2 = ((float)(com().max_entity.get()) - (float)(com().active_entity.get())) / 
+    		  (float)(com().max_entity.get());
+      float re = (com().val_fill2.getred() * inf + com().val_fill1.getred() * inf2) / 1.0F;
+      float gr = (com().val_fill2.getgreen() * inf + com().val_fill1.getgreen()* inf2) / 1.0F;
+      float bl = (com().val_fill2.getblue() * inf + com().val_fill1.getblue() * inf2) / 1.0F;
+      shape.col_fill = com().gui.app.color(re, gr, bl);
+      shape.col_line = com().val_stroke.get();
     }
     return this;
   }
@@ -310,25 +309,25 @@ class Cell {
     return this;
   }
   Cell define(Cell p) {
-//    if (p != null) {
-//      PVector _p = p.shape.pos;
-//      PVector _d = p.shape.dir;
-//      shape.pos.x = _p.x + _d.x;
-//      shape.pos.y = _p.y + _d.y;
-//      shape.dir.set(_d);
-//      shape.dir.rotate(com().gui.app.random(-PConstants.HALF_PI/com().dev.get(), PConstants.HALF_PI/com().dev.get()));
-//      shape.dir.setMag(shape.dir.mag() * com().gui.app.random(Math.min(com().shrt.get(), 1), Math.max(com().shrt.get(), 1)) );
-//      
-//      shape.face.p2.set(p.shape.face.p2.x, - p.shape.face.p2.y / com().larg.get());
-//      shape.face.p3.set(p.shape.face.p3.x, - p.shape.face.p3.y / com().larg.get());
-//    } else if (com().adding_cursor != null) {
-//      shape.pos.x = com().adding_cursor.pos().x;
-//      shape.pos.y = com().adding_cursor.pos().y;
-//      float dm = shape.dir.mag();
-//      shape.dir.set(com().adding_cursor.dir());
-//      shape.dir.rotate(com().gui.app.random(-PConstants.HALF_PI/com().dev.get(), PConstants.HALF_PI/com().dev.get()));
-//      shape.dir.setMag(dm * shape.dir.mag() * com().gui.app.random(Math.min(com().shrt.get(), 1), Math.max(com().shrt.get(), 1)) );
-//    }
+    if (p != null) {
+      PVector _p = p.shape.pos;
+      PVector _d = p.shape.dir;
+      shape.pos.x = _p.x + _d.x;
+      shape.pos.y = _p.y + _d.y;
+      shape.dir.set(_d);
+      shape.dir.rotate(com().gui.app.random(-PConstants.HALF_PI/com().dev.get(), PConstants.HALF_PI/com().dev.get()));
+      shape.dir.setMag(shape.dir.mag() * com().gui.app.random(Math.min(com().shrt.get(), 1), Math.max(com().shrt.get(), 1)) );
+      
+      shape.face.p2.set(p.shape.face.p2.x, - p.shape.face.p2.y / com().larg.get());
+      shape.face.p3.set(p.shape.face.p3.x, - p.shape.face.p3.y / com().larg.get());
+    } else if (com().adding_cursor != null) {
+      shape.pos.x = com().adding_cursor.pos().x;
+      shape.pos.y = com().adding_cursor.pos().y;
+      float dm = shape.dir.mag();
+      shape.dir.set(com().adding_cursor.dir());
+      shape.dir.rotate(com().gui.app.random(-PConstants.HALF_PI/com().dev.get(), PConstants.HALF_PI/com().dev.get()));
+      shape.dir.setMag(dm * shape.dir.mag() * com().gui.app.random(Math.min(com().shrt.get(), 1), Math.max(com().shrt.get(), 1)) );
+    }
     return this;
   }
   Cell tick() {
@@ -341,10 +340,10 @@ class Cell {
     } else if (state == 1) {
       if (com().gui.app.crandom(com().branch.get()) > 0.5) {
         com().newEntity(this);
-        //nCursor c = com().newCursor("branch_"+com().cursor_count, true);
-        //c.pval.set(shape.pos.x + shape.dir.x, shape.pos.y + shape.dir.y);
-        //c.dval.set(shape.dir.x, shape.dir.y);
-        //c.show.set(true);
+//        nCursor c = com().newCursor("branch_"+com().cursor_count, true);
+//        c.pval.set(shape.pos.x + shape.dir.x, shape.pos.y + shape.dir.y);
+//        c.dval.set(shape.dir.x, shape.dir.y);
+//        c.show.set(true);
       }
       state = 2;
     } else if (state == 2) {
@@ -353,7 +352,7 @@ class Cell {
     return this;
   }
   Cell draw(Rapp a) {
-//    shape.draw(a);
+    shape.draw(a, false);
     return this;
   }
   Organism com() { 

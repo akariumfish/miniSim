@@ -666,7 +666,7 @@ class MSheetMain extends MBasic {
 		    		new nRunnable() { public void run() { sheet.reduc(); }});
 	    }
 	    if (show3.get()) {
-		  newRowProtectedValue(sheet.val_self);
+		  newRowProtectedValue(sheet.val_sheet);
 	    }
 	    if (show4.get()) {
 	    		newRowValue_Pan(sheet.priority);

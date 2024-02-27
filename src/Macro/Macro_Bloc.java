@@ -153,12 +153,12 @@ public class Macro_Bloc extends Macro_Abstract {
 	  else return addLinkedLField(e, v);
 	}
 	nLinkedWidget addLinkedLField(Macro_Element e, sValue v) {
-	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setFltPrecision(5).setLinkedValue(v);
 	  w.setInfo(v.ref);
 	  return w;
 	}
 	nWatcherWidget addLWatcher(Macro_Element e, sValue v) {
-	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text", v.ref).setLinkedValue(v);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text", v.ref).setFloatPrecision(5).setLinkedValue(v);
 	  w.setBackground();
 	  w.setInfo(v.ref);
 	  return w;
@@ -178,14 +178,14 @@ public class Macro_Bloc extends Macro_Abstract {
 	}
 	nLinkedWidget addLinkedLField_Pan(int c, sValue v) {
 	  Macro_Element e = addEmptyL(c);
-	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setFltPrecision(5).setLinkedValue(v);
 	  w.setInfo(v.ref);
 	  e.addValuePanel(v);
 	  return w;
 	}
 	nWatcherWidget addLWatcher_Pan(int c, sValue v) {
 	  Macro_Element e = addEmptyL(c);
-	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text").setLinkedValue(v);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text").setFloatPrecision(5).setLinkedValue(v);
 	  w.setInfo(v.ref);
 	  e.addValuePanel(v);
 	  return w;
@@ -206,13 +206,13 @@ public class Macro_Bloc extends Macro_Abstract {
 	}
 	nLinkedWidget addLinkedLField(int c, sValue v) {
 	  Macro_Element e = addEmptyL(c);
-	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setLinkedValue(v);
+	  nLinkedWidget w = e.addLinkedModel("MC_Element_Field").setFltPrecision(5).setLinkedValue(v);
 	  w.setInfo(v.ref);
 	  return w;
 	}
 	nWatcherWidget addLWatcher(int c, sValue v) {
 	  Macro_Element e = addEmptyL(c);
-	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text").setLinkedValue(v);
+	  nWatcherWidget w = e.addWatcherModel("MC_Element_Text").setFloatPrecision(5).setLinkedValue(v);
 	  w.setInfo(v.ref);
 	  return w;
 	}

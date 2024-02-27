@@ -77,7 +77,7 @@ nWatcherWidget setLinkedValue(sVec b) {
   b.addEventChange(val_run);
   return this; }
 	int float_pres = 3;
-	nWatcherWidget setFloatPrecision(int i) {
+	public nWatcherWidget setFloatPrecision(int i) {
 		float_pres = i;
 		return this;
 	}

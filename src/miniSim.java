@@ -9,6 +9,13 @@ public class miniSim {
 /* DONT HIT ENTER HERE FFS!!
 
 
+
+patern add input move/add : use in x y rot scale as modifier to current_replic then add
+				 color : use received color for next adds
+Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
+
+switch show links
+
 		MACRO BLOC review
 Blocs List :
 		DONE
@@ -25,9 +32,6 @@ Blocs List :
 	GUI : Button, Slider, Comment
 	
 		TO DO
-	Transform/Filter Transform : col <> RGBA
-	GUI : GUIPanel, GUILabel, GUIButton, GUIGraph, GUISlide
-	
 		FOR LATER
 	Working : Environment:MCamera, MCanvas, MTick   Actifs:MStructure, MForm, MPatern
 	Complexes : matrice
@@ -36,8 +40,9 @@ Blocs List :
 		ColorCalc : set add : RGBA SatHue
 		Transform/Filter : 	Filter type : str, col
 							Filter : only on change : on/off (need saving of all val types)
-							Transform : col <> SatHue, all > num/vec/col
-	GUI : ToolPanel
+							Transform : col <> SatHue, all > num/vec/col, col <> RGBA
+	GUI : GUIPanel, GUILabel, GUIButton, GUIGraph, GUISlide, GToolPanel
+	
 	Other : Midi, Preset
 
 		

@@ -714,6 +714,18 @@ class MStructure extends MBaseMenu {
 		new_dir.set(first_rep.dir.x, first_rep.dir.y); 
 		return this;
 	}
+	MStructure move_replic_from(Replic r) {
+		nposx.set(nposx.get()+r.pos.x);
+		nposy.set(nposy.get()+r.pos.y);
+		nrot.set(nrot.get()+r.dir.heading());
+		nscale.set(nscale.get()+PApplet.max(0, r.dir.mag()));
+		new_pos.set(nposx.get(), nposy.get()); 
+		first_rep.pos.set(nposx.get(), nposy.get());
+		first_rep.dir.set(nscale.get(), 0);
+		first_rep.dir.rotate(nrot.get());
+		new_dir.set(first_rep.dir.x, first_rep.dir.y); 
+		return this;
+	}
 
 	MStructure translate(PVector r) {
 		nposx.add(r.x);
@@ -753,8 +765,8 @@ class MStructure extends MBaseMenu {
 			clear_replic(); }});
 		new_pos = newVec("new_pos", "new_pos");
 		new_dir = newVec("new_dir", "new_dir");
-		nposx = menuFltSlide(0, -10000, 10000, "adding_x");
-		nposy = menuFltSlide(0, -10000, 10000, "adding_y");
+		nposx = menuFltSlide(0, -20000, 20000, "adding_x");
+		nposy = menuFltSlide(0, -20000, 20000, "adding_y");
 		nscale = menuFltSlide(10, 1, 20, "adding_scale");
 		nrot = menuFltSlide(0, -RConst.PI, RConst.PI, "adding_rot");
 		up_npos = new nRunnable() {public void run() { 
@@ -881,7 +893,7 @@ class MPatern extends MBaseMenu {
 	sFlt nposx,nposy,nscale,nrot;
 	nRunnable up_npos;
 	
-	sRun ask_add_run, ask_clear_run, ask_del_run, ask_get_run, ask_set_run;
+	sRun ask_add_run, ask_clear_run, ask_addmove_run, ask_get_run, ask_set_run;
 	Replic current_replic;
 	
 	
@@ -904,8 +916,8 @@ class MPatern extends MBaseMenu {
 		      public void run() { ask_add(); } } );
 		ask_clear_run = newRun("ask_clear_run", "ask_clear_run", new nRunnable() { 
 		      public void run() { ask_clear(); } } );
-		ask_del_run = newRun("ask_del_run", "ask_del_run", new nRunnable() { 
-		      public void run() { ask_del(); } } );
+		ask_addmove_run = newRun("ask_del_run", "ask_del_run", new nRunnable() { 
+		      public void run() { ask_move(); } } );
 		ask_get_run = newRun("ask_get_run", "ask_get_run", new nRunnable() { 
 		      public void run() { ask_get(); } } );
 		ask_set_run = newRun("ask_set_run", "ask_set_run", new nRunnable() { 
@@ -913,9 +925,9 @@ class MPatern extends MBaseMenu {
 		
 		current_replic = new Replic();
 		
-		nposx = menuFltSlide(0, -500, 500, "adding_x");
-		nposy = menuFltSlide(0, -500, 500, "adding_y");
-		nscale = menuFltSlide(10, 5, 20, "adding_scale");
+		nposx = menuFltSlide(0, -20000, 20000, "adding_x");
+		nposy = menuFltSlide(0, -20000, 20000, "adding_y");
+		nscale = menuFltSlide(1, 0, 20, "adding_scale");
 		nrot = menuFltSlide(0, -RConst.PI, RConst.PI, "adding_rot");
 		up_npos = new nRunnable() {public void run() { 
 			current_replic.pos.set(nposx.get(), nposy.get());
@@ -970,12 +982,15 @@ class MPatern extends MBaseMenu {
 		struct_order.set_link();
 		
 		addInputBang(0, "add", ask_add_run.get());
-		addInputBang(0, "del", ask_del_run.get());
+		addInputBang(0, "move", ask_addmove_run.get());
 		addInputBang(0, "clear", ask_clear_run.get());
 		addInputBang(0, "get", ask_get_run.get());
 		addInputBang(0, "set", ask_set_run.get());
-		
-		addEmptyS(1); addEmptyS(1); addEmptyS(1); addEmptyS(1); addEmptyS(1);
+		addTrigS(1, "add", ask_add_run.get());
+		addTrigS(1, "move", ask_addmove_run.get());
+		addTrigS(1, "clear", ask_clear_run.get());
+		addTrigS(1, "get", ask_get_run.get());
+		addTrigS(1, "set", ask_set_run.get());
 
 		out_px = addOutput(1, "nposx");
 		out_py = addOutput(1, "nposy");
@@ -998,9 +1013,6 @@ class MPatern extends MBaseMenu {
 	}
 	Macro_Connexion in_m1, in_m2;
 	void ask_add() {
-//		Macro_Packet p = new Macro_Packet("ASK");
-//		p.addMsg("STRUCT_NEW");
-//		struct_order.send(p);
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1010,9 +1022,6 @@ class MPatern extends MBaseMenu {
 		}
 	}
 	void ask_clear() {
-//		Macro_Packet p = new Macro_Packet("ASK");
-//		p.addMsg("STRUCT_CLR");
-//		struct_order.send(p);
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1021,18 +1030,7 @@ class MPatern extends MBaseMenu {
 			}
 		}
 	}
-	void ask_del() {
-		MStructure mf = null;
-		for (Macro_Connexion c : struct_order.connected_inputs) {
-			if (c.elem.bloc.val_type.get().equals("struct")) {
-				mf = ((MStructure)c.elem.bloc);
-				mf.del_oldest_replic();
-			}
-		}
-	}
 	void ask_get() {
-//		Macro_Packet p = Macro_Packet.newPacketObject((Object)current_replic);
-//		struct_order.send(p);
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1046,15 +1044,20 @@ class MPatern extends MBaseMenu {
 		}
 	}
 	void ask_set() {
-//		Macro_Packet p = new Macro_Packet("ASK");
-//		p.addMsg("STRUCT_DEF");
-//		p.addMsg(current_replic.to_str());
-//		struct_order.send(p);
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
 				mf = ((MStructure)c.elem.bloc);
 				mf.set_replic_from(current_replic);
+			}
+		}
+	}
+	void ask_move() {
+		MStructure mf = null;
+		for (Macro_Connexion c : struct_order.connected_inputs) {
+			if (c.elem.bloc.val_type.get().equals("struct")) {
+				mf = ((MStructure)c.elem.bloc);
+				mf.move_replic_from(current_replic);
 			}
 		}
 	}
@@ -1137,9 +1140,9 @@ class MForm extends MBaseMenu {
 	    shape = new nBase(gui.app);
 	    is_line = menuBoo(false, "is_line");
 	    val_draw_layer = menuIntIncr(0, 1, "val_draw_layer");
-	    val_scale = menuFltSlide(500, 1, 1000, "scale");
+	    val_scale = menuFltSlide(50, 10, 100, "scale");
 	    shape.dir.setMag(val_scale.get());
-	    val_linew = menuFltSlide(0.05F, 0.01F, 1.0F, "line_weight");
+	    val_linew = menuFltSlide(0.05F, 0.0F, 1.0F, "line_weight");
 	    val_col_grad = menuFltSlide(0.0F, 0.0F, 1.0F, "val_col_grad");
 	    shape.line_w = val_linew.get();
 	    vpax = newFlt(shape.face.p1.x, "vpax", "vpax");
@@ -1171,17 +1174,20 @@ class MForm extends MBaseMenu {
     		float r = val_fill1.getred() * val_col_grad.get() + val_fill2.getred() * (1-val_col_grad.get());
     		float g = val_fill1.getgreen() * val_col_grad.get() + val_fill2.getgreen() * (1-val_col_grad.get());
     		float b = val_fill1.getblue() * val_col_grad.get() + val_fill2.getblue() * (1-val_col_grad.get());
-	    		shape.col_fill = gui.app.color(r,g,b); }});
+    		float a = val_fill1.getalpha() * val_col_grad.get() + val_fill2.getalpha() * (1-val_col_grad.get());
+    			shape.col_fill = gui.app.color(r,g,b,a); }});
 	    val_fill2.addEventChange(new nRunnable() { public void run() { 
     		float r = val_fill1.getred() * val_col_grad.get() + val_fill2.getred() * (1-val_col_grad.get());
     		float g = val_fill1.getgreen() * val_col_grad.get() + val_fill2.getgreen() * (1-val_col_grad.get());
     		float b = val_fill1.getblue() * val_col_grad.get() + val_fill2.getblue() * (1-val_col_grad.get());
-	    		shape.col_fill = gui.app.color(r,g,b); }});
+    		float a = val_fill1.getalpha() * val_col_grad.get() + val_fill2.getalpha() * (1-val_col_grad.get());
+	    		shape.col_fill = gui.app.color(r,g,b,a); }});
 	    val_col_grad.addEventChange(new nRunnable() { public void run() { 
     		float r = val_fill1.getred() * val_col_grad.get() + val_fill2.getred() * (1-val_col_grad.get());
     		float g = val_fill1.getgreen() * val_col_grad.get() + val_fill2.getgreen() * (1-val_col_grad.get());
     		float b = val_fill1.getblue() * val_col_grad.get() + val_fill2.getblue() * (1-val_col_grad.get());
-	    		shape.col_fill = gui.app.color(r,g,b); }});
+    		float a = val_fill1.getalpha() * val_col_grad.get() + val_fill2.getalpha() * (1-val_col_grad.get());
+    			shape.col_fill = gui.app.color(r,g,b,a); }});
 	    val_scale.addEventChange(new nRunnable() { public void run() { shape.dir.setMag(val_scale.get()); }});
 	    val_linew.addEventChange(new nRunnable() { public void run() { shape.line_w = val_linew.get(); }});
 	//    

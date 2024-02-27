@@ -888,7 +888,7 @@ class MVar extends MBasic {
   	}
 
     void build_normal() { 
-		addEmptyS(1).addCtrlModel("MC_Element_SButton", "Get")
+		addEmptyS(1).addCtrlModel("MC_Element_SButton", "send")
 		.setRunnable(new nRunnable() { public void run() {
 			if (cible != null) out.send(cible.asPacket()); } })
 		.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
@@ -1011,6 +1011,7 @@ class MVar extends MBasic {
   void setValue(sFlt v) {
     fval = v;
     ftmp = v.get();
+    
     val_run = new nRunnable() { public void run() { 
     	if (update_send.get()) out.send(Macro_Packet.newPacketFloat(fval.get())); }};
     in_run = new nRunnable() { public void run() { 
@@ -1196,12 +1197,14 @@ class MValue extends MBasic {
     
 	addEmptyS(1).addCtrlModel("MC_Element_SButton", "Get")
     .setRunnable(new nRunnable() { public void run() {
-    	if (cible != null) out.send(cible.asPacket()); } })
+    	if (cible != null && !cible.type.equals("run")) out.send(cible.asPacket()); } })
     .getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
 		.setLinkedValue(setup_send); 
 	out = addOutput(2, "out");
     in = addInput(0, "in", new nRunnable() { public void run() {
-        if (in.lastPack() != null && in.lastPack().isBang() && cible != null) out.send(cible.asPacket());
+        if (in.lastPack() != null && in.lastPack().isBang() && 
+        			cible != null && !cible.type.equals("run")) 
+        		out.send(cible.asPacket());
       } });
 
     addEmpty(1); 
