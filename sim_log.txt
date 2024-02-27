@@ -1,12 +1,22 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-5645:- :full_data_save to save.sdata
-5821:- :setup_load from exploding_struct.sdata
-6807:  :setup_load from random_mouvement.sdata
-15842:  :setup_load from save.sdata
-40297:  :full_data_save to save.sdata
-40907:  :exit
+28611:  :full_data_save to save.sdata
+28839:  :full_data_save to save.sdata
+28850:  :setup_load from save.sdata
+31489:  :full_data_save to save.sdata
+31498:  :setup_load from save.sdata
+34156:  :full_data_save to save.sdata
+34184:  :setup_load from save.sdata
+35535:  :full_data_save to save.sdata
+35550:  :setup_load from save.sdata
+39009:  :full_data_save to save.sdata
+39029:  :setup_load from save.sdata
+45780:  :full_data_save to save.sdata
+46276:  :full_data_save to save.sdata
+46319:  :setup_load from save.sdata
+48566:  :full_data_save to save.sdata
+48625:  :exit
 null
 null
 null

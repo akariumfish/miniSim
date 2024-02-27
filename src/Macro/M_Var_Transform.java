@@ -1287,7 +1287,7 @@ class MValue extends MBasic {
 	    } };
 	    v.addEventChange(val_run);
 	    in.addEventReceive(in_run);
-	  }
+}
   void setValue(sFlt v) {
     fval = v;
     ftmp = v.get();
