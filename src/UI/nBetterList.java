@@ -43,7 +43,14 @@ public class nBetterList extends nDrawer {
 	}
 	
 	  ArrayList<nListEntry> complexe_entrys = new ArrayList<nListEntry>();
-	  
+
+	  public nBetterList setEntrys(ArrayList<String> l) {
+		  start_complexe_entry();
+		  for (String s : l) 
+			  new_comp_entry(RConst.copy(s)).setSelectable();
+		  end_complexe_entry();
+		  return this;
+	  }
 	  public nBetterList start_complexe_entry() {
 		  complexe_entrys.clear();
 		  return this;
@@ -64,7 +71,11 @@ public class nBetterList extends nDrawer {
 	      nWidget ne = gui.theme.newWidget(gui, "List_Entry").setSize(larg - item_s, item_s)
 	        .stackDown()
 	        .setTextAlignment(align, PApplet.CENTER);
-	      ne.addEventSwitchOn_Builder(new nRunnable() { public void run() {
+	      ne.addEventVisibilityChange(new nRunnable(ne) { public void run() {
+	        	if (!ref.isHided()) 
+	        		((nWidget)builder).show();
+	        	else ((nWidget)builder).hide();
+	      }}).addEventSwitchOn_Builder(new nRunnable() { public void run() {
 	          if (last_choice_widget != null && last_choice_widget != ((nWidget)builder)) 
 	            last_choice_widget.setLook(gui.theme, "List_Entry");
 	          ((nWidget)builder).setLook(gui.theme, "List_Entry_Selected");
@@ -93,12 +104,15 @@ public class nBetterList extends nDrawer {
   	        }}).addEventVisibilityChange(new nRunnable(cheat) { public void run() {
   	        	int i = ((WidgetCheat)builder).index + entry_pos;
   	        	if (i < complexe_entrys.size() && 
-  	        		complexe_entrys.get(i).has_option) 
+  	        		complexe_entrys.get(i).has_option && 
+  	        		!ref.isHided()) 
   	        		((WidgetCheat)builder).self.show();
   	        	else ((WidgetCheat)builder).self.hide();
   	        }}).setSwitch().hide()
   	        ;
 	      ne_op.setParent(ne);
+	      if (!ref.isHided()) ne.show();
+	      else ne.hide();
   	      listoptions.add(ne_op);
 	    }
 	    for (nWidget w : listwidgets) w.toLayerTop();
@@ -126,9 +140,11 @@ public class nBetterList extends nDrawer {
 	        i++; }
 	      last_choice_index = i+entry_pos;
 	      last_choice_widget = listwidgets.get(i);
-	  	if (last_choice_index < complexe_entrys.size() && 
-	  		complexe_entrys.get(last_choice_index).click_run != null) 
-	  			complexe_entrys.get(last_choice_index).click_run.run();
+	  	  if (last_choice_index < complexe_entrys.size() && 
+	  			  complexe_entrys.get(last_choice_index).click_run != null) 
+	  		complexe_entrys.get(last_choice_index).click_run.run();
+	  	
+	      nRunnable.runEvents(eventChangeRun);
 	    }
 	  }
 	  void unselect() { last_choice_index = -1; update_list(); }
@@ -175,20 +191,20 @@ public class nBetterList extends nDrawer {
 	  boolean event_active = true;
 	  public int last_choice_index = -1;
 	  
-//	  ArrayList<nRunnable> eventChangeRun = new ArrayList<nRunnable>();
-//	  ArrayList<nRunnable> eventScrollRun = new ArrayList<nRunnable>();
-//	  public nBetterList addEventScroll(nRunnable r)       { eventScrollRun.add(r); return this; }
-//	  public nBetterList addEventChange(nRunnable r)       { eventChangeRun.add(r); return this; }
-//	  public nBetterList addEventChange_Builder(nRunnable r) { eventChangeRun.add(r); r.builder = this; return this; }
-//	  
+	  ArrayList<nRunnable> eventChangeRun = new ArrayList<nRunnable>();
+	  ArrayList<nRunnable> eventScrollRun = new ArrayList<nRunnable>();
+	  public nBetterList addEventScroll(nRunnable r)       { eventScrollRun.add(r); return this; }
+	  public nBetterList addEventChange(nRunnable r)       { eventChangeRun.add(r); return this; }
+	  public nBetterList addEventChange_Builder(nRunnable r) { eventChangeRun.add(r); r.builder = this; return this; }
+	  
 	  int layer = 0;
 	  
 	  public nBetterList toLayerTop() {
 	    super.toLayerTop();
 	    back.toLayerTop();
-	    scroll.toLayerTop();
 	    for (nWidget w : listwidgets) w.toLayerTop();
 	    for (nWidget w : listoptions) w.toLayerTop();
+	    scroll.toLayerTop();
 	    return this;
 	  }
 	  public nBetterList clear() {
@@ -226,7 +242,7 @@ public class nBetterList extends nDrawer {
 	      .addEventChange(new nRunnable() { public void run() {
 	        entry_pos = scroll.entry_pos;
 	        update_list();
-//	        runEvents(eventScrollRun);
+	        runEvents(eventScrollRun);
 	      }});
 	    end_complexe_entry();
 	  }

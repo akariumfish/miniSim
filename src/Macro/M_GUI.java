@@ -26,11 +26,61 @@ import sData.sVec;
 public class M_GUI {}
 
 
+class MValView extends MBasic {
+	static class Builder extends MAbstract_Builder {
+		Builder() { super("valview", "ValViewer", "", "GUI"); }
+		MValView build(Macro_Sheet s, sValueBloc b) { MValView m = new MValView(s, b); return m; }
+	}
+	sInt row_nb; sBoo view_label;
+	ArrayList<sFlt> vals;
+	ArrayList<sStr> labs;
+	ArrayList<Macro_Connexion> connects;
+	Macro_Connexion current_out;
+	int current_index;
+	MValView(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "valview", _bloc); }
+	public void init() {
+		  	row_nb = newInt(3, "row_nb");
+		  	view_label = newBoo(false, "view_label");
+		  	vals = new ArrayList<sFlt>();
+		  	labs = new ArrayList<sStr>();
+		  	connects = new ArrayList<Macro_Connexion>();
+	}	
+	public void build_param() { 
+		addTrigS(2, "add row", new nRunnable() { public void run() { row_nb.add(1); rebuild(); }});
+		addEmptyS(1).addWatcherModel("MC_Element_SField").setLinkedValue(row_nb);
+	  	addTrigS(0, "del row", new nRunnable() { public void run() { 
+	  		if (row_nb.get() > 1) row_nb.add(-1); rebuild(); }});
+	  	
+	  	addEmptyS(0); addEmptyS(2);
+	  	addLinkedSSwitch(1, view_label);
+		build_normal();
+	}
+	public void build_normal() {
+		for (int i = 0 ; i < row_nb.get() ; i++) {
+			sFlt v = newFlt(0, "val"+i, "val"+i);
+			sStr s = newStr("label"+i, "label"+i);
+		  	if (!vals.contains(v)) vals.add(v);
+		  	Macro_Connexion in = addInput(0, "val "+i);
+		  	connects.add(in);
+		  	linkInputToValue(in, v);
+		  	addEmptyS(1).addWatcherModel("MC_Element_Text")
+		  		.setFloatPrecision(5).setLinkedValue(v)
+		  		.setPX(ref_size*-1.75);
+		  	if (view_label.get()) {
+		  		addLinkedSField(2, s);
+		  	}
+		}
+	}
+	public MValView clear() {
+		super.clear(); return this; }
+}
+
+
 
 
 class MQuickFloat extends MBasic {
 	static class Builder extends MAbstract_Builder {
-		Builder() { super("quickFlt", "QuickFloat", "", "Data"); }
+		Builder() { super("quickFlt", "QuickFloat", "", "GUI"); }
 		MQuickFloat build(Macro_Sheet s, sValueBloc b) { MQuickFloat m = new MQuickFloat(s, b); return m; }
 	}
 	Macro_Connexion out;
@@ -176,38 +226,52 @@ class MButton extends MBasic {
 			else wMode.setText("Trigger");
 		}});
 		
-		size = newSelectInt(0, 1, "size");
+		size = newSelectInt(0, 2, "size");
 		size.set_limit(1, 2);
 		label = newFieldStr(0, "label", "");
 		setup_send = newSwitchBoo(0, false, "stp_snd");
+	  	state = newBoo("state", "state", false);
+		
+		build_button();
 	}
 	public void build_normal() {
 		mode = newBoo("mode", "mode", false);
-		size = newInt(1, "size");
+		size = newInt(2, "size");
 	  	label = newStr("label", "");
 	  	setup_send = newBoo("stp_snd", "stp_snd", false);
 	  	state = newBoo("state", "state", false);
+	  	
+	  	build_button();
+	}
+	void build_button() {
 	  	if (!mode.get()) {
 		 	if (size.get() == 1) {
 			  	Macro_Element e = addEmptyS(0);
 			  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
 				  	out_t.send(Macro_Packet.newPacketBang());
 			  	} });
+			 	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+			 		.setLinkedValue(setup_send);
 		    
 			  	out_t = addOutput(1, "trig").setDefBang();
 		  	} else {
 			  	out_t = addOutput(1, "trig").setDefBang();
 	
 			  	addEmptyS(0);
-			  	Macro_Element e = addEmptyL(0);
+			  	Macro_Element e = addEmptyS(0);
 			  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
 			  		out_t.send(Macro_Packet.newPacketBang());
 			  	} });
-			  	trig.setSY(ref_size*2).setPY(-ref_size*17/16);
+			  	trig.setSY(ref_size*2).setPY(-ref_size*15/16);
+			  	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+			  		.setLinkedValue(setup_send).setPX(ref_size*0.25);
 		  	}
-		 	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-		 		.setLinkedValue(setup_send);
-		  	if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		 	
+		 	label.addEventChange(new nRunnable() { public void run() {
+		 		trig.setText(label.get()); } });
+		 	
+		  	if (setup_send.get()) 
+		  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
 			  	out_t.send(Macro_Packet.newPacketBang());
 		  	} });
 	  	} else {
@@ -233,16 +297,22 @@ class MButton extends MBasic {
 	  		    out_t = addOutput(1, "out")
 	  		    		.setDefBool();
 	  		    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button", label.get()).setLinkedValue(state);
-	  		    swtch.setSY(ref_size*2).setPY(-ref_size*17/16);
+	  		    swtch.setSY(ref_size*2).setPY(-ref_size*15/16);
 			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+			    swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+		  			.setLinkedValue(setup_send).setPX(ref_size*0.25);
 	  		} else {
 			    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton", label.get()).setLinkedValue(state);
 			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+		  		swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+			 		.setLinkedValue(setup_send);
 			    out_t = addOutput(2, "out")
 			    		.setDefBool();
 	  		}
-	  		swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-		 		.setLinkedValue(setup_send);
+
+		 	label.addEventChange(new nRunnable() { public void run() {
+		 		swtch.setText(label.get()); } });
+		 	
   		    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
 		    		out_t.send(Macro_Packet.newPacketBool(state.get()));
 		    } });

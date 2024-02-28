@@ -98,7 +98,9 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	  String side = "";
 	  void set_spot(nWidget _spot, String sd) { 
 	    side = sd;
-	    spot = _spot; spot.setLook("MC_Element_At_Spot").setPassif(); back.setLook("MC_Element_At_Spot").setPassif(); 
+	    spot = _spot; 
+	    spot.setLook("MC_Element_At_Spot").setPassif(); 
+	    back.setLook("MC_Element_At_Spot").setPassif(); 
 	    spot.setText(bloc.value_bloc.base_ref);
 	    sheet_viewable = false; 
 	  }
@@ -125,7 +127,8 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	    back.clearParent(); back.setParent(ref); 
 	    back.setPX(-ref_size*0.5);
 	    if (bloc.openning.get() == OPEN && bloc.mmain().show_macro.get()) {
-	      back.show(); 
+	    		back.show();
+		    if (elem_widgets.size() == 0) spot.hide_childs();
 	      for (nWidget w : elem_widgets) w.show();
 	    } else { 
 	      back.hide(); 
@@ -155,10 +158,11 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	      
 	      back.clearParent(); back.setParent(spot);
 	      //if () 
-	      back.show(); 
+//	      back.show(); 
+	      back.hide();
 	      back.setPX(0);
 	      for (nWidget w : elem_widgets) w.show();
-	      toLayerTop();
+	      if (elem_widgets.size() == 0) spot.hide_childs();
 	    } else { 
 	      back.hide(); 
 	      for (nWidget w : elem_widgets) w.hide();

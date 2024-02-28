@@ -358,10 +358,10 @@ public class nShelf extends nBuilder {
 	    return d;
 	  }
 	  public nBetterList addBetterList(int n, float wf, float hf) {
-		    nBetterList d = new nBetterList(this, n, ref_size, wf, hf);
-		    insertDrawer(d);
-		    return d;
-		  }
+	    nBetterList d = new nBetterList(this, n, ref_size, wf, hf);
+	    insertDrawer(d);
+	    return d;
+	  }
 	  
 	  public nExplorer addExplorer() {
 	    nExplorer d = new nExplorer(this);

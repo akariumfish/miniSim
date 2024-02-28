@@ -168,13 +168,16 @@ nExplorer sheet_explorer;
   void build_macro_menus() {
     if (macro_tool != null) macro_tool.clear();
     macro_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
-    macro_tool.addShelf().addDrawer(2.125, 1)
+    macro_tool.addShelf().addDrawer(3.25, 1)
         .addLinkedModel("Menu_Button_Small_Outline-S1-P1", "P")
           .setLinkedValue(do_packet)
           .setInfo("do packet processing").setFont((int)(ref_size/1.9)).getDrawer()
         .addLinkedModel("Menu_Button_Small_Outline-S1-P2", "L")
           .setLinkedValue(show_link)
           .setInfo("show/hide links").setFont((int)(ref_size/1.9)).getDrawer()
+        .addLinkedModel("Menu_Button_Small_Outline-S1-P3", "LV")
+          .setLinkedValue(show_link_volat)
+          .setInfo("show hided links when hovering connexions").setFont((int)(ref_size/1.9)).getDrawer()
           .getShelfPanel()
       .addShelf().addDrawer(4.375F, 1)
         .addLinkedModel("Menu_Button_Small_Outline-S1-P1", "S")
@@ -272,13 +275,21 @@ nExplorer sheet_explorer;
 		    .setFont((int)(ref_size/2));
 		    ;
 	    }
-	//    build_tool.addShelf();
-	//    for (String t : bloc_types5) { build_tool.getShelf(1).addDrawer(2.5, 0.75)
-	//      .addCtrlModel("Menu_Button_Small_Outline-S2.5/0.75", t)
-	//        .setRunnable(new nRunnable(t) { public void run() { selected_sheet.addByType(((String)builder)); }})
-	//        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-	//        ;
-	//    }
+	    for (sValueBloc t : shown_templ_list) {
+	    		row_count++;
+			if (row_count > 18) {
+//				shelf_cible++; 
+				row_count = 0;
+				sh = build_tool.addShelf();
+			}
+		    sh.addDrawer(3F, 0.75F)
+		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.ref)
+		    .setRunnable(new nRunnable(t) { public void run() { 
+		    		paste_tmpl(((sValueBloc)builder));
+		    	}})
+		    .setFont((int)(ref_size/2));
+		    ;
+	    }
 	    if (!show_build_tool.get()) build_tool.reduc();
 	    build_tool.addEventReduc(new nRunnable() { public void run() { 
 	      show_build_tool.set(!build_tool.hide); }});
@@ -334,16 +345,55 @@ nExplorer sheet_explorer;
       
     template_explorer = tab.getShelf()
       .addSeparator()
-      .addExplorer()
-        .setStrtBloc(saved_template)
-        .hideValueView()
-        .hideGoBack()
-        .addEventChange(new nRunnable() { public void run() { 
-          if (saved_template != template_explorer.explored_bloc) {
-            template_explorer.setStrtBloc(saved_template);
-            template_explorer.update(); 
-          }
-        } } )
+      .addExplorer();
+    
+    template_explorer.setComplexEntry(new nRunnable() { public void run() { 
+		String[] saved_shown_tmpl = PApplet.splitTokens(shown_templ.get(), OBJ_TOKEN);
+		shown_templ_list.clear();
+		shown_templ.set("");
+		
+		saved_template.runBlocIterator(
+		new nIterator<sValueBloc>() { public void run(sValueBloc m) { 
+			for (String t : saved_shown_tmpl) if (t.equals(m.ref)) {
+				shown_templ_list.add(m); }
+	    }});
+	    for (sValueBloc m2 : shown_templ_list) 
+	    		shown_templ.set(shown_templ.get() + OBJ_TOKEN + m2.ref);
+		
+		build_buildtool();
+  		template_explorer.explorer_list.start_complexe_entry();
+	  	for (sValueBloc s : template_explorer.explorer_blocs) {
+	  		nRunnable option_run = new nRunnable(RConst.copy(s.ref)) { public void run() { 
+				sValueBloc m = saved_template.getBloc((String)builder);
+				if (m != null) {
+					if (shown_templ_list.contains(m)) shown_templ_list.remove(m);
+					else shown_templ_list.add(m);
+				    shown_templ.set("");
+				    for (sValueBloc m2 : shown_templ_list) 
+				    	shown_templ.set(shown_templ.get() + OBJ_TOKEN + m2.ref);
+					build_buildtool();
+				}
+	  		}};
+	  		if (shown_templ_list.contains(s)) 
+	  		template_explorer.explorer_list.new_comp_entry(RConst.copy(s.ref))
+	  		.setSelectable()
+	  		.setOption(true, "", option_run);
+	  		else 
+	  		template_explorer.explorer_list.new_comp_entry(RConst.copy(s.ref))
+	  		.setSelectable()
+	  		.setOption(false, "", option_run);
+		}
+	  	template_explorer.explorer_list.end_complexe_entry();
+    } } )
+    .setStrtBloc(saved_template)
+    .hideValueView()
+    .hideGoBack()
+    .addEventChange(new nRunnable() { public void run() { 
+  		if (saved_template != template_explorer.explored_bloc) {
+	  		template_explorer.setStrtBloc(saved_template);
+	    		template_explorer.update(); 
+	  	}
+    } } )
         ;
     tab.getShelf()
       .addSeparator()
@@ -383,6 +433,9 @@ nExplorer sheet_explorer;
 	  update_bloc_selector_list();
   }
 
+  void build_templ_explorer() {
+	  
+  }
 	ArrayList<String> catego;
   void update_bloc_selector_list() {
 	  if (selector_list != null) {
@@ -390,8 +443,11 @@ nExplorer sheet_explorer;
 		selector_list.new_comp_entry("            --- Blocs ---");
 	  }
 		String[] saved_shown = PApplet.splitTokens(shown_builder.get(), OBJ_TOKEN);
+		String[] saved_shown_spe = PApplet.splitTokens(shown_spe.get(), OBJ_TOKEN);
 		shown_type_list.clear();
 		shown_builder.set("");
+		shown_spe_list.clear();
+		shown_spe.set("");
 		for (MAbstract_Builder m : bloc_builders) {
 			boolean found = false;
 			for (String t : saved_shown) if (t.equals(m.type)) {
@@ -401,7 +457,18 @@ nExplorer sheet_explorer;
 			if (!found) m.show_in_buildtool = false;
 		} 
 	    for (MAbstract_Builder m2 : shown_type_list) 
-	    	shown_builder.set(shown_builder.get() + OBJ_TOKEN + m2.type);
+	    		shown_builder.set(shown_builder.get() + OBJ_TOKEN + m2.type);
+
+		for (Sheet_Specialize m : sheetspe_builders) {
+			boolean found = false;
+			for (String t : saved_shown_spe) if (t.equals(m.name)) {
+				found = true;
+				shown_spe_list.add(m);
+				m.show_in_buildtool = true; }
+			if (!found) m.show_in_buildtool = false;
+		} 
+	    for (Sheet_Specialize m2 : shown_spe_list) 
+	    		shown_spe.set(shown_spe.get() + OBJ_TOKEN + m2.name);
 		
 		build_buildtool();
 
@@ -445,20 +512,22 @@ nExplorer sheet_explorer;
 			.setOption(m.show_in_buildtool, "", new nRunnable(m) { public void run() {
 				Sheet_Specialize m = ((Sheet_Specialize)builder);
 				m.show_in_buildtool = !m.show_in_buildtool;
+				if (m.show_in_buildtool) shown_spe_list.add(m);
+				else shown_spe_list.remove(m);
+
+			    shown_spe.set("");
+			    for (Sheet_Specialize m2 : shown_spe_list) 
+			    	shown_spe.set(shown_spe.get() + OBJ_TOKEN + m2.name);
 				build_buildtool();
 			}});
 
-//		selector_list.new_comp_entry("            --- Old Blocs ---");
-//	    for (String m : bloc_types1) 
-//			selector_list.new_comp_entry(" - "+m).setBuilder(m)
-//			.setSelectable(new nRunnable(m) { public void run() {
-//				selected_sheet.addByType(((String)builder)); 
-//			}});
 	     selector_list.end_complexe_entry();
 	  }
   }
-  
+
   ArrayList<MAbstract_Builder> shown_type_list = new ArrayList<MAbstract_Builder>();
+  ArrayList<Sheet_Specialize> shown_spe_list = new ArrayList<Sheet_Specialize>();
+  ArrayList<sValueBloc> shown_templ_list = new ArrayList<sValueBloc>();
   nBetterList selector_list;
 
   
@@ -887,8 +956,8 @@ nExplorer sheet_explorer;
   nRunnable packet_frame_run;
   
   //, show_sheet_tool
-  sBoo show_gui, show_macro, show_link, show_build_tool, show_macro_tool, do_packet;
-  sStr new_temp_name, database_path, shown_builder, shown_spe; sRun del_select_run, copy_run, paste_run, reduc_run;
+  sBoo show_gui, show_macro, show_link, show_link_volat, show_build_tool, show_macro_tool, do_packet;
+  sStr new_temp_name, database_path, shown_builder, shown_spe, shown_templ; sRun del_select_run, copy_run, paste_run, reduc_run;
   public sInterface inter;
   Rapp app;
   public sValueBloc saved_template;
@@ -927,8 +996,10 @@ Macro_Sheet search_sheet = this;
   void reduc_selected() {
     for (Macro_Abstract m : selected_macro) m.changeOpenning();
   }
-  
+
   ArrayList<MAbstract_Builder> bloc_builders = new ArrayList<MAbstract_Builder>();
+  ArrayList<Sheet_Specialize> sheetspe_builders = new ArrayList<Sheet_Specialize>();
+  
   void add_bloc_builders(MAbstract_Builder m) {
     bloc_builders.add(m);
   }
@@ -963,6 +1034,7 @@ public Macro_Main(sInterface _int) {
       update_select_bound();
     }});
     show_link = setting_bloc.newBoo("show_link", "showL", true);
+    show_link_volat = setting_bloc.newBoo("show_link_volat", "showLV", true);
     
     show_build_tool = setting_bloc.newBoo("show_build_tool", "build tool", true);
     show_build_tool.addEventChange(new nRunnable(this) { public void run() { 
@@ -971,6 +1043,7 @@ public Macro_Main(sInterface _int) {
 
     shown_builder = setting_bloc.newStr("shown_builder", "shown_builder", "");
     shown_spe = setting_bloc.newStr("shown_spe", "shown_spe", "");
+    shown_templ = setting_bloc.newStr("shown_templ", "shown_templ", "");
     
     show_macro_tool = setting_bloc.newBoo("show_macro_tool", "macro tool", true);
     show_macro_tool.addEventChange(new nRunnable(this) { public void run() { 
@@ -1002,13 +1075,14 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MSheetMain.MSheetMain_Builder());
       add_bloc_builders(new MSheetCo.MSheetCo_Builder());
       add_bloc_builders(new MCursor.MCursor_Builder());
+      add_bloc_builders(new MPoint.MPoint_Builder());
+      add_bloc_builders(new MPack.Builder());
       add_bloc_builders(new MForm.MForm_Builder());
       add_bloc_builders(new MCam.MCam_Builder());
       add_bloc_builders(new MStructure.MStructure_Builder());
       add_bloc_builders(new MTick.MTick_Builder());
       add_bloc_builders(new MPatern.MPatern_Builder());
       add_bloc_builders(new MCanvas.MCanvas_Builder());
-      add_bloc_builders(new MPoint.MPoint_Builder());
       add_bloc_builders(new MChan.MChan_Builder());
       add_bloc_builders(new MGate.MGate_Builder());
       add_bloc_builders(new MRamp.MRamp_Builder());
@@ -1027,6 +1101,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MNumCalc.Builder());
       add_bloc_builders(new MTransform.Builder());
       add_bloc_builders(new MQuickFloat.Builder());
+      add_bloc_builders(new MValView.Builder());
 
       add_bloc_builders(new MColRGB.MColRGB_Builder());
       add_bloc_builders(new MToolBin.MToolBin_Builder());
@@ -1192,11 +1267,13 @@ public Macro_Main(sInterface _int) {
   
   public void addSpecializedSheet(Sheet_Specialize s) {
     s.mmain = this;
+    sheetspe_builders.add(s);
     build_macro_menus();
   }
   public Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
     s.mmain = this;
     s.unique = true;
+    sheetspe_builders.add(s);
     build_macro_menus();
     Macro_Sheet ms = s.add_new(this, null, null);
     return ms;
@@ -1248,7 +1325,7 @@ public Macro_Main(sInterface _int) {
 	    .setOutline(true)
 	    .setFont((int)(ref_size/1.6F))
 	    .setText("--")
-	    .setSize(ref_size*2, ref_size*0.75F).setPosition(ref_size*1.0F, ref_size*0.5F)
+	    .setSize(ref_size*2, ref_size*0.75F).setPosition(ref_size*0.75F, ref_size*0.5F)
 	    );
 	  theme.addModel("MC_Front", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(50, 0))
@@ -1514,7 +1591,7 @@ public Macro_Main(sInterface _int) {
 	    );
 	  theme.addModel("MC_Param", theme.newWidget("MC_Reduc")
 	    .setSize(ref_size*0.75, ref_size*0.75)
-	    .setPosition(ref_size*1.75, ref_size*0.5)
+	    .setPosition(ref_size*1.125, ref_size*0.5)
 	    .alignDown().stackLeft()
 	    );
 	  theme.addModel("MC_Connect_Default", theme.newWidget("mc_ref")

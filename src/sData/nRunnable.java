@@ -38,6 +38,7 @@ public abstract class nRunnable {
 	public nRunnable(Object p) { builder = p; } 
 	public void run() {}
 	public void run(float v) {}
+	public void run(Object v) {}
   
 	public static void runEvents(ArrayList<nRunnable> e) { for (int i = e.size() - 1 ; i >= 0 ; i--) e.get(i).run(); }
 	public static void runEvents(ArrayList<nRunnable> e, float v) { for (int i = e.size() - 1 ; i >= 0 ; i--) e.get(i).run(v); }

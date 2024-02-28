@@ -13,6 +13,7 @@ import UI.nWidget;
 import processing.core.PConstants;
 import processing.core.PVector;
 import sData.*;
+import z_old_specialise.Sheet_Specialize;
 
 
 public class M_Sheet {}
@@ -98,7 +99,7 @@ void build_param() {
 	addTrigS(1, "menu", menu_run);
 }
 void build_normal() {
-	addEmptyS(0);
+	addInputBang(0, "menu", menu_run);
 	addTrigS(1, "menu", menu_run);
 }
 public MBaseMenu clear() {
@@ -444,58 +445,129 @@ class MCursor extends MBasic {
 }
 
 
-//class MSheetIn extends Macro_Bloc {
-//	static class MSheetI_Builder extends MAbstract_Builder {
-//		MSheetI_Builder() { 
-//			super("in", "connexions with sheet parent"); show_in_buildtool = true; }
-//		MSheetIn build(Macro_Sheet s, sValueBloc b) { MSheetIn m = new MSheetIn(s, b); return m; }
-//	}
-//  Macro_Element elem;
-//  nLinkedWidget view;
-//  sStr val_view;
-//  
-//  MSheetIn(Macro_Sheet _sheet, sValueBloc _bloc) { 
-//    super(_sheet, "in", "in", _bloc); 
-//    val_view = newStr("val", "val", "");
-//    view = addEmptyS(1).addLinkedModel("MC_Element_SField");
-//    view.addEventFieldChange(new nRunnable() { public void run() { 
-//      elem.sheet_connect.setInfo(val_view.get());
-//    } });
-//    view.setLinkedValue(val_view);
-//    elem = addSheetInput(0, "in");
-//    if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
-//    //val_title.addEventChange(new nRunnable() { public void run() { 
-//    //if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_title.get()); } });
-//  }
-//  public MSheetIn clear() {
-//    super.clear(); return this; }
-//}
-//
-//class MSheetOut extends Macro_Bloc {
-//	static class MSheetO_Builder extends MAbstract_Builder {
-//		MSheetO_Builder() { 
-//			super("out", "connexions with sheet parent"); show_in_buildtool = true; }
-//		MSheetOut build(Macro_Sheet s, sValueBloc b) { MSheetOut m = new MSheetOut(s, b); return m; }
-//	}
-//  Macro_Element elem;
-//  nLinkedWidget view;
-//  sStr val_view;
-//  MSheetOut(Macro_Sheet _sheet, sValueBloc _bloc) { 
-//    super(_sheet, "out", "out", _bloc); 
-//    val_view = newStr("val", "val", "");
-//    view = addEmptyS(0).addLinkedModel("MC_Element_SField");
-//    view.addEventFieldChange(new nRunnable() { public void run() { 
-//      elem.sheet_connect.setInfo(val_view.get());
-//    } });
-//    view.setLinkedValue(val_view);
-//    elem = addSheetOutput(1, "out");
-//    if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
-//    //val_title.addEventChange(new nRunnable() { public void run() { 
-//    //if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_title.get()); } });
-//  }
-//  public MSheetOut clear() {
-//    super.clear(); return this; }
-//}
+
+
+
+class MPack extends MBasic { 
+  static class Builder extends MAbstract_Builder {
+	  Builder() { super("pack", "Pack", "Packing links", "Sheet"); }
+	  MPack build(Macro_Sheet s, sValueBloc b) { MPack m = new MPack(s, b); return m; }
+    }
+  sInt co_nb;
+  Macro_Connexion link; 
+  ArrayList<MPack> packs;
+  ArrayList<Macro_Connexion> connects;
+  
+  MPack(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "pack", _bloc); }
+	public void init() {
+		co_nb = newInt(2, "co_nb");
+		addSSelectToInt(0, co_nb);
+		co_nb.set_limit(2, 8);
+		packs = new ArrayList<MPack>();
+		connects = new ArrayList<Macro_Connexion>();
+	}	
+	public void build_param() {
+		link = addInput(0, "link");
+		nRunnable link_run = new nRunnable() { public void run() {packs.clear();
+		for (Macro_Connexion m : link.connected_inputs) 
+			if (m.elem.bloc.val_type.get().equals("pack")) 
+				packs.add((MPack)m.elem.bloc);
+		if (link.direct_co != null)
+			for (Macro_Connexion m : link.direct_co.connected_inputs) 
+				if (m.elem.bloc.val_type.get().equals("pack")) 
+					packs.add((MPack)m.elem.bloc);
+		}};
+		link.set_link().addEventLink(link_run).addEventUnLink(link_run);
+		for (int i = 0 ; i < co_nb.get() ; i++) {
+			Macro_Connexion c = addOutput(0, "out"+(i+1));
+			connects.add(c);
+		}
+		finish();
+	}	
+	public void build_normal() {
+		link = addOutput(0, "link");
+		nRunnable link_run = new nRunnable() { public void run() {packs.clear();
+		for (Macro_Connexion m : link.connected_inputs) 
+			if (m.elem.bloc.val_type.get().equals("pack")) 
+				packs.add((MPack)m.elem.bloc);
+		if (link.direct_co != null)
+			for (Macro_Connexion m : link.direct_co.connected_inputs) 
+				if (m.elem.bloc.val_type.get().equals("pack")) 
+					packs.add((MPack)m.elem.bloc);
+		}};
+		link.set_link().addEventLink(link_run).addEventUnLink(link_run);
+		for (int i = 0 ; i < co_nb.get() ; i++) {
+			Macro_Connexion c = addInput(0, "in"+(i+1));
+		  	nObjectPair pr = new nObjectPair();
+		  	pr.obj1 = c; pr.obj2 = i;
+		  	c.addEventReceive(new nRunnable(pr) { public void run() {
+
+				packs.clear();
+				for (Macro_Connexion m : link.connected_inputs) 
+					if (m.elem.bloc.val_type.get().equals("pack")) 
+						packs.add((MPack)m.elem.bloc);
+				if (link.direct_co != null)
+					for (Macro_Connexion m : link.direct_co.connected_inputs) 
+						if (m.elem.bloc.val_type.get().equals("pack")) 
+							packs.add((MPack)m.elem.bloc);
+				for (MPack p : packs) 
+					p.connects.get((int) ((nObjectPair)builder).obj2).send(
+						((Macro_Connexion) ((nObjectPair)builder).obj1).lastPack());
+			}});
+			connects.add(c);
+		}
+		finish();
+	}
+	public void finish() {
+		
+		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		co_nb.addEventChange(new nRunnable() { public void run() { 
+			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  			  if (!rebuilding) rebuild(); }}); }}); }});
+	}
+  public MPack clear() {
+    super.clear(); 
+    return this; }
+  public MPack toLayerTop() {
+    super.toLayerTop(); 
+    return this; }
+}
+
+
+
+
+class MPoint extends MBasic { 
+  static class MPoint_Builder extends MAbstract_Builder {
+	  MPoint_Builder() { super("point", "Point", "connection node", "Sheet"); }
+      MPoint build(Macro_Sheet s, sValueBloc b) { MPoint m = new MPoint(s, b); return m; }
+    }
+  Macro_Connexion in, out; 
+  sStr val_label;
+  MPoint(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "point", _bloc); }
+	public void init() {
+		val_label = newStr("val_label", "val_label");
+	}	
+	public void build_param() {
+		in = addInput(0, "in", new nRunnable() {public void run() { 
+    			if (in.lastPack() != null) out.send(in.lastPack()); }});
+		out = addOutput(2, "out");
+		addLinkedSField(1, val_label).setPX(ref_size*-1.8).setSX(ref_size*5.5);
+	}	
+	public void build_normal() {
+		in = addInput(0, "in", new nRunnable() {public void run() { 
+    			if (in.lastPack() != null) out.send(in.lastPack()); }});
+		out = addOutput(0, "out");
+	}	
+  public MPoint clear() {
+    super.clear(); 
+    return this; }
+  public MPoint toLayerTop() {
+    super.toLayerTop(); 
+    return this; }
+}
+
+
+
 
 class MSheetCo extends MBasic {
 	static class MSheetCo_Builder extends MAbstract_Builder {
@@ -512,12 +584,14 @@ class MSheetCo extends MBasic {
   }
   public void build_param() {
     view = addEmptyS(0).addLinkedModel("MC_Element_SField");
-    view.addEventFieldChange(new nRunnable() { public void run() { 
-      elem.sheet_connect.setInfo(val_view.get());
-    } });
     view.setLinkedValue(val_view);
+    val_view.addEventChange(new nRunnable() { public void run() { 
+        elem.sheet_connect.setInfo(val_view.get());
+        elem.connect.setInfo(val_view.get());
+    } });
     elem = addSheetOutput(1, "out");
     if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
+    elem.connect.setInfo(val_view.get());
   }
 
   public void build_normal() {

@@ -148,7 +148,8 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
               getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) 
               < 
               3 * ref.look.outlineWeight / gui.scale
-              && (sheet.mmain().show_link.get() || lens.isHovered || m.lens.isHovered) ) {
+              && (sheet.mmain().show_link.get() || 
+              	 ((lens.isHovered || m.lens.isHovered) && sheet.mmain().show_link_volat.get()) ) ) {
                 
                 
                 
@@ -201,7 +202,13 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         }
         if (gui.scale > 0.03) 
         	for (Macro_Connexion m : connected_inputs) {
-        if (m.isDraw() && (sheet.mmain().show_link.get() || lens.isHovered || m.lens.isHovered) ) {
+        if (m.isDraw() && (sheet.mmain().show_link.get() || 
+        		((lens.isHovered || m.lens.isHovered) && sheet.mmain().show_link_volat.get()) || 
+        		elem.bloc.szone_selected || m.elem.bloc.szone_selected 
+//        		||
+//        		(elem.spot != null && elem.bloc.sheet.openning.get() == OPEN) ||
+//        		(m.elem.spot != null && m.elem.bloc.sheet.openning.get() == OPEN)
+        		) ) {
         	  
 		  app.strokeWeight(ref.look.outlineWeight);
 		  PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);

@@ -10,11 +10,6 @@ public class miniSim {
 
 
 
-patern add input move/add : use in x y rot scale as modifier to current_replic then add
-				 color : use received color for next adds
-Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
-
-switch show links
 
 		MACRO BLOC review
 Blocs List :
@@ -52,6 +47,8 @@ Blocs List :
 
 		
 		DOABLE IDEE
+
+Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
 
 conf file with general param loaded once at start
 	fullscreen on/off

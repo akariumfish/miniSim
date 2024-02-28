@@ -663,6 +663,7 @@ class MStructure extends MBaseMenu {
 		MStructure build(Macro_Sheet s, sValueBloc b) { MStructure m = new MStructure(s, b); return m; }
 	}
 	MStructure new_replic() {
+//		gui.app.logln(value_bloc.ref + " got new order");
 		Replic r = new Replic().pos(new_pos.get()).dir(new_dir.get());
 		replics.add(r);
 		last_build = r;
@@ -671,27 +672,28 @@ class MStructure extends MBaseMenu {
 		return this;
 	}
 //	String save_copy = "";
-	MStructure del_oldest_replic() {
-		if (last_build != null && last_build != first_rep) {
-			replics.remove(last_build);
-			if (replics.size() > 1) {
-				last_build = replics.get(1);
-//				replics_save.set(save_copy);
-//				String[] l = PApplet.splitTokens(save_copy, OBJ_TOKEN);
-//				save_copy = "";
-//				if (l.length > 0) {
-//					save_copy = l[0];
-//					for (int i = 2 ; i < l.length ; i ++) save_copy = save_copy + l[i];
-//				}
-			} else {
-				last_build = null;
-//				replics_save.set("");
-//				save_copy = "";
-			}
-		}
-		return this;
-	}
+//	MStructure del_oldest_replic() {
+//		if (last_build != null && last_build != first_rep) {
+//			replics.remove(last_build);
+//			if (replics.size() > 1) {
+//				last_build = replics.get(1);
+////				replics_save.set(save_copy);
+////				String[] l = PApplet.splitTokens(save_copy, OBJ_TOKEN);
+////				save_copy = "";
+////				if (l.length > 0) {
+////					save_copy = l[0];
+////					for (int i = 2 ; i < l.length ; i ++) save_copy = save_copy + l[i];
+////				}
+//			} else {
+//				last_build = null;
+////				replics_save.set("");
+////				save_copy = "";
+//			}
+//		}
+//		return this;
+//	}
 	MStructure clear_replic() {
+//		gui.app.logln(value_bloc.ref + " got clear order");
 		replics.clear();
 		replics_save.set("");
 		nposx.set(0); nposy.set(0); nscale.set(10); nrot.set(0);
@@ -700,9 +702,11 @@ class MStructure extends MBaseMenu {
 		return this;
 	}
 	String current_replic() {
+//		gui.app.logln(value_bloc.ref + " sended current replic");
 		return first_rep.to_str();
 	}
 	MStructure set_replic_from(Replic r) {
+		gui.app.logln(value_bloc.ref + " got set order "+r.to_str());
 		nposx.set(r.pos.x);
 		nposy.set(r.pos.y);
 		nrot.set(r.dir.heading());
@@ -715,10 +719,11 @@ class MStructure extends MBaseMenu {
 		return this;
 	}
 	MStructure move_replic_from(Replic r) {
+		gui.app.logln(value_bloc.ref + " got move order "+r.to_str());
 		nposx.set(nposx.get()+r.pos.x);
 		nposy.set(nposy.get()+r.pos.y);
 		nrot.set(nrot.get()+r.dir.heading());
-		nscale.set(nscale.get()+PApplet.max(0, r.dir.mag()));
+		nscale.set(nscale.get()*PApplet.max(0, r.dir.mag()));
 		new_pos.set(nposx.get(), nposy.get()); 
 		first_rep.pos.set(nposx.get(), nposy.get());
 		first_rep.dir.set(nscale.get(), 0);
@@ -793,33 +798,7 @@ class MStructure extends MBaseMenu {
 	}
 	void build_normal() {
 		super.build_normal();
-		com_in = addInput(0,"COM", new nRunnable() {public void run() { 
-//			if (com_in.lastPack() == null) return;
-//			String m_def = com_in.lastPack().def;
-//			String msg = com_in.lastPack().popMsg();
-//			if (com_in.lastPack() != null && m_def.equals("ASK") && 
-//					com_in.lastPack().hasMsg() &&
-//					msg.equals("STRUCT_NEW")) {
-//				new_replic();
-//			} else if (com_in.lastPack() != null && m_def.equals("ASK") && 
-//					com_in.lastPack().hasMsg() &&
-//					msg.equals("STRUCT_CLR")) {
-//				clear_replic();
-//			} else if (com_in.lastPack() != null && m_def.equals("ASK") && 
-//					com_in.lastPack().hasMsg() &&
-//					msg.equals("STRUCT_DEF")) {
-//				while(com_in.lastPack().hasMsg()) {
-//					String st = com_in.lastPack().popMsg();
-//					Replic r = new Replic();
-//					replics.add(r);
-//					r.from_str(st);
-//					replics_save.set(replics_save.get() + OBJ_TOKEN + st);
-//				}
-//			} else if (com_in.lastPack() != null && com_in.lastPack().isObject()) {
-//				Replic r = (Replic)com_in.lastPack().asObject();
-//				r.from_str(first_rep.to_str());
-//			} 
-		}});
+		com_in = addInput(0,"COM");
 		com_in.set_link();
 		addEmptyS(1);
 		addTrigS(0, "new", new_rep_run.get());
@@ -832,8 +811,6 @@ class MStructure extends MBaseMenu {
 	public void build_custom_menu(nFrontPanel sheet_front) {
 	    nFrontTab tab = sheet_front.getTab(2);
 	    tab.getShelf()
-//	      .addDrawer(10.25, 0.75)
-//	      .addModel("Label-S4", "-Canvas Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
 	      .addDrawerDoubleButton(new_rep_run, clear_rep_run, 10, 1)
 	      .addSeparator(0.125)
@@ -1020,10 +997,24 @@ class MPatern extends MBaseMenu {
 				mf.new_replic();
 			}
 		}
+		if (struct_order.direct_co != null)
+		for (Macro_Connexion c : struct_order.direct_co.connected_inputs) {
+			if (c.elem.bloc.val_type.get().equals("struct")) {
+				mf = ((MStructure)c.elem.bloc);
+				mf.new_replic();
+			}
+		}
 	}
 	void ask_clear() {
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
+			if (c.elem.bloc.val_type.get().equals("struct")) {
+				mf = ((MStructure)c.elem.bloc);
+				mf.clear_replic();
+			}
+		}
+		if (struct_order.direct_co != null)
+		for (Macro_Connexion c : struct_order.direct_co.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
 				mf = ((MStructure)c.elem.bloc);
 				mf.clear_replic();
@@ -1042,6 +1033,17 @@ class MPatern extends MBaseMenu {
 				out_r.sendFloat(current_replic.dir.heading());
 			}
 		}
+		if (struct_order.direct_co != null)
+		for (Macro_Connexion c : struct_order.direct_co.connected_inputs) {
+			if (c.elem.bloc.val_type.get().equals("struct")) {
+				mf = ((MStructure)c.elem.bloc);
+				current_replic.from_str(mf.current_replic());
+				out_px.sendFloat(current_replic.pos.x);
+				out_py.sendFloat(current_replic.pos.y);
+				out_s.sendFloat(current_replic.dir.mag());
+				out_r.sendFloat(current_replic.dir.heading());
+			}
+		}
 	}
 	void ask_set() {
 		MStructure mf = null;
@@ -1051,10 +1053,24 @@ class MPatern extends MBaseMenu {
 				mf.set_replic_from(current_replic);
 			}
 		}
+		if (struct_order.direct_co != null)
+		for (Macro_Connexion c : struct_order.direct_co.connected_inputs) {
+			if (c.elem.bloc.val_type.get().equals("struct")) {
+				mf = ((MStructure)c.elem.bloc);
+				mf.set_replic_from(current_replic);
+			}
+		}
 	}
 	void ask_move() {
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
+			if (c.elem.bloc.val_type.get().equals("struct")) {
+				mf = ((MStructure)c.elem.bloc);
+				mf.move_replic_from(current_replic);
+			}
+		}
+		if (struct_order.direct_co != null)
+		for (Macro_Connexion c : struct_order.direct_co.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
 				mf = ((MStructure)c.elem.bloc);
 				mf.move_replic_from(current_replic);

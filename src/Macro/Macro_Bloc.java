@@ -395,6 +395,18 @@ public class Macro_Bloc extends Macro_Abstract {
 	    	}}).setPX(ref_size*3.25).setSX(ref_size*0.75);
     		return e;
     }
+    Macro_Element addSSelectToInt(int c, sInt v) {
+	    	Macro_Element e = addEmptyS(c);
+	    	e.addCtrlModel("MC_Element_SButton", "-").setRunnable(new nRunnable(v) { public void run() {
+	    		((sInt)builder).set(((sInt)builder).get()-1);
+	    	}}).setPX(ref_size*0.125).setSX(ref_size*0.5);
+	    	e.addCtrlModel("MC_Element_SButton", "+").setRunnable(new nRunnable(v) { public void run() {
+	    		((sInt)builder).set(((sInt)builder).get()+1);
+	    	}}).setPX(ref_size*1.375).setSX(ref_size*0.5);
+	    	nWatcherWidget w = e.addWatcherModel("MC_Element_SField").setLinkedValue(v);
+	    	w.setInfo(v.ref).setPX(ref_size*0.75).setSX(ref_size*0.5);
+			return e;
+	}
     sInt newSelectInt(int c, int d, String r) {
 	    	sInt v = newInt(d, r, r);
 	    	addSelectToInt(c, v);

@@ -3,6 +3,7 @@ package UI;
 import java.util.ArrayList;
 import java.util.Map;
 
+import RApplet.RConst;
 import processing.core.PApplet;
 import sData.*;
 
@@ -10,14 +11,14 @@ public class nExplorer extends nDrawer {
 	  boolean access_child = true;
 	  public nExplorer setChildAccess(boolean b) { access_child = b; return this; }
 	  ArrayList<String> explorer_entry;
-	  ArrayList<sValueBloc> explorer_blocs;
+	  public ArrayList<sValueBloc> explorer_blocs;
 	  ArrayList<sValue> explorer_values;
 	  public sValueBloc explored_bloc;
 	  public sValueBloc selected_bloc;
 	  public sValueBloc starting_bloc;
 	  public sValue selected_value;
 	  int selected_bloc_index = 0, selected_value_index = 0;
-	  public nList explorer_list;
+	  public nBetterList explorer_list;
 	  
 	  public nExplorer setStrtBloc(sValueBloc sb) { if (sb != explored_bloc) { starting_bloc = sb; explored_bloc = sb; update(); } return this; }
 	  public nExplorer setBloc(sValueBloc sb) { if (sb != explored_bloc) { explored_bloc = sb; update(); } return this; }
@@ -89,6 +90,8 @@ public class nExplorer extends nDrawer {
 		        new nBinPanel(gui, task, (sRun)clicked_val);
 	          } else if (clicked_val.type.equals("obj")) { 
 		        new nObjectPanel(gui, task, (sObj)clicked_val);
+	          } else if (clicked_val.type.equals("vec")) { 
+		        new nVecPanel(gui, task, (sVec)clicked_val);
 	          }
 	        } 
 	      }});
@@ -100,7 +103,7 @@ public class nExplorer extends nDrawer {
 		          sValue val = explorer_values.get(ind-gobackspace - explorer_blocs.size());
 		          if (val.type.equals("str") || val.type.equals("col") || val.type.equals("run") || 
 		              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo") ||
-		              val.type.equals("obj")) 
+		              val.type.equals("obj") || val.type.equals("vec")) 
 		                ((nCtrlWidget)builder).show();
 		          else { ((nCtrlWidget)builder).hide(); }
 		        } else { ((nCtrlWidget)builder).hide(); }
@@ -115,7 +118,11 @@ public class nExplorer extends nDrawer {
 	    explorer_list.addEventScroll(new nRunnable() { public void run() {
 	      update_val_bp();
 	    }});
+	    ref.addEventVisibilityChange(new nRunnable() { public void run() {
+	      update_val_bp();
+	    }});
 	    update_val_bp();
+	    myshelf.toLayerTop();
 	    return this; 
 	  }
 	  
@@ -128,11 +135,12 @@ public class nExplorer extends nDrawer {
 	          sValue val = explorer_values.get(ind-gobackspace - explorer_blocs.size());
 	          if (val.type.equals("str") || val.type.equals("col") || val.type.equals("obj") ||
 	              val.type.equals("int") || val.type.equals("flt") || val.type.equals("boo") || 
-	              val.type.equals("run")) values_button.get(i).show();
+	              val.type.equals("run") || val.type.equals("vec")) values_button.get(i).show();
 	          else values_button.get(i).hide();
 	        } else values_button.get(i).hide();
 	      }
 	    }
+	    toLayerTop();
 	  }
 	  
 	  nTaskPanel task;
@@ -149,16 +157,17 @@ public class nExplorer extends nDrawer {
 	    myshelf = new nShelf(shelf.shelfPanel, shelf.space_factor);
 	    myshelf.addSeparator(0.25F);
 	    myshelf.ref.setParent(ref);
-	    explorer_list = myshelf.addList(entry_nb, 10, 1).setTextAlign(PApplet.LEFT)
+	    explorer_list = myshelf.addBetterList(entry_nb, 10, 1).setTextAlign(PApplet.LEFT)
 	      .addEventChange_Builder(new nRunnable() { 
 	      public void run() {
-	        int ind = ((nList)builder).last_choice_index;
+	        int ind = ((nBetterList)builder).last_choice_index;
 	        if (ind == gobackindex && explored_bloc != null && explored_bloc != starting_bloc) {
 	          explored_bloc = explored_bloc.parent;
 	          selected_bloc = null;
 	          selected_value = null;
 	          update_list();
 	          runEvents(eventChangeRun);
+	          update_val_bp();
 	          
 	        } else if (ind != gobackindex && ind < explorer_blocs.size()+gobackspace) {
 	          if (selected_bloc == explorer_blocs.get(ind-gobackspace) && access_child) {
@@ -167,11 +176,13 @@ public class nExplorer extends nDrawer {
 	            selected_value = null;
 	            update_list();
 	            runEvents(eventChangeRun);
+	  	    	  	update_val_bp();
 	          } else {
 	            selected_bloc = explorer_blocs.get(ind-gobackspace);
 	            selected_value = null;
 	            update_info();
 	            runEvents(eventChangeRun);
+	  	    	  	update_val_bp();
 	          }
 	        } else if (ind != gobackindex && ind - explorer_blocs.size() < explorer_values.size()+gobackspace) {
 	          selected_bloc = null;
@@ -179,6 +190,7 @@ public class nExplorer extends nDrawer {
 	          
 	          update_info();
 	          runEvents(eventChangeRun);
+	  	    	  update_val_bp();
 	        } 
 	      } } )
 	      ;
@@ -297,8 +309,18 @@ public class nExplorer extends nDrawer {
 	      }
 	      val_tmp.clear();
 	    }
-	    explorer_list.setEntrys(explorer_entry);
+	    if (!isComplexEntry) explorer_list.setEntrys(explorer_entry);
+	    else complex_build_run.run();
 	    update_info();
+	    update_val_bp();
+	  }
+	  boolean isComplexEntry = false;
+	  nRunnable complex_build_run;
+	  public nExplorer setComplexEntry(nRunnable r) {
+		  isComplexEntry = true;
+		  complex_build_run = r;
+		  update_list();
+		  return this;
 	  }
 	}
 

@@ -2,6 +2,8 @@ package UI;
 
 import java.util.ArrayList;
 
+import sData.nRunnable;
+
 public class nTaskPanel extends nToolPanel {
 	  ArrayList<nWindowPanel> windowPanels = new ArrayList<nWindowPanel>();
 	  ArrayList<nWidget> window_buttons = new ArrayList<nWidget>();
@@ -34,6 +36,14 @@ public class nTaskPanel extends nToolPanel {
 	      window_buttons.add(nw);
 	    }
 	    //gui.addEventSetup(new Runnable() { public void run() { reduc(); } } );
+	    addEventReduc(new nRunnable() { public void run() { 
+	    		panel.show_childs(); 
+	    		for (nWindowPanel w : windowPanels) 
+	    			if (!w.collapsed && w.grabber.isHided()) {
+	    				w.grabber.show();
+	    				w.toLayerTop();
+	    			}
+	    	} } );
 	  } 
 	  public nTaskPanel updateHeight() { 
 	    super.updateHeight(); return this; }

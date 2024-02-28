@@ -120,6 +120,14 @@ public class nWidget {
     }
     return this; 
   }
+  public nWidget show_childs() { 
+	    for (nWidget w : childs) w.show(); 
+	    return this; 
+	  }
+  public nWidget hide_childs() { 
+	    for (nWidget w : childs) w.hide(); 
+	    return this; 
+	  }
   
   public nWidget copy(nWidget w) {
   //eventFrameRun.clear(); for (Runnable r : w.eventFrameRun) eventFrameRun.add(r);

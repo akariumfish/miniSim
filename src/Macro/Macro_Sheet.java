@@ -241,8 +241,10 @@ public class Macro_Sheet extends Macro_Abstract {
   //call by add_spot widget
   void new_spot(String side) {
 	  if (!building_spot) {
-    if (!side.equals("left")) left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
-    else right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
+    left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
+    right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
+//    if (!side.equals("left")) left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
+//    else right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
     for (Macro_Element m : child_elements) if (m.sheet_viewable) {
       m.back.setTrigger().setLook("MC_Element_For_Spot"); /*event in init de l'element*/ }
     building_spot = true;
@@ -285,7 +287,6 @@ public class Macro_Sheet extends Macro_Abstract {
       nWidget spot = null;
       if (side.equals("left")) {
         left_s += elem.descr + OBJ_TOKEN;
-        
         getShelf(0).removeDrawer(left_spot_drawer);
         spot = getShelf(0).addDrawer(2, 1).addModel("MC_Panel_Spot_Back");
         getShelf(0).insertDrawer(left_spot_drawer);
@@ -561,6 +562,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     deployer.setParent(panel);
     deployer.alignDown().stackRight().addEventTrigger(new nRunnable() { public void run() { 
       if (openning.get() == DEPLOY) open(); else { deploy(); select(); } } });
+    
+    title.setPX(ref_size*3.5);
     
     left_spot_drawer = addShelf().addDrawer(2, 0.5);
     left_spot_add = left_spot_drawer.addModel("MC_Add_Spot_Passif")

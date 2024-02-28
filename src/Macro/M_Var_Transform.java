@@ -915,12 +915,12 @@ class MVar extends MBasic {
 					vval.set(in.lastPack().asVec()); chooseValue(vval); }
 		} });
 		
-		addEmpty(1); 
+		addEmptyS(1); 
 		addEmptyS(2).addCtrlModel("MC_Element_SButton", "Set")
 		.setRunnable(new nRunnable() { public void run() {
 		  if (cible != null) cible.pop_panel(mmain().screen_gui, mmain().inter.taskpanel);
 		} }); 
-		val_elem = addEmptyL(0);
+		val_elem = addEmptyS(0);
 
 	    if      (var_type.get().equals("flt")) chooseValue(fval);
 	    else if (var_type.get().equals("int")) chooseValue(ival);
