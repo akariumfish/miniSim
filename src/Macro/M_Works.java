@@ -706,7 +706,7 @@ class MStructure extends MBaseMenu {
 		return first_rep.to_str();
 	}
 	MStructure set_replic_from(Replic r) {
-		gui.app.logln(value_bloc.ref + " got set order "+r.to_str());
+//		gui.app.logln(value_bloc.ref + " got set order "+r.to_str());
 		nposx.set(r.pos.x);
 		nposy.set(r.pos.y);
 		nrot.set(r.dir.heading());
@@ -719,7 +719,7 @@ class MStructure extends MBaseMenu {
 		return this;
 	}
 	MStructure move_replic_from(Replic r) {
-		gui.app.logln(value_bloc.ref + " got move order "+r.to_str());
+//		gui.app.logln(value_bloc.ref + " got move order "+r.to_str());
 		nposx.set(nposx.get()+r.pos.x);
 		nposy.set(nposy.get()+r.pos.y);
 		nrot.set(nrot.get()+r.dir.heading());
@@ -886,7 +886,6 @@ class MPatern extends MBaseMenu {
 		mode_2 = newBoo(false, "mode_2");
 
 		rot_speed = menuFltSlide(0, -RConst.PI / 60, RConst.PI / 60, "rot_speed");
-
 		col_grad = menuFltSlide(0, 0, 1, "col_grad");
 
 		ask_add_run = newRun("ask_add_run", "ask_add_run", new nRunnable() { 
@@ -911,6 +910,12 @@ class MPatern extends MBaseMenu {
 			current_replic.dir.set(nscale.get(), 0);
 			current_replic.dir.rotate(nrot.get());
 		}};
+
+		nposx.addEventChange(up_npos);
+		nposy.addEventChange(up_npos);
+		nscale.addEventChange(up_npos);
+		nrot.addEventChange(up_npos);
+		up_npos.run();
 		
 		nposx.addEventChange(new nRunnable() { public void run() { 
 			out_px.send(Macro_Packet.newPacketFloat(nposx.get())); }});
@@ -920,37 +925,10 @@ class MPatern extends MBaseMenu {
 			out_s.send(Macro_Packet.newPacketFloat(nscale.get())); }});
 		nrot.addEventChange(new nRunnable() { public void run() { 
 			out_r.send(Macro_Packet.newPacketFloat(nrot.get())); }});
-		nposx.addEventChange(up_npos);
-		nposy.addEventChange(up_npos);
-		nscale.addEventChange(up_npos);
-		nrot.addEventChange(up_npos);
-		up_npos.run();
 	}
 	Macro_Connexion in_px,in_py,in_s,in_r , out_px,out_py,out_s,out_r;
 	void build_param() {
-		super.build_param();
-//		in_tick = addInput(0,"tick", tick_run);
-//		struct_order = addOutput(1,"struct order out");
-//		addInputBang(0, "add", ask_add_run.get());
-//		addInputBang(0, "clear", ask_clear_run.get());
-//		addInputBang(0, "get", ask_get_run.get());
-//		addInputBang(0, "set", ask_set_run.get());
-//		
-//		addEmptyS(1); addEmptyS(1); addEmptyS(1); addEmptyS(1);
-//
-//		out_px = addOutput(1, "nposx");
-//		out_py = addOutput(1, "nposy");
-//		out_s = addOutput(1, "nscale");
-//		out_r = addOutput(1, "nrot");
-//
-//		in_px = addInputFloat(0, "nposx", new nRunnable() { public void run() { 
-//			nposx.set(in_px.lastPack().asFloat()); }});
-//		in_py = addInputFloat(0, "nposy", new nRunnable() { public void run() { 
-//			nposy.set(in_py.lastPack().asFloat()); }});
-//		in_s = addInputFloat(0, "nscale", new nRunnable() { public void run() { 
-//			nscale.set(in_s.lastPack().asFloat()); }});
-//		in_r = addInputFloat(0, "nrot", new nRunnable() { public void run() { 
-//			nrot.set(in_r.lastPack().asFloat()); }});
+		build_normal();
 	}
 	void build_normal() {
 		super.build_normal();
@@ -974,14 +952,10 @@ class MPatern extends MBaseMenu {
 		out_s = addOutput(1, "nscale");
 		out_r = addOutput(1, "nrot");
 
-		in_px = addInputFloat(0, "nposx", new nRunnable() { public void run() { 
-			nposx.set(in_px.lastPack().asFloat()); }});
-		in_py = addInputFloat(0, "nposy", new nRunnable() { public void run() { 
-			nposy.set(in_py.lastPack().asFloat()); }});
-		in_s = addInputFloat(0, "nscale", new nRunnable() { public void run() { 
-			nscale.set(in_s.lastPack().asFloat()); }});
-		in_r = addInputFloat(0, "nrot", new nRunnable() { public void run() { 
-			nrot.set(in_r.lastPack().asFloat()); }});
+		addInputToValue(0, nposx);
+		addInputToValue(0, nposy);
+		addInputToValue(0, nscale);
+		addInputToValue(0, nrot);
 		
 		in_m1 = addInputBool(0, "mode1", new nRunnable() { public void run() { 
 			if (in_m1.lastPack() != null) mode_1.set(in_m1.lastPack().asBool()); }});
@@ -990,6 +964,7 @@ class MPatern extends MBaseMenu {
 	}
 	Macro_Connexion in_m1, in_m2;
 	void ask_add() {
+//		gui.app.logln(value_bloc.ref + " ask add");
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1006,6 +981,7 @@ class MPatern extends MBaseMenu {
 		}
 	}
 	void ask_clear() {
+//		gui.app.logln(value_bloc.ref + " ask clear");
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1022,6 +998,8 @@ class MPatern extends MBaseMenu {
 		}
 	}
 	void ask_get() {
+		up_npos.run();
+//		gui.app.logln(value_bloc.ref + " ask get");
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1046,6 +1024,8 @@ class MPatern extends MBaseMenu {
 		}
 	}
 	void ask_set() {
+		up_npos.run();
+//		gui.app.logln(value_bloc.ref + " ask set with "+current_replic.to_str());
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1060,8 +1040,14 @@ class MPatern extends MBaseMenu {
 				mf.set_replic_from(current_replic);
 			}
 		}
+		out_px.sendFloat(current_replic.pos.x);
+		out_py.sendFloat(current_replic.pos.y);
+		out_s.sendFloat(current_replic.dir.mag());
+		out_r.sendFloat(current_replic.dir.heading());
 	}
 	void ask_move() {
+		up_npos.run();
+//		gui.app.logln(value_bloc.ref + " ask move with "+current_replic.to_str());
 		MStructure mf = null;
 		for (Macro_Connexion c : struct_order.connected_inputs) {
 			if (c.elem.bloc.val_type.get().equals("struct")) {
@@ -1076,6 +1062,10 @@ class MPatern extends MBaseMenu {
 				mf.move_replic_from(current_replic);
 			}
 		}
+		out_px.sendFloat(current_replic.pos.x);
+		out_py.sendFloat(current_replic.pos.y);
+		out_s.sendFloat(current_replic.dir.mag());
+		out_r.sendFloat(current_replic.dir.heading());
 	}
 	public void build_custom_menu(nFrontPanel sheet_front) {
 	    nFrontTab tab = sheet_front.getTab(2);

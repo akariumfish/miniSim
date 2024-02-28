@@ -9,7 +9,14 @@ public class miniSim {
 /* DONT HIT ENTER HERE FFS!!
 
 
+Button option : button click direct to choosen channel
 
+merge save as / save to in main menu
+
+var duplicable en rangé (like sequance) can choose to show connexion and or field
+
+point duplicable in row
+	can choose row width (2 or 3) and composition (view in out label)
 
 		MACRO BLOC review
 Blocs List :
@@ -49,6 +56,11 @@ Blocs List :
 		DOABLE IDEE
 
 Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
+
+find a way to glue group of bloc together, 
+	when selecting one, the others get selected automaticaly so they always move together
+	
+macro header : only a big grabbable, to easily move glued group
 
 conf file with general param loaded once at start
 	fullscreen on/off

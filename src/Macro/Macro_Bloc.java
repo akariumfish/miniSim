@@ -58,10 +58,10 @@ public class Macro_Bloc extends Macro_Abstract {
 	  return in;
 	}
 	Macro_Connexion linkInputToValue(Macro_Connexion in, sValue v) { 
-      nObjectPair pin = new nObjectPair();
-      pin.obj1 = v; pin.obj2 = in;
-      if (v.type.equals("str")) { 
-          in.setFilterString()
+        nObjectPair pin = new nObjectPair();
+        pin.obj1 = v; pin.obj2 = in;
+        if (v.type.equals("str")) { 
+            in.setFilterString()
 	        .addEventReceiveStr(new nRunnable(pin) { public void run() {
 	        	nObjectPair pair = ((nObjectPair)builder);
 	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
@@ -110,6 +110,20 @@ public class Macro_Bloc extends Macro_Abstract {
   	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
   	    			  ((sVec)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asVec());
   	    	    }});
+        } else if (v.type.equals("run")) { 
+            in.setFilterBang()
+  	        .addEventReceiveBang(new nRunnable(pin) { public void run() {
+  	        	nObjectPair pair = ((nObjectPair)builder);
+  	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+  	    			  ((sRun)pair.obj1).run();
+  	    	    }});
+        } else if (v.type.equals("obj")) { 
+            in.setFilterBang()
+  	        .addEventReceiveBang(new nRunnable(pin) { public void run() {
+  	        	nObjectPair pair = ((nObjectPair)builder);
+  	    		  if (((Macro_Connexion)pair.obj2).lastPack() != null) 
+  	    			  ((sObj)pair.obj1).set(((Macro_Connexion)pair.obj2).lastPack().asObj());
+  	    	    }});
         }
       return in; 
     }
@@ -138,6 +152,18 @@ public class Macro_Bloc extends Macro_Abstract {
     	  	((sValue)pair.obj1).removeEventChange(((nRunnable)pair.obj2));
 	  }});
       return out; 
+    }
+	Macro_Bloc linkValueToRunnable(sValue v, nRunnable run) { 
+      nRunnable val_run = new nRunnable(run) { public void run() {
+  	  	((nRunnable)builder).run(); }};
+	  v.addEventChange(val_run);
+	  nObjectPair pr = new nObjectPair();
+      pr.obj1 = v; pr.obj2 = val_run;
+      addEventClear(new nRunnable(pr) { public void run() {
+    	  	nObjectPair pair = ((nObjectPair)builder);
+    	  	((sValue)pair.obj1).removeEventChange(((nRunnable)pair.obj2));
+	  }});
+      return this; 
     }
 	
 	

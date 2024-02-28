@@ -124,15 +124,32 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	  
 	  Macro_Element show() {
 	    
-	    back.clearParent(); back.setParent(ref); 
-	    back.setPX(-ref_size*0.5);
-	    if (bloc.openning.get() == OPEN && bloc.mmain().show_macro.get()) {
-	    		back.show();
-		    if (elem_widgets.size() == 0) spot.hide_childs();
-	      for (nWidget w : elem_widgets) w.show();
-	    } else { 
+	    if (bloc.mmain().show_macro.get()) {
+		    if (bloc.sheet.openning.get() == DEPLOY && 
+			    		bloc.openning.get() == OPEN) {
+			    back.clearParent(); back.setParent(ref); 
+			    back.setPX(-ref_size*0.5);
+		    		back.show();
+		    		for (nWidget w : elem_widgets) w.show();
+		    		if (spot != null) spot.show();
+		    		if (spot != null) spot.toLayerTop();
+		    		else back.toLayerTop(); 
+		    } else if (bloc.sheet.openning.get() == OPEN && spot != null) {
+			    back.clearParent(); back.setParent(spot);
+			    back.setPX(0);
+
+		    		back.show();
+		    		for (nWidget w : elem_widgets) w.show();
+		    		if (spot != null) spot.show();
+		    } else {
+			      back.hide(); 
+			      for (nWidget w : elem_widgets) w.hide();
+			      if (spot != null) spot.hide();
+			} 
+	    } else {
 	      back.hide(); 
 	      for (nWidget w : elem_widgets) w.hide();
+	      if (spot != null) spot.hide();
 	    } 
 	    toLayerTop();
 	    
@@ -145,6 +162,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	    
 	    back.hide(); 
 	    for (nWidget w : elem_widgets) w.hide();
+	    if (spot != null) spot.hide();
 	    
 	    if (sheet_connect != null) { sheet_connect.upview(); sheet_connect.toLayerTop(); }
 	    if (connect != null)  { connect.upview(); connect.toLayerTop(); }
@@ -153,19 +171,34 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	  }
 	  
 	  Macro_Element hide() {
-	    
-	    if (bloc.sheet.openning.get() == OPEN && spot != null && bloc.mmain().show_macro.get()) {
-	      
-	      back.clearParent(); back.setParent(spot);
-	      //if () 
-//	      back.show(); 
-	      back.hide();
-	      back.setPX(0);
-	      for (nWidget w : elem_widgets) w.show();
-	      if (elem_widgets.size() == 0) spot.hide_childs();
-	    } else { 
+
+	    if (bloc.mmain().show_macro.get()) {
+		    if (bloc.sheet.openning.get() == DEPLOY && 
+			    		bloc.openning.get() == OPEN) {
+			    back.clearParent(); back.setParent(ref); 
+			    back.setPX(-ref_size*0.5);
+		    		back.show();
+		    		for (nWidget w : elem_widgets) w.show();
+		    		if (spot != null) spot.show();
+		    		if (spot != null) spot.toLayerTop();
+		    		else back.toLayerTop(); 
+		    } else if (bloc.sheet.openning.get() == OPEN && spot != null) {
+			    back.clearParent(); back.setParent(spot);
+			    back.setPX(0);
+
+		    		back.show();
+		    		for (nWidget w : elem_widgets) w.show();
+		    		spot.show();
+		    		spot.toLayerTop();
+		    } else {
+			      back.hide(); 
+			      for (nWidget w : elem_widgets) w.hide();
+			      if (spot != null) spot.hide();
+			} 
+	    } else {
 	      back.hide(); 
 	      for (nWidget w : elem_widgets) w.hide();
+	      if (spot != null) spot.hide();
 	    } 
 	    
 	    if (sheet_connect != null) { sheet_connect.upview(); sheet_connect.toLayerTop(); }

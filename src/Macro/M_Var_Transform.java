@@ -862,7 +862,7 @@ class MVar extends MBasic {
 	  MVar build(Macro_Sheet s, sValueBloc b) { MVar m = new MVar(s, b); return m; }
   }
   sValue cible; 
-  sStr var_type; sBoo setup_send, update_send;
+  sStr var_type; sBoo setup_send, change_send, all_send;
   sBoo bval; sInt ival; sFlt fval; sStr sval; sVec vval; sRun rval; sCol cval; sObj oval;
   nRunnable in_run, val_run;
   boolean btmp; int itmp; float ftmp; String stmp = ""; 
@@ -875,7 +875,8 @@ class MVar extends MBasic {
 
   	void init() {
 		setup_send = newBoo("stp_snd", "stp_snd", false);
-		update_send = newBoo("update_send", "update_send", true);
+		change_send = newBoo("update_send", "update_send", false);
+		all_send = newBoo("all_send", "all_send", true);
 		var_type = newStr("var_type");
 		ival = newInt(0, "int_value");
 		fval = newFlt(0, "float_value");
@@ -888,16 +889,6 @@ class MVar extends MBasic {
   	}
 
     void build_normal() { 
-		addEmptyS(1).addCtrlModel("MC_Element_SButton", "send")
-		.setRunnable(new nRunnable() { public void run() {
-			if (cible != null) out.send(cible.asPacket()); } })
-		.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-			.setLinkedValue(setup_send); 
-		out = addOutput(2, "out");
-
-		out.elem.addLinkedModel("MC_Element_MiniButton", "U")
-			.setLinkedValue(update_send); 
-		
 		in = addInput(0, "set", new nRunnable() { public void run() {
 			if (in.lastPack() != null)
 				if (in.lastPack().isBang() && cible != null) out.send(cible.asPacket());
@@ -914,6 +905,24 @@ class MVar extends MBasic {
 				else if (in.lastPack().isVec()) { 
 					vval.set(in.lastPack().asVec()); chooseValue(vval); }
 		} });
+		addEmptyS(1).addCtrlModel("MC_Element_SButton", "send")
+			.setRunnable(new nRunnable() { public void run() {
+				if (cible != null) out.send(cible.asPacket()); } }).getDrawer()
+		.addLinkedModel("MC_Element_MiniButton", "A")
+			.setLinkedValue(all_send).setPX(-ref_size*0.25)
+			.setInfo("Send on all inputs").getDrawer()
+		.addLinkedModel("MC_Element_MiniButton", "B")
+			.setPX(-ref_size*9 / 16)
+			.setInfo("Send on bang");
+		
+		out = addOutput(2, "out");
+		out.elem.addLinkedModel("MC_Element_MiniButton", "C")
+			.setLinkedValue(change_send)
+			.setInfo("Send on value change");
+		out.elem.addLinkedModel("MC_Element_MiniButton", "S")
+			.setLinkedValue(setup_send).setPX(-ref_size*0.25)
+			.setInfo("Send at building");  
+		
 		
 		addEmptyS(1); 
 		addEmptyS(2).addCtrlModel("MC_Element_SButton", "Set")
@@ -984,12 +993,13 @@ class MVar extends MBasic {
   void setValue(sRun v) {
     rval = v;
     val_run = new nRunnable() { public void run() { 
-    	if (update_send.get()) out.send(Macro_Packet.newPacketBang()); }};
+    		if (change_send.get()) out.send(Macro_Packet.newPacketBang()); }};
     in_run = new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isBang()) { 
         rval.doEvent(false); 
         rval.run(); 
         rval.doEvent(true); 
+        if (all_send.get()) out.send(Macro_Packet.newPacketBang()); 
       }
     } };
     v.addEventAllChange(val_run);
@@ -998,12 +1008,14 @@ class MVar extends MBasic {
   void setValue(sObj v) {
 	    oval = v;
 	    val_run = new nRunnable() { public void run() { 
-	    	if (update_send.get()) out.send(oval.asPacket()); }};
+	    		if (change_send.get()) out.send(oval.asPacket()); }};
 	    in_run = new nRunnable() { public void run() { 
 	      if (in.lastPack() != null && in.lastPack().isBang()) 
 	    	  	out.send(oval.asPacket()); 
-	      if (in.lastPack() != null && in.lastPack().isObj()) 
+	      if (in.lastPack() != null && in.lastPack().isObj()) {
 	    	  	oval.set(in.lastPack().asObj());
+	    		if (all_send.get()) out.send(oval.asPacket());
+	      }
 	    } };
 	    v.addEventChange(val_run);
 	    in.addEventReceive(in_run);
@@ -1013,11 +1025,12 @@ class MVar extends MBasic {
     ftmp = v.get();
     
     val_run = new nRunnable() { public void run() { 
-    	if (update_send.get()) out.send(Macro_Packet.newPacketFloat(fval.get())); }};
+    		if (change_send.get()) out.send(Macro_Packet.newPacketFloat(fval.get())); }};
     in_run = new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isFloat() && ftmp != in.lastPack().asFloat()) { 
         ftmp = in.lastPack().asFloat();
         fval.set(in.lastPack().asFloat()); }
+	  if (all_send.get()) out.send(Macro_Packet.newPacketFloat(fval.get()));
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -1026,11 +1039,12 @@ class MVar extends MBasic {
     ival = v;
     itmp = v.get();
     val_run = new nRunnable() { public void run() { 
-    	if (update_send.get()) out.send(Macro_Packet.newPacketInt(ival.get())); }};
+    		if (change_send.get()) out.send(Macro_Packet.newPacketInt(ival.get())); }};
     in_run = new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isInt() && itmp != in.lastPack().asInt()) { 
         itmp = in.lastPack().asInt();
         ival.set(in.lastPack().asInt()); }
+	  if (all_send.get()) out.send(Macro_Packet.newPacketInt(ival.get()));
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -1039,14 +1053,16 @@ class MVar extends MBasic {
     bval = v;
     btmp = v.get();
     val_run = new nRunnable() { public void run() { 
-    	if (update_send.get()) out.send(Macro_Packet.newPacketBool(bval.get())); }};
+    		if (change_send.get()) out.send(Macro_Packet.newPacketBool(bval.get())); }};
     in_run = new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isBool() && !(btmp == in.lastPack().asBool())) { 
         btmp = in.lastPack().asBool();
-        bval.set(in.lastPack().asBool()); }
+        bval.set(in.lastPack().asBool());
+		if (change_send.get()) out.send(Macro_Packet.newPacketBool(bval.get())); }
       if (in.lastPack() != null && in.lastPack().isBang()) { 
         btmp = !btmp;
         bval.set(!bval.get()); }
+	  if (all_send.get()) out.send(Macro_Packet.newPacketBool(bval.get()));
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -1055,11 +1071,12 @@ class MVar extends MBasic {
     sval = v;
     stmp = RConst.copy(v.get());
     val_run = new nRunnable() { public void run() { 
-    	if (update_send.get()) out.send(Macro_Packet.newPacketStr(sval.get())); }};
+    		if (change_send.get()) out.send(Macro_Packet.newPacketStr(sval.get())); }};
     in_run = new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isStr() && !stmp.equals(in.lastPack().asStr())) { 
         stmp = RConst.copy(in.lastPack().asStr());
         sval.set(in.lastPack().asStr()); }
+	  if (all_send.get()) out.send(Macro_Packet.newPacketStr(sval.get()));
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -1070,7 +1087,7 @@ class MVar extends MBasic {
     vtmp.set(v.get());
     val_run = new nRunnable() { public void run() { 
 //      mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-    	if (update_send.get()) out.send(Macro_Packet.newPacketVec(vval.get())); 
+    		if (change_send.get()) out.send(Macro_Packet.newPacketVec(vval.get())); 
 //    	}}); 
       }};
     in_run = new nRunnable() { public void run() { 
@@ -1078,6 +1095,7 @@ class MVar extends MBasic {
         vtmp.set(in.lastPack().asVec());
         vval.set(in.lastPack().asVec()); 
       }
+		if (all_send.get()) out.send(Macro_Packet.newPacketVec(vval.get())); 
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -1087,7 +1105,7 @@ class MVar extends MBasic {
     ctmp = v.get();
     val_run = new nRunnable() { public void run() { 
 //      mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-    	if (update_send.get()) out.send(Macro_Packet.newPacketCol(cval.get()));
+    		if (change_send.get()) out.send(Macro_Packet.newPacketCol(cval.get()));
 //    	  }}); 
       }};
     in_run = new nRunnable() { public void run() { 
@@ -1095,6 +1113,7 @@ class MVar extends MBasic {
         ctmp = in.lastPack().asCol();
         cval.set(in.lastPack().asCol()); 
       }
+		if (all_send.get()) out.send(Macro_Packet.newPacketCol(cval.get()));
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);

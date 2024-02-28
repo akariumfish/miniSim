@@ -258,6 +258,7 @@ class MButton extends MBasic {
 			  	out_t = addOutput(1, "trig").setDefBang();
 	
 			  	addEmptyS(0);
+			  	addEmptyS(1);
 			  	Macro_Element e = addEmptyS(0);
 			  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
 			  		out_t.send(Macro_Packet.newPacketBang());

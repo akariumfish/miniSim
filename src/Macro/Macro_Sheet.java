@@ -122,6 +122,7 @@ public class Macro_Sheet extends Macro_Abstract {
       front.show(); title.show(); reduc.hide(); deployer.show();
       grabber.setLook(gui.theme.getLook("MC_Grabber_Deployed"));
       cancel_new_spot();
+      left_spot_add.show(); right_spot_add.show();
       for (Macro_Abstract m : child_macro) { m.show(); m.toLayerTop(); }
       updateBack(); 
       moving(); 
@@ -139,6 +140,7 @@ public class Macro_Sheet extends Macro_Abstract {
       reduc.setPosition(-ref_size, ref_size*0.375);
       grabber.setLook(gui.theme.getLook("MC_Grabber"));
       cancel_new_spot();
+      left_spot_add.show(); right_spot_add.show();
       for (Macro_Abstract m : child_macro) m.hide();
       if (mmain().selected_sheet == this && sheet != this) sheet.select();
       moving(); toLayerTop();
@@ -155,6 +157,7 @@ public class Macro_Sheet extends Macro_Abstract {
       reduc.setPosition(ref_size * 0.75, ref_size*0.75);
       grabber.setLook(gui.theme.getLook("MC_Grabber"));
       cancel_new_spot();
+      left_spot_add.hide(); right_spot_add.hide();
       for (Macro_Abstract m : child_macro) m.hide();
       if (mmain().selected_sheet == this && sheet != this) sheet.select();
       moving(); toLayerTop();
@@ -169,6 +172,7 @@ public class Macro_Sheet extends Macro_Abstract {
       cancel_new_spot();
       grabber.hide(); panel.hide(); back.hide(); back_front.hide();
       front.hide(); title.hide(); reduc.hide(); deployer.hide();
+      left_spot_add.hide(); right_spot_add.hide();
       if (mmain().show_macro.get() && mmain().selected_sheet == this && sheet != this && sheet != mmain()) 
         sheet.select();
     }
