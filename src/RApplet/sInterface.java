@@ -432,7 +432,7 @@ public class sInterface {
   }
   public nWidget match_flag;
   public  nWindowPanel files_panel;
-  public String version_title = "MiniSim 0.3.3";
+  public String version_title = "MiniSim 0.3.4";
   public String savepath = "save.sdata";
   public sStr savepath_value, filempath_value;
   public sBoo auto_load, log_ext_save;

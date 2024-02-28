@@ -535,6 +535,59 @@ class MPack extends MBasic {
 
 
 
+class MMPoints extends MBasic { 
+  static class Builder extends MAbstract_Builder {
+	  Builder() { super("points", "MultiPoint", "", "Sheet"); }
+	  MMPoints build(Macro_Sheet s, sValueBloc b) { MMPoints m = new MMPoints(s, b); return m; }
+    }
+  sInt co_nb;
+  ArrayList<Macro_Connexion> out_list;
+  ArrayList<Macro_Connexion> in_list;
+  
+  MMPoints(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "points", _bloc); }
+	public void init() {
+		co_nb = newInt(2, "co_nb");
+		co_nb.set_limit(2, 8);
+		out_list = new ArrayList<Macro_Connexion>();
+		in_list = new ArrayList<Macro_Connexion>();
+	}	
+	public void build_param() {
+		addSSelectToInt(0, co_nb);
+		addEmptyS(1);
+		addEmptyS(2);
+		build_normal();
+	}	
+	public void build_normal() {
+		finish();
+	}
+	public void finish() {
+		for (int i = 0 ; i < co_nb.get() ; i++) {
+			Macro_Connexion c = addInput(0, "in"+(i+1));
+			in_list.add(c);
+		  	Macro_Connexion o = addOutput(2, "out"+(i+1));
+			out_list.add(o);
+		  	nObjectPair pr = new nObjectPair();
+		  	pr.obj1 = c; pr.obj2 = o;
+		  	c.addEventReceive(new nRunnable(pr) { public void run() {
+		  		nObjectPair p = (nObjectPair)builder;
+		  		((Macro_Connexion)p.obj2).send(((Macro_Connexion)p.obj1).lastPack());
+			}});
+		}
+		
+		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		co_nb.addEventChange(new nRunnable() { public void run() { 
+			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  			  if (!rebuilding) rebuild(); }}); }}); }});
+	}
+  public MMPoints clear() {
+    super.clear(); 
+    return this; }
+  public MMPoints toLayerTop() {
+    super.toLayerTop(); 
+    return this; }
+}
+
+
 
 class MPoint extends MBasic { 
   static class MPoint_Builder extends MAbstract_Builder {

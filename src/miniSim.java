@@ -12,11 +12,18 @@ public class miniSim {
 Button option : button click direct to choosen channel
 
 merge save as / save to in main menu
+add cut bp
+
+some connection lens still viewable when bloc reducted?
+
+different passing mode for mvar and mvalue: 
+	send val if : A any in ; B bang in ; C on val change ; S at build
 
 var duplicable en rangé (like sequance) can choose to show connexion and or field
 
 point duplicable in row
 	can choose row width (2 or 3) and composition (view in out label)
+	merge it with Mvalviewer
 
 		MACRO BLOC review
 Blocs List :
