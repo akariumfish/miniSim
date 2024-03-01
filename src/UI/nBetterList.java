@@ -63,8 +63,12 @@ public class nBetterList extends nDrawer {
 		  return le;
 	  }
 	  public nBetterList end_complexe_entry() {
-	    for (int i = 0 ; i < listoptions.size() ; i++) listoptions.get(i).clear();
+		    for (int i = 0 ; i < listoptions.size() ; i++) listoptions.get(i).clear();
+		    for (int i = 0 ; i < listoptions.size() ; i++) listoptions.get(i).clear();
+		    for (int i = 0 ; i < listoptions.size() ; i++) listoptions.get(i).clear();
 	    listoptions.clear();
+	    for (int i = 0 ; i < listwidgets.size() ; i++) listwidgets.get(i).clear();
+	    for (int i = 0 ; i < listwidgets.size() ; i++) listwidgets.get(i).clear();
 	    for (int i = 0 ; i < listwidgets.size() ; i++) listwidgets.get(i).clear();
 	    listwidgets.clear();
 	    for (int i = 0 ; i < list_widget_nb ; i++) {
@@ -72,7 +76,7 @@ public class nBetterList extends nDrawer {
 	        .stackDown()
 	        .setTextAlignment(align, PApplet.CENTER);
 	      ne.addEventVisibilityChange(new nRunnable(ne) { public void run() {
-	        	if (!ref.isHided()) 
+	        	if (!ref.isHided() && !getShelfPanel().panel.isHided() && !getShelf().ref.isHided()) 
 	        		((nWidget)builder).show();
 	        	else ((nWidget)builder).hide();
 	      }}).addEventSwitchOn_Builder(new nRunnable() { public void run() {
@@ -213,6 +217,11 @@ public class nBetterList extends nDrawer {
 	    for (nWidget w : listwidgets) w.clear();
 	    for (nWidget w : listoptions) w.clear();
 	    back.clear();
+	    for (int i = 0 ; i < listwidgets.size() ; i++) {
+		      nWidget w = listwidgets.get(i);
+		      nWidget wo = listoptions.get(i);
+		      w.clear(); wo.clear();
+	    }
 	    return this;
 	  }
 	  int align = PApplet.CENTER;

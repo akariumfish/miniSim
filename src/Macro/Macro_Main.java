@@ -186,10 +186,10 @@ nExplorer sheet_explorer;
         .addCtrlModel("Menu_Button_Small_Outline-S1-P2", "X")
           .setRunnable(new nRunnable() { public void run() { del_selected(); }})
           .setInfo("Delete selected bloc").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P3", "E")
-          .setRunnable(new nRunnable() { public void run() { 
-            selected_sheet.empty(); if (sheet_explorer != null) sheet_explorer.update(); }})
-          .setInfo("Empty selected sheet").setFont((int)(ref_size/1.9)).getDrawer()
+//        .addCtrlModel("Menu_Button_Small_Outline-S1-P3", "E")
+//          .setRunnable(new nRunnable() { public void run() { 
+//            selected_sheet.empty(); if (sheet_explorer != null) sheet_explorer.update(); }})
+//          .setInfo("Empty selected sheet").setFont((int)(ref_size/1.9)).getDrawer()
         .addCtrlModel("Menu_Button_Small_Outline-S1-P4", "C")
           .setRunnable(new nRunnable() { public void run() { copy_to_tmpl(); }})
           .setInfo("Copy selected blocs").setFont((int)(ref_size/1.9)).getShelfPanel()
@@ -1076,6 +1076,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MSheetCo.MSheetCo_Builder());
       add_bloc_builders(new MCursor.MCursor_Builder());
       add_bloc_builders(new MPoint.MPoint_Builder());
+      add_bloc_builders(new MMPoints.Builder());
       add_bloc_builders(new MPack.Builder());
       add_bloc_builders(new MForm.MForm_Builder());
       add_bloc_builders(new MCam.MCam_Builder());
@@ -1102,7 +1103,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MTransform.Builder());
       add_bloc_builders(new MQuickFloat.Builder());
       add_bloc_builders(new MValView.Builder());
-
+      
       add_bloc_builders(new MColRGB.MColRGB_Builder());
       add_bloc_builders(new MToolBin.MToolBin_Builder());
       add_bloc_builders(new MToolTri.MToolTri_Builder());
@@ -1256,7 +1257,7 @@ public Macro_Main(sInterface _int) {
 //      p.add(-p.x%ref_size/2, -p.y%ref_size/2);
       p = inter.cam.cam_to_screen(p);
       p.add(-select_grab_widg.getLocalSX()/2, -select_grab_widg.getLocalSY()/2);
-      if (selected_macro.size() > 1 || ref_size * gui.scale < 30) 
+      if (selected_macro.size() > 0)// || ref_size * gui.scale < 30) 
         select_grab_widg.show().setPosition(p.x, p.y);
       else select_grab_widg.hide();
     } else {

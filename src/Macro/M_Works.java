@@ -917,14 +917,14 @@ class MPatern extends MBaseMenu {
 		nrot.addEventChange(up_npos);
 		up_npos.run();
 		
-		nposx.addEventChange(new nRunnable() { public void run() { 
-			out_px.send(Macro_Packet.newPacketFloat(nposx.get())); }});
-		nposy.addEventChange(new nRunnable() { public void run() { 
-			out_py.send(Macro_Packet.newPacketFloat(nposy.get())); }});
-		nscale.addEventChange(new nRunnable() { public void run() { 
-			out_s.send(Macro_Packet.newPacketFloat(nscale.get())); }});
-		nrot.addEventChange(new nRunnable() { public void run() { 
-			out_r.send(Macro_Packet.newPacketFloat(nrot.get())); }});
+//		nposx.addEventChange(new nRunnable() { public void run() { 
+//			out_px.send(Macro_Packet.newPacketFloat(nposx.get())); }});
+//		nposy.addEventChange(new nRunnable() { public void run() { 
+//			out_py.send(Macro_Packet.newPacketFloat(nposy.get())); }});
+//		nscale.addEventChange(new nRunnable() { public void run() { 
+//			out_s.send(Macro_Packet.newPacketFloat(nscale.get())); }});
+//		nrot.addEventChange(new nRunnable() { public void run() { 
+//			out_r.send(Macro_Packet.newPacketFloat(nrot.get())); }});
 	}
 	Macro_Connexion in_px,in_py,in_s,in_r , out_px,out_py,out_s,out_r;
 	void build_param() {

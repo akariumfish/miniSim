@@ -134,7 +134,7 @@ sStr val_title;
   nRunnable szone_st, szone_en;
   
 Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
-    super(_sheet.gui, _sheet.ref_size, 0.25F);
+    super(_sheet.gui, _sheet.ref_size, 0.125F);
     gui = _sheet.gui; ref_size = _sheet.ref_size; sheet = _sheet; 
     sheet_depth = sheet.sheet_depth + 1;
     

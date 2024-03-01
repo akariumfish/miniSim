@@ -574,6 +574,7 @@ public sRun full_screen_run;
   ArrayList<nRunnable> eventsSetupLoad = new ArrayList<nRunnable>();
   public void setup_load() {
 		app.logln("setup_load from "+savepath_value.get());
+		app.app_grab.setText(version_title + "  -  "+savepath_value.get());
 	    file_savebloc.clear();
 	    if (setup_bloc != null) setup_bloc.clear();
 	    if (file_savebloc.load_from(savepath_value.get())) {

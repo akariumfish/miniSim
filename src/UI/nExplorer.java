@@ -55,6 +55,13 @@ public class nExplorer extends nDrawer {
 	  nShelf myshelf;
 	  nWidget bloc_info, val_info;
 	  nDrawer info_drawer;
+	  public nExplorer clear() {
+	    explorer_list.clear();
+	    myshelf.clear();
+	    for (nWidget w : values_button) w.clear();
+	    super.clear();
+	    return this;
+	  }
 	  
 	  public nDrawer setLayer(int l) { super.setLayer(l); myshelf.setLayer(l); return this; }
 	  public nDrawer toLayerTop() { 

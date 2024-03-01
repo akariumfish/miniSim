@@ -570,8 +570,12 @@ class MMPoints extends MBasic {
 		  	pr.obj1 = c; pr.obj2 = o;
 		  	c.addEventReceive(new nRunnable(pr) { public void run() {
 		  		nObjectPair p = (nObjectPair)builder;
-		  		((Macro_Connexion)p.obj2).send(((Macro_Connexion)p.obj1).lastPack());
+		  		if (((Macro_Connexion)p.obj1).lastPack() != null) 
+		  			((Macro_Connexion)p.obj2)
+		  			.send(((Macro_Connexion)p.obj1).lastPack());
 			}});
+			sStr l = newStr("label"+(i+1), "label"+(i+1));
+			addLinkedSField(1, l).setPX(ref_size*-1.8).setSX(ref_size*5.5);
 		}
 		
 		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {

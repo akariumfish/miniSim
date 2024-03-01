@@ -64,12 +64,14 @@ class MSequance extends MBasic {
 			  if (actif_val.get()) {
 				  counter++;
 				  if (counter >= current_delay.get()) {
+					  counter = 0;
 					  current_out.sendBang();
 					  current_index++;
 					  if (current_index >= row_nb.get()) current_index = 0;
-					  current_delay = ivals.get(current_index);
-					  current_out = connects.get(current_index);
-					  counter = 0;
+					  if (current_index < row_nb.get()) { 
+						  current_delay = ivals.get(current_index);
+						  current_out = connects.get(current_index);
+					  }
 				  }
 			  }
 		  }};
