@@ -34,7 +34,7 @@ contact growsDev@gmail.com.
 .
 ..
 
-FRANCAIS---MINISIM---
+---FRANCAIS---MINISIM---
 Il y a quelque preview dans le dossier image.
 
 Demarrage :
