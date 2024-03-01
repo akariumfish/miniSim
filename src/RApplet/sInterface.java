@@ -433,7 +433,7 @@ public class sInterface {
   public nWidget match_flag;
   public  nWindowPanel files_panel;
   public String version_title = "MiniSim 0.3.5";
-  public String savepath = "save.sdata";
+  public String savepath = "start.sdata";
   public sStr savepath_value, filempath_value;
   public sBoo auto_load, log_ext_save;
   public Save_Bloc file_savebloc;

@@ -8,7 +8,8 @@ public class miniSim {
 
 /* DONT HIT ENTER HERE FFS!!
 
-	BUG
+	VERSION .5 : 
+		BUG FIX
 big lag when selecting an heavy sheet (maybe only main?)
 sequance in param state rebuild continuously (var too?)
 
@@ -20,10 +21,6 @@ update sheet back when adding spot
 sequance dont understand param 0 as delay
 
 MCursor should update nCursor even when hided (sheet closed is mouved) 
-
-
-
-	VERSION 0.4 : 
 		IMPORTANT FIX
 stop linkbuilding by rightclick, not left, to move cam
 
@@ -61,6 +58,8 @@ keep link and spot when switching blocs from param to normal
 remove gaps in bloc panel and sheet front
 	should fix sheet spot spacing so connection align
 
+	VERSION .6 : 
+		IMPORTANT FIX
 better sheet spot :
 	when creating spot make all elem widget passif
 	in spot creation mode add a bp to create empty space
@@ -85,7 +84,6 @@ blocs elements can be mirrored via a bp
 	at widget level a set of parameters can apply mirroring
 		for each axis : bool to active and float as mirror axis
 	applyed when calling getx gety getsx getsy , consider parent mirroring
-	
 		BLOCS MODIF TO DO
 MMain :
 	method in main to add sBoo or sRun to a shortcut tab in main menu
@@ -113,41 +111,9 @@ MPack : 		Rename in connect?
 		in this case only do them both in col 0 (as a MPoint) 
 		and move them to be aligned ?
 
+>>>>>> VERSION STABLE <<<<<<<
 
-
-
-
-
-
-		MACRO BLOC REVIEW
-Blocs List :
-		DONE
-	Flux : point, chan, gate
-	Sheet : Macro_Sheet, Sheet_Main, SheetCo, Cursor
-	Stock/access : Variable, sValue
-	Input : StandardInputs
-	Modify / Interpret : VecCalc, BoolCalc, NumCalc, Random
-		Transform/Filter :
-			filtered : type : bang, bool, num, vec ; types limits : bool:TorF
-				time : cnt(delay), frame
-			Transform : bool <> bang, vec <> XY, vec <> MagDir, all > bang/bool
-	Complexes : rampe, sequance, setreset, counter
-	GUI : Button, Slider, Comment
-	
-		TO DO
-		FOR LATER
-	Working : Environment:MCamera, MCanvas, MTick   Actifs:MStructure, MForm, MPatern
-	Complexes : matrice
-	Modify / Interpret : 
-		NumCalc : pow sqrt min max lerp abs
-		ColorCalc : set add : RGBA SatHue
-		Transform/Filter : 	Filter type : str, col
-							Filter : only on change : on/off (need saving of all val types)
-							Transform : col <> SatHue, all > num/vec/col, col <> RGBA
-	GUI : GUIPanel, GUILabel, GUIButton, GUIGraph, GUISlide, GToolPanel
-	
-	Other : Midi, Preset
-	
+	VERSION .7 : 
 Bloc Modif :
 		BASE BLOC
 MBase : when build the first time is only a field, if input word is a type it become this type
@@ -181,6 +147,7 @@ MRamp :
 	param : linear/sine 1/SAW/LP UP/DW 
 MSequance : input / field to set all delay at once
 
+	VERSION .8 : 
 		NEW BLOC
 MPanel :
 	draw a rectangle from the bloc pos of the size of a windowpanel
@@ -200,6 +167,7 @@ MPOV : extend sheet object, use sheet specialize ?
 	as gotoview, nextcam, and deploy as big trig in spots by default
 	as a MZone automatically inside to set the view
 
+	VERSION .9 : 
 		NEW WORKING BLOCS
 MForm 
 	fixed size array of vector for shape vertice coords
@@ -234,13 +202,40 @@ MCollision
 		the collision area.
 	find a way to make it output the index pair (use pack?)
 
-
+>>>>>> VERSION 0.4 <<<<<<<
 		
 
 
 
+		MACRO BLOC REVIEW
+Blocs List :
+		DONE
+	Flux : point, chan, gate
+	Sheet : Macro_Sheet, Sheet_Main, SheetCo, Cursor
+	Stock/access : Variable, sValue
+	Input : StandardInputs
+	Modify / Interpret : VecCalc, BoolCalc, NumCalc, Random
+		Transform/Filter :
+			filtered : type : bang, bool, num, vec ; types limits : bool:TorF
+				time : cnt(delay), frame
+			Transform : bool <> bang, vec <> XY, vec <> MagDir, all > bang/bool
+	Complexes : rampe, sequance, setreset, counter
+	GUI : Button, Slider, Comment
+	
+		TO DO
+		FOR LATER
+	Working : Environment:MCamera, MCanvas, MTick   Actifs:MStructure, MForm, MPatern
+	Complexes : matrice
+	Modify / Interpret : 
+		NumCalc : pow sqrt min max lerp abs
+		ColorCalc : set add : RGBA SatHue
+		Transform/Filter : 	Filter type : str, col
+							Filter : only on change : on/off (need saving of all val types)
+							Transform : col <> SatHue, all > num/vec/col, col <> RGBA
+	GUI : GUIPanel, GUILabel, GUIButton, GUIGraph, GUISlide, GToolPanel
+	
+	Other : Midi, Preset
 
-		
 		DOABLE IDEE
 
 Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
