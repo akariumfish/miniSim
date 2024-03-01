@@ -1,7 +1,14 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-16940:  :exit
+191:- :setup_load from base.sdata
+792:  :setup_load from base.sdata
+1034:  :setup_load from save.sdata
+4323:  :full_data_save to empty.sdata
+4801:  :full_data_save to save.sdata
+5007:  :setup_load from base.sdata
+5427:  :setup_load from save.sdata
+5572:  :exit
 null
 null
 null
