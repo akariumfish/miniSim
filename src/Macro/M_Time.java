@@ -59,10 +59,13 @@ class MSequance extends MBasic {
 		  	
 		  build_normal();
 	  }
-	  void tryzeroatindex() {
-//		  while (current_delay.get() == 0) {
+//	  void tryzeroatindex() {
+//		  while (current_delay.get() == 0 && current_index > 0) {
 //			  if (current_index >= row_nb.get()) {
 //				  rst_run.run();
+//				  current_delay = ivals.get(current_index);
+//				  current_out = connects.get(current_index);
+//				  break;
 //			  } else if (current_index < row_nb.get()) { 
 //				  current_out.sendBang();
 //				  current_index++;
@@ -70,7 +73,7 @@ class MSequance extends MBasic {
 //				  current_out = connects.get(current_index);
 //			  }
 //		  }
-	  }
+//	  }
 	  void build_normal() {
 		  if (show_actif.get()) {
 			  if (show_delay.get()) addEmptyS(2);
@@ -85,24 +88,37 @@ class MSequance extends MBasic {
 		  }};
 		  nRunnable tick_run = new nRunnable() { public void run() { 
 			  if (actif_val.get()) {
-				  if (current_delay.get() == 0) {
-					  tryzeroatindex();
-				  } else {
-					  counter++;
-					  if (counter >= current_delay.get()) {
-						  counter = 0;
-						  current_out.sendBang();
-						  current_index++;
-						  if (current_index >= row_nb.get()) {
-							  rst_run.run();
-						  } else if (current_index < row_nb.get()) { 
-							  current_delay = ivals.get(current_index);
-							  current_out = connects.get(current_index);
-							  tryzeroatindex();
-						  }
+				  counter++;
+				  if (counter >= current_delay.get()) {
+					  counter = 0;
+					  current_out.sendBang();
+					  current_index++;
+					  if (current_index >= row_nb.get()) current_index = 0;
+					  if (current_index < row_nb.get()) { 
+						  current_delay = ivals.get(current_index);
+						  current_out = connects.get(current_index);
 					  }
 				  }
 			  }
+//			  if (actif_val.get()) {
+//				  counter++;
+//				  if (current_delay.get() == 0) {
+//					  tryzeroatindex();
+//				  } else {
+//					  if (counter >= current_delay.get()) {
+//						  counter = 0;
+//						  current_out.sendBang();
+//						  current_index++;
+//						  if (current_index >= row_nb.get()) {
+//							  rst_run.run();
+//						  } else if (current_index < row_nb.get()) { 
+//							  current_delay = ivals.get(current_index);
+//							  current_out = connects.get(current_index);
+//							  tryzeroatindex();
+//						  }
+//					  }
+//				  }
+//			  }
 		  }};
 		  addInputBang(0, "tick", tick_run).hide_msg()
 		  	  .elem.addCtrlModel("MC_Element_SButton", "tick")
