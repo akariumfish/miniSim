@@ -1,4 +1,5 @@
 package Macro;
+import UI.Drawable;
 import UI.Rect;
 import UI.nCtrlWidget;
 import UI.nGUI;
@@ -35,14 +36,77 @@ abstract class MAbstract_Builder {
 }
 
 public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
-  
+
+	  void moving() { 
+		  if (sheet != this) sheet.movingChild(this); 
+	  }
+	  void group_move(float x, float y) { 
+	    grabber.setPY(grabber.getLocalY() + y); grabber.setPX(grabber.getLocalX() + x);
+	    group_move_custom(x, y); }
+	  protected void group_move_custom(float x, float y) {}
+	  Macro_Abstract setPosition(double x, double y) { return setPosition((float)x, (float)y); }
+	  Macro_Abstract setPosition(float x, float y) { 
+//	    grab_pos.doEvent(false);
+	    grabber.setPosition(x, y); //grab_pos.set(x, y);
+//	    grab_pos.doEvent(true);
+	    return this; }
+	  Macro_Abstract setParent(Macro_Sheet s) { grabber.clearParent(); grabber.setParent(s.grabber); return this; }
+	  public Macro_Abstract toLayerTop() { 
+		  if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
+		  panel.toLayerTop();  
+		  title.getDrawable(); grabber.getDrawable(); reduc.getDrawable(); 
+		  prio_sub.getDrawable(); prio_add.getDrawable(); prio_view.getDrawable(); 
+		  front.getDrawable(); grab_front.getDrawable(); 
+		  
+	    return this; }
+//	  public Macro_Abstract buildLayer() { 
+//		  gui.app.logln(value_bloc.ref+ " build layer");
+//		  panel.getDrawable().clear_coDrawer();
+//		  buildLayerTo(panel.getDrawable()); 
+//	  return this; }
+//	  public Macro_Abstract buildLayerTo(Drawable d) { 
+//		  gui.app.logln(value_bloc.ref+ " build layer TO");
+//		    d.add_coDrawer(title.getDrawable()); 
+//		    d.add_coDrawer(grabber.getDrawable()); 
+//		    d.add_coDrawer(reduc.getDrawable()); 
+//		    d.add_coDrawer(prio_sub.getDrawable()); 
+//		    d.add_coDrawer(prio_add.getDrawable()); 
+//		    d.add_coDrawer(prio_view.getDrawable()); 
+//		    d.add_coDrawer(front.getDrawable()); 
+//		    d.add_coDrawer(grab_front.getDrawable()); 
+//	  return this; }
+	  public Macro_Main mmain() { if (sheet == this) return (Macro_Main)this; return sheet.mmain(); }
+
+	  void switch_select() {
+		  if (szone_selected ) {
+			  szone_unselect();
+
+			  mmain().selected_macro.remove(this);
+			  mmain().update_select_bound();
+			  
+		  } else szone_select();
+	  }
+	  void szone_select() {
+	    if (mmain().selected_sheet != sheet) sheet.select();
+	    mmain().selected_macro.add(this);
+	    szone_selected = true;
+	    mmain().update_select_bound();
+	    if (openning.get() == REDUC) grab_front.setOutline(true);
+	    else front.setOutline(true);
+	    toLayerTop();
+	  }
+	  void szone_unselect() {//carefull! still need to remove from mmain.selected_macro and run mmain.update_select_bound
+	    szone_selected = false;
+	    front.setOutline(false);
+	    grab_front.setOutline(false);
+	  }
   Macro_Abstract deploy() { open(); return this; } //
   Macro_Abstract open() {
     if (openning.get() != OPEN) {
       openning.set(OPEN);
       grabber.show(); grab_front.show(); panel.show(); back.hide(); 
       front.show(); title.show(); reduc.show(); 
-      reduc.setPosition(-ref_size, ref_size*0.25);
+      reduc.setPosition(-ref_size * 0.75, ref_size*0.25);
       moving();
     }
     toLayerTop();
@@ -53,7 +117,7 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
       openning.set(REDUC);
       grabber.show(); grab_front.show(); panel.hide(); back.hide(); 
       front.hide(); title.hide(); reduc.show(); 
-      reduc.show().setPosition(ref_size * 0.75, ref_size*0.75);
+      reduc.show().setPosition(ref_size * 0.5, ref_size*0.5);
       moving();
     }
     return this;
@@ -82,39 +146,7 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
     else if (openning.get() == DEPLOY) { open(); }
     return this; }
   
-  void szone_select() {
-    if (mmain().selected_sheet != sheet) sheet.select();
-    mmain().selected_macro.add(this);
-    szone_selected = true;
-    mmain().update_select_bound();
-    if (openning.get() == REDUC) grab_front.setOutline(true);
-    else front.setOutline(true);
-    toLayerTop();
-  }
-  void szone_unselect() {//carefull! still need to remove from mmain.selected_macro and run mmain.update_select_bound
-    szone_selected = false;
-    front.setOutline(false);
-    grab_front.setOutline(false);
-  }
-  
-  void moving() { 
-    sheet.movingChild(this); 
-  }
-  void group_move(float x, float y) { 
-    grabber.setPY(grabber.getLocalY() + y); grabber.setPX(grabber.getLocalX() + x); }
-  Macro_Abstract setPosition(double x, double y) { return setPosition((float)x, (float)y); }
-  Macro_Abstract setPosition(float x, float y) { 
-//    grab_pos.doEvent(false);
-    grabber.setPosition(x, y); //grab_pos.set(x, y);
-//    grab_pos.doEvent(true);
-    return this; }
-  Macro_Abstract setParent(Macro_Sheet s) { grabber.clearParent(); grabber.setParent(s.grabber); return this; }
-  public Macro_Abstract toLayerTop() { 
-    super.toLayerTop(); panel.toLayerTop(); title.toLayerTop(); grabber.toLayerTop(); 
-    reduc.toLayerTop(); prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
-    front.toLayerTop(); grab_front.toLayerTop(); return this; }
 
-  public Macro_Main mmain() { if (sheet == this) return (Macro_Main)this; return sheet.mmain(); }
   
   public nGUI gui;
   Macro_Sheet sheet;    int sheet_depth = 0;
@@ -134,7 +166,7 @@ sStr val_title;
   nRunnable szone_st, szone_en;
   
 Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
-    super(_sheet.gui, _sheet.ref_size, 0.125F);
+    super(_sheet.gui, _sheet.ref_size, 0.0F);
     gui = _sheet.gui; ref_size = _sheet.ref_size; sheet = _sheet; 
     sheet_depth = sheet.sheet_depth + 1;
     
@@ -218,7 +250,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     build_ui();
   }
   Macro_Abstract(sInterface _int) { // FOR MACRO_MAIN ONLY
-    super(_int.cam_gui, _int.ref_size, 0.125F);
+    super(_int.cam_gui, _int.ref_size, 0.0F);
     
 //    mlogln("build main abstract ");
     
@@ -274,11 +306,13 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
       moving(); 
     } });
     grabber.addEventGrab(new nRunnable() { public void run() { 
-      prev_x = grabber.getLocalX(); prev_y = grabber.getLocalY(); toLayerTop(); } });
-    
+      prev_x = grabber.getLocalX(); prev_y = grabber.getLocalY(); toLayerTop(); } })
+    .addEventTriggerRight(new nRunnable() { public void run() { 
+    		if (mmain().selected_sheet == sheet) switch_select(); } });
     panel.copy(gui.theme.getModel("MC_Panel"));
     panel.setParent(grabber).setPassif();
-    panel.setPosition(-grabber.getLocalSX()/4, grabber.getLocalSY()/2 + ref_size * 1 / 8)
+    panel
+    		.setPosition(ref_size * 0.06250, ref_size * 0.50)//grabber.getLocalSY()/2)//-grabber.getLocalSX()/4
       .addEventShapeChange(new nRunnable() { public void run() {
         front.setSize(panel.getLocalSX(), panel.getLocalSY()); } } )
       .addEventVisibilityChange(new nRunnable() { public void run() {
@@ -312,8 +346,9 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     title = addLinkedModel("MC_Title").setLinkedValue(val_title);
     title.addEventFieldChange(new nRunnable() { public void run() { title.setOutline(true); } });
     title.clearParent().setParent(panel);
-    title.alignDown().stackLeft();
-    title.setSX(ref_size*(0.5F + 0.3F*val_title.get().length()) );
+    title.alignDown().stackRight();
+    title.setSX(ref_size*(0.5F + 0.3F*val_title.get().length()) )
+    		.setPosition(-ref_size*1.25 - title.getLocalSX(), ref_size*0.5);
     grabber.addEventMouseEnter(new nRunnable() { public void run() { 
       if (openning.get() == REDUC) title.show(); } });
     grabber.addEventMouseLeave(new nRunnable() { public void run() { 
@@ -348,6 +383,9 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     
     setParent(sheet); 
     sheet.child_macro.add(this); 
+    
+
+//    this.buildLayer();
     
   }
   void init_end() {

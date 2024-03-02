@@ -176,7 +176,7 @@ nExplorer sheet_explorer;
           .setLinkedValue(show_link)
           .setInfo("show/hide links").setFont((int)(ref_size/1.9)).getDrawer()
         .addLinkedModel("Menu_Button_Small_Outline-S1-P3", "LV")
-          .setLinkedValue(show_link_volat)
+          .setLinkedValue(link_volatil)
           .setInfo("show hided links when hovering connexions").setFont((int)(ref_size/1.9)).getDrawer()
           .getShelfPanel()
       .addShelf().addDrawer(4.375F, 1)
@@ -431,6 +431,16 @@ nExplorer sheet_explorer;
 	    ;
 	  if (catego == null) catego = new ArrayList<String>();
 	  update_bloc_selector_list();
+	  
+	  sheet_front.addEventClose(new nRunnable(this) { public void run() { 
+//		  if (preset_explorer != null) mmain().presets_explorers.remove(preset_explorer); 
+		  if (selector_list != null) selector_list.clear(); 
+		  if (template_explorer != null) template_explorer.clear(); 
+		  if (sheet_explorer != null) sheet_explorer.clear(); 
+		  selector_list = null;
+		  template_explorer = null;
+		  sheet_explorer = null;
+      }});
   }
 
   void build_templ_explorer() {
@@ -784,6 +794,8 @@ nExplorer sheet_explorer;
 	      
 	    szone_clear_select();
 	    is_setup_loading = false;
+
+//	    buildLayer();
 	} } );
   }
   
@@ -956,7 +968,7 @@ nExplorer sheet_explorer;
   nRunnable packet_frame_run;
   
   //, show_sheet_tool
-  sBoo show_gui, show_macro, show_link, show_link_volat, show_build_tool, show_macro_tool, do_packet;
+  sBoo show_gui, show_macro, show_link, link_volatil, show_build_tool, show_macro_tool, do_packet;
   sStr new_temp_name, database_path, shown_builder, shown_spe, shown_templ; sRun del_select_run, copy_run, paste_run, reduc_run;
   public sInterface inter;
   Rapp app;
@@ -985,6 +997,8 @@ Macro_Sheet search_sheet = this;
   int pan_nb = 0, tool_nb = 0;
   Macro_Sheet last_link_sheet = null;
   String last_created_link = "";
+  
+
   
   void updateBack() { update_select_bound(); }
   
@@ -1034,7 +1048,7 @@ public Macro_Main(sInterface _int) {
       update_select_bound();
     }});
     show_link = setting_bloc.newBoo("show_link", "showL", true);
-    show_link_volat = setting_bloc.newBoo("show_link_volat", "showLV", true);
+    link_volatil = setting_bloc.newBoo("show_link_volat", "showLV", true);
     
     show_build_tool = setting_bloc.newBoo("show_build_tool", "build tool", true);
     show_build_tool.addEventChange(new nRunnable(this) { public void run() { 
@@ -1103,6 +1117,8 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MTransform.Builder());
       add_bloc_builders(new MQuickFloat.Builder());
       add_bloc_builders(new MValView.Builder());
+	  add_bloc_builders(new MBin.MBin_Builder());
+	  add_bloc_builders(new MNot.MNot_Builder());
       
       add_bloc_builders(new MColRGB.MColRGB_Builder());
       add_bloc_builders(new MToolBin.MToolBin_Builder());
@@ -1112,6 +1128,8 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MPanSld.MPanSld_Builder());
       add_bloc_builders(new MPanBin.MPanBin_Builder());
       add_bloc_builders(new MPanel.MPanel_Builder());
+      add_bloc_builders(new MFrame.MFrame_Builder());
+      add_bloc_builders(new MPulse.MPulse_Builder());
 
       
       
@@ -1120,15 +1138,11 @@ public Macro_Main(sInterface _int) {
 //    add_bloc_builders(new MMouse.MMouse_Builder());
 //    add_bloc_builders(new MTrig.MTrig_Builder());
 //    add_bloc_builders(new MSwitch.MSwitch_Builder());
-//    add_bloc_builders(new MFrame.MFrame_Builder());
-//    add_bloc_builders(new MPulse.MPulse_Builder());
+//    add_bloc_builders(new MVecMD.MVecMD_Builder());
+//    add_bloc_builders(new MVecXY.MVecXY_Builder());
 //    add_bloc_builders(new MComp.MComp_Builder());
 //    add_bloc_builders(new MBool.MBool_Builder());
 //    add_bloc_builders(new MCalc.MCalc_Builder());
-//    add_bloc_builders(new MBin.MBin_Builder());
-//    add_bloc_builders(new MNot.MNot_Builder());
-//    add_bloc_builders(new MVecMD.MVecMD_Builder());
-//    add_bloc_builders(new MVecXY.MVecXY_Builder());
       
       
     
@@ -1194,6 +1208,7 @@ public Macro_Main(sInterface _int) {
     inter.addEventTwoFrame(new nRunnable() { public void run() { 
         packpross_by_frame.set(packp_holder);
 //        update_bloc_selector_list();
+//        buildLayer();
         inter.addEventFrame(new nRunnable() { public void run() { frame(); } } );
       } } );
   }
@@ -1314,7 +1329,7 @@ public Macro_Main(sInterface _int) {
 	  theme.addModel("MC_Panel", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(50, 0))
 	    .setOutlineColor(theme.app.color(105))
-	    .setOutlineWeight(ref_size * 2.0F / 16.0F)
+	    .setOutlineWeight(ref_size * 2.25F / 24.0F)// 0.25/16.0
 	    .setOutline(true)
 	    );
 	  
@@ -1342,14 +1357,16 @@ public Macro_Main(sInterface _int) {
 	    .setStandbyColor(theme.app.color(60))
 	    .setOutlineColor(theme.app.color(105, 105, 80))
 	    .setOutlineWeight(ref_size * 1.0 / 16.0)
-	    .setSize(ref_size*2, ref_size)
+	    .setSize(ref_size*2.25F, ref_size*1.125)
+//	    .setPosition(ref_size*0.0, ref_size*0.0)
 	    .setFont((int)(ref_size/2))
 	    .setOutline(true)
 	    );
 	  theme.addModel("MC_Add_Spot_Actif", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(120, 70, 0))
 	    .setHoveredColor(theme.app.color(180, 90, 10))
-	    .setSize(ref_size*2, ref_size*0.5)
+	    .setSize(ref_size*2.250, ref_size*1.125)
+//	    .setPosition(ref_size*0.125, ref_size*(1.125-0.75)/2)
 	    );
 	  theme.addModel("MC_Add_Spot_Passif", theme.newWidget("MC_Add_Spot_Actif")
 	    .setStandbyColor(theme.app.color(50))
@@ -1367,11 +1384,11 @@ public Macro_Main(sInterface _int) {
 	    .setOutline(true)
 	    );
 	  theme.addModel("MC_Element", theme.newWidget("mc_ref")
-	    .setStandbyColor(theme.app.color(70))
+	    .setStandbyColor(theme.app.color(70))///////////
 	    .setOutlineColor(theme.app.color(90))
-	    .setOutlineWeight(ref_size / 16F)
+	    .setOutlineWeight(ref_size / 20.0F)//////////
 	    .setOutline(true)
-	    .setPosition(-ref_size*0.5, 0)
+//	    .setPosition(0, ref_size*0.0)
 	    );
 	  theme.addModel("MC_Element_For_Spot", theme.newWidget("MC_Element")
 	    .setStandbyColor(theme.app.color(120, 70, 0))
@@ -1385,27 +1402,25 @@ public Macro_Main(sInterface _int) {
 	    .setOutline(true)
 	    );
 	  theme.addModel("MC_Element_Single", theme.newWidget("MC_Element")
-	    .setSize(ref_size*2, ref_size)
+	    .setSize(ref_size*2.25, ref_size*1.125)
+	    );
+	  theme.addModel("MC_Element_Empty", theme.newWidget("MC_Element")
+			    .setStandbyColor(theme.app.color(0, 0, 0, 0))
+			    .setOutlineColor(theme.app.color(0, 0, 0, 0))
+			    .setOutline(false)
+	    .setSize(ref_size*2.25, ref_size*1.125)
 	    );
 	  theme.addModel("MC_Element_Double", theme.newWidget("MC_Element")
-	    .setSize(ref_size*4.125, ref_size)
+	    .setSize(ref_size*4.50, ref_size*1.125)
 	    );
 	  theme.addModel("MC_Element_Triple", theme.newWidget("MC_Element")
-	    .setSize(ref_size*6.25, ref_size)
+	    .setSize(ref_size*6.75, ref_size*1.125)
 	    );
 	  theme.addModel("MC_Element_Big", theme.newWidget("MC_Element")
-	    .setSize(ref_size*4.125, ref_size*4.125)
+	    .setSize(ref_size*4.50, ref_size*4.50)
 	    );
 	  theme.addModel("MC_Element_Bigger", theme.newWidget("MC_Element")
-	    .setSize(ref_size*6.25, ref_size*6.25)
-	    );
-	  theme.addModel("MC_Element_Fillright", theme.newWidget("MC_Element")
-	    .setSize(ref_size*0.5, ref_size*1.625)
-	    .setPosition(ref_size*1.25, -ref_size*0.25)
-	    );
-	  theme.addModel("MC_Element_Fillleft", theme.newWidget("MC_Element")
-	    .setSize(ref_size*0.5, ref_size*1.625)
-	    .setPosition(-ref_size*2.875, -ref_size*0.25)
+	    .setSize(ref_size*6.75, ref_size*6.75)
 	    );
 	  theme.addModel("MC_Element_Field", theme.newWidget("mc_ref")
 			    .setStandbyColor(theme.app.color(10, 40, 80))
@@ -1570,10 +1585,10 @@ public Macro_Main(sInterface _int) {
 	    .setClickedColor(theme.app.color(160))
 	    .setOutlineWeight(ref_size / 12)
 	    .setSize(ref_size*0.4, ref_size*0.5)
-	    .setPosition(-ref_size*1.0, ref_size*0.0)
+	    .setPosition(-ref_size*0.75, ref_size*0.250)
 	    );
 	  theme.addModel("MC_Deploy", theme.newWidget("MC_Reduc")
-	    .setSize(ref_size*0.55, ref_size*0.65).setPosition(-ref_size*0.375, -ref_size*0.1775)
+	    .setSize(ref_size*0.55, ref_size*0.65).setPosition(-ref_size*0.375, -ref_size*0.25)
 	    );
 	  theme.addModel("MC_Prio", theme.newWidget("MC_Reduc")
 	    .setSize(ref_size*0.75, ref_size*0.5)
@@ -1590,10 +1605,15 @@ public Macro_Main(sInterface _int) {
 	  theme.addModel("MC_Prio_Add", theme.newWidget("MC_Prio")
 	    .setPosition(ref_size*0.5, ref_size*0.125)
 	    );
+	  theme.addModel("MC_Mirror", theme.newWidget("MC_Reduc")
+	    .setSize(ref_size*0.75, ref_size*0.75)
+	    .setPosition(ref_size*0.5, ref_size*0.5)
+	    .alignDown().stackLeft()
+	    );
 	  theme.addModel("MC_Param", theme.newWidget("MC_Reduc")
 	    .setSize(ref_size*0.75, ref_size*0.75)
-	    .setPosition(ref_size*1.125, ref_size*0.5)
-	    .alignDown().stackLeft()
+	    .setPosition(-ref_size*1.375, ref_size*0.5)
+	    .alignDown().stackRight()
 	    );
 	  theme.addModel("MC_Connect_Default", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(140, 140))

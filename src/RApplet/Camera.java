@@ -19,7 +19,7 @@ public class Camera {
   public sFlt cam_grid_spacing; //facteur de grossicement
   float ZOOM_FACTOR = 1.1F; //facteur de modification de cam_scale quand on utilise la roulette de la sourie
   boolean GRAB = true, grabbed = false;
-  public sBoo grid; //show grid
+  public sBoo grid,can_grab; //show grid
   public boolean screenshot = false; //enregistre une image de la frame sans les menu si true puis se desactive
   boolean matrixPushed = false; //track if in or out of the cam matrix
   
@@ -29,10 +29,13 @@ public class Camera {
   Camera(sInput i, sValueBloc d) { 
 	input = i;
     grid = new sBoo(d, true, "show_grid", "grid");
+    can_grab = new sBoo(d, true, "can_grab", "grab");
     cam_scale = new sFlt(d, 1.0F, "cam_scale", "scale");
     cam_scale.set_limit(min_scale, max_scale);
-    cam_grid_spacing = new sFlt(d, 200F, "cam_grid_spacing", "grid_spacing");
+    cam_grid_spacing = new sFlt(d, 325F, "cam_grid_spacing", "grid_spacing");
     up_view_run = new nRunnable() { public void run() {
+
+        cam_grid_spacing.set(210);
 	    cam_view.pos.set(screen_to_cam(
 	    		new PVector(input.app.screen_0_x, input.app.screen_0_y)));
 	    cam_view.size.set(screen_to_cam(
@@ -131,7 +134,7 @@ public class Camera {
     mmouse.y = tmm.y;
 
     //permet le cliquer glisser le l'ecran
-    if (input.getClick("MouseLeft") && GRAB) grabbed = true; 
+    if (input.getClick("MouseLeft") && can_grab.get() && GRAB) grabbed = true; 
     if (!input.getState("MouseLeft") && grabbed) grabbed = false; 
     if (input.getState("MouseLeft") && grabbed) { 
       cam_pos.add((mouse.x - pmouse.x)*cam_scale.get(), 
@@ -140,12 +143,12 @@ public class Camera {
     }
 
     //permet le zoom
-    if (input.mouseWheelUp && GRAB && cam_scale.get() > min_scale) { 
+    if (input.mouseWheelUp && can_grab.get() && GRAB && cam_scale.get() > min_scale) { 
       cam_scale.set(cam_scale.get()*1/ZOOM_FACTOR); 
       cam_pos.mult(1/ZOOM_FACTOR); 
       up_view_run.run();
     }
-    if (input.mouseWheelDown && GRAB && cam_scale.get() < max_scale) {
+    if (input.mouseWheelDown && can_grab.get() && GRAB && cam_scale.get() < max_scale) {
       cam_scale.set(cam_scale.get()*ZOOM_FACTOR); 
       cam_pos.mult(ZOOM_FACTOR); 
       up_view_run.run();

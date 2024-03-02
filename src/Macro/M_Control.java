@@ -57,10 +57,12 @@ class MInput extends MBasic {
   			mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
   				if (!rebuilding) rebuild(); }});
 	  	} };
-	  	modeKEY.addEventChange(mode_run);
-	  	modeCROSS.addEventChange(mode_run);
-	  	modeMOUSE.addEventChange(mode_run);
-	  	modeMKEY.addEventChange(mode_run);
+	  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  	modeKEY.addEventChange(mode_run);
+		  	modeCROSS.addEventChange(mode_run);
+		  	modeMOUSE.addEventChange(mode_run);
+		  	modeMKEY.addEventChange(mode_run);
+	  	}});
 	    build_normal();
 	}
 	public void build_normal() {

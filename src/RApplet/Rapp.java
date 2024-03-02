@@ -176,6 +176,12 @@ public class Rapp extends PApplet implements RConst {
 		logln_this_frame = false;
 	}
 	
+
+	public void breakpnt() { 
+  		logln("breakpoint"); 
+		float a = 1,b = 2; a = b; b = a;
+	}
+	
 	public void mouseWheel(MouseEvent event) { 
 	  interf.input.mouseWheelEvent(event);
 	}  
@@ -258,6 +264,7 @@ public class Rapp extends PApplet implements RConst {
 //		graphic debugs
 		public boolean DEBUG_HOVERPILE = false;
 		public boolean DEBUG_NOFILL = false;
+		public boolean DEBUG_NOTOLAYTOP = false;
 		
 		boolean DEBUG = true, save_log_exit = false, save_log_all = false;
 		String logpath = "sim_log.txt";

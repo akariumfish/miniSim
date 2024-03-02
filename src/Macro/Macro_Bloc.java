@@ -23,26 +23,19 @@ import sData.*;
 //}
 
 public class Macro_Bloc extends Macro_Abstract {
-	nCtrlWidget param_open;
-	  Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
-		    super(_sheet, t, n, _bloc);
-//		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
-		    addShelf(); 
-		    addShelf();
-		  }
-	  Macro_Bloc(Macro_Sheet _sheet, String t, sValueBloc _bloc) {
-		    super(_sheet, t, t, _bloc);
-//		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
-		    addShelf(); 
-		    addShelf();
-		  }
-
 	  nCtrlWidget get_param_openner() {
 		  if (param_open == null) {
 			  param_open = addCtrlModel("MC_Param", "P");
 			  param_open.setParent(panel).setInfo("show/hide param");
 		  }
 		  return param_open;
+	  }
+	  nCtrlWidget get_mirror() {
+		  if (mirror_sw == null) {
+			  mirror_sw = addCtrlModel("MC_Mirror", "|");
+			  mirror_sw.setParent(panel).setInfo("mirror");
+		  }
+		  return mirror_sw;
 	  }
 	  Macro_Bloc set_param_action(nRunnable r) {
 		  get_param_openner().setRunnable(r);
@@ -531,21 +524,21 @@ public class Macro_Bloc extends Macro_Abstract {
     return m;
   }
   nWidget addEmpty(int c) { 
-    Macro_Element m = new Macro_Element(this, "", "mc_ref", null, NO_CO, NO_CO, false);
+    Macro_Element m = new Macro_Element(this, "", "MC_Element_Empty", null, NO_CO, NO_CO, false);
     addElement(c, m); 
     return m.back;
   }
 
-  nWidget addFillR(int c) { 
-    Macro_Element m = new Macro_Element(this, "", "MC_Element_Fillright", null, NO_CO, NO_CO, false);
-    addElement(c, m); 
-    return m.back;
-  }
-  nWidget addFillL(int c) { 
-    Macro_Element m = new Macro_Element(this, "", "MC_Element_Fillleft", null, NO_CO, NO_CO, false);
-    addElement(c, m); 
-    return m.back;
-  }
+//  nWidget addFillR(int c) { 
+//    Macro_Element m = new Macro_Element(this, "", "MC_Element_Fillright", null, NO_CO, NO_CO, false);
+//    addElement(c, m); 
+//    return m.back;
+//  }
+//  nWidget addFillL(int c) { 
+//    Macro_Element m = new Macro_Element(this, "", "MC_Element_Fillleft", null, NO_CO, NO_CO, false);
+//    addElement(c, m); 
+//    return m.back;
+//  }
 
   nWidget addLabelS(int c, String t) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
@@ -604,16 +597,44 @@ public class Macro_Bloc extends Macro_Abstract {
     addElement(c, m); 
     return m;
   }
+  
+  
+  
+
+	nCtrlWidget param_open, mirror_sw;
+
+	  int[] rows_nb = new int[3];
+	  
+	  Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
+		    super(_sheet, t, n, _bloc);
+//		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
+		    addShelf(); 
+		    addShelf();
+			rows_nb[0] = 0; rows_nb[1] = 0; rows_nb[2] = 0;
+		  }
+	  Macro_Bloc(Macro_Sheet _sheet, String t, sValueBloc _bloc) {
+		    super(_sheet, t, t, _bloc);
+//		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
+		    addShelf(); 
+		    addShelf();
+			rows_nb[0] = 0; rows_nb[1] = 0; rows_nb[2] = 0;
+		  }
 
 
   Macro_Element addElement(int c, Macro_Element m) {
     if (c >= 0 && c < 3) {
+    	rows_nb[c]++;
       if (c == 2 && shelfs.size() < 3) addShelf();
       elements.add(m);
+      m.shelf_ind = c;
+      m.row_ind = rows_nb[c];
       getShelf(c).insertDrawer(m);
-      if (c == 0 && getShelf(c).drawers.size() == 1) getShelf(c).getDrawer(0).ref.setPX(-ref_size*0.0);
-      if (c == 1 && getShelf(c).drawers.size() == 1) getShelf(c).getDrawer(0).ref.setPX(ref_size*0.5);
-      if (c == 2 && getShelf(c).drawers.size() == 1) getShelf(c).getDrawer(0).ref.setPX(ref_size);
+      if (c == 0 && getShelf(c).drawers.size() == 1) 
+    	  	getShelf(c).getDrawer(0).ref.setPX(ref_size*0);
+      if (c == 1 && getShelf(c).drawers.size() == 1) 
+    	  	getShelf(c).getDrawer(0).ref.setPX(ref_size*0);
+      if (c == 2 && getShelf(c).drawers.size() == 1) 
+    	  	getShelf(c).getDrawer(0).ref.setPX(ref_size*0);
       if (openning.get() == OPEN) for (Macro_Element e : elements) e.show();
       toLayerTop();
       return m;
@@ -646,12 +667,47 @@ public class Macro_Bloc extends Macro_Abstract {
   }
   
   ArrayList<Macro_Element> elements = new ArrayList<Macro_Element>();
+//  public Macro_Abstract buildLayer() { 
+//	  super.buildLayerTo(panel.getDrawable()); 
+//	  buildLayerTo(panel.getDrawable()); 
+//  return this; }
+//  public Macro_Abstract buildLayerTo(Drawable d) { 
+//	  	d.clear_coDrawer();
+//	    d.add_coDrawer(title.getDrawable()); 
+//	    d.add_coDrawer(reduc.getDrawable()); 
+//	    d.add_coDrawer(prio_sub.getDrawable()); 
+//	    d.add_coDrawer(prio_add.getDrawable()); 
+//	    d.add_coDrawer(prio_view.getDrawable()); 
+//	    d.add_coDrawer(front.getDrawable()); 
+//	    d.add_coDrawer(grab_front.getDrawable()); 
+//	    if (elements != null) {
+//		    for (Macro_Element e : elements) 
+//		    		if (e.spot == null) e.buildLayerTo(d); 
+//		    for (Macro_Element e : elements) 
+//		    		if (e.spot != null) e.buildLayerTo(d); 
+//  		}
+//	    d.add_coDrawer(grabber.getDrawable()); 
+//
+//	    if (param_open != null) d.add_coDrawer(param_open.getDrawable()); 
+//  return this; }
   public Macro_Bloc toLayerTop() { 
+    
     super.toLayerTop(); 
-    for (Macro_Element e : elements) e.toLayerTop(); 
-    for (Macro_Element e : elements) if (e.spot != null) e.toLayerTop(); 
-    grabber.toLayerTop();  
+
+	for (Macro_Element e : elements) if (e.spot == null) e.toLayerTop(); 
+	for (Macro_Element e : elements) if (e.spot != null) e.toLayerTop(); 
+
+	panel.toLayerTop();  
+
+	for (Macro_Element e : elements) if (e.spot == null) e.widget_toLayTop(); 
+	for (Macro_Element e : elements) if (e.spot != null) e.widget_toLayTop(); 
+	
+	title.toLayerTop(); grabber.toLayerTop(); reduc.toLayerTop(); 
+	prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
+	front.toLayerTop(); grab_front.toLayerTop(); 
+
     if (param_open != null) param_open.toLayerTop();
+    if (mirror_sw != null) mirror_sw.toLayerTop();
     return this;
   }
   
@@ -663,16 +719,6 @@ public class Macro_Bloc extends Macro_Abstract {
 	    for (nRunnable e : eventClearRun) e.run();
 	    for (Macro_Element e : elements) e.clear();
     super.clear(); return this; }
-
-  
-  Macro_Bloc set_unique() {
-//	  if (sheet.sheet_unique_bloc != null) {
-//	    	mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { clear(); } });
-//	    } else {
-//	    	sheet.sheet_menu_bloc = this;
-//	    }
-	  return this;
-  }
   
   Macro_Bloc open() {
     super.open();

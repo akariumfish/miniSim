@@ -33,6 +33,8 @@ public class nWidget {
   
   public nWidget addEventMouseEnter(nRunnable r) { eventMouseEnterRun.add(r); return this; }
   public nWidget addEventMouseLeave(nRunnable r) { eventMouseLeaveRun.add(r); return this; }
+
+  public  nWidget addEventTriggerRight(nRunnable r)         { eventTriggerRightRun.add(r); return this; }
   
   public nWidget addEventPressed(nRunnable r)      { eventPressRun.add(r); return this; }
   public nWidget addEventRelease(nRunnable r)    { eventReleaseRun.add(r); return this; }
@@ -62,7 +64,10 @@ public class nWidget {
     }
     return this; 
   }
-  
+
+  public Drawable getDrawable() { 
+    return drawer; 
+  }
   public nWidget setLayer(int l) { 
     layer = l; 
     if (drawer != null) drawer.setLayer(layer); 
@@ -70,6 +75,7 @@ public class nWidget {
     nRunnable.runEvents(eventLayerChange); 
     return this; 
   }
+
   
   public nWidget toLayerTop() {
     if (drawer != null) drawer.toLayerTop();
@@ -162,7 +168,7 @@ public class nWidget {
     showInfo = w.showInfo; infoText = RConst.str_copy(w.infoText);
     auto_line_return = w.auto_line_return;
     constrainDlength = w.constrainDlength; constrainD = w.constrainD;
-    fine_view = w.fine_view;
+    fine_view = w.fine_view; always_view = w.always_view;
     look.copy(w.look);
     setLayer(w.layer);
     setPosition(w.localrect.pos.x, w.localrect.pos.y);
@@ -187,8 +193,10 @@ public class nWidget {
     eventPositionChange.clear(); eventShapeChange.clear(); eventLayerChange.clear(); 
     eventVisibilityChange.clear(); eventClear.clear(); eventFrameRun.clear(); 
     eventGrabRun.clear(); eventDragRun.clear(); eventLiberateRun.clear(); eventFieldChangeRun.clear();
-    eventMouseEnterRun.clear(); eventMouseLeaveRun.clear(); eventPressRun.clear(); eventReleaseRun.clear();
-    eventTriggerRun.clear(); eventSwitchOnRun.clear(); eventSwitchOffRun.clear(); eventFieldChangeRun.clear();
+    eventMouseEnterRun.clear(); eventMouseLeaveRun.clear(); 
+    eventPressRun.clear(); eventReleaseRun.clear(); eventTriggerRun.clear(); 
+    eventTriggerRightRun.clear(); 
+    eventSwitchOnRun.clear(); eventSwitchOffRun.clear(); eventFieldChangeRun.clear();
     has_been_cleared = true;
   }
   
@@ -205,7 +213,9 @@ public class nWidget {
   public boolean isHided() { return hide; }
   public boolean isOn() { return switchState; }
   
-  
+  public nWidget setAlwaysView(boolean b) { 
+	  always_view = b;
+	  return this; }
   
   public nWidget setHoverablePhantomSpace(float f) { if (hover != null) hover.phantom_space = f; return this; }
   
@@ -386,9 +396,9 @@ public class nWidget {
   public float getLocalSY() { return localrect.size.y; }
   
   public boolean isViewable() {
-	  return Rect.rectCollide(getRect(), gui.view) && 
-    		  !(fine_view && getSX()*gui.scale < 0.5 && getSY()*gui.scale < 0.5) && 
-    		  !(!fine_view && getSX()*gui.scale < 3 && getSY()*gui.scale < 3);
+	  return always_view || (Rect.rectCollide(getRect(), gui.view) && 
+    		  !(fine_view && getSX()*gui.scale < 1 && getSY()*gui.scale < 1 ) && 
+    		  !(!fine_view && getSX()*gui.scale < 5 && getSY()*gui.scale < 5));
   }
   
   public nWidget(Rapp a) {   //only for theme model saving !!
@@ -432,7 +442,9 @@ public class nWidget {
   private nWidget parent = null;
   private ArrayList<nWidget> childs = new ArrayList<nWidget>();
   public nLook look;
-  //private nPanelDrawer pan_drawer = null;
+  
+
+  
   private nDrawer ndrawer = null;
   
   private String label, infoText;
@@ -444,6 +456,7 @@ public class nWidget {
   private int cursorCycle = 80;
 
   private boolean fine_view = false;
+  private boolean always_view = false;
   
   private boolean switchState = false;
   public boolean isClicked = false;
@@ -479,6 +492,7 @@ boolean constantOutlineWeight = false;
   ArrayList<nRunnable> eventPressRun = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventReleaseRun = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventTriggerRun = new ArrayList<nRunnable>();
+  ArrayList<nRunnable> eventTriggerRightRun = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventSwitchOnRun = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventSwitchOffRun = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventFieldChangeRun = new ArrayList<nRunnable>();
@@ -599,7 +613,9 @@ boolean constantOutlineWeight = false;
   }
   
   void frame() {
-    if (hover != null && hover.mouseOver) {
+    if (hover != null && hover.mouseOver && 
+    		!(fine_view && getSX()*gui.scale < 2 && getSY()*gui.scale < 2) && 
+    		!(!fine_view && getSX()*gui.scale < 10 && getSY()*gui.scale < 10)) {
       if (!isHovered) nRunnable.runEvents(eventMouseEnterRun);
       if (showInfo) gui.info.showText(infoText);
       isHovered = true;
@@ -612,8 +628,10 @@ boolean constantOutlineWeight = false;
         if (isClicked) nRunnable.runEvents(eventReleaseRun); 
         isClicked = false;
       }
+      if (gui.in.getClick("MouseRight") && isHovered && !isClicked) 
+    	  		nRunnable.runEvents(eventTriggerRightRun); 
+      
       if (gui.in.getClick("MouseLeft") && isHovered && !isClicked) {
-        
         isClicked = true;
         if (triggerMode) nRunnable.runEvents(eventTriggerRun); 
         if (switchMode) { if (switchState) { setOff(); } else { setOn(); } }

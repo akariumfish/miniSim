@@ -16,12 +16,14 @@ class MSequance extends MBasic {
 		  MSequance build(Macro_Sheet s, sValueBloc b) { MSequance m = new MSequance(s, b); return m; }
 	  }
 
+	    boolean build_flag = false;
 	  ArrayList<sInt> ivals;
 	  ArrayList<Macro_Connexion> connects;
 	  sInt current_delay;	int counter = 0;
 	  Macro_Connexion current_out;
 	  int current_index;
 	  sInt row_nb; sBoo actif_val, show_actif, show_delay;
+	  nRunnable rst_run;
 	  MSequance(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "sequ", _bloc); }
 	  void init() {
 		  row_nb = newInt(3, "row_nb");
@@ -39,47 +41,68 @@ class MSequance extends MBasic {
 			  if (row_nb.get() > 2) row_nb.add(-1); rebuild(); }});
 		  addEmptyS(1); addEmptyS(2);
 		  addLinkedLSwitch(0, show_actif).setText("show_actif");
-		  show_actif.addEventChange(new nRunnable() { public void run() {
-			  if (!show_actif.get()) actif_val.set(true);
-			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	  			  if (!rebuilding) rebuild(); }});
-		  	} });
 		  addEmptyS(1); addEmptyS(2);
 		  addLinkedLSwitch(0, show_delay).setText("show_delay");
-		  show_delay.addEventChange(new nRunnable() { public void run() {
-//			  if (!show_delay.get()) actif_val.set(true);
-			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	  			  if (!rebuilding) rebuild(); }});
-		  	} });
+		  
+		  // build loop solution
+		  	nRunnable mode_run = new nRunnable() { public void run() {
+		  		if (!build_flag)
+		  			mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  				if (!rebuilding) rebuild(); }});
+		  		build_flag = true;
+		  	} };
+		  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+				  show_actif.addEventChange(mode_run);
+				  show_delay.addEventChange(mode_run);
+		  	}});
+		  	
+		  	
 		  build_normal();
 	  }
-	  
+	  void tryzeroatindex() {
+//		  while (current_delay.get() == 0) {
+//			  if (current_index >= row_nb.get()) {
+//				  rst_run.run();
+//			  } else if (current_index < row_nb.get()) { 
+//				  current_out.sendBang();
+//				  current_index++;
+//				  current_delay = ivals.get(current_index);
+//				  current_out = connects.get(current_index);
+//			  }
+//		  }
+	  }
 	  void build_normal() {
 		  if (show_actif.get()) {
 			  if (show_delay.get()) addEmptyS(2);
 			  addEmptyS(1).addLinkedModel("MC_Element_SButton", "ON").setLinkedValue(actif_val);
 		  	  addInputToValue(0, actif_val);
 		  }
-		  nRunnable tick_run = new nRunnable() { public void run() { 
-			  if (actif_val.get()) {
-				  counter++;
-				  if (counter >= current_delay.get()) {
-					  counter = 0;
-					  current_out.sendBang();
-					  current_index++;
-					  if (current_index >= row_nb.get()) current_index = 0;
-					  if (current_index < row_nb.get()) { 
-						  current_delay = ivals.get(current_index);
-						  current_out = connects.get(current_index);
-					  }
-				  }
-			  }
-		  }};
-		  nRunnable rst_run = new nRunnable() { public void run() { 
+		  rst_run = new nRunnable() { public void run() { 
 			  if (ivals.size() > 0) current_delay = ivals.get(0);
 			  current_index = 0;
 			  if (connects.size() > 0) current_out = connects.get(0);
 			  counter = 0;
+		  }};
+		  nRunnable tick_run = new nRunnable() { public void run() { 
+			  if (actif_val.get()) {
+				  if (current_delay.get() == 0) {
+					  tryzeroatindex();
+				  } else {
+					  counter++;
+					  if (counter >= current_delay.get()) {
+						  counter = 0;
+						  current_out.sendBang();
+						  current_index++;
+						  if (current_index >= row_nb.get()) {
+							  rst_run.run();
+						  } else if (current_index < row_nb.get()) { 
+							  current_delay = ivals.get(current_index);
+							  current_out = connects.get(current_index);
+							  tryzeroatindex();
+						  }
+					  }
+				  }
+			  }
 		  }};
 		  addInputBang(0, "tick", tick_run).hide_msg()
 		  	  .elem.addCtrlModel("MC_Element_SButton", "tick")

@@ -22,7 +22,7 @@ public class M_Sheet {}
 class MBasic extends Macro_Bloc { 
   Macro_Element elem_com;
   
-  sBoo param_view;
+  sBoo param_view, mirror_view;
   
   nLinkedWidget param_ctrl;
   nRunnable pview_run;
@@ -32,9 +32,14 @@ class MBasic extends Macro_Bloc {
     super(_sheet, t, t, _bloc); 
     
     param_view = newBoo("com_param_view", "com_param_view", false);
+	mirror_view = newBoo("mirror_view", "mirror_view", false);
     
     get_param_openner().setRunnable(new nRunnable() { public void run() { 
         param_view.set(!param_view.get());
+        rebuild();
+      } });
+    get_mirror().setRunnable(new nRunnable() { public void run() { 
+    		mirror_view.set(!mirror_view.get());
         rebuild();
       } });
     init();
@@ -44,6 +49,11 @@ class MBasic extends Macro_Bloc {
   void init() { ; }
   void build_param() { addEmptyS(0); addEmptyS(1); }
   void build_normal() { addEmptyS(0); addEmptyS(1); }
+  
+  void init_end() {
+	  super.init_end();
+//	  for (Macro_Element m : elements) m.mirror(mirror_view.get());
+  }
   
   void rebuild() {
     if (!rebuilding) {
@@ -369,13 +379,12 @@ class MCursor extends MBasic {
     public sVec pval = null;
     public sVec dval = null;
     public sBoo show = null;
-  nRunnable sheet_grab_run, pval_run;
+  nRunnable sheet_grab_run, pval_run, movingchild_run;
   Macro_Connexion in, out;
   MCursor(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "cursor", _bloc); }
   void init_cursor() {
 	  cursor = new nCursor(mmain(), value_bloc, true);
 	  mmain().cursors_list.add(cursor);
-//	  mmain().update_cursor_selector_list();
 	  sheet.sheet_cursors_list.add(cursor);
 	  sheet.cursor_count++;
 	  
@@ -386,28 +395,29 @@ class MCursor extends MBasic {
 	  }
 	  
 	  cursor.addEventClear(new nRunnable(cursor) { public void run() { 
+		  cursor = null;
 	      sheet.sheet_cursors_list.remove(((nCursor)builder));
 	    mmain().cursors_list.remove(((nCursor)builder)); 
 	    sheet.cursor_count--;
-//	    mmain().update_cursor_selector_list(); 
-	    }});
+	  }});
 	  
 	  grab_pos.addEventChange(new nRunnable() { public void run() {
-	      if (cursor.pval != null) cursor.pval.set(
+	      if (cursor != null && cursor.pval!= null) cursor.pval.set(
 	          grab_pos.get().x + sheet.grabber.getX(), 
 	          grab_pos.get().y + sheet.grabber.getY());
 	  } });
   	pval_run = new nRunnable() { public void run() {
-	if (sheet != mmain())
-	setPosition(cursor.pval.get().x - sheet.grabber.getX(), 
-          cursor.pval.get().y - sheet.grabber.getY());
-	else setPosition(cursor.pval.get().x, cursor.pval.get().y);
-	moving();
-	  
-	if (out != null) out.send(cursor.pval.asPacket());
+		if (sheet != mmain())
+			setPosition(cursor.pval.get().x - sheet.grabber.getX(), 
+	          cursor.pval.get().y - sheet.grabber.getY());
+		else setPosition(cursor.pval.get().x, cursor.pval.get().y);
+		moving();
+		  
+		if (out != null && cursor != null) out.send(cursor.pval.asPacket());
 	}};
 	cursor.pval.addEventChange(pval_run);
-	  
+	
+	movingchild_run = new nRunnable() { public void run() { moving(); } };
 	  
 	if (sheet != mmain()) {
 		sheet_grab_run = new nRunnable() { public void run() {
@@ -418,6 +428,11 @@ class MCursor extends MBasic {
 		} };
 		sheet.grab_pos.addEventAllChange(sheet_grab_run);
 	}
+  }
+
+  protected void group_move_custom(float x, float y) {
+//	  cursor.pval.set(cursor.pval.get().x + x, 
+//			  cursor.pval.get().y + y);
   }
   void build_param() {
 	  show = newRowBoo(false, "show"); //!!!!! is hided by default
@@ -433,11 +448,13 @@ class MCursor extends MBasic {
 	    addEmptyS(0);
 	    addSwitchS(1, "show", show);
   }
+  boolean flag_del = false;
   public MCursor clear() {
+	  flag_del = true;
+	if (sheet != mmain()) sheet.grab_pos.removeEventAllChange(sheet_grab_run);
+	if (pval != null) pval.removeEventChange(pval_run);
     super.clear(); 
-    cursor.clear();
-    if (pval != null) pval.removeEventChange(pval_run);
-    if (sheet != mmain()) sheet.grab_pos.removeEventChange(sheet_grab_run);
+    if (cursor != null) cursor.clear();
     return this; }
   public MCursor toLayerTop() {
     super.toLayerTop(); 

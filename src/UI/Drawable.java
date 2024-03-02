@@ -1,5 +1,6 @@
 package UI;
 
+import java.util.ArrayList;
 
 public class Drawable {
 	  Drawing_pile pile = null;
@@ -30,6 +31,30 @@ public class Drawable {
 	  public void toLayerBottom() { pile.drawables.remove(this); pile.drawables.add(this); }
 	  public Drawable setLayer(int l) {
 	    layer = l;
+	    return this;
+	  }
+	  public void do_drawing() {
+		  drawing();
+		  if (co_orderered_drawable == null)
+			  co_orderered_drawable = new ArrayList<Drawable>();
+		  for (Drawable w : co_orderered_drawable) 
+			  if (w != null) w.do_drawing();
+
+	  }
+	  ArrayList<Drawable> co_orderered_drawable;
+	  public Drawable add_coDrawer(Drawable w) {
+	    if (w != null) {
+	        if (co_orderered_drawable == null)
+	    			co_orderered_drawable = new ArrayList<Drawable>();
+	    		if (co_orderered_drawable.contains(w))
+	    			co_orderered_drawable.remove(w);
+	    		co_orderered_drawable.add(w);
+	    }
+	    return this;
+	  }
+	  public Drawable clear_coDrawer() {
+	    if (co_orderered_drawable != null) 
+	        	co_orderered_drawable.clear();
 	    return this;
 	  }
 	  public void drawing() {}

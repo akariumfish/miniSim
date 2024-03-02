@@ -13,7 +13,7 @@ class Drawing_pile {
 	      for (int i = drawables.size() - 1; i >= 0 ; i--) {
 	        Drawable r = drawables.get(i);
 	        if (r.layer == layer) {
-	          if (r.get_view()) r.drawing();
+	          if (r.get_view()) r.do_drawing();
 	          run_count++;
 	        }
 	      }

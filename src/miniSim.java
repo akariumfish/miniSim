@@ -8,46 +8,24 @@ public class miniSim {
 
 /* DONT HIT ENTER HERE FFS!!
 
-	VERSION .5 : 
 		BUG FIX
-big lag when selecting an heavy sheet (maybe only main?)
-sequance in param state rebuild continuously (var too?)
+big lag when selecting an heavy sheet caused by to LayerTop() recursive calls
 
 some connection lens still viewable when bloc reducted?
 
-sheet explorer list shown when switching taskpanel
-update sheet back when adding spot
+link blue color missing when co is used as spot, but work 
 
-sequance dont understand param 0 as delay
+sequance do inf loop > crash
 
-MCursor should update nCursor even when hided (sheet closed is mouved) 
+
+
+	VERSION .5 : 
 		IMPORTANT FIX
-stop linkbuilding by rightclick, not left, to move cam
 
-dont bloc zoom on cam widgets?
-
-make hovered link bigger
-
-save last deleted link, bloc
-	sRun to undo
-
-sBoo cam movable by mouse
-sRun to toggle breakpoint
-sBoo active link deletion
-move reduc from under P button in mpack
-
-hide reduc/prio when a little dezoomed
-change gate switch text in param mode
-cant delete / hover link and co on other sheet than selected
-
-bring back bin and not : 
-	a lot of old bloc can be brought back cause not all of them need to be seen in panel
-
-rightclick on grabber or any panel widget select/deselect macro 
-	add rightclick/unclick/press event to widget
-
-when tolayertoping a sheet do macro in prio order, when changing prio tolaytop parent sheet
-	apply this order to spots too
+better sheet spot :
+	when creating spot make all elem widget passif
+	in spot creation mode add a bp to create empty space
+	way to delete spot : add a bp next to each spot when in spot creation mode
 
 keep link and spot when switching blocs from param to normal
 	add a links and spots sStr to saved valuebloc (like for template)
@@ -55,15 +33,13 @@ keep link and spot when switching blocs from param to normal
 	optional row should always be last so elem dont change name
 	can add empty drawer to bloc panel to create space without elem to not influence elem indexing
 
-remove gaps in bloc panel and sheet front
-	should fix sheet spot spacing so connection align
+
 
 	VERSION .6 : 
 		IMPORTANT FIX
-better sheet spot :
-	when creating spot make all elem widget passif
-	in spot creation mode add a bp to create empty space
-	way to delete spot : add a bp next to each spot when in spot creation mode
+
+when tolayertoping a sheet do macro in prio order, when changing prio tolaytop parent sheet
+	apply this order to spots too
 
 connect type : IN OUT LINK differentiated by colors and shape
 		change in to circle and link standby color to blue
@@ -80,10 +56,6 @@ connect type : IN OUT LINK differentiated by colors and shape
 	link connection have a validated state activated by blocs when link is in use
 		change line color sigtly
 
-blocs elements can be mirrored via a bp
-	at widget level a set of parameters can apply mirroring
-		for each axis : bool to active and float as mirror axis
-	applyed when calling getx gety getsx getsy , consider parent mirroring
 		BLOCS MODIF TO DO
 MMain :
 	method in main to add sBoo or sRun to a shortcut tab in main menu
@@ -91,7 +63,7 @@ MMain :
 	method in main to auto create a sBoo or sRun linked to a widget in maintoolpan
 		auto add to shortcut menu
 	add bp in main toolpan for selectAll cut and duplicate selected
-		A select all bloc in current sheet 
+		A select/unselect all bloc in current sheet  (unselect if all are already selected)
 		D del W duplic X cut C copy V paste
 	merge save as / save to in main toolpan
 	add a field and a bp to build toolpan > new template, a switch > viewable or not
@@ -112,6 +84,14 @@ MPack : 		Rename in connect?
 		and move them to be aligned ?
 
 >>>>>> VERSION STABLE <<<<<<<
+
+
+
+
+
+
+
+
 
 	VERSION .7 : 
 Bloc Modif :
@@ -135,6 +115,7 @@ MComment : renaming in MText ?
 	as bp to insert input last packet getText() (small int select for input cible)
 MChan : as an input to set channel
 MGate option :
+	change gate switch text in param mode
 	as inverted output
 	at bang in state co let packet throug for next frame
 MVar and MValue :
@@ -237,6 +218,10 @@ Blocs List :
 	Other : Midi, Preset
 
 		DOABLE IDEE
+
+dont bloc zoom on cam widgets?
+
+save last deleted link, bloc : sRun to undo
 
 Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
 

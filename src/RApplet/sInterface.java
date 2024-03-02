@@ -441,7 +441,7 @@ public class sInterface {
   public nExplorer file_explorer, data_explorer;
   public nTaskPanel taskpanel;
   public float ref_size;
-  
+
   public sBoo show_taskpanel;
   
   
@@ -517,9 +517,14 @@ public class sInterface {
         if (!screen_gui.hoverable_pile.found) { cam.GRAB = true; runEvents(eventsHoverNotFound); } } } );
     
     auto_load = macro_main.newBoo(false, "auto_load", "autoload");
-    
+
+    breakpoint = macro_main.newRun("breakpoint", "breakpoint", 
+      new nRunnable() { public void run() { 
+    		app.logln("breakpoint"); 
+    	  	breakp = true; 
+    	} } );
     quicksave_run = macro_main.newRun("quicksave", "qsave", 
-      new nRunnable() { public void run() { full_data_save(); } } );
+    	      new nRunnable() { public void run() { full_data_save(); } } );
     quickload_run = macro_main.newRun("quickload", "qload", 
       new nRunnable() { public void run() { addEventNextFrame(new nRunnable() { 
       public void run() { setup_load(); } } ); } } );
@@ -538,7 +543,9 @@ public class sInterface {
     
     
   }
-  
+
+  public sRun breakpoint;
+  boolean  breakp = false;
   public sRun quicksave_run;
 public sRun quickload_run;
 public sRun filesm_run;
@@ -658,6 +665,7 @@ public sRun full_screen_run;
   boolean is_starting = true;
   public boolean show_info = true;
   void frame() {
+	  if (breakp) { app.breakpnt(); breakp = false; }
 	  
     input.frame_str(); // track mouse
     framerate.frame(); // calc last frame

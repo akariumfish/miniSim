@@ -33,12 +33,24 @@ connexion
 public class Macro_Connexion extends nBuilder implements Macro_Interf {
   Macro_Element getElement() { return elem; }
 
+  public Macro_Connexion buildLayer() { 
+	  buildLayerTo(msg_view.getDrawable()); 
+  return this; }
+  public Macro_Connexion buildLayerTo(Drawable d) { 
+	    d.add_coDrawer(msg_view.getDrawable()); 
+		msg_view.getDrawable().clear_coDrawer();
+	    msg_view.getDrawable().add_coDrawer(lens.getDrawable()); 
+	    msg_view.getDrawable().add_coDrawer(ref.getDrawable()); 
+	return this; }
+  
   public Macro_Connexion toLayerTop() { 
-    super.toLayerTop(); 
-    msg_view.toLayerTop(); 
-    lens.toLayerTop(); 
-    ref.toLayerTop();
-    return this;
+//	    if (!gui.app.DEBUG_NOTOLAYTOP) 
+//	    	super.toLayerTop(); 
+		    msg_view.toLayerTop(); 
+//		    lens.toLayerTop(); 
+//		    ref.toLayerTop(); 
+        
+	    return this;
   }
   //ArrayList<nWidget> elem_widgets = new ArrayList<nWidget>();
   protected nWidget customBuild(nWidget w) { 
@@ -46,6 +58,24 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     if ( (!is_sheet_co && sheet.openning.get() != DEPLOY) || 
     (is_sheet_co && (sheet.openning.get() != DEPLOY || elem.spot == null)) )w.hide();
     return w; 
+  }
+  
+  Macro_Connexion mirror(boolean b) { 
+	  	lens.setSize(ref_size*14/16, ref_size*14/16)
+		  .setPosition(-ref_size*5/16, -ref_size*5/16);
+	    ref.setSize(ref_size*4/16, ref_size*4/16)
+	      .setPosition(-ref_size*8/16, ref_size*7/16);
+	    if ((!b && type == OUTPUT) || (b && type == INPUT)) { 
+	      msg_view.stackLeft();
+	      elem.back.setTextAlignment(PConstants.LEFT, PConstants.CENTER);
+	      ref.alignRight().setPX(-ref.getLocalX()); 
+	    } 
+	    else {
+	      msg_view.stackRight();
+	      elem.back.setTextAlignment(PConstants.RIGHT, PConstants.CENTER);
+	      ref.alignLeft().setPX(ref.getLocalX()); 
+	    }
+      return this;
   }
   
   nWidget ref, lens, msg_view;
@@ -74,12 +104,15 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         
         if (buildingLine) {
           buildingLine = false; elem.bloc.mmain().buildingLine = false;
+          ref.setAlwaysView(buildingLine);
           for (Macro_Connexion i : sheet.child_connect) 
             i.lens.setLook(gui.theme.getLook("MC_Connect_Default")).setTrigger();  
+          ref.setAlwaysView(buildingLine);
         }
         else if (!elem.bloc.mmain().buildingLine && !buildingLine && sheet.mmain().selected_sheet == sheet) {
           if (type == OUTPUT) {
             buildingLine = true; elem.bloc.mmain().buildingLine = true;
+            ref.setAlwaysView(buildingLine);
             
             sheet.mmain().szone_clear_select();
             
@@ -97,6 +130,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           }
           else if (type == INPUT) {
             buildingLine = true; elem.bloc.mmain().buildingLine = true;
+            ref.setAlwaysView(buildingLine);
             
             sheet.mmain().szone_clear_select();
             
@@ -120,6 +154,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           newLine.y = elem.bloc.mmain().gui.mouseVector.y;
           if (elem.bloc.mmain().gui.in.getClick("MouseRight")) { 
             buildingLine = false; elem.bloc.mmain().buildingLine = false;
+            ref.setAlwaysView(buildingLine);
             for (Macro_Connexion i : sheet.child_connect) 
               i.lens.setLook(gui.theme.getLook("MC_Connect_Default")).setTrigger(); 
           }
@@ -129,6 +164,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
               if (type != m.type && m.lens.isHovered()) {
                 connect_to(m);
                 buildingLine = false; 
+                ref.setAlwaysView(buildingLine);
                 elem.bloc.mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
                   elem.bloc.mmain().buildingLine = false; }});
                 for (Macro_Connexion i : sheet.child_connect) 
@@ -136,20 +172,22 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
                 found = true;
               }
             }
-            if (!found && !lens.isHovered()) {
-              buildingLine = false; elem.bloc.mmain().buildingLine = false;
-              for (Macro_Connexion i : sheet.child_connect) 
-                i.lens.setLook(gui.theme.getLook("MC_Connect_Default")).setTrigger();  
-            }
+//            if (!found && !lens.isHovered()) {
+//              buildingLine = false; elem.bloc.mmain().buildingLine = false;
+//              for (Macro_Connexion i : sheet.child_connect) 
+//                i.lens.setLook(gui.theme.getLook("MC_Connect_Default")).setTrigger();  
+//            }
           }
         }
-        if (!buildingLine && elem.bloc.mmain().gui.in.getClick("MouseRight")) for (Macro_Connexion m : connected_inputs) {
-          if (RConst.distancePointToLine(gui.mouseVector.x, gui.mouseVector.y, 
+        if (!buildingLine && elem.bloc.mmain().gui.in.getClick("MouseRight")) 
+        	for (Macro_Connexion m : connected_inputs) {
+          if ( (sheet.mmain().selected_sheet == m.sheet || 
+  				  sheet.mmain().selected_sheet == sheet) && RConst.distancePointToLine(gui.mouseVector.x, gui.mouseVector.y, 
               getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) 
               < 
               3 * ref.look.outlineWeight / gui.scale
-              && (sheet.mmain().show_link.get() || 
-              	 ((lens.isHovered || m.lens.isHovered) && sheet.mmain().show_link_volat.get()) ) ) {
+              && sheet.mmain().link_volatil.get() && (sheet.mmain().show_link.get() || 
+              	 (lens.isHovered || m.lens.isHovered) ) ) {
                 
                 
                 
@@ -203,21 +241,24 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
         if (gui.scale > 0.03) 
         	for (Macro_Connexion m : connected_inputs) {
         if (m.isDraw() && (sheet.mmain().show_link.get() || 
-        		((lens.isHovered || m.lens.isHovered) && sheet.mmain().show_link_volat.get()) || 
+        		((lens.isHovered || m.lens.isHovered) && sheet.mmain().link_volatil.get()) || 
         		elem.bloc.szone_selected || m.elem.bloc.szone_selected 
 //        		||
 //        		(elem.spot != null && elem.bloc.sheet.openning.get() == OPEN) ||
 //        		(m.elem.spot != null && m.elem.bloc.sheet.openning.get() == OPEN)
         		) ) {
-        	  
-		  app.strokeWeight(ref.look.outlineWeight);
+
+  		  boolean is_hovered = (sheet.mmain().selected_sheet == m.sheet || 
+  				  sheet.mmain().selected_sheet == sheet) && 
+  				  RConst.distancePointToLine(elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
+  	              getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
+  	              3 * ref.look.outlineWeight / gui.scale;
+  		  if (is_hovered) app.strokeWeight(ref.look.outlineWeight*2.5F);
+  		  else app.strokeWeight(ref.look.outlineWeight);
 		  PVector l = new PVector(m.getCenter().x - getCenter().x, m.getCenter().y - getCenter().y);
 		  PVector lm = new PVector(l.x, l.y);
 		  lm.setMag(getSize()/2);
-		  
-          if (RConst.distancePointToLine(elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
-	              getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y) < 
-	              3 * ref.look.outlineWeight / gui.scale) { 
+          if (is_hovered) { 
 	        	  if (pack_info != null && (hasSend > 0 || hasReceived > 0)) 
 	        		  elem.bloc.mmain().info.showText(pack_info);
 	        	  app.fill(ref.look.outlineSelectedColor); 
@@ -263,7 +304,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     };
     ref = addModel("MC_Connect_Link")
       .setSize(ref_size*4/16, ref_size*4/16)
-      .setPosition(-ref_size*6/16, ref_size*6/16)
+      .setPosition(-ref_size*8/16, ref_size*7/16)
       .setDrawable(ref_draw)
       .setFineView(true);
     if (_info != null) lens.setInfo(_info);
@@ -271,6 +312,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     ref.setParent(elem.back);
     msg_view = addModel("MC_Connect_View").clearParent();
     msg_view.setParent(ref);
+
     if (type == OUTPUT) { 
       msg_view.stackLeft();
       elem.back.setTextAlignment(PConstants.LEFT, PConstants.CENTER);
@@ -282,6 +324,10 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     }
     lens.setParent(ref);
     sheet.child_connect.add(this);
+    
+    buildLayer();
+    
+    
   }
 
   Macro_Connexion hide_msg() { 

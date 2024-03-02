@@ -63,6 +63,23 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	    addLinkedModel("MC_Element_MiniButton", sw_txt).setLinkedValue(vb);
 	    return cw;
 	  }
+	  
+	  
+	  int shelf_ind = 0, row_ind = 0;
+
+	  Macro_Element mirror(boolean b) { 
+		  if (connect != null) connect.mirror(b);
+		  if (sheet_connect != null) sheet_connect.mirror(b);
+		  if (b && shelf_ind == 0) { 
+			  back.setPX(ref_size*2.25);
+		  } else if (b && shelf_ind +1 == bloc.shelfs.size()) {
+			  back.setPX(-ref_size*2.25);
+		  } else {
+			  back.setPX(0);
+		  }
+	      return this;
+	  }
+	  
 	
 	  Macro_Bloc getBloc() { return bloc; }
 	  
@@ -73,7 +90,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	  String descr;
 	  sObj val_self;
 	  Macro_Element(Macro_Bloc _bloc, String _ref, String _model, String _info, int co_side, int sco_side, boolean sheet_view) {
-	    super(_bloc.getShelf(), _bloc.ref_size*1.375F, _bloc.ref_size);
+	    super(_bloc.getShelf(), _bloc.ref_size*2.25F, _bloc.ref_size*1.125F);
 	    bloc = _bloc; sheet_viewable = sheet_view; was_viewable = sheet_view; 
 	    back = addModel(_model).setText(_ref).setPassif(); 
 	    
@@ -128,7 +145,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 		    if (bloc.sheet.openning.get() == DEPLOY && 
 			    		bloc.openning.get() == OPEN) {
 			    back.clearParent(); back.setParent(ref); 
-			    back.setPX(-ref_size*0.5);
+//			    back.setPX(-ref_size*0.5);
 		    		back.show();
 		    		for (nWidget w : elem_widgets) w.show();
 		    		if (spot != null) spot.show();
@@ -136,7 +153,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 		    		else back.toLayerTop(); 
 		    } else if (bloc.sheet.openning.get() == OPEN && spot != null) {
 			    back.clearParent(); back.setParent(spot);
-			    back.setPX(0);
+//			    back.setPX(0);
 
 		    		back.show();
 		    		for (nWidget w : elem_widgets) w.show();
@@ -152,7 +169,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	      if (spot != null) spot.hide();
 	    } 
 	    toLayerTop();
-	    
+//	    
 	    if (sheet_connect != null) { sheet_connect.upview(); sheet_connect.toLayerTop(); }
 	    if (connect != null)  { connect.upview(); connect.toLayerTop(); }
 	    
@@ -176,7 +193,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 		    if (bloc.sheet.openning.get() == DEPLOY && 
 			    		bloc.openning.get() == OPEN) {
 			    back.clearParent(); back.setParent(ref); 
-			    back.setPX(-ref_size*0.5);
+//			    back.setPX(-ref_size*0.5);
 		    		back.show();
 		    		for (nWidget w : elem_widgets) w.show();
 		    		if (spot != null) spot.show();
@@ -184,7 +201,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 		    		else back.toLayerTop(); 
 		    } else if (bloc.sheet.openning.get() == OPEN && spot != null) {
 			    back.clearParent(); back.setParent(spot);
-			    back.setPX(0);
+//			    back.setPX(0);
 
 		    		back.show();
 		    		for (nWidget w : elem_widgets) w.show();
@@ -206,17 +223,38 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	    
 	    return this;
 	  }
-	  
+
+//	  public Macro_Element buildLayer() { 
+//		  back.getDrawable().clear_coDrawer();
+//		  buildLayerTo(back.getDrawable()); 
+//	  return this; }
+//	  public Macro_Element buildLayerTo(Drawable d) { 
+//
+//		  for (nWidget w : elem_widgets) 
+//			  if (w != null && w != back && back != null) 
+//  			d.add_coDrawer(w.getDrawable()); 
+//	    if (sheet_connect != null) sheet_connect.buildLayerTo(d); 
+//	    if (connect != null) connect.buildLayerTo(d); 
+//		return this; }
 	  public Macro_Element toLayerTop() { 
-	    super.toLayerTop(); 
-	    for (nWidget w : elem_widgets) w.toLayerTop();
-	    if (sheet_connect != null) sheet_connect.toLayerTop(); 
-	    if (connect != null) connect.toLayerTop(); 
+	    if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
+	    		for (nWidget w : elem_widgets) w.toLayerTop();
+//	    		back.toLayerTop();  // better
+	    	    if (sheet_connect != null) sheet_connect.toLayerTop(); 
+	    	    if (connect != null) connect.toLayerTop(); 
+	    return this;
+	  }
+	  public Macro_Element widget_toLayTop() { 
+	    		for (nWidget w : elem_widgets) if (w != back) w.toLayerTop();
+	    	    if (sheet_connect != null) sheet_connect.toLayerTop(); 
+	    	    if (connect != null) connect.toLayerTop(); 
 	    return this;
 	  }
 	  ArrayList<nWidget> elem_widgets = new ArrayList<nWidget>();
 	  protected nWidget customBuild(nWidget w) { 
-	    if (elem_widgets != null) elem_widgets.add(w); 
+	    if (elem_widgets != null) { 
+	    		elem_widgets.add(w); 
+	    }
 	    if (bloc != null && bloc.sheet.openning.get() != DEPLOY) w.hide();
 	    if (w != back) w.setParent(back);
 	    return w.setDrawer(this); 

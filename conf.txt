@@ -25,6 +25,6 @@ str
 shr
 prev_savepth
 val
-empty.sdata
+spirale_base.sdata
 0
 0
