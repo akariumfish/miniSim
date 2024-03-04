@@ -42,7 +42,9 @@ cant be grabbed when open
 public class Macro_Sheet extends Macro_Abstract {
 	
 	class MSheet_Builder extends MAbstract_Builder {
-		MSheet_Builder() { super("sheet", "Sheet", "can contain blocs and organise them", "Sheet"); }
+		MSheet_Builder(Macro_Main m) { 
+			super("sheet", "Sheet", "can contain blocs and organise them", "Sheet");
+			first_start_show(m); }
 		Macro_Sheet build(Macro_Sheet s, sValueBloc b) { return new Macro_Sheet(s, type, b); }
 	}
 
@@ -151,7 +153,11 @@ public class Macro_Sheet extends Macro_Abstract {
       title_fixe = true; 
       grabber.show(); panel.show(); back.hide(); back_front.hide();
       front.show(); title.show(); reduc.show(); deployer.show();
-      reduc.setPosition(-ref_size, ref_size*0.375);
+      reduc.setPosition(-ref_size, ref_size*0.375)
+	    .setSize(ref_size*0.4, ref_size*0.75);;
+
+//      reduc.setPosition(-ref_size * 0.75, ref_size*0.5)
+//	    .setSize(ref_size*0.4, ref_size*0.75);
       grabber.setLook(gui.theme.getLook("MC_Grabber"));
       cancel_new_spot();
       left_spot_add.show(); right_spot_add.show();
@@ -168,8 +174,11 @@ public class Macro_Sheet extends Macro_Abstract {
       openning.set(REDUC);
       title_fixe = false; 
       grabber.show(); panel.hide(); back.hide(); back_front.hide();
-      front.hide(); title.hide(); reduc.show(); deployer.hide();
-      reduc.setPosition(ref_size * 0.75, ref_size*0.75);
+      front.hide(); 
+      title.hide(); 
+      reduc.show(); deployer.hide();
+      reduc.show().setPosition(ref_size * 0.5, ref_size*0.5)
+	    .setSize(ref_size*0.4, ref_size*0.5);
       grabber.setLook(gui.theme.getLook("MC_Grabber"));
       cancel_new_spot();
       left_spot_add.hide(); right_spot_add.hide();
@@ -223,30 +232,22 @@ public class Macro_Sheet extends Macro_Abstract {
 //  return this; }
 //  
   public Macro_Sheet toLayerTop() { 
-	//if (!gui.app.DEBUG_NOTOLAYTOP) 
-	
-	super.toLayerTop(); 
-
-    
-      if (child_macro != null) 
-    	  	for (Macro_Abstract e : child_macro) {
-    	  		e.toLayerTop(); 
-    	  	}
-
-    panel.toLayerTop(); 
-//    reduc.toLayerTop(); 
-    prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
-    grabber.toLayerTop(); deployer.toLayerTop(); title.toLayerTop(); 
-    
-    front.toLayerTop();
-    
-    
-    back_front.toLayerTop(); 
-    
-    reduc.toLayerTop(); 
-
-    
-    return this;
+	  //if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
+	  for (nWidget w : spot_empty_widget) w.toLayerTop(); 
+	  if (child_macro != null) {
+		  int max_l = 0;
+		  for (Macro_Abstract e : child_macro) 
+			  if (e.priority.get() > max_l) max_l = e.priority.get();
+		  for (int i = 0 ; i <= max_l ; i++)
+			  for (Macro_Abstract e : child_macro) 
+				  if (e.priority.get() == i) e.toLayerTop(); 
+      }
+      panel.toLayerTop(); 
+      front.toLayerTop(); back_front.toLayerTop(); 
+      prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
+      title.toLayerTop(); grabber.toLayerTop(); deployer.toLayerTop(); 
+      reduc.toLayerTop(); 
+      return this;
   }
   
   void add_link(String in, String out) {
@@ -305,78 +306,176 @@ public class Macro_Sheet extends Macro_Abstract {
   //call by add_spot widget
   void new_spot(String side) {
 	  if (!building_spot) {
-    left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
-    right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
-//    if (!side.equals("left")) left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
-//    else right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
-    for (Macro_Element m : child_elements) if (m.sheet_viewable) {
-      m.back.setTrigger().setLook("MC_Element_For_Spot"); /*event in init de l'element*/ }
-    building_spot = true;
-    new_spot_side = side;
-    mmain().inter.addEventFrame(new_spot_run);
+		  if (side.equals("left")) {
+			  left_spot_add.setText("Empty"); 
+			  right_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
+		  }
+		  if (side.equals("right")) {
+			  right_spot_add.setText("Empty");
+			  left_spot_add.setBackground().setLook("MC_Add_Spot_Passif");
+		  }
+		  for (Macro_Element m : child_elements) {
+			  if (m.sheet_viewable) {
+				  m.back.setTrigger().setLook("MC_Element_For_Spot"); /*event in init de l'element*/ 
+				  for (nWidget w : m.elem_widgets) if (w != m.back) w.tempPassif(true);
+			  } 
+			  if (m.spot != null) {
+				  m.spot.setTrigger(); /*event in init de l'element*/
+			  }
+		  }
+		  for (nWidget w : spot_empty_widget) w.setTrigger();
+		  building_spot = true;
+		  new_spot_side = side;
+		  mmain().inter.addEventFrame(new_spot_run);
 	  } else {
-		  
+		  add_spot(side, null);
 	  }
   }
-  ArrayList<nWidget> spot_text_widget = new ArrayList<nWidget>();
-  
+  ArrayList<nWidget> spot_empty_widget = new ArrayList<nWidget>();
+  int spot_empty_nb = 0;
   void selecting_element(Macro_Element elem) { // called by eventTrigger of elem.back
-    add_spot(new_spot_side, elem);
-    cancel_new_spot();
+	  if (elem.spot == null) {
+		  add_spot(new_spot_side, elem);
+		  cancel_new_spot();
+	  } else {
+		   remove_spot(elem.descr);
+	  }
   }
   void cancel_new_spot() {
-    
+	for (nWidget w : spot_empty_widget) w.setBackground();
     for (Macro_Element m : child_elements) if (m.sheet_viewable) {
-      m.back.setBackground().setLook("MC_Element"); }
-    
+      m.back.setBackground().setLook("MC_Element"); 
+	  if (m.spot != null) m.spot.setBackground(); 
+    }
     mmain().inter.removeEventFrame(new_spot_run);
     if (openning.get() == DEPLOY && mmain().selected_sheet == this) {
-      left_spot_add.setTrigger().setLook("MC_Add_Spot_Actif"); 
-      right_spot_add.setTrigger().setLook("MC_Add_Spot_Actif"); }
+      left_spot_add.setTrigger().setLook("MC_Add_Spot_Actif").setText("+"); 
+      right_spot_add.setTrigger().setLook("MC_Add_Spot_Actif").setText("+"); }
     else {
-      left_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); 
-      right_spot_add.setBackground().setLook("MC_Add_Spot_Passif"); }
-    
+      left_spot_add.setBackground().setLook("MC_Add_Spot_Passif").setText(""); 
+      right_spot_add.setBackground().setLook("MC_Add_Spot_Passif").setText(""); }
+    for (Macro_Element m : child_elements) {
+    		for (nWidget w : m.elem_widgets) w.tempPassif(false);
+    }
     building_spot = false; new_spot_side = "";
   }
-  
+
   void add_spot(String side, Macro_Element elem) {
-    gui.app.mlogln(value_bloc.ref+ " add_spot "+side+" "+elem.descr);
-    if (elem.spot == null) {
-      String[] spots_side_list = PApplet.splitTokens(spots.get(), GROUP_TOKEN);
-      String left_s = OBJ_TOKEN, right_s = OBJ_TOKEN;
-      if (spots_side_list.length == 2) { 
-        left_s = RConst.copy(spots_side_list[0]); right_s = RConst.copy(spots_side_list[1]); }
-      
-      nWidget spot = null;
-      if (side.equals("left")) {
-        left_s += elem.descr + OBJ_TOKEN;
-        getShelf(0).removeDrawer(left_spot_drawer);
-        nDrawer d = getShelf(0).addDrawer(2.25, 1.125);
-        spot = d.addModel("MC_Panel_Spot_Back");
-        getShelf(0).insertDrawer(left_spot_drawer);
-      } else if (side.equals("right")) {
-        right_s += elem.descr + OBJ_TOKEN;
-        
-        getShelf(1).removeDrawer(right_spot_drawer);
-        nDrawer d = getShelf(1).addDrawer(2.25, 1.125);
-        spot = d.addModel("MC_Panel_Spot_Back");
-        getShelf(1).insertDrawer(right_spot_drawer);
-      }
-      
-      elem.set_spot(spot,side);
-      String new_str = "";
-      new_str += left_s+GROUP_TOKEN+right_s;
-      spots.set(new_str);
-      if (spot != null) {
-        if (openning.get() != REDUC && openning.get() != HIDE) spot.show();
-        else spot.hide();
-      }
-      
-      moving();
-      
-    }
-    gui.app.mlogln(value_bloc.ref+ " add_spot end ");
+	  if (elem == null) {
+		  gui.app.mlogln(value_bloc.ref+ " add_empty_spot "+side);
+		  String[] spots_side_list = PApplet.splitTokens(spots.get(), GROUP_TOKEN);
+	      String left_s = OBJ_TOKEN, right_s = OBJ_TOKEN;
+	      if (spots_side_list.length == 2) { 
+	        left_s = RConst.copy(spots_side_list[0]); right_s = RConst.copy(spots_side_list[1]); }
+
+		  nWidget spot = null;
+		  String ttl = BLOC_TOKEN + "empty" + BLOC_TOKEN + 
+				  spot_empty_nb + OBJ_TOKEN;
+	      if (side.equals("left")) {
+	        left_s += ttl;
+	        getShelf(0).removeDrawer(left_spot_drawer);
+	        nDrawer d = getShelf(0).addDrawer(2.25, 1.125);
+	        spot = d.addModel("MC_Panel_Spot_Back")
+//	        		.setTextVisibility(false)
+	        		.setText(ttl)
+	        		.setTrigger();
+	    	    spot.addEventTrigger(new nRunnable(spot) {public void run() {
+	        			remove_empty_spot("left", (nWidget)builder); }});
+	        getShelf(0).insertDrawer(left_spot_drawer);
+	      } else if (side.equals("right")) {
+	        right_s += ttl;
+	        getShelf(1).removeDrawer(right_spot_drawer);
+	        nDrawer d = getShelf(1).addDrawer(2.25, 1.125);
+	        spot = d.addModel("MC_Panel_Spot_Back")
+//	        		.setTextVisibility(false)
+	        		.setText(ttl)
+	        		.setTrigger();
+	        spot.addEventTrigger(new nRunnable(spot) {public void run() {
+	        			remove_empty_spot("right", (nWidget)builder); }});
+	        getShelf(1).insertDrawer(right_spot_drawer);
+	      }
+
+	      String new_str = "";
+	      new_str += left_s+GROUP_TOKEN+right_s;
+	      spots.set(new_str);
+	      if (spot != null) {
+	    	  	spot_empty_widget.add(spot);
+	    	  	spot_empty_nb++;
+	        if (openning.get() != REDUC && openning.get() != HIDE) spot.show();
+	        else spot.hide();
+	      }
+
+	      moving();
+	      toLayerTop();
+	  } else {
+	    gui.app.mlogln(value_bloc.ref+ " add_spot "+side+" "+elem.descr);
+	    if (elem.spot == null && sheet != this) {
+	      String[] spots_side_list = PApplet.splitTokens(spots.get(), GROUP_TOKEN);
+	      String left_s = OBJ_TOKEN, right_s = OBJ_TOKEN;
+	      if (spots_side_list.length == 2) { 
+	        left_s = RConst.copy(spots_side_list[0]); right_s = RConst.copy(spots_side_list[1]); }
+	      
+	      nWidget spot = null;
+	      if (side.equals("left")) {
+	        left_s += elem.descr + OBJ_TOKEN;
+	        getShelf(0).removeDrawer(left_spot_drawer);
+	        nDrawer d = getShelf(0).addDrawer(2.25, 1.125);
+	        spot = d.addModel("MC_Panel_Spot_Back");
+	        getShelf(0).insertDrawer(left_spot_drawer);
+	      } else if (side.equals("right")) {
+	        right_s += elem.descr + OBJ_TOKEN;
+	        getShelf(1).removeDrawer(right_spot_drawer);
+	        nDrawer d = getShelf(1).addDrawer(2.25, 1.125);
+	        spot = d.addModel("MC_Panel_Spot_Back");
+	        getShelf(1).insertDrawer(right_spot_drawer);
+	      }
+	      
+	      elem.set_spot(spot,side);
+	      String new_str = "";
+	      new_str += left_s+GROUP_TOKEN+right_s;
+	      spots.set(new_str);
+	      if (spot != null) {
+	        if (openning.get() != REDUC && openning.get() != HIDE) spot.show();
+	        else spot.hide();
+	        spot.setTrigger();
+	      }
+	      
+	      moving();
+	      toLayerTop();
+	    }
+	  }
+      gui.app.mlogln(value_bloc.ref+ " add_spot end ");  
+  }
+  void remove_empty_spot(String side, nWidget spot) {
+    gui.app.logln(value_bloc.ref+ " remove_empty_spot "+side);
+    
+//	    spot_empty_widget.remove(spot);
+    
+//	    nShelf sh = null;
+//	    if (side.equals("left")) sh = getShelf(0);
+//	    if (side.equals("right")) sh = getShelf(1);
+//	    if (sh != null) sh.removeDrawer(spot.getDrawer()); 
+//	    spot.getDrawer().clear();
+//	    spot.clear();
+    
+    
+    String[] spots_side_list = PApplet.splitTokens(spots.get(), GROUP_TOKEN);
+    String left_s = OBJ_TOKEN, right_s = OBJ_TOKEN;
+    if (spots_side_list.length == 2) { 
+      left_s = RConst.copy(spots_side_list[0]); right_s = RConst.copy(spots_side_list[1]); }
+
+    String[] list = PApplet.splitTokens(left_s, OBJ_TOKEN);
+    left_s = OBJ_TOKEN;
+    for (String s : list) if (!s.equals(spot.getText())) left_s += s + OBJ_TOKEN;
+    list = PApplet.splitTokens(right_s, OBJ_TOKEN);
+    right_s = OBJ_TOKEN;
+    for (String s : list) if (!s.equals(spot.getText())) right_s += s + OBJ_TOKEN;
+    
+    String new_str =  left_s+GROUP_TOKEN+right_s;
+    spots.set(new_str);
+    
+    redo_spot();
+    gui.app.mlogln(value_bloc.ref+ " remove_spot end ");
   }
   void remove_spot(String ref) {
     gui.app.mlogln(value_bloc.ref+ " remove_spot "+ref);
@@ -435,14 +534,18 @@ public class Macro_Sheet extends Macro_Abstract {
     for (String elem_ref : list) {
       Macro_Element e = null;
       for (Macro_Element t : child_elements) if (t.descr.equals(elem_ref)) { e = t; break; }
-      if (e != null) add_spot("left", e);
+//      String[] l = PApplet.splitTokens(elem_ref, OBJ_TOKEN);
+      if (e != null || elem_ref.equals(BLOC_TOKEN + "empty" + BLOC_TOKEN + "empty")) 
+    	  	add_spot("left", e);
+      
     }
     
     list = PApplet.splitTokens(right_s, OBJ_TOKEN);
     for (String elem_ref : list) {
       Macro_Element e = null;
       for (Macro_Element t : child_elements) if (t.descr.equals(elem_ref)) { e = t; break; }
-      if (e != null) add_spot("right", e);
+      if (e != null || elem_ref.equals(BLOC_TOKEN + "empty" + BLOC_TOKEN + "empty")) 
+    	  	add_spot("right", e);
     }
     gui.app.mlogln(value_bloc.ref+ " redo_spot end ");
   }
@@ -554,6 +657,7 @@ public class Macro_Sheet extends Macro_Abstract {
   
   sStr links;
   sStr spots;
+  sInt val_max_bloc;
   nWidget right_spot_add, left_spot_add;
   boolean building_spot = false;
   String new_spot_side = "";
@@ -596,6 +700,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     spots = setting_bloc.newStr("spots", "spots", OBJ_TOKEN+GROUP_TOKEN+OBJ_TOKEN);
     val_sheet = setting_bloc.newObj("sheet_obj", "sheet_obj");
     val_sheet.set(this);
+    val_max_bloc = setting_bloc.newInt(50, "val_max_bloc", "val_max_bloc");
     addShelf(); addShelf();
     left_spot_add = addModel("mc_ref");
     right_spot_add = addModel("mc_ref");
@@ -620,6 +725,9 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     val_sheet = ((sObj)(setting_bloc.getValue("sheet_obj"))); 
     if (val_sheet == null) val_sheet = setting_bloc.newObj("sheet_obj", "sheet_obj");
     val_sheet.set(this);
+
+    val_max_bloc = ((sInt)(setting_bloc.getValue("val_max_bloc"))); 
+    if (val_max_bloc == null) val_max_bloc = setting_bloc.newInt(50, "val_max_bloc", "val_max_bloc");
     
     back_front = addModel("MC_Front_Sheet")
       .clearParent().setPassif();
@@ -667,14 +775,16 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
 	  if (!loading_from_bloc) { 
 		deploy();
+		if (!specialize.get().equals("sheet"))
 		mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { 
-			MSheetMain m = new MSheetMain(((Macro_Sheet)builder), null);
+			MSheetBloc m = new MSheetBloc(((Macro_Sheet)builder), null);
 			m.init_end();
 			m.grabber.setPosition(ref_size*8, 0);
 			updateBack();
 		}});
 		sheet.select();
 		find_place(back);
+		if (sheetCursor != null) sheetCursor.pval.set(grabber.getLocalX(), grabber.getLocalY());
 		select();
 	  }
       if (!mmain().show_macro.get()) hide();
@@ -689,11 +799,11 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     empty();
     if (!unclearable) {
       super.clear();
-      
-      
+	  for (nWidget w : spot_empty_widget) w.clear(); 
+	  spot_empty_widget.clear();
       if (sheetCursor != null) sheetCursor.clear();
-		if (sheetCursor_pval != null) sheetCursor_pval.removeEventChange(pval_run);
-		if (sheet != mmain()) sheet.grab_pos.removeEventChange(sheet_grab_run);
+	  if (sheetCursor_pval != null) sheetCursor_pval.removeEventChange(pval_run);
+	  if (sheet != mmain()) sheet.grab_pos.removeEventChange(sheet_grab_run);
       sheet.child_sheet.remove(this);
       value_bloc.clear();
       if (mmain() != this) mmain().szone.removeEventStartSelect(szone_run);
@@ -817,7 +927,8 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 	    addEventsBuildMenu(new nRunnable(c) { public void run() { 
 	      if (custom_tab != null) custom_tab.getShelf()
 	        .addDrawer(10, 1)
-	        .addLinkedModel("Auto_Button-S2-P3", "show").setLinkedValue(((nCursor)builder).show).getDrawer()
+	        .addLinkedModel("Auto_Button-S2-P3", "show")
+	        		.setLinkedValue(((nCursor)builder).show).getDrawer()
 	        .addModel("Label_Small_Text-S1-P1", "Cursor: " + ((nCursor)builder).ref)
 	          .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
 	        .getShelf()
@@ -1174,12 +1285,16 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
             elem_descr_l[0] = changepart[1];
           }
         }
+        if (elem_descr_l[0].equals("empty"))
+        		spot_empty_nb = Math.max(PApplet.parseInt(elem_descr_l[1]), spot_empty_nb);
         String new_elem = BLOC_TOKEN+elem_descr_l[0]+BLOC_TOKEN+elem_descr_l[1];
         gui.app.mlogln("renamed "+new_elem);
         Macro_Element e = null;
         for (Macro_Element t : child_elements) if (t.descr.equals(new_elem)) { e = t; break; }
-        if (e != null && side == 0) add_spot("left", e);
-        if (e != null && side == 1) add_spot("right", e);
+        if (e != null) {
+	        if (side == 0) add_spot("left", e);
+	        if (side == 1) add_spot("right", e);
+        }
       }
       
       side++;
@@ -1360,7 +1475,11 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     return null; 
   }
   
-  Macro_Abstract addByType(String t) { return addByType(t, null); }
+  Macro_Abstract addByType(String t) { 
+	  cancel_new_spot();
+	  if (child_macro.size() < val_max_bloc.get()) return addByType(t, null); 
+	  return null;
+  }
   Macro_Abstract addByType(String t, sValueBloc b) { 
 	  Macro_Abstract nm = null;
     for (MAbstract_Builder m : mmain().bloc_builders)

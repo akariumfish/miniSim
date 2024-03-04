@@ -9,7 +9,6 @@ public class miniSim {
 /* DONT HIT ENTER HERE FFS!!
 
 		BUG FIX
-big lag when selecting an heavy sheet caused by to LayerTop() recursive calls
 
 some connection lens still viewable when bloc reducted?
 
@@ -23,27 +22,14 @@ sequance do inf loop > crash
 		IMPORTANT FIX
 
 better sheet spot :
-	when creating spot make all elem widget passif
 	in spot creation mode add a bp to create empty space
-	way to delete spot : add a bp next to each spot when in spot creation mode
-
-keep link and spot when switching blocs from param to normal
-	add a links and spots sStr to saved valuebloc (like for template)
-	with destroyed bloc links listed
-	optional row should always be last so elem dont change name
-	can add empty drawer to bloc panel to create space without elem to not influence elem indexing
-
+		is saved?
+		cant be deleted
 
 
 	VERSION .6 : 
-		IMPORTANT FIX
-
-when tolayertoping a sheet do macro in prio order, when changing prio tolaytop parent sheet
-	apply this order to spots too
-
-connect type : IN OUT LINK differentiated by colors and shape
-		change in to circle and link standby color to blue
-	only in to out and link to link permitted
+connect :
+	run link throug pack and gate :
 	bloc as a method to add a link co with param : in/out, run at link/unlink, name
 		when co made get connected block, 
 		if pack go throug, if gate go throug if active, in both :
@@ -60,6 +46,7 @@ connect type : IN OUT LINK differentiated by colors and shape
 MMain :
 	method in main to add sBoo or sRun to a shortcut tab in main menu
 		select in list, enter key, press bp > set shortcut
+		Ctrl+key shortcut possible
 	method in main to auto create a sBoo or sRun linked to a widget in maintoolpan
 		auto add to shortcut menu
 	add bp in main toolpan for selectAll cut and duplicate selected
@@ -217,54 +204,43 @@ Blocs List :
 	
 	Other : Midi, Preset
 
-		DOABLE IDEE
 
-dont bloc zoom on cam widgets?
-
-save last deleted link, bloc : sRun to undo
-
-Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
-
-cursors can be selected by rightclick-drag and moved with blocs
-
-dont put a sheetmain bloc by def in sheet
-
-hide numbering from titles 
-
-MEnveloppe : 
-	series of row with a tick length, an end value, and a courbure
-	tick to crawl it
-
-counted tick generator
-
-switch to show/hide mouse coord and fps
-
+		IDEE
+	--utils :
 build a widget parent relation viewing tool, 
-	nWidget methods output limited partial and full description as text
-	nGUI method output a text file with the complete structure formatted, 
+	nWidget methods output limited( DONE ) partial and full description as text
+	nGUI method output a text file with the complete structure formatted( mid DONE ), 
 	parent child relation shown with limited descr and line nb of full descr
 	can add debug label to widget, they will show first line with theyr full descr and hyerarchy line
-
 conf file with general param loaded once at start
 	fullscreen on/off
 	autoload
 	file to open (last openned)
+trad README French
+finished project golder for easy viewing
+	'open finished' bp, search file in sub folder, cant save on it again
+	'save final' bp to save in this folder 
+		verify if new file name is existing to stop you from overwriting
+dont bloc zoom on cam widgets?
 
-trig n switch : screen widget when too dezoomed (on/off) ; picker for bp color
+	--Hard:
+when selecting a preset auto hide uncompatible
+save last deleted link, bloc : sRun to undo
 
-distence mesuring tool
-
+	--Blocs:
+Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
+cursors can be selected by rightclick-drag and moved with blocs
 keep your mouse on a cursor for 0.5s > a bar appear under it, 
 	its a slider to change scale, 
 	always appear centered, go from 0.25x current scale to 4x current scale
 	ephemere : will disappear if mouse stop hovering it or the cursor
-
-when selecting a preset auto hide uncompatible
-
-trad README French
-
-'open finished' bp, search file in sub folder, cant save on it again
-'save final' bp to save in this folder (verify if new file name is existing to stop you from overwriting)
+MEnveloppe : 
+	series of row with a tick length, an end value, and a courbure
+	tick to crawl it
+counted tick generator
+switch to show/hide mouse coord and fps
+trig n switch : screen widget when too dezoomed (on/off) ; picker for bp color
+distence mesuring tool
 
 
 
@@ -275,6 +251,9 @@ trad README French
 
 		R & D
 		
+big lag when selecting an heavy sheet caused by to LayerTop() recursive calls
+		>>>> sheet bloc number limited
+
 mesure and store the relative process time used by different things
 
 logarythmic slides

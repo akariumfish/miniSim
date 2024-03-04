@@ -103,6 +103,7 @@ public abstract class sValue implements RConst {
 	  public int asCol() { return 0; }
 	  public String asStr() { return ""; }
 	  public Object asObj() { return null; }
+	  public nRunnable asRun() { return null; }
 
 	  public boolean isRun()   { return type.equals("run"); }
 	  public boolean isObj()   { return type.equals("obj"); }
@@ -122,23 +123,28 @@ public abstract class sValue implements RConst {
 		  if (isStr()) return Macro_Packet.newPacketStr(asStr());
 		  if (isObj()) return Macro_Packet.newPacketObject(asObj());
 		  if (isStr()) return Macro_Packet.newPacketStr(asStr());
+		  if (isRun()) return Macro_Packet.newPacketRun(asRun());
 		  return null;
 //		  return new Macro_Packet("value").setValue(this); 
 	  }
 	  
-	  public void pop_panel(nGUI gui, nTaskPanel tpan) {
+	  public nWindowPanel pop_panel(nGUI gui, nTaskPanel tpan) {
         if (type.equals("str")) { 
-          new nTextPanel(gui, tpan, (sStr)this);
+          return new nTextPanel(gui, tpan, (sStr)this);
         } else if (type.equals("flt")) { 
-          new nNumPanel(gui, tpan, (sFlt)this);
+        	  return new nNumPanel(gui, tpan, (sFlt)this);
         } else if (type.equals("int")) { 
-          new nNumPanel(gui, tpan, (sInt)this);
+        	  return new nNumPanel(gui, tpan, (sInt)this);
         } else if (type.equals("boo")) { 
-          new nBinPanel(gui, tpan, (sBoo)this);
+          return new nBinPanel(gui, tpan, (sBoo)this);
         } else if (type.equals("col")) { 
-          new nColorPanel(gui, tpan, (sCol)this);
+        	  return new nColorPanel(gui, tpan, (sCol)this);
         } else if (type.equals("vec")) { 
-          new nVecPanel(gui, tpan, (sVec)this);
-        }
+        	  return new nVecPanel(gui, tpan, (sVec)this);
+        } else if (type.equals("run")) { 
+          return new nBinPanel(gui, tpan, (sRun)this);
+	    } else if (type.equals("obj")) { 
+	    	  return new nObjectPanel(gui, tpan, (sObj)this);
+	    } else return null;
 	  }
 	}

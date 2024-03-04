@@ -11,6 +11,13 @@ public interface RConst {
 	static String str_copy(String s) { 
 		if (s != null) return "" + s/*.substring(0, s.length())*/; else return null; }
 	
+	static public boolean testParseFlt(String s) {
+		return s.length() > 0 && !PApplet.str(Rapp.parseFlt(s)).equals("NaN");
+	}
+	static public boolean testParseInt(String s) {
+		return s.length() > 0 && !PApplet.str(PApplet.parseInt(s)).equals("NaN");
+	}
+	
 	static public String trimFlt(float f) { return trimFlt(f, 3); }
 	static public String trimFlt(float f, int p) {
 		int dec_m = 0;

@@ -149,6 +149,8 @@ public class Canvas extends Macro_Sheet {
 	    } });
 	    
 	    ref_cursor = menuSheetCursor("Canvas", false);
+	    
+	    
 	    if (ref_cursor.show != null) ref_cursor.show.set(val_show.get() && val_show_grab.get());
 	    if (ref_cursor.pval != null) ref_cursor.pval.set(val_pos.get());
 	    if (ref_cursor.pval != null) ref_cursor.pval.addEventChange(new nRunnable() { public void run() { 

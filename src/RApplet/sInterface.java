@@ -522,6 +522,19 @@ public class sInterface {
       new nRunnable() { public void run() { 
     		app.logln("breakpoint"); 
     	  	breakp = true; 
+    	  	
+    	} } );
+    log_widg_hierarch = macro_main.newRun("log_widg_hierarch", "log_widg_hierarch", 
+      new nRunnable() { public void run() { 
+    		app.logln("");
+  		app.logln("screen widgets hierarchy : ");
+  		app.logln(screen_gui.getHierarchy());
+  		app.logln("");
+  		app.logln("");
+  		app.logln("");
+		app.logln("cam widgets hierarchy : ");
+		app.logln(cam_gui.getHierarchy());
+  		app.logln("");
     	} } );
     quicksave_run = macro_main.newRun("quicksave", "qsave", 
     	      new nRunnable() { public void run() { full_data_save(); } } );
@@ -544,7 +557,7 @@ public class sInterface {
     
   }
 
-  public sRun breakpoint;
+  public sRun breakpoint,log_widg_hierarch;
   boolean  breakp = false;
   public sRun quicksave_run;
 public sRun quickload_run;

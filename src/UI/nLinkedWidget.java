@@ -62,7 +62,7 @@ public class nLinkedWidget extends nWidget {
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 
 	      String s = ((nLinkedWidget)builder).getText();
-	      if (s.length() > 0 && !PApplet.str(PApplet.parseInt(s)).equals("NaN")) 
+	      if (RConst.testParseInt(s)) 
 	    	  	ival.set(PApplet.parseInt(s)); } } );
 	    return this; }
 	  nLinkedWidget setLinkedValue(sFlt b) { 
@@ -75,7 +75,7 @@ public class nLinkedWidget extends nWidget {
 	    setField(true);
 	    addEventFieldChange(new nRunnable(this) { public void run() { 
 	      String s = ((nLinkedWidget)builder).getText();
-	      if (s.length() > 0 && !PApplet.str(Rapp.parseFlt(s)).equals("NaN")) 
+	      if (RConst.testParseFlt(s)) 
 	    	  	fval.set(Rapp.parseFlt(s)); } } );//Float.parseFloat(s)
 	      //!(s.length() > 0 && float(s) == 0) && 
 	    return this; }

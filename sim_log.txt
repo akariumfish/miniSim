@@ -1,13 +1,7 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-313:- :setup_load from spirale.sdata
-4349:  :full_data_save to usine.sdata
-6538:  :full_data_save to usine.sdata
-19401:  :full_data_save to usine.sdata
-19410:  :setup_load from usine.sdata
-22662:  :full_data_save to usine.sdata
-22849:  :exit
+474:- :exit
 null
 null
 null

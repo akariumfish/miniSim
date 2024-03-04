@@ -1139,7 +1139,7 @@ class MValue extends MBasic {
       MValue build(Macro_Sheet s, sValueBloc b) { MValue m = new MValue(s, b); return m; }
     }
   sValue cible; sValueBloc bloc_cible;
-  sStr val_cible, val_bloc, val_depth, var_type; sBoo setup_send;
+  sStr val_cible, val_bloc, val_depth, var_type; sBoo setup_send, panel_open;
   Macro_Connexion in, out;
   nWidget val_widget;
   Macro_Element val_elem;
@@ -1158,6 +1158,7 @@ class MValue extends MBasic {
 	  if (sheet == mmain()) val_depth.set("/");
 	  var_type = newStr("type", "type", "");
 	  setup_send = newBoo("stp_snd", "stp_snd", false);
+	  panel_open = newBoo("pan_opn", "pan_opn", false);
   }
   void build_param() { 
 	nDrawer d = addEmptyS(0);
@@ -1216,7 +1217,7 @@ class MValue extends MBasic {
     
 	addEmptyS(1).addCtrlModel("MC_Element_SButton", "Get")
     .setRunnable(new nRunnable() { public void run() {
-    	if (cible != null && !cible.type.equals("run")) out.send(cible.asPacket()); } })
+    	if (cible != null) out.send(cible.asPacket()); } })
     .getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
 		.setLinkedValue(setup_send); 
 	out = addOutput(2, "out");
@@ -1229,7 +1230,8 @@ class MValue extends MBasic {
     addEmpty(1); 
     addEmptyS(2).addCtrlModel("MC_Element_SButton", "Set")
     .setRunnable(new nRunnable() { public void run() {
-      if (cible != null) cible.pop_panel(mmain().screen_gui, mmain().inter.taskpanel);
+      if (cible != null) cible.pop_panel(mmain().screen_gui, mmain().inter.taskpanel)
+		.addEventClose(new nRunnable() { public void run() { panel_open.set(false); } } );
     } }); 
     val_elem = addEmptyL(0);
     
@@ -1269,7 +1271,7 @@ class MValue extends MBasic {
 
   void setValue(sValue v) {
     if (v != null) {
-    	clearValue();
+    		clearValue();
 	    val_cible.set(v.ref);
 	    cible = v; 
 	    val_widget = addLinkedLWidget(val_elem, v);
@@ -1282,17 +1284,20 @@ class MValue extends MBasic {
 	    else if (cible.type.equals("col")) setValue((sCol)cible);
 	    else if (cible.type.equals("obj")) setValue((sObj)cible);
 	    if (setup_send.get()) out.send(cible.asPacket());
+	    if (panel_open.get()) cible.pop_panel(mmain().screen_gui, mmain().inter.taskpanel)
+      		.addEventClose(new nRunnable() { public void run() { panel_open.set(false); } } );
     }
   }
-  	
+  	int last_send_framenb = 0;
   void setValue(sRun v) {
     rval = v;
-    val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketBang()); }};
+    val_run = new nRunnable() { public void run() { 
+    		if (last_send_framenb + 1 < gui.app.global_frame_count)
+    			out.send(Macro_Packet.newPacketBang()); 
+    		last_send_framenb = gui.app.global_frame_count; }};
     in_run = new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isBang()) { 
-        rval.doEvent(false); 
         rval.run(); 
-        rval.doEvent(true); 
       }
     } };
     v.addEventAllChange(val_run);

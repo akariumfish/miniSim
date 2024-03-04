@@ -25,6 +25,7 @@ public class Macro_Packet {
 	public static Macro_Packet newPacketStr(String p) { return new Macro_Packet("str").addMsg(RConst.copy(p)); }
 
 	public static Macro_Packet newPacketObject(Object m) { return new Macro_Packet("obj").setObject(m); }
+	public static Macro_Packet newPacketRun(Object m) { return new Macro_Packet("obj").setObject(m); }
 
 	public static Macro_Packet newPacketBool(boolean b) { 
 	  String r; 

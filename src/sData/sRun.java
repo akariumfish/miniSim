@@ -1,6 +1,7 @@
 package sData;
 
 public class sRun extends sValue {
+	  public nRunnable asRun() { return val; }
 	  public String getString() { return ref; }
 	  public void clear() { super.clear(); }
 	  private nRunnable val;

@@ -601,40 +601,48 @@ public class Macro_Bloc extends Macro_Abstract {
   
   
 
+    ArrayList<Macro_Element> elements = new ArrayList<Macro_Element>();
 	nCtrlWidget param_open, mirror_sw;
 
-	  int[] rows_nb = new int[3];
-	  
-	  Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
-		    super(_sheet, t, n, _bloc);
+  ArrayList<nRunnable> eventClearRun = new ArrayList<nRunnable>();
+  Macro_Bloc addEventClear(nRunnable r) { eventClearRun.add(r); return this; }
+  
+  
+  
+  Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
+	    super(_sheet, t, n, _bloc);
 //		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
-		    addShelf(); 
-		    addShelf();
-			rows_nb[0] = 0; rows_nb[1] = 0; rows_nb[2] = 0;
-		  }
-	  Macro_Bloc(Macro_Sheet _sheet, String t, sValueBloc _bloc) {
-		    super(_sheet, t, t, _bloc);
+	    addShelf(); 
+	    addShelf();
+	    addShelf();
+		col_rows_nb[0] = 0; col_rows_nb[1] = 0; col_rows_nb[2] = 0;
+	  }
+  Macro_Bloc(Macro_Sheet _sheet, String t, sValueBloc _bloc) {
+	    super(_sheet, t, t, _bloc);
 //		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
-		    addShelf(); 
-		    addShelf();
-			rows_nb[0] = 0; rows_nb[1] = 0; rows_nb[2] = 0;
-		  }
-
+	    addShelf(); 
+	    addShelf();
+	    addShelf();
+		col_rows_nb[0] = 0; col_rows_nb[1] = 0; col_rows_nb[2] = 0;			
+	  }
+  int[] col_rows_nb = new int[3];
 
   Macro_Element addElement(int c, Macro_Element m) {
-    if (c >= 0 && c < 3) {
-    	rows_nb[c]++;
-      if (c == 2 && shelfs.size() < 3) addShelf();
+    if (c >= 0 && c <= shelfs.size()) {
+      if (shelfs.size() <= c) {// <= c+1) {
+    	  	addShelf();
+    	  	if (col_rows_nb.length < c+1) {
+	    	  	int[] rn = new int[c+1];
+	    	  	rn[c] = 0;
+	    	  	for (int i = 0 ; i < c-1 ; i++) rn[i] = col_rows_nb[i]; 
+	    	  	col_rows_nb = rn; 
+	    	}
+      }
+  	  col_rows_nb[c]++;
       elements.add(m);
       m.shelf_ind = c;
-      m.row_ind = rows_nb[c];
+      m.row_ind = col_rows_nb[c];
       getShelf(c).insertDrawer(m);
-      if (c == 0 && getShelf(c).drawers.size() == 1) 
-    	  	getShelf(c).getDrawer(0).ref.setPX(ref_size*0);
-      if (c == 1 && getShelf(c).drawers.size() == 1) 
-    	  	getShelf(c).getDrawer(0).ref.setPX(ref_size*0);
-      if (c == 2 && getShelf(c).drawers.size() == 1) 
-    	  	getShelf(c).getDrawer(0).ref.setPX(ref_size*0);
       if (openning.get() == OPEN) for (Macro_Element e : elements) e.show();
       toLayerTop();
       return m;
@@ -666,7 +674,6 @@ public class Macro_Bloc extends Macro_Abstract {
     return left_s + GROUP_TOKEN + right_s; 
   }
   
-  ArrayList<Macro_Element> elements = new ArrayList<Macro_Element>();
 //  public Macro_Abstract buildLayer() { 
 //	  super.buildLayerTo(panel.getDrawable()); 
 //	  buildLayerTo(panel.getDrawable()); 
@@ -692,7 +699,7 @@ public class Macro_Bloc extends Macro_Abstract {
 //  return this; }
   public Macro_Bloc toLayerTop() { 
     
-    super.toLayerTop(); 
+    //if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
 
 	for (Macro_Element e : elements) if (e.spot == null) e.toLayerTop(); 
 	for (Macro_Element e : elements) if (e.spot != null) e.toLayerTop(); 
@@ -701,10 +708,11 @@ public class Macro_Bloc extends Macro_Abstract {
 
 	for (Macro_Element e : elements) if (e.spot == null) e.widget_toLayTop(); 
 	for (Macro_Element e : elements) if (e.spot != null) e.widget_toLayTop(); 
-	
+
+	front.toLayerTop(); grab_front.toLayerTop(); 
+
 	title.toLayerTop(); grabber.toLayerTop(); reduc.toLayerTop(); 
 	prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
-	front.toLayerTop(); grab_front.toLayerTop(); 
 
     if (param_open != null) param_open.toLayerTop();
     if (mirror_sw != null) mirror_sw.toLayerTop();
@@ -712,12 +720,9 @@ public class Macro_Bloc extends Macro_Abstract {
   }
   
 
-  ArrayList<nRunnable> eventClearRun = new ArrayList<nRunnable>();
-  Macro_Bloc addEventClear(nRunnable r) { eventClearRun.add(r); return this; }
-  
   public Macro_Bloc clear() {
-	    for (nRunnable e : eventClearRun) e.run();
-	    for (Macro_Element e : elements) e.clear();
+    for (nRunnable e : eventClearRun) e.run();
+    for (Macro_Element e : elements) e.clear();
     super.clear(); return this; }
   
   Macro_Bloc open() {

@@ -27,6 +27,7 @@ public class sStr extends sValue {
 	      doChange(); 
 	    } 
 	  }
+	  public void add(String v) { set(val + v); }
 	  void save_to_bloc(Save_Bloc svb) { super.save_to_bloc(svb);
 	    svb.newData("val", val);
 	  }

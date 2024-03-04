@@ -11,6 +11,7 @@ import processing.core.PVector;
 
 import java.util.ArrayList;
 
+import RApplet.RConst;
 import RApplet.sInterface;
 import sData.*;
 
@@ -21,9 +22,13 @@ import sData.*;
 // 
 // */
 
-abstract class MAbstract_Builder {
+abstract class MAbstract_Builder implements Macro_Interf {
 	boolean visible = true;
 	boolean show_in_buildtool = false;
+	public void first_start_show(Macro_Main mmain) {
+		show_in_buildtool = true;
+	    	mmain.shown_builder.set(mmain.shown_builder.get() + OBJ_TOKEN + type);
+	}
 	String type, descr = ""; 
 	String title, category = "";
 	MAbstract_Builder(String t) { type = t; title = t; }
@@ -47,17 +52,16 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
 	  Macro_Abstract setPosition(double x, double y) { return setPosition((float)x, (float)y); }
 	  Macro_Abstract setPosition(float x, float y) { 
 //	    grab_pos.doEvent(false);
-	    grabber.setPosition(x, y); //grab_pos.set(x, y);
+	    grabber.setPosition(x, y); grab_pos.set(x, y);
 //	    grab_pos.doEvent(true);
 	    return this; }
 	  Macro_Abstract setParent(Macro_Sheet s) { grabber.clearParent(); grabber.setParent(s.grabber); return this; }
 	  public Macro_Abstract toLayerTop() { 
 		  if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
 		  panel.toLayerTop();  
+		  front.getDrawable(); grab_front.getDrawable(); 
 		  title.getDrawable(); grabber.getDrawable(); reduc.getDrawable(); 
 		  prio_sub.getDrawable(); prio_add.getDrawable(); prio_view.getDrawable(); 
-		  front.getDrawable(); grab_front.getDrawable(); 
-		  
 	    return this; }
 //	  public Macro_Abstract buildLayer() { 
 //		  gui.app.logln(value_bloc.ref+ " build layer");
@@ -93,12 +97,18 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
 	    mmain().update_select_bound();
 	    if (openning.get() == REDUC) grab_front.setOutline(true);
 	    else front.setOutline(true);
+	    title_fixe = true;
+	    title.show();
 	    toLayerTop();
 	  }
 	  void szone_unselect() {//carefull! still need to remove from mmain.selected_macro and run mmain.update_select_bound
 	    szone_selected = false;
 	    front.setOutline(false);
 	    grab_front.setOutline(false);
+	    if (openning.get() == REDUC || openning.get() == HIDE) {
+	    		title_fixe = false;
+	    		if (!grabber.isHovered()) title.hide();
+	    }
 	  }
   Macro_Abstract deploy() { open(); return this; } //
   Macro_Abstract open() {
@@ -106,7 +116,8 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
       openning.set(OPEN);
       grabber.show(); grab_front.show(); panel.show(); back.hide(); 
       front.show(); title.show(); reduc.show(); 
-      reduc.setPosition(-ref_size * 0.75, ref_size*0.25);
+      reduc.setPosition(-ref_size * 0.75, ref_size*0.5)
+	    .setSize(ref_size*0.4, ref_size*0.75);
       moving();
     }
     toLayerTop();
@@ -116,8 +127,11 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
     if (openning.get() != REDUC) {
       openning.set(REDUC);
       grabber.show(); grab_front.show(); panel.hide(); back.hide(); 
-      front.hide(); title.hide(); reduc.show(); 
-      reduc.show().setPosition(ref_size * 0.5, ref_size*0.5);
+      front.hide(); 
+      if (!title_fixe) title.hide(); else title.show(); 
+      reduc.show(); 
+      reduc.show().setPosition(ref_size * 0.5, ref_size*0.5)
+	    .setSize(ref_size*0.4, ref_size*0.5);
       moving();
     }
     return this;
@@ -159,11 +173,25 @@ boolean loading_from_bloc = false;
 sStr val_title;
   sInt priority, openning, openning_pre_hide; sObj val_self;
   float prev_x, prev_y; //for group dragging
-  nLinkedWidget grabber, title; nCtrlWidget prio_sub, prio_add; nWatcherWidget prio_view;
+  public nLinkedWidget grabber;
+nLinkedWidget title; nCtrlWidget prio_sub, prio_add; nWatcherWidget prio_view;
   nWidget reduc, front, grab_front, back;
   public sValueBloc value_bloc = null;
   public sValueBloc setting_bloc;
   nRunnable szone_st, szone_en;
+  String short_title = "";
+  
+  void up_short_title() {
+	  short_title = val_title.get();
+	  for (int i = 0 ; i < short_title.length() ; i ++) {
+		  if (short_title.charAt(i) == '_') {
+			  String n = short_title.substring(0, i);
+			  if (RConst.testParseInt(n))
+				  short_title = short_title.substring(i+1, short_title.length());
+			  break;
+		  }
+	  }
+  }
   
 Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     super(_sheet.gui, _sheet.ref_size, 0.0F);
@@ -209,7 +237,6 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     	loading_from_bloc = true;
     	value_bloc = _bloc;
     }
-    
 //    mlogln("build abstract "+ty+" "+n+" "+ _bloc+"    as "+value_bloc.ref);
     
     setting_bloc = value_bloc.getBloc("settings");
@@ -247,6 +274,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     else val_self.set(this);
     if (priority == null) priority = setting_bloc.newInt("priority", "prio", 0);
     priority.set_limit(0, 9);
+    up_short_title();
     build_ui();
   }
   Macro_Abstract(sInterface _int) { // FOR MACRO_MAIN ONLY
@@ -341,14 +369,31 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
       .setLinkedValue(priority);
     prio_view.setParent(panel);
     prio_view.stackUp().alignRight().setInfo("priority");
-    
+    priority.addEventChange(new nRunnable() { public void run() { sheet.toLayerTop(); }});
 
     title = addLinkedModel("MC_Title").setLinkedValue(val_title);
-    title.addEventFieldChange(new nRunnable() { public void run() { title.setOutline(true); } });
+    title.addEventFieldChange(new nRunnable() { public void run() { 
+        up_short_title(); title.setOutline(true); } });
     title.clearParent().setParent(panel);
     title.alignDown().stackRight();
     title.setSX(ref_size*(0.5F + 0.3F*val_title.get().length()) )
-    		.setPosition(-ref_size*1.25 - title.getLocalSX(), ref_size*0.5);
+    		.setPosition(-ref_size*1.75 - title.getLocalSX(), ref_size*0.5);
+    nRunnable title_run = new nRunnable() { public void run() { 
+        title.setSX(ref_size*(0.5F + 0.3F*val_title.get().length()) );
+        if (openning.get() == REDUC)
+      	  	title.setPosition(ref_size*0.25 - title.getLocalSX(), ref_size*0.25); 
+        else title.setPosition(-ref_size*1.75 - title.getLocalSX(), ref_size*0.5); 
+//        for (Macro_Element m : sheet.child_elements) {
+//			m.bloc.up_short_title();
+//			if (m.spot != null) m.spot.setText(m.bloc.value_bloc.base_ref);
+//		}
+    } };
+//    val_title.addEventChange(new nRunnable() { public void run() { 
+//		
+//    } });
+    val_title.addEventChange(title_run);
+    openning.addEventChange(title_run);
+    
     grabber.addEventMouseEnter(new nRunnable() { public void run() { 
       if (openning.get() == REDUC) title.show(); } });
     grabber.addEventMouseLeave(new nRunnable() { public void run() { 
@@ -419,9 +464,11 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
 	int adding_side_cnt = 0;
     int adding_count = 0;
     float phf = 0.75F;
+//    float move_fct = 3 * GRID_SNAP_FACT;
     float move_fct = Math.max(collide_cible.getPhantomRect().size.x, collide_cible.getPhantomRect().size.y);
     move_fct /= ref_size;
-    move_fct = move_fct - move_fct%GRID_SNAP_FACT + 3*GRID_SNAP_FACT;
+    move_fct = move_fct - move_fct%(GRID_SNAP_FACT*3) + 6*GRID_SNAP_FACT;
+    
     boolean found = false;
     while (!found) {
       boolean col = false;
@@ -449,8 +496,8 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     	  	adding_count++;
     	  	if (adding_count >= adding_side_l) {
     	  		adding_count = 0;
-    	  		if (adding_dir_x == 0) { adding_dir_x = adding_dir_y; adding_dir_y = 0; }
-    	  		else { adding_dir_y = adding_dir_x; adding_dir_x = 0; }
+    	  		if (adding_dir_x == 0) { adding_dir_x = adding_dir_y * -1; adding_dir_y = 0; }
+    	  		else { adding_dir_y = adding_dir_x * -1; adding_dir_x = 0; }
     	  		adding_side_cnt++;
     	  		if (adding_side_cnt >= 2) {
     	  			adding_side_cnt = 0;
@@ -466,8 +513,8 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
   protected boolean is_cleared = false;
   public Macro_Abstract clear() {
     if (!unclearable) {
-    	is_cleared = true;
-    	szone_unselect();
+    	  is_cleared = true;
+    	  szone_unselect();
 //    	mmain().selected_macro.remove(this);
       super.clear();
       

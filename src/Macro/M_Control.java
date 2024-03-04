@@ -9,7 +9,7 @@ public class M_Control {}
 
 class MInput extends MBasic {
 	static class Builder extends MAbstract_Builder {
-		Builder() { super("input", "StdInput", "", "Control"); }
+		Builder() { super("input", "Input", "", "Control"); }
 		MInput build(Macro_Sheet s, sValueBloc b) { MInput m = new MInput(s, b); return m; }
 	}
   	sBoo modeKEY, modeCROSS, modeMOUSE, modeMKEY;

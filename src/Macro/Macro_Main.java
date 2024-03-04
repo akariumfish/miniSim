@@ -198,7 +198,9 @@ nExplorer sheet_explorer;
           .setRunnable(new nRunnable() { public void run() { pastebin_tmpl(); }})
           .setInfo("Paste").setFont((int)(ref_size/1.9)).getDrawer()
         .addCtrlModel("Menu_Button_Small_Outline-S1-P2", "MM")
-          .setRunnable(new nRunnable() { public void run() { build_sheet_menu(); }})
+          .setRunnable(new nRunnable() { public void run() { 
+        	    if (main_sheetbloc != null) main_sheetbloc.menu();
+        	    else build_sheet_menu(); }})
           .setInfo("Open main sheet menu").setFont((int)(ref_size/1.9)).getDrawer()
         .addCtrlModel("Menu_Button_Small_Outline-S1-P3", "FM")
           .setRunnable(new nRunnable() { public void run() { inter.filesManagement(); }})
@@ -231,6 +233,7 @@ nExplorer sheet_explorer;
     
   }
   void build_buildtool() {
+	  int build_row = 12;
 	  nShelf sh = null;
 	  int row_count = 0;
 //	  int shelf_cible = 0;
@@ -246,24 +249,24 @@ nExplorer sheet_explorer;
 	    sh = build_tool.addShelf();
 	    for (int i = 0 ; i < bloc_builders.size() ; i++) 
 	    if (bloc_builders.get(i).show_in_buildtool && bloc_builders.get(i).visible) {
-	    	row_count++;
-	    	if (row_count > 18) {
-//	    		shelf_cible++; 
-	    		row_count = 0;
-	    		sh = build_tool.addShelf();
-	    	}
-	      sh.addDrawer(3F, 0.75F).addCtrlModel("Menu_Button_Small_Outline-S3/0.75", bloc_builders.get(i).title)
-	        .setRunnable(new nRunnable(bloc_builders.get(i).type) { public void run() { 
-	          selected_sheet.addByType(((String)builder)); }})
-	        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
-	        .setInfo(bloc_builders.get(i).descr)
-	        ;
+		    	row_count++;
+		    	if (row_count > build_row) {
+	//	    		shelf_cible++; 
+		    		row_count = 0;
+		    		sh = build_tool.addShelf();
+		    	}
+		      sh.addDrawer(3F, 0.75F).addCtrlModel("Menu_Button_Small_Outline-S3/0.75", bloc_builders.get(i).title)
+		        .setRunnable(new nRunnable(bloc_builders.get(i).type) { public void run() { 
+		          selected_sheet.addByType(((String)builder)); }})
+		        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
+		        .setInfo(bloc_builders.get(i).descr)
+		        ;
 	    }
 //	    sh.addSeparator(0.25);
 	    for (Sheet_Specialize t : Sheet_Specialize.prints) 
 	    if (!t.unique && t.visible && t.show_in_buildtool) {
-	    	row_count++;
-			if (row_count > 18) {
+	    		row_count++;
+			if (row_count > build_row) {
 //				shelf_cible++; 
 				row_count = 0;
 				sh = build_tool.addShelf();
@@ -277,7 +280,7 @@ nExplorer sheet_explorer;
 	    }
 	    for (sValueBloc t : shown_templ_list) {
 	    		row_count++;
-			if (row_count > 18) {
+			if (row_count > build_row) {
 //				shelf_cible++; 
 				row_count = 0;
 				sh = build_tool.addShelf();
@@ -440,6 +443,7 @@ nExplorer sheet_explorer;
 		  selector_list = null;
 		  template_explorer = null;
 		  sheet_explorer = null;
+	      if (main_sheetbloc != null) main_sheetbloc.menu_open.set(false);
       }});
   }
 
@@ -626,6 +630,10 @@ nExplorer sheet_explorer;
     }
   }
   public void paste_tmpl(sValueBloc bloc) {
+	  if (bloc.blocs.size()+selected_sheet.child_macro.size() > val_max_bloc.get()) {
+		  return;
+	  }
+	  selected_sheet.cancel_new_spot();
     //save adding pos
     PVector prevs_gr_p = new PVector(); //def center
 //    boolean to_empty_sheet = selected_sheet.child_macro.size() == 0;
@@ -669,10 +677,11 @@ nExplorer sheet_explorer;
 	int adding_side_cnt = 0;
     int adding_count = 0;
     float phf = 0.0F;
+//    float move_fct = 3 * GRID_SNAP_FACT;
     float move_fct = Math.max(select_bound_widg.getPhantomRect().size.x, select_bound_widg.getPhantomRect().size.y);
     move_fct /= ref_size;
     move_fct = move_fct + 2 * GRID_SNAP_FACT;
-    move_fct = move_fct - move_fct%GRID_SNAP_FACT;
+    move_fct = move_fct - move_fct%(GRID_SNAP_FACT*3);
     boolean found = false;
     while (!found) {
       boolean col = false;
@@ -703,8 +712,8 @@ nExplorer sheet_explorer;
 	      adding_count++;
   		  if (adding_count >= adding_side_l) {
 			adding_count = 0;
-			if (adding_dir_x == 0) { adding_dir_x = adding_dir_y; adding_dir_y = 0; }
-			else { adding_dir_y = adding_dir_x; adding_dir_x = 0; }
+			if (adding_dir_x == 0) { adding_dir_x = adding_dir_y * -1; adding_dir_y = 0; }
+			else { adding_dir_y = adding_dir_x * -1; adding_dir_x = 0; }
 			adding_side_cnt++;
 			if (adding_side_cnt >= 2) {
 				adding_side_cnt = 0;
@@ -795,6 +804,9 @@ nExplorer sheet_explorer;
 	    szone_clear_select();
 	    is_setup_loading = false;
 
+        if (main_sheetbloc == null) main_sheetbloc = new MSheetBloc(mmain(), null);
+        main_sheetbloc.init_end();
+        
 //	    buildLayer();
 	} } );
   }
@@ -992,6 +1004,7 @@ Macro_Sheet search_sheet = this;
   ArrayList<MPanel> pan_macros = new ArrayList<MPanel>();
   ArrayList<MTool> tool_macros = new ArrayList<MTool>();
   ArrayList<nCursor> cursors_list = new ArrayList<nCursor>();
+  MSheetBloc main_sheetbloc;
   MPanel last_added_panel;
   MTool last_added_tool;
   int pan_nb = 0, tool_nb = 0;
@@ -1085,11 +1098,11 @@ public Macro_Main(sInterface _int) {
     
     
 
-      add_bloc_builders(new Macro_Sheet.MSheet_Builder());
-      add_bloc_builders(new MSheetMain.MSheetMain_Builder());
+      add_bloc_builders(new Macro_Sheet.MSheet_Builder(this));
+      add_bloc_builders(new MSheetBloc.Builder());
       add_bloc_builders(new MSheetCo.MSheetCo_Builder());
       add_bloc_builders(new MCursor.MCursor_Builder());
-      add_bloc_builders(new MPoint.MPoint_Builder());
+      add_bloc_builders(new MPoint.MPoint_Builder(this));
       add_bloc_builders(new MMPoints.Builder());
       add_bloc_builders(new MPack.Builder());
       add_bloc_builders(new MForm.MForm_Builder());
@@ -1130,6 +1143,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MPanel.MPanel_Builder());
       add_bloc_builders(new MFrame.MFrame_Builder());
       add_bloc_builders(new MPulse.MPulse_Builder());
+      add_bloc_builders(new MSheetBloc.MSheetMain_Builder());
 
       
       
@@ -1206,11 +1220,21 @@ public Macro_Main(sInterface _int) {
 
     
     inter.addEventTwoFrame(new nRunnable() { public void run() { 
-        packpross_by_frame.set(packp_holder);
-//        update_bloc_selector_list();
-//        buildLayer();
-        inter.addEventFrame(new nRunnable() { public void run() { frame(); } } );
-      } } );
+	    	inter.addEventNextFrame(new nRunnable() { public void run() { 
+	        packpross_by_frame.set(packp_holder);
+	        if (main_sheetbloc == null) {
+	        		main_sheetbloc = new MSheetBloc(mmain(), null);
+	    	        main_sheetbloc.init_end();
+	    	        main_sheetbloc.grabber.setPosition(0, -ref_size*10.5);
+	        }
+		    szone_clear_select();
+		    update_select_bound();
+	//        update_bloc_selector_list();
+	//        buildLayer();
+	        inter.addEventFrame(new nRunnable() { public void run() { frame(); } } );
+	    	} } );
+    } } );
+    
   }
   float sgrab_px = 0, sgrab_py = 0;
   void update_select_bound() {
@@ -1365,6 +1389,7 @@ public Macro_Main(sInterface _int) {
 	  theme.addModel("MC_Add_Spot_Actif", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(120, 70, 0))
 	    .setHoveredColor(theme.app.color(180, 90, 10))
+	    .setLabelColor(theme.app.color(60, 30, 0))
 	    .setSize(ref_size*2.250, ref_size*1.125)
 //	    .setPosition(ref_size*0.125, ref_size*(1.125-0.75)/2)
 	    );
@@ -1392,9 +1417,10 @@ public Macro_Main(sInterface _int) {
 	    );
 	  theme.addModel("MC_Element_For_Spot", theme.newWidget("MC_Element")
 	    .setStandbyColor(theme.app.color(120, 70, 0))
-	    .setOutlineColor(theme.app.color(150, 150, 0))
-	    .setOutlineWeight(ref_size / 8F)
-	    .setOutline(true)
+	    .setHoveredColor(theme.app.color(200, 120, 0))
+//	    .setOutlineColor(theme.app.color(150, 150, 0))
+//	    .setOutlineWeight(ref_size / 8F)
+	    .setOutline(false)
 	    );
 	  theme.addModel("MC_Element_At_Spot", theme.newWidget("MC_Element")
 	    .setOutlineColor(theme.app.color(120, 70, 0))
@@ -1537,7 +1563,7 @@ public Macro_Main(sInterface _int) {
 	    .setClickedColor(theme.app.color(130))
 	    .setOutlineWeight(ref_size / 9F)
 	    .setOutline(true)
-	    .setOutlineColor(theme.app.color(180, 150, 150))
+	    .setOutlineColor(theme.app.color(180, 150, 120))
 	    .setLosange(true)
 	    .setSize(ref_size*1, ref_size*0.75)
 	    );
@@ -1585,7 +1611,7 @@ public Macro_Main(sInterface _int) {
 	    .setClickedColor(theme.app.color(160))
 	    .setOutlineWeight(ref_size / 12)
 	    .setSize(ref_size*0.4, ref_size*0.5)
-	    .setPosition(-ref_size*0.75, ref_size*0.250)
+	    .setPosition(-ref_size*0.75, ref_size*0.5)
 	    );
 	  theme.addModel("MC_Deploy", theme.newWidget("MC_Reduc")
 	    .setSize(ref_size*0.55, ref_size*0.65).setPosition(-ref_size*0.375, -ref_size*0.25)
@@ -1605,15 +1631,16 @@ public Macro_Main(sInterface _int) {
 	  theme.addModel("MC_Prio_Add", theme.newWidget("MC_Prio")
 	    .setPosition(ref_size*0.5, ref_size*0.125)
 	    );
-	  theme.addModel("MC_Mirror", theme.newWidget("MC_Reduc")
+	  theme.addModel("MC_SpeTrig", theme.newWidget("MC_Reduc")
 	    .setSize(ref_size*0.75, ref_size*0.75)
-	    .setPosition(ref_size*0.5, ref_size*0.5)
-	    .alignDown().stackLeft()
-	    );
-	  theme.addModel("MC_Param", theme.newWidget("MC_Reduc")
-	    .setSize(ref_size*0.75, ref_size*0.75)
-	    .setPosition(-ref_size*1.375, ref_size*0.5)
 	    .alignDown().stackRight()
+	    .setOutlineColor(theme.app.color(80))
+	    );
+	  theme.addModel("MC_Mirror", theme.newWidget("MC_SpeTrig")
+	    .setPosition(-ref_size*1.875, ref_size*0.5)
+	    );
+	  theme.addModel("MC_Param", theme.newWidget("MC_SpeTrig")
+	    .setPosition(-ref_size*1.375, ref_size*0.5)
 	    );
 	  theme.addModel("MC_Connect_Default", theme.newWidget("mc_ref")
 	    .setStandbyColor(theme.app.color(140, 140))

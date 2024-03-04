@@ -2,18 +2,11 @@ package Macro;
 
 import java.util.ArrayList;
 
-import UI.nColorPanel;
-import UI.nCursor;
-import UI.nExplorer;
-import UI.nFrontPanel;
-import UI.nFrontTab;
-import UI.nLinkedWidget;
-import UI.nSlide;
-import UI.nWidget;
+import UI.*;
+import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
 import sData.*;
-import z_old_specialise.Sheet_Specialize;
 
 
 public class M_Sheet {}
@@ -23,25 +16,33 @@ class MBasic extends Macro_Bloc {
   Macro_Element elem_com;
   
   sBoo param_view, mirror_view;
+  sStr links_save;
   
-  nLinkedWidget param_ctrl;
+  nCtrlWidget param_ctrl;
   nRunnable pview_run;
   
   boolean rebuilding = false;
   MBasic(Macro_Sheet _sheet, String t, sValueBloc _bloc) { 
-    super(_sheet, t, t, _bloc); 
+    super(_sheet, t, t, _bloc);
+    
+    links_save = newStr("links_save", "links_save", "");
     
     param_view = newBoo("com_param_view", "com_param_view", false);
 	mirror_view = newBoo("mirror_view", "mirror_view", false);
-    
-    get_param_openner().setRunnable(new nRunnable() { public void run() { 
-        param_view.set(!param_view.get());
-        rebuild();
-      } });
+	param_view.addEventChange(new nRunnable() { public void run() { 
+        if (param_view.get()) param_ctrl.setText("P");
+        else param_ctrl.setText("N");
+	}});
     get_mirror().setRunnable(new nRunnable() { public void run() { 
     		mirror_view.set(!mirror_view.get());
         rebuild();
-      } });
+    } });
+	param_ctrl = get_param_openner().setRunnable(new nRunnable() { public void run() { 
+        param_view.set(!param_view.get());
+        rebuild();
+    } });
+    if (param_view.get()) param_ctrl.setText("P");
+    else param_ctrl.setText("N");
     init();
     if (param_view.get()) build_param();
     else build_normal();
@@ -52,12 +53,58 @@ class MBasic extends Macro_Bloc {
   
   void init_end() {
 	  super.init_end();
-//	  for (Macro_Element m : elements) m.mirror(mirror_view.get());
+	  for (Macro_Element m : elements) m.mirror(mirror_view.get());
+	  load_co_links();
   }
-  
+  void load_co_links() {
+      for (Macro_Element e : elements) {
+    	      if (e.connect != null) {
+  	  		  load_co_links(e.connect);
+  		  	  if (e.sheet_connect != null) 
+  		  		  load_co_links(e.sheet_connect);
+    	      }
+      }
+  }
+  void save_co_links() {
+	  links_save.set("");
+      for (Macro_Element e : elements) {
+  	  	if (e.connect != null) {
+  	  		save_co_links(e.connect);
+  		  	if (e.sheet_connect != null) save_co_links(e.sheet_connect);
+  	  	}
+      }
+  }
+  void load_co_links(Macro_Connexion co) {
+	  String[] co_type = PApplet.splitTokens(links_save.get(), OBJ_TOKEN);
+	  for (String s : co_type) {
+		  String[] co_links = PApplet.splitTokens(s, GROUP_TOKEN);
+		  if (co_links.length > 1 && co.base_info.equals(co_links[0])) {
+			  co_links = PApplet.splitTokens(co_links[1], INFO_TOKEN);
+			  for (String d : co_links) for (Macro_Connexion c : co.sheet.child_connect)
+			  if (c.descr.equals(d)) {
+				  co.connect_to(c);
+			  }
+		  }
+	  }
+  }
+  void save_co_links(Macro_Connexion co) {
+	ArrayList<Macro_Connexion> co_list = null;
+	if (co.type == INPUT) co_list = co.connected_outputs;
+	else if (co.type == OUTPUT) co_list = co.connected_inputs;
+	if (co_list != null && co_list.size() > 0) {
+		links_save.add(co.base_info + GROUP_TOKEN);
+		for (Macro_Connexion c : co_list) {
+			links_save.add(c.descr + INFO_TOKEN);
+		}
+		links_save.add(OBJ_TOKEN);
+	}
+  }
   void rebuild() {
     if (!rebuilding) {
+    	  unclearable = false; 
       rebuilding = true;
+      
+      save_co_links();
       
       boolean was_select = mmain().selected_macro.contains(this);
       
@@ -86,154 +133,154 @@ class MBasic extends Macro_Bloc {
 
 
 class MBaseMenu extends MBasic { 
-//	static class MAlive_Builder extends MAbstract_Builder {
-//	MAlive_Builder() { super("alive", "live blocs"); show_in_buildtool = true; }
-//	MAlive build(Macro_Sheet s, sValueBloc b) { MAlive m = new MAlive(s, b); return m; }
-//}
-//
-//MAlive(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "alive", _bloc); }
+	//	static class MAlive_Builder extends MAbstract_Builder {
+	//	MAlive_Builder() { super("alive", "live blocs"); show_in_buildtool = true; }
+	//	MAlive build(Macro_Sheet s, sValueBloc b) { MAlive m = new MAlive(s, b); return m; }
+	//}
+	//
+	//MAlive(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "alive", _bloc); }
+	
+	MBaseMenu(Macro_Sheet _sheet, String n, sValueBloc _bloc) { super(_sheet, n, _bloc); }
+	void init() {
+		eventsBuildMenu = new ArrayList<nRunnable>();
+		menu_run = new nRunnable() { public void run() { build_bloc_menu(); }};
+		new_preset_name = newStr("preset_name", "pname", "new"); 
+		menu_open_val = newBoo("menu_open_val", "menuop", false); 
+	}
+	void init_end() {
+		super.init_end();
+		if (menu_open_val.get()) build_bloc_menu();
+	}
+	void build_param() {
+		addEmptyS(0);
+		addTrigS(1, "menu", menu_run);
+	}
+	void build_normal() {
+		addInputBang(0, "menu", menu_run);
+		addTrigS(1, "menu", menu_run);
+	}
+	public MBaseMenu clear() {
+		super.clear(); 
+		if (bloc_front != null) bloc_front.clear();
+		return this; }
+	public MBaseMenu toLayerTop() {
+		super.toLayerTop(); 
+		return this;
+	}
+	
+	MBaseMenu addEventsBuildMenu(nRunnable r) { eventsBuildMenu.add(r); return this; }
+	ArrayList<nRunnable> eventsBuildMenu;
+	nFrontTab custom_tab;
+	nFrontPanel bloc_front;  
+	nExplorer bloc_viewer, preset_explorer;
+	sStr new_preset_name; sBoo menu_open_val;
+	nWidget match_flag;
+	nRunnable menu_run;
+	
+	public void build_custom_menu(nFrontPanel sheet_front) {}
+	
+	public void build_bloc_menu() {
+		if (bloc_front == null) {
+				menu_open_val.set(true);	
+		  bloc_front = new nFrontPanel(mmain().screen_gui, mmain().inter.taskpanel, val_title.get());
+		  
+		  bloc_front.addTab("View").getShelf()
+		    .addSeparator(0.125)
+		    .addDrawer(10.25, 1).addModel("Label-S3", "sheet view :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getShelf()
+		    .addSeparator()
+		    ;
+		  bloc_viewer = bloc_front.getTab(0).getShelf(0)
+		    .addSeparator()
+		    .addExplorer()
+		      .setChildAccess(false)
+		      .setStrtBloc(value_bloc)
+		      .addValuesModifier(mmain().inter.taskpanel)
+		      .addEventChange(new nRunnable() { public void run() { 
+		          if (bloc_viewer.explored_bloc != value_bloc) {
+		            bloc_viewer.setStrtBloc(value_bloc);
+		          }
+		      } } )
+		      ;
+		  match_flag = bloc_front.addTab("Preset").getShelf()
+		    .addSeparator(0.125)
+		    .addDrawer(10.25, 1).addModel("Label-S3", "Presets :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+		    .addCtrlModel("Button-S2-P3", "Delete").setRunnable(new nRunnable() { public void run() { 
+		      preset_explorer.selected_bloc.clear(); 
+		      for (nExplorer e : mmain().presets_explorers) e.update(); } } )
+		      .setInfo("delete selected preset").getDrawer()
+		    .addModel("Label_DownLight_Back-S2-P2", "")
+		      .setInfo("selected preset compatibility with this sheet");
+		    
+		  match_flag.getShelf()
+		    .addSeparator()
+		    ;
+		  preset_explorer = bloc_front.getTab(1).getShelf(0)
+		    .addSeparator()
+		    .addExplorer()
+		      .setStrtBloc(mmain().saved_preset)
+		      //.hideGoBack()
+		      .addValuesModifier(mmain().inter.taskpanel)
+		      .addEventChange(new nRunnable() { public void run() { 
+		        if (!(preset_explorer.explored_bloc == mmain().saved_preset ||
+		            preset_explorer.explored_bloc.parent == mmain().saved_preset)) 
+		          preset_explorer.setStrtBloc(mmain().saved_preset);
+		        if (preset_explorer.selected_bloc != null && 
+		            (mmain().inter.data.values_found(value_bloc, preset_explorer.selected_bloc) || 
+		            		mmain().inter.data.values_found(preset_explorer.selected_bloc, value_bloc)) ) 
+		          match_flag.setLook(gui.theme.getLook("Label_HightLight_Back")).setText("matching");
+		        else match_flag.setLook(gui.theme.getLook("Label_DownLight_Back")).setText("");
+		      } } )
+		      ;
+		  mmain().presets_explorers.add(preset_explorer);
+		  
+		  preset_explorer.getShelf()
+		    .addSeparator(0.25)
+		    .addDrawer(1)
+		      .addCtrlModel("Button-S2-P1", "Save").setRunnable(new nRunnable() { public void run() { 
+		        save_preset(); } } ).setInfo("Save sheet values as preset").getDrawer()
+		      .addLinkedModel("Field-S2-P2").setLinkedValue(new_preset_name).getDrawer()
+		      .addCtrlModel("Button-S2-P3", "Load").setRunnable(new nRunnable() { public void run() { 
+		        load_preset(); } } ).setInfo("load corresponding preset values into sheet values").getDrawer()
+		      .getShelf()
+		    .addSeparator(0.25)
+		    ;
+		  //sheet_front.setPosition(
+		  //  screen_gui.view.pos.x + screen_gui.view.size.x - sheet_front.grabber.getLocalSX() - ref_size * 3, 
+		  //  screen_gui.view.pos.y + ref_size * 2 );
+		  
+		  custom_tab = bloc_front.addTab("Control");
+		
+		  custom_tab.getShelf()
+		    .addDrawer(10.25, 0.75)
+		    .addModel("Label-S10/0.75", "-  Control  -").setFont((int)(ref_size/1.5)).getShelf()
+		    .addSeparator(0.125)
+		    ;
+		  nRunnable.runEvents(eventsBuildMenu);
+		  
+		  build_custom_menu(bloc_front);
+		  
+		  bloc_front.addEventClose(new nRunnable(this) { public void run() { 
+		    if (preset_explorer != null) mmain().presets_explorers.remove(preset_explorer);
+		    bloc_front = null;
+		    menu_open_val.set(false); }});
+		} else {
+		  bloc_front.popUp();
+		}
+	}
 
-MBaseMenu(Macro_Sheet _sheet, String n, sValueBloc _bloc) { super(_sheet, n, _bloc); }
-void init() {
-	eventsBuildMenu = new ArrayList<nRunnable>();
-	menu_run = new nRunnable() { public void run() { build_bloc_menu(); }};
-	new_preset_name = newStr("preset_name", "pname", "new"); 
-	menu_open_val = newBoo("menu_open_val", "menuop", false); 
-}
-void init_end() {
-	super.init_end();
-	if (menu_open_val.get()) build_bloc_menu();
-}
-void build_param() {
-	addEmptyS(0);
-	addTrigS(1, "menu", menu_run);
-}
-void build_normal() {
-	addInputBang(0, "menu", menu_run);
-	addTrigS(1, "menu", menu_run);
-}
-public MBaseMenu clear() {
-	super.clear(); 
-	if (bloc_front != null) bloc_front.clear();
-	return this; }
-public MBaseMenu toLayerTop() {
-	super.toLayerTop(); 
-	return this;
-}
-
-MBaseMenu addEventsBuildMenu(nRunnable r) { eventsBuildMenu.add(r); return this; }
-ArrayList<nRunnable> eventsBuildMenu;
-nFrontTab custom_tab;
-nFrontPanel bloc_front;  
-nExplorer bloc_viewer, preset_explorer;
-sStr new_preset_name; sBoo menu_open_val;
-nWidget match_flag;
-nRunnable menu_run;
-
-public void build_custom_menu(nFrontPanel sheet_front) {}
-
-public void build_bloc_menu() {
-if (bloc_front == null) {
-		menu_open_val.set(true);	
-  bloc_front = new nFrontPanel(mmain().screen_gui, mmain().inter.taskpanel, val_title.get());
-  
-  bloc_front.addTab("View").getShelf()
-    .addSeparator(0.125)
-    .addDrawer(10.25, 1).addModel("Label-S3", "sheet view :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getShelf()
-    .addSeparator()
-    ;
-  bloc_viewer = bloc_front.getTab(0).getShelf(0)
-    .addSeparator()
-    .addExplorer()
-      .setChildAccess(false)
-      .setStrtBloc(value_bloc)
-      .addValuesModifier(mmain().inter.taskpanel)
-      .addEventChange(new nRunnable() { public void run() { 
-          if (bloc_viewer.explored_bloc != value_bloc) {
-            bloc_viewer.setStrtBloc(value_bloc);
-          }
-      } } )
-      ;
-  match_flag = bloc_front.addTab("Preset").getShelf()
-    .addSeparator(0.125)
-    .addDrawer(10.25, 1).addModel("Label-S3", "Presets :").setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
-    .addCtrlModel("Button-S2-P3", "Delete").setRunnable(new nRunnable() { public void run() { 
-      preset_explorer.selected_bloc.clear(); 
-      for (nExplorer e : mmain().presets_explorers) e.update(); } } )
-      .setInfo("delete selected preset").getDrawer()
-    .addModel("Label_DownLight_Back-S2-P2", "")
-      .setInfo("selected preset compatibility with this sheet");
-    
-  match_flag.getShelf()
-    .addSeparator()
-    ;
-  preset_explorer = bloc_front.getTab(1).getShelf(0)
-    .addSeparator()
-    .addExplorer()
-      .setStrtBloc(mmain().saved_preset)
-      //.hideGoBack()
-      .addValuesModifier(mmain().inter.taskpanel)
-      .addEventChange(new nRunnable() { public void run() { 
-        if (!(preset_explorer.explored_bloc == mmain().saved_preset ||
-            preset_explorer.explored_bloc.parent == mmain().saved_preset)) 
-          preset_explorer.setStrtBloc(mmain().saved_preset);
-        if (preset_explorer.selected_bloc != null && 
-            (mmain().inter.data.values_found(value_bloc, preset_explorer.selected_bloc) || 
-            		mmain().inter.data.values_found(preset_explorer.selected_bloc, value_bloc)) ) 
-          match_flag.setLook(gui.theme.getLook("Label_HightLight_Back")).setText("matching");
-        else match_flag.setLook(gui.theme.getLook("Label_DownLight_Back")).setText("");
-      } } )
-      ;
-  mmain().presets_explorers.add(preset_explorer);
-  
-  preset_explorer.getShelf()
-    .addSeparator(0.25)
-    .addDrawer(1)
-      .addCtrlModel("Button-S2-P1", "Save").setRunnable(new nRunnable() { public void run() { 
-        save_preset(); } } ).setInfo("Save sheet values as preset").getDrawer()
-      .addLinkedModel("Field-S2-P2").setLinkedValue(new_preset_name).getDrawer()
-      .addCtrlModel("Button-S2-P3", "Load").setRunnable(new nRunnable() { public void run() { 
-        load_preset(); } } ).setInfo("load corresponding preset values into sheet values").getDrawer()
-      .getShelf()
-    .addSeparator(0.25)
-    ;
-  //sheet_front.setPosition(
-  //  screen_gui.view.pos.x + screen_gui.view.size.x - sheet_front.grabber.getLocalSX() - ref_size * 3, 
-  //  screen_gui.view.pos.y + ref_size * 2 );
-  
-  custom_tab = bloc_front.addTab("Control");
-
-  custom_tab.getShelf()
-    .addDrawer(10.25, 0.75)
-    .addModel("Label-S10/0.75", "-  Control  -").setFont((int)(ref_size/1.5)).getShelf()
-    .addSeparator(0.125)
-    ;
-  nRunnable.runEvents(eventsBuildMenu);
-  
-  build_custom_menu(bloc_front);
-  
-  bloc_front.addEventClose(new nRunnable(this) { public void run() { 
-    if (preset_explorer != null) mmain().presets_explorers.remove(preset_explorer);
-    bloc_front = null;
-    menu_open_val.set(false); }});
-} else {
-  bloc_front.popUp();
-}
-}
-
-void save_preset() {
-Save_Bloc b = new Save_Bloc("");
-value_bloc.preset_value_to_save_bloc(b);
-mmain().saved_preset.newBloc(b, new_preset_name.get());
-for (nExplorer e : mmain().presets_explorers) { 
-  e.update();
-  e.selectEntry(new_preset_name.get());
-}
-}
-void load_preset() {
-if (preset_explorer.selected_bloc != null) {
-	mmain().inter.data.transfer_bloc_values(preset_explorer.selected_bloc, value_bloc);
-}
+	void save_preset() {
+		Save_Bloc b = new Save_Bloc("");
+		value_bloc.preset_value_to_save_bloc(b);
+		mmain().saved_preset.newBloc(b, new_preset_name.get());
+		for (nExplorer e : mmain().presets_explorers) { 
+		  e.update();
+		  e.selectEntry(new_preset_name.get());
+		}
+	}
+	void load_preset() {
+		if (preset_explorer.selected_bloc != null) {
+			mmain().inter.data.transfer_bloc_values(preset_explorer.selected_bloc, value_bloc);
+	}
 }
   
 
@@ -611,13 +658,14 @@ class MMPoints extends MBasic {
 
 
 class MPoint extends MBasic { 
-  static class MPoint_Builder extends MAbstract_Builder {
-	  MPoint_Builder() { super("point", "Point", "connection node", "Sheet"); }
-      MPoint build(Macro_Sheet s, sValueBloc b) { MPoint m = new MPoint(s, b); return m; }
+	static class MPoint_Builder extends MAbstract_Builder {
+		MPoint_Builder(Macro_Main m) { super("point", "Point", "connection node", "Sheet"); 
+			first_start_show(m); }
+      	MPoint build(Macro_Sheet s, sValueBloc b) { MPoint m = new MPoint(s, b); return m; }
     }
-  Macro_Connexion in, out; 
-  sStr val_label;
-  MPoint(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "point", _bloc); }
+  	Macro_Connexion in, out; 
+  	sStr val_label;
+  	MPoint(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "point", _bloc); }
 	public void init() {
 		val_label = newStr("val_label", "val_label");
 	}	
@@ -651,7 +699,8 @@ class MSheetCo extends MBasic {
 	}
   Macro_Element elem;
   nLinkedWidget view;
-  sStr val_view;
+  sStr val_view, links_save;
+  
   MSheetCo(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "co", _bloc); }
   public void init() {
     val_view = newStr("val", "val", "");
@@ -660,7 +709,7 @@ class MSheetCo extends MBasic {
     view = addEmptyS(0).addLinkedModel("MC_Element_SField");
     view.setLinkedValue(val_view);
     val_view.addEventChange(new nRunnable() { public void run() { 
-        elem.sheet_connect.setInfo(val_view.get());
+        if (sheet != mmain()) elem.sheet_connect.setInfo(val_view.get());
         elem.connect.setInfo(val_view.get());
     } });
     elem = addSheetOutput(1, "out");
@@ -683,24 +732,35 @@ class MSheetCo extends MBasic {
 }
 
 
-class MSheetMain extends MBasic { 
+class MSheetBloc extends MBasic { 
 	static class MSheetMain_Builder extends MAbstract_Builder {
 		MSheetMain_Builder() { 
-			super("sheetmain", "SheetMain", "sheet mains tools", "Sheet"); 
+			super("sheetmain", "Old - SheetBloc", "sheet tools", "Old"); 
 //			visible = false;
 			show_in_buildtool = false; }
-		MSheetMain build(Macro_Sheet s, sValueBloc b) { MSheetMain m = new MSheetMain(s, b); return m; }
+		MSheetBloc build(Macro_Sheet s, sValueBloc b) { MSheetBloc m = new MSheetBloc(s, b); return m; }
 	}
+	static class Builder extends MAbstract_Builder {
+		Builder() { 
+		super("sheetbloc", "SheetBloc", "sheet tools", "Sheet"); 
+//		visible = false;
+		show_in_buildtool = false; }
+	MSheetBloc build(Macro_Sheet s, sValueBloc b) { MSheetBloc m = new MSheetBloc(s, b); return m; }
+}
 	Macro_Element menu_elem;
 	Macro_Connexion in_menu;
-	nLinkedWidget stp_view; sBoo setup_send, menu_reduc; sVec menu_pos; sInt menu_tab;
+	nLinkedWidget stp_view; sBoo menu_open, menu_reduc; sVec menu_pos; sInt menu_tab;
 	nRunnable grab_run, reduc_run, close_run, tab_run;
 	  nRunnable goto_run;
 	  Macro_Connexion out_sheet;
 	  sBoo show1, show2, show3, show4;
-	MSheetMain(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "sheetmain", _bloc); }
+	MSheetBloc(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "sheetbloc", _bloc); 
+//		unclearable = true; 
+		if (sheet == mmain() && mmain().main_sheetbloc != null) { clear(); return; }
+		if (sheet == mmain()) mmain().main_sheetbloc = this;
+	}
 	void init() {
-	    setup_send = newBoo("stp_snd", "stp_snd", false);
+	    menu_open = newBoo("stp_snd", "stp_snd", false);
 	    menu_reduc = newBoo("menu_reduc", "menu_reduc", false);
 	    menu_tab = newInt("menu_tab", "menu_tab", 0);
 	    menu_pos = newVec("menu_pos", "menu_pos");
@@ -728,26 +788,27 @@ class MSheetMain extends MBasic {
 	    		if (sheet.sheet_front != null) menu_reduc.set(sheet.sheet_front.collapsed); } };
 	    tab_run = new nRunnable() { public void run() {
 	    		if (sheet.sheet_front != null) menu_tab.set(sheet.sheet_front.current_tab_id); } };
-	    close_run = new nRunnable() { public void run() { setup_send.set(false); } };
-
-	    if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	    		menu(); } });
+	    close_run = new nRunnable() { public void run() { 
+	    		menu_open.set(false); } };
 	}
 	void init_end() {
 		super.init_end();
-		if (!loading_from_bloc && menu_elem != null) { //
+		if (sheet != mmain() && !loading_from_bloc && menu_elem != null) { //
 			sheet.add_spot("left", menu_elem);
 			sheet.add_spot("right", out_sheet.elem);
 		}
+
+	    if (menu_open.get()) mmain().inter.addEventTwoFrame(new nRunnable() { public void run() {
+	    		menu(); } });
 	}
 	void build_param() {
 		menu_elem = addEmptyS(1);
 		menu_elem.addTrigS("menu", new nRunnable() { public void run() {
-		    		menu(); grab_run.run(); tab_run.run(); reduc_run.run(); } })
+		    		menu(); } })
 		    .setInfo("open sheet general menu");
-		menu_elem.addLinkedMiniSwitch("st", setup_send);
+		menu_elem.addLinkedMiniSwitch("st", menu_open);
 	    addInputBang(0, "open menu", new nRunnable() { public void run() { 
-	    		menu(); setup_send.set(true); } });
+	    		menu(); } });
 	    out_sheet = addOutput(2, "sheet link");
 	    out_sheet.set_link();
 
@@ -760,24 +821,27 @@ class MSheetMain extends MBasic {
 	    } });
     		
 	    addEmptyS(1); addEmptyS(2); 
-	    addEmptyXL(0).addSwitchXLSelector(1, "view", "show view access in normal view", show1)
-	    .addSwitchXLSelector(2, "open", "show openning control in normal view", show2)
-	    .addSwitchXLSelector(3, "self", "show selh object access in normal view", show3)
-	    .addSwitchXLSelector(4, "prio", "show sheet priority control in normal view", show4);
+	    Macro_Element m = 
+	    addEmptyXL(0);
+	    m.addSwitchXLSelector(1, "view", "show view access in normal view", show1);
+	    if (sheet != mmain()) m.addSwitchXLSelector(2, "open", "show openning control in normal view", show2);
+	    m.addSwitchXLSelector(3, "self", "show selh object access in normal view", show3);
+	    if (sheet != mmain()) m.addSwitchXLSelector(4, "prio", "show sheet priority control in normal view", show4);
 	    
 	    addTrigS(1, "view", goto_run).setInfo("view full sheet");
 	    addInputBang(0, "view", new nRunnable() { public void run() { goto_run.run(); }});
 	    addEmptyS(2);
 	    
+	    if (sheet != mmain()) {
 	    addInputBang(0, "Deploy Sheet", 
 	    		new nRunnable() { public void run() { sheet.deploy(); }});
 	    addInputBang(1, "Open Sheet", 
 	    		new nRunnable() { public void run() { sheet.open(); }});
 	    addInputBang(2, "Reduc Sheet", 
 	    		new nRunnable() { public void run() { sheet.reduc(); }});
-	    
+	    }
 	    newRowProtectedValue(sheet.val_self);
-	    newRowValue_Pan(sheet.priority);
+	    if (sheet != mmain()) newRowValue_Pan(sheet.priority);
 
 //	    newRowValue(sheet.grab_pos);
 	}
@@ -805,7 +869,7 @@ class MSheetMain extends MBasic {
 		    if (show2.get() || show3.get() || show4.get())
 		    		addEmptyS(2);
 	    }
-	    if (show2.get()) {
+	    if (show2.get() && sheet != mmain()) {
 		    addInputBang(0, "Dep", 
 		    		new nRunnable() { public void run() { sheet.deploy(); }});
 		    addInputBang(1, "Opn", 
@@ -816,33 +880,37 @@ class MSheetMain extends MBasic {
 	    if (show3.get()) {
 		  newRowProtectedValue(sheet.val_sheet);
 	    }
-	    if (show4.get()) {
+	    if (show4.get() && sheet != mmain()) {
 	    		newRowValue_Pan(sheet.priority);
 	    }
 	}
 	void menu() {
+	    menu_open.set(true);
 	    sheet.build_sheet_menu();
 	    if (sheet.sheet_front != null) { 
 		    if (menu_pos.get().x == 0 && menu_pos.get().y == 0) grab_run.run();
-		    if (setup_send.get()) {
-				if (!(menu_pos.get().x == 0 && menu_pos.get().y == 0)) sheet.sheet_front.grabber.setPosition(menu_pos.get());
+		    if (menu_open.get()) {
+				if (!(menu_pos.get().x == 0 && menu_pos.get().y == 0)) 
+					sheet.sheet_front.grabber.setPosition(menu_pos.get());
 				if (menu_reduc.get()) sheet.sheet_front.collapse(); else sheet.sheet_front.popUp();
 				sheet.sheet_front.setTab(menu_tab.get());
 		    }
-			setup_send.set(true);
+//			setup_send.set(true);
 			sheet.sheet_front.grabber.addEventDrag(grab_run); 
 			sheet.sheet_front.addEventTab(tab_run)
 			.addEventCollapse(reduc_run).addEventClose(close_run);  
 	    }
+		grab_run.run(); tab_run.run(); reduc_run.run(); 
 	}
-	public MSheetMain clear() {
+	public MSheetBloc clear() {
 	    if (sheet.sheet_front != null) sheet.sheet_front.grabber.removeEventDrag(grab_run);
 	    if (sheet.sheet_front != null) sheet.sheet_front.removeEventCollapse(reduc_run); 
 	    if (sheet.sheet_front != null) sheet.sheet_front.removeEventClose(close_run); 
 	    if (sheet.sheet_front != null) sheet.sheet_front.clear();
+	    if (mmain().main_sheetbloc == this) mmain().main_sheetbloc = null; 
 		super.clear(); 
 		return this; }
-	public MSheetMain toLayerTop() {
+	public MSheetBloc toLayerTop() {
 		super.toLayerTop(); 
 		return this; }
 }

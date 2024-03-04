@@ -6,6 +6,7 @@ public class Drawable {
 	  Drawing_pile pile = null;
 	  int layer = 0;
 	  private boolean active = true;
+	  boolean drawn_this_frame = false;
 	  Drawable set_view(boolean b) { if (b) show(); else hide(); return this; }
 	  Drawable show() { 
 		  //removing from array break drawing order...
@@ -34,6 +35,7 @@ public class Drawable {
 	    return this;
 	  }
 	  public void do_drawing() {
+		  drawn_this_frame = true;
 		  drawing();
 		  if (co_orderered_drawable == null)
 			  co_orderered_drawable = new ArrayList<Drawable>();

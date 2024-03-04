@@ -44,6 +44,7 @@ public class nTaskPanel extends nToolPanel {
 	    				w.toLayerTop();
 	    			}
 	    	} } );
+	    reduc.hide();
 	  } 
 	  public nTaskPanel updateHeight() { 
 	    super.updateHeight(); return this; }

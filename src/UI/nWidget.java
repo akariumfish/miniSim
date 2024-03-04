@@ -10,6 +10,32 @@ import processing.core.PVector;
 import sData.nRunnable;
 
 public class nWidget {
+	
+	public static ArrayList<nWidget> all_widgets = new ArrayList<nWidget>();
+
+	private String identity = ""; 
+	private boolean identity_flag = false; 
+	public  nWidget setIdentity(String s) { identity = s; return this; }
+	public  nWidget setIdentityFlag(boolean s) { identity_flag = s; return this; }
+	public  String getIdentity() { boolean[] last = new boolean[0]; return getIdentity(0, last); }
+	public  String getIdentity(int rec_count, boolean[] last) { 
+		String id = this + " widgetid:" + identity + " childs:";
+		if (identity_flag) {
+			for (int i = 0 ; i < 10 - rec_count ; i++) id += "    ";
+			id += ">>> FLAG <<<";
+		}
+		id += " "+'\n';
+		for (nWidget w : childs) {
+			for (int i = 0 ; i < rec_count - 1 ; i++) 
+				if (last[i]) id += "    "; else id += "  | ";
+			boolean[] last2 = new boolean[rec_count+1];
+			for (int i = 0 ; i < rec_count ; i++) last2[i] = last[i];
+			last2[rec_count] = childs.get(childs.size() - 1) == w;
+			id += "  |_" + w.getIdentity(rec_count+1, last2);
+			last2[rec_count] = false;
+		}
+		return id; 
+	}
 	  
   public  nWidget setDrawer(nDrawer d) { ndrawer = d; return this; }
   public  nDrawer getDrawer() { return ndrawer; }
@@ -97,12 +123,24 @@ public class nWidget {
   public nWidget setTextAlignment(int sx, int sy) { textAlignX = sx; textAlignY = sy; return this; }
   public nWidget setTextVisibility(boolean s) { show_text = s; return this; }
   public nWidget setTextAutoReturn(boolean s) { auto_line_return = s; return this; }
+  public nWidget setTextLineLength(int s) { set_line_length = s; return this; }
+  public nWidget setTextLineNoLength() { set_line_length = 0; return this; }
+  
+  
   public nWidget setInfo(String s) { if (s != null && s.length() > 0) { infoText = s; showInfo = true; } return this; }
   public nWidget setNoInfo() { showInfo = false; return this; }
   
   public nWidget setLook(nLook l) { look.copy(l); return this; }
   public nWidget setLook(nTheme t, String r) { look.copy(t.getLook(r)); return this; }
   public nWidget setLook(String r) { look.copy(gui.theme.getLook(r)); return this; }
+
+  public nWidget tempPassif(boolean b) { 
+    if (b != temp_passif) {
+    		if (!b && hover != null) hover.active = hoverHideState; 
+    		else if (hover != null) { hoverHideState = hover.active; hover.active = false; }
+    }
+    return this;
+  }
   
   public nWidget hide() { 
     if (!hide) {
@@ -166,7 +204,7 @@ public class nWidget {
     textAlignX = w.textAlignX; textAlignY = w.textAlignY; show_text = w.show_text;
     shapeRound = w.shapeRound; shapeLosange = w.shapeLosange; 
     showInfo = w.showInfo; infoText = RConst.str_copy(w.infoText);
-    auto_line_return = w.auto_line_return;
+    auto_line_return = w.auto_line_return; set_line_length = w.set_line_length;
     constrainDlength = w.constrainDlength; constrainD = w.constrainD;
     fine_view = w.fine_view; always_view = w.always_view;
     look.copy(w.look);
@@ -181,6 +219,7 @@ public class nWidget {
   }
   boolean has_been_cleared = false;
   public void clear() {
+	  all_widgets.remove(this);
     //if (ndrawer != null) ndrawer.widgets.remove(this);
     for (nWidget w : childs) w.clear();
     nRunnable.runEvents(eventClear);
@@ -281,25 +320,27 @@ public class nWidget {
     if (v != localrect.pos.y) { localrect.pos.y = v; changePosition(); return this; } return this; }
   public nWidget setSX(float v) { 
     if (v != localrect.size.x) { 
-      localrect.size.x = v; 
-      globalrect.size.x = getSX(); 
-      if (stackX && placeLeft) globalrect.pos.x = getX(); 
-      for (nWidget w : childs) 
-        if (((w.stackX || w.alignX) && w.placeRight) || ((stackX || alignX) && placeLeft)) w.changePosition(); 
-      nRunnable.runEvents(eventShapeChange); 
-      return this; 
+    		localrect.size.x = v; 
+//    		globalrect.size.x = getSX(); 
+//    		if (stackX && placeLeft) globalrect.pos.x = getX(); 
+		changePosition();
+//		for (nWidget w : childs) 
+//			if (((w.stackX || w.alignX) && w.placeRight) || ((stackX || alignX) && placeLeft)) w.changePosition(); 
+      	nRunnable.runEvents(eventShapeChange); 
+      	return this; 
     } 
     return this; 
   }
   public nWidget setSY(float v) { 
     if (v != localrect.size.y) { 
-      localrect.size.y = v; 
-      globalrect.size.y = getSY(); 
-      if (stackY && placeUp) globalrect.pos.y = getY(); 
-      for (nWidget w : childs) 
-        if (((w.stackY || w.alignY) && w.placeDown) || ((stackY || alignY) && placeUp)) w.changePosition(); 
-      nRunnable.runEvents(eventShapeChange); 
-      return this; 
+    		localrect.size.y = v; 
+//    		globalrect.size.y = getSY(); 
+//    		if (stackY && placeUp) globalrect.pos.y = getY(); 
+    		changePosition();
+//    		for (nWidget w : childs) 
+//    			if (((w.stackY || w.alignY) && w.placeDown) || ((stackY || alignY) && placeUp)) w.changePosition(); 
+    		nRunnable.runEvents(eventShapeChange); 
+    		return this; 
     } 
     return this; 
   }
@@ -436,7 +477,7 @@ public class nWidget {
   }
   
   protected nGUI gui;
-  private Drawable drawer;
+  Drawable drawer;
   private Hoverable hover;
   private Rect globalrect, localrect, phantomrect;
   private nWidget parent = null;
@@ -449,6 +490,7 @@ public class nWidget {
   
   private String label, infoText;
   private boolean auto_line_return = false;
+  private int set_line_length = 0;
   private float mx = 0, my = 0;
 //		  float pmx = 0, pmy = 0;
   private int cursorPos = 0;
@@ -457,7 +499,8 @@ public class nWidget {
 
   private boolean fine_view = false;
   private boolean always_view = false;
-  
+
+  private boolean temp_passif = false;
   private boolean switchState = false;
   public boolean isClicked = false;
   public boolean isHovered = false;
@@ -500,6 +543,7 @@ boolean constantOutlineWeight = false;
   private nRunnable frame_run;
   public Rapp app;
   void init(nGUI g) {
+	  all_widgets.add(this);
     gui = g; app = g.app;
     frame_run = new nRunnable() { public void run() { frame(); } };
     gui.addEventFrame(frame_run);
@@ -571,8 +615,11 @@ boolean constantOutlineWeight = false;
 	            ty += getLocalSY() - (look.textFont / 10);
 	          if (textAlignX == PConstants.LEFT)        tx += look.textFont / 4.0;
 	          else if (textAlignX == PConstants.CENTER) tx += getSX() / 2;
+	          else if (textAlignX == PConstants.BOTTOM) //ref to opposite side
+	        	  	tx += getSX() - gui.app.textWidth('n')*l.length();
 	
 	  	      float line_max_char = (getSX() / gui.app.textWidth('m'));
+	  	      if (set_line_length > 0) line_max_char = set_line_length;
 	          if (!auto_line_return || l.length() < line_max_char) app.text(l, tx, ty);
 	          else {
 	            int printed_char = 0;

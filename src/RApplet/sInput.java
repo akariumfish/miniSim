@@ -123,17 +123,18 @@ public sInput_Button keyAll;
   }  
 
   void keyPressedEvent() { 
-    //char k = key;
+    char k = app.key;
     //if (keyCtrl.state) { 
     //  k = char(keyCode);
     //  String ts = ""; ts = ts + k;
     //  ts = ts.toLowerCase();
     //  k = ts.charAt(0);
     //}
-    //logln(" "+k);
+//    if (!(app.key == PConstants.CODED && app.keyCode == PConstants.CONTROL))
+//    		app.logln(k+" "+Integer.toBinaryString((int)app.keyCode));
     
     for (sInput_Button b : buttons) 
-      if (b.ref.equals("k") && b.key_char == app.key) { b.eventPress(); pressed_keys.add(b); }
+      if (b.ref.equals("k") && b.key_char == app.keyCode) { b.eventPress(); pressed_keys.add(b); }
     if (app.key == PConstants.CODED) {
       if (app.keyCode == PConstants.LEFT) keyLeft.eventPress();
       if (app.keyCode == PConstants.RIGHT) keyRight.eventPress();
@@ -144,7 +145,7 @@ public sInput_Button keyAll;
       if (app.key == PConstants.BACKSPACE) keyBackspace.eventPress();
       if (app.key == PConstants.ENTER) keyEnter.eventPress();
       keyAll.eventPress();
-      last_key = app.key;
+      last_key = (char) app.keyCode;
     }
   }
 

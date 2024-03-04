@@ -35,14 +35,14 @@ public class nBinPanel extends nWindowPanel {
 	    
 	    getShelf()
 	      .addDrawer(7.25F, 1).getShelf()
-//	      .addDrawer(7.25F, 1)
-//	        .addCtrlModel("Button-S2", "OK")
-//	          .setRunnable(new nRunnable() { public void run() { clear(); } })
-//	          .setPX(2.375F*ref_size).getDrawer()
+	      .addDrawer(7.25F, 1)
+	        .addCtrlModel("Button-S2", "OK")
+	          .setRunnable(new nRunnable() { public void run() { clear(); } })
+	          .setPX(2.375F*ref_size).getDrawer()
 	          ;
 	    
-	    widget = getDrawer(0,0).addLinkedModel("Button-S4")
-	      .setLinkedValue(rval)
+	    widget = getDrawer(0,0).addLinkedModel("Button-S3", rval.ref)
+	      .setLinkedValue(rval).setPX(1.625F*ref_size)
 	      ;
 	  } 
 	  public nBinPanel clear() { 

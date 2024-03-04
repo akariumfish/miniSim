@@ -33,6 +33,17 @@ Global GUI Theme
 
 //drawing point
 public class nGUI {
+	
+
+	public  String getHierarchy() { 
+		String id = this + " widgets hierarchy:"+'\n';
+		for (nWidget w : nWidget.all_widgets) {
+			id += w.getIdentity();
+		}
+		id += '\n';
+		return id; 
+	}
+	
   public nGUI setMouse(PVector v) { mouseVector = v; return this; }
   public nGUI setpMouse(PVector v) { pmouseVector = v; return this; }
   public nGUI setView(Rect v) { view = v; updateView(); return this; }
