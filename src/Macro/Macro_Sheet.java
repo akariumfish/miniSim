@@ -96,7 +96,7 @@ public class Macro_Sheet extends Macro_Abstract {
         miny = -elem_space;
         maxx = panel.getLocalX() + panel.getLocalSX() + elem_space;
         maxy = panel.getLocalY() + panel.getLocalSY() + elem_space;
-    	  	for (Macro_Abstract m : child_macro) testChild( m);
+    	  	for (Macro_Abstract m : child_macro) testChild(m);
           back.setPosition(minx, miny);
           back.setSize(maxx - minx, maxy - miny);
           if (sheet != this) sheet.updateBack();
@@ -370,24 +370,24 @@ public class Macro_Sheet extends Macro_Abstract {
 
 		  nWidget spot = null;
 		  String ttl = BLOC_TOKEN + "empty" + BLOC_TOKEN + 
-				  spot_empty_nb + OBJ_TOKEN;
+				  spot_empty_nb;
 	      if (side.equals("left")) {
-	        left_s += ttl;
+	        left_s += ttl + OBJ_TOKEN;
 	        getShelf(0).removeDrawer(left_spot_drawer);
 	        nDrawer d = getShelf(0).addDrawer(2.25, 1.125);
 	        spot = d.addModel("MC_Panel_Spot_Back")
-//	        		.setTextVisibility(false)
+	        		.setTextVisibility(false)
 	        		.setText(ttl)
 	        		.setTrigger();
 	    	    spot.addEventTrigger(new nRunnable(spot) {public void run() {
 	        			remove_empty_spot("left", (nWidget)builder); }});
 	        getShelf(0).insertDrawer(left_spot_drawer);
 	      } else if (side.equals("right")) {
-	        right_s += ttl;
+	        right_s += ttl + OBJ_TOKEN;
 	        getShelf(1).removeDrawer(right_spot_drawer);
 	        nDrawer d = getShelf(1).addDrawer(2.25, 1.125);
 	        spot = d.addModel("MC_Panel_Spot_Back")
-//	        		.setTextVisibility(false)
+	        		.setTextVisibility(false)
 	        		.setText(ttl)
 	        		.setTrigger();
 	        spot.addEventTrigger(new nRunnable(spot) {public void run() {
@@ -463,7 +463,7 @@ public class Macro_Sheet extends Macro_Abstract {
     String left_s = OBJ_TOKEN, right_s = OBJ_TOKEN;
     if (spots_side_list.length == 2) { 
       left_s = RConst.copy(spots_side_list[0]); right_s = RConst.copy(spots_side_list[1]); }
-
+    
     String[] list = PApplet.splitTokens(left_s, OBJ_TOKEN);
     left_s = OBJ_TOKEN;
     for (String s : list) if (!s.equals(spot.getText())) left_s += s + OBJ_TOKEN;
@@ -503,6 +503,10 @@ public class Macro_Sheet extends Macro_Abstract {
     //logln("clear_child_elem_spot");
     for (Macro_Element t : child_elements) t.clear_spot();
     
+    spot_empty_nb = 0;
+    for (nWidget w : spot_empty_widget) w.clear();
+    spot_empty_widget.clear();
+    
     //logln("clear_left");
     ArrayList<nDrawer> a = new ArrayList<nDrawer>();
     getShelf(0).removeDrawer(left_spot_drawer);
@@ -534,8 +538,8 @@ public class Macro_Sheet extends Macro_Abstract {
     for (String elem_ref : list) {
       Macro_Element e = null;
       for (Macro_Element t : child_elements) if (t.descr.equals(elem_ref)) { e = t; break; }
-//      String[] l = PApplet.splitTokens(elem_ref, OBJ_TOKEN);
-      if (e != null || elem_ref.equals(BLOC_TOKEN + "empty" + BLOC_TOKEN + "empty")) 
+      String[] l = PApplet.splitTokens(elem_ref, BLOC_TOKEN);
+      if (e != null || (l.length > 0 && l[0].equals("empty"))) 
     	  	add_spot("left", e);
       
     }
@@ -544,9 +548,13 @@ public class Macro_Sheet extends Macro_Abstract {
     for (String elem_ref : list) {
       Macro_Element e = null;
       for (Macro_Element t : child_elements) if (t.descr.equals(elem_ref)) { e = t; break; }
-      if (e != null || elem_ref.equals(BLOC_TOKEN + "empty" + BLOC_TOKEN + "empty")) 
+      String[] l = PApplet.splitTokens(elem_ref, BLOC_TOKEN);
+      if (e != null || (l.length > 0 && l[0].equals("empty"))) 
     	  	add_spot("right", e);
     }
+    
+    moving();
+    toLayerTop();
     gui.app.mlogln(value_bloc.ref+ " redo_spot end ");
   }
   //when a spot is used the ref of the element and the nb and side of the spot are saved into the string
@@ -1007,6 +1015,14 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     } });
     return f;
   }
+  protected sInt menuIntWatch(sInt f) {
+    addEventsBuildMenu(new nRunnable(f) { public void run() { 
+      if (custom_tab != null) custom_tab.getShelf()
+      .addDrawerWatch(((sInt)builder), 10, 1)
+      .addSeparator(0.125);
+    } });
+    return f;
+  }
   sFlt menuFltIncr(float v, float _f, String r) {
     sFlt f = newFlt(v, r, r);
     f.ctrl_factor = _f;
@@ -1285,13 +1301,14 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
             elem_descr_l[0] = changepart[1];
           }
         }
+//        gui.app.mlogln(elem_descr_l[0]);
         if (elem_descr_l[0].equals("empty"))
         		spot_empty_nb = Math.max(PApplet.parseInt(elem_descr_l[1]), spot_empty_nb);
         String new_elem = BLOC_TOKEN+elem_descr_l[0]+BLOC_TOKEN+elem_descr_l[1];
         gui.app.mlogln("renamed "+new_elem);
         Macro_Element e = null;
         for (Macro_Element t : child_elements) if (t.descr.equals(new_elem)) { e = t; break; }
-        if (e != null) {
+        if (e != null) {// || elem_descr_l[0].equals("empty")
 	        if (side == 0) add_spot("left", e);
 	        if (side == 1) add_spot("right", e);
         }

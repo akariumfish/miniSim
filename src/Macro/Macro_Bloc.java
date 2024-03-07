@@ -23,30 +23,12 @@ import sData.*;
 //}
 
 public class Macro_Bloc extends Macro_Abstract {
-	  nCtrlWidget get_param_openner() {
-		  if (param_open == null) {
-			  param_open = addCtrlModel("MC_Param", "P");
-			  param_open.setParent(panel).setInfo("show/hide param");
-		  }
-		  return param_open;
-	  }
-	  nCtrlWidget get_mirror() {
-		  if (mirror_sw == null) {
-			  mirror_sw = addCtrlModel("MC_Mirror", "|");
-			  mirror_sw.setParent(panel).setInfo("mirror");
-		  }
-		  return mirror_sw;
-	  }
-	  Macro_Bloc set_param_action(nRunnable r) {
-		  get_param_openner().setRunnable(r);
-		  return this;
-	  }
 
 	  
 	  
 	  
 	Macro_Connexion addInputToValue(int c, sValue v) { 
-	  Macro_Connexion in = addInput(0, v.ref);
+	  Macro_Connexion in = addInput(c, v.ref);
 	  linkInputToValue(in, v);
 	  return in;
 	}
@@ -434,9 +416,36 @@ public class Macro_Bloc extends Macro_Abstract {
     
     
     
-    
-    
   Macro_Element addSelectS(int c, sBoo v1, sBoo v2, String s1, String s2) { 
+    Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
+    addElement(c, m); 
+    nWidget w1 = m.addLinkedModel("MC_Element_Button_Selector_1", s1).setLinkedValue(v1);
+    nWidget w2 = m.addLinkedModel("MC_Element_Button_Selector_2", s2).setLinkedValue(v2);
+    return m;
+  }
+  
+  Macro_Element addSelectL(int c, sBoo v1, sBoo v2, sBoo v3, 
+                           String s1, String s2, String s3) { 
+    Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);
+    addElement(c, m); 
+    nWidget w1 = m.addLinkedModel("MC_Element_Button_Selector_1", s1).setLinkedValue(v1);
+    nWidget w2 = m.addLinkedModel("MC_Element_Button_Selector_2", s2).setLinkedValue(v2);
+    nWidget w3 = m.addLinkedModel("MC_Element_Button_Selector_3", s3).setLinkedValue(v3);
+    return m;
+  }
+  
+  Macro_Element addSelectL(int c, sBoo v1, sBoo v2, sBoo v3, sBoo v4, 
+                           String s1, String s2, String s3, String s4) { 
+    Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);
+    addElement(c, m); 
+    nWidget w1 = m.addLinkedModel("MC_Element_Button_Selector_1", s1).setLinkedValue(v1);
+    nWidget w2 = m.addLinkedModel("MC_Element_Button_Selector_2", s2).setLinkedValue(v2);
+    nWidget w3 = m.addLinkedModel("MC_Element_Button_Selector_3", s3).setLinkedValue(v3);
+    nWidget w4 = m.addLinkedModel("MC_Element_Button_Selector_4", s4).setLinkedValue(v4);
+    return m;
+  }
+    
+  Macro_Element addSelectS_Excl(int c, sBoo v1, sBoo v2, String s1, String s2) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Single", null, NO_CO, NO_CO, true);
     addElement(c, m); 
     nWidget w1 = m.addLinkedModel("MC_Element_Button_Selector_1", s1).setLinkedValue(v1);
@@ -446,7 +455,7 @@ public class Macro_Bloc extends Macro_Abstract {
     return m;
   }
   
-  Macro_Element addSelectL(int c, sBoo v1, sBoo v2, sBoo v3, 
+  Macro_Element addSelectL_Excl(int c, sBoo v1, sBoo v2, sBoo v3, 
                            String s1, String s2, String s3) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);
     addElement(c, m); 
@@ -459,7 +468,7 @@ public class Macro_Bloc extends Macro_Abstract {
     return m;
   }
   
-  Macro_Element addSelectL(int c, sBoo v1, sBoo v2, sBoo v3, sBoo v4, 
+  Macro_Element addSelectL_Excl(int c, sBoo v1, sBoo v2, sBoo v3, sBoo v4, 
                            String s1, String s2, String s3, String s4) { 
     Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);
     addElement(c, m); 
@@ -598,6 +607,27 @@ public class Macro_Bloc extends Macro_Abstract {
     return m;
   }
   
+  
+  
+
+  nCtrlWidget get_param_openner() {
+	  if (param_open == null) {
+		  param_open = addCtrlModel("MC_Param", "P");
+		  param_open.setParent(panel).setInfo("show/hide param");
+	  }
+	  return param_open;
+  }
+  nCtrlWidget get_mirror() {
+	  if (mirror_sw == null) {
+		  mirror_sw = addCtrlModel("MC_Mirror", "|");
+		  mirror_sw.setParent(panel).setInfo("mirror");
+	  }
+	  return mirror_sw;
+  }
+  Macro_Bloc set_param_action(nRunnable r) {
+	  get_param_openner().setRunnable(r);
+	  return this;
+  }
   
   
 

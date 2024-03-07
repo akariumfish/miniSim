@@ -298,7 +298,8 @@ public class sInterface {
   }
   
   void file_explorer_save() {
-    if (file_explorer != null && !filempath_value.get().equals("default.sdata")) {
+    if (file_explorer != null && file_explorer.starting_bloc != null && 
+    		!filempath_value.get().equals("default.sdata")) {
       file_savebloc.clear();
       file_explorer.starting_bloc.preset_to_save_bloc(file_savebloc);
       file_savebloc.save_to(filempath_value.get());
@@ -432,7 +433,7 @@ public class sInterface {
   }
   public nWidget match_flag;
   public  nWindowPanel files_panel;
-  public String version_title = "MiniSim 0.3.5";
+  public String version_title = "MiniSim 0.3.6";
   public String savepath = "start.sdata";
   public sStr savepath_value, filempath_value;
   public sBoo auto_load, log_ext_save;

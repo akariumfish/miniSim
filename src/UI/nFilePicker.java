@@ -41,9 +41,11 @@ public class nFilePicker extends nWindowPanel {
 	    
 	    if (!_autoclose) {
 	      info = getShelf().addSeparator(0.25F)
-	        .addDrawer(1.4F)
-	          .addLinkedModel("Label-S4", "Selected File :")
-	          .setLinkedValue(val_cible).setTextAlignment(PApplet.LEFT, PApplet.TOP);
+	        .addDrawer(1.0F)
+	          .addLinkedModel("Field-S4")
+	          .setLinkedValue(val_cible).setTextAlignment(PApplet.LEFT, PApplet.TOP)
+	          .addEventFieldEnter(new nRunnable() { public void run() { 
+	            clear(); runEvents(eventsChoose); } });
 	    
 	      getShelf()
 	        .addSeparator(0.25F)

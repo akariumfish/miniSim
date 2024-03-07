@@ -75,10 +75,15 @@ public class nWidget {
   public nWidget addEventSwitchOff(nRunnable r)  { eventSwitchOffRun.add(r); return this; }
   public nWidget clearEventSwitchOn()   { eventSwitchOnRun.clear(); return this; }
   public nWidget clearEventSwitchOff()  { eventSwitchOffRun.clear(); return this; }
-  
+
   public nWidget addEventFieldChange(nRunnable r) { eventFieldChangeRun.add(r); return this; }
   public nWidget removeEventFieldChange(nRunnable r) { eventFieldChangeRun.remove(r); return this; }
   public nWidget clearEventFieldChange() { eventFieldChangeRun.clear(); return this; }
+  
+  
+  public nWidget addEventFieldEnter(nRunnable r) { eventFieldEnterRun.add(r); return this; }
+
+  public nWidget addEventFieldUnselect(nRunnable r) { eventFieldUnselectRun.add(r); return this; }
   
   public nWidget setDrawable(Drawable d) { 
     gui.drawing_pile.drawables.remove(drawer); 
@@ -539,6 +544,8 @@ boolean constantOutlineWeight = false;
   ArrayList<nRunnable> eventSwitchOnRun = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventSwitchOffRun = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventFieldChangeRun = new ArrayList<nRunnable>();
+  ArrayList<nRunnable> eventFieldEnterRun = new ArrayList<nRunnable>();
+  ArrayList<nRunnable> eventFieldUnselectRun = new ArrayList<nRunnable>();
   
   private nRunnable frame_run;
   public Rapp app;
@@ -730,7 +737,10 @@ boolean constantOutlineWeight = false;
         }
       } else if (!isHovered && gui.in.getClick("MouseLeft") && isSelected) {
         showOutline = prev_select_outline;
-        if (isField) showCursor = false;
+        if (isField) { 
+        		showCursor = false;
+        		nRunnable.runEvents(eventFieldUnselectRun);
+        }
         isSelected = false;
         gui.field_used = false;
       }
@@ -746,6 +756,7 @@ boolean constantOutlineWeight = false;
         nRunnable.runEvents(eventFieldChangeRun);
       }
       else if (gui.in.getClick("Enter")) {
+    	  	nRunnable.runEvents(eventFieldEnterRun);
               // it break the saving!!!
         //String str = label.substring(0, cursorPos);
         //String end = label.substring(cursorPos, label.length());
@@ -765,5 +776,18 @@ boolean constantOutlineWeight = false;
     nRunnable.runEvents(eventFrameRun);
   }
   private boolean prev_select_outline = false;
+  public void field_select() {
+	  isSelected = !isSelected;
+      if (isSelected) {
+        prev_select_outline = showOutline;
+        showOutline = true;
+        if (isField) showCursor = true;
+        gui.field_used = true;
+      } else {
+        showOutline = prev_select_outline;
+        if (isField) showCursor = false;
+        gui.field_used = false;
+      }
+  }
 }
 

@@ -18,25 +18,30 @@ public class nTheme {
 	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    return new nWidget(app).copy(m); }
+	  app.logln("Widget model unfound: "+r);
 	  return null; }
 	public nWidget newWidget(nGUI g, String r) {
 	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    return new nWidget(g).copy(m); }
+	  app.logln("Widget model unfound: "+r);
 	  return null; }
 	public nLinkedWidget newLinkedWidget(nGUI g, String r) {
 	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    nLinkedWidget lw = new nLinkedWidget(g); lw.copy(m); return lw; }
+	  app.logln("Widget model unfound: "+r);
 	  return null; }
 	public nWatcherWidget newWatcherWidget(nGUI g, String r) {
 	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    nWatcherWidget lw = new nWatcherWidget(g); lw.copy(m); return lw; }
+	  app.logln("Widget model unfound: "+r);
 	  return null; }
 	public nCtrlWidget newCtrlWidget(nGUI g, String r) {
 	  for (Map.Entry<String,nWidget> me : models.entrySet()) if (me.getKey().equals(r)) { 
 	    nWidget m = (nWidget)me.getValue(); 
 	    nCtrlWidget lw = new nCtrlWidget(g); lw.copy(m); return lw; }
+	  app.logln("Widget model unfound: "+r);
 	  return null; }
 }

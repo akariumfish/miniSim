@@ -105,7 +105,7 @@ class MInput extends MBasic {
 		    ctrl_swt = key_field.getDrawer().addLinkedModel("MC_Element_MiniButton")
 		    		.setLinkedValue(ctrl_filter);
 		    ctrl_swt.setInfo("desactive send when macros are hided");
-		    addSelectS(0, val_swtch, val_trig, "Swtch", "Trig");
+		    addSelectS_Excl(0, val_swtch, val_trig, "Swtch", "Trig");
 		    out_key_t = addOutput(1, "out")
 		    		.setDefBang();
 		    addEmptyS(1);
@@ -180,24 +180,39 @@ class MInput extends MBasic {
 } 
 
 
-class MGate extends Macro_Bloc {
-
+class MGate extends MBasic {
   static class MGate_Builder extends MAbstract_Builder {
-	  MGate_Builder() { super("gate", "Gate", "flow control", "Control"); }
+	  MGate_Builder(Macro_Main m) { super("gate", "Gate", "flow control", "Control"); 
+	  	  first_start_show(m); }
 	  MGate build(Macro_Sheet s, sValueBloc b) { MGate m = new MGate(s, b); return m; }
   }
-  
-  Macro_Connexion in_m, in_b, out;
+  Macro_Connexion in_m, in_b, out, out_inv;
   nLinkedWidget swtch; 
-  sBoo state;
-  MGate(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "gate", "gate", _bloc); 
-    
+  sBoo state; sStr label;
+  MGate(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "gate", _bloc); }
+  public void init() {
     state = newBoo("state", "state", false);
-    
-    in_m = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in_m.lastPack() != null && state.get()) out.send(in_m.lastPack());
-    } });
+    label = newStr("label", "label");
+  }
+  public void build_param() {
+	addEmpty(1);
+  	addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(label);
+  	label.addEventChange(new nRunnable() { public void run() { 
+ 		if (swtch != null) swtch.setText(label.get());
+ 	} } );
+	build_normal();
+  }
+  public void build_normal() {
+    in_m = addInput(0, "in");
+//    .addEventReceive(new nRunnable() { public void run() { 
+//      if (in_m.lastPack() != null)
+//    	  	if (state.get()) out.send(in_m.lastPack());
+//    	  	else out_inv.send(in_m.lastPack());
+//    } });
+    state.addEventChange(new nRunnable() { public void run() { 
+    		if (state.get()) { in_m.direct_deconnect(out_inv); in_m.direct_connect(out); } 
+    		else { in_m.direct_deconnect(out); in_m.direct_connect(out_inv); }
+    }});
     in_b = addInput(0, "gate").addEventReceive(new nRunnable() { public void run() { 
       if (in_b.lastPack() != null && in_b.lastPack().isBool()) 
         state.set(in_b.lastPack().asBool()); 
@@ -205,10 +220,16 @@ class MGate extends Macro_Bloc {
         state.set(!state.get()); 
     } });
     out = addOutput(1, "out");
-    
-    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton").setLinkedValue(state);
-    
+    out_inv = addOutput(1, "inv");
+
+    in_m.set_undefine();
+  	out_inv.set_undefine();
+  	out.set_undefine();
+    swtch = out_inv.elem.addLinkedModel("MC_Element_SButton", label.get()).setLinkedValue(state);
+    swtch.setPX(-ref_size*1.5);
   }
+  public Macro_Connexion get_active_out() { 
+	  if (state.get()) return out; else return out_inv; }
   public MGate clear() {
     super.clear(); return this; }
 }

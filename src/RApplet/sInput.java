@@ -134,7 +134,7 @@ public sInput_Button keyAll;
 //    		app.logln(k+" "+Integer.toBinaryString((int)app.keyCode));
     
     for (sInput_Button b : buttons) 
-      if (b.ref.equals("k") && b.key_char == app.keyCode) { b.eventPress(); pressed_keys.add(b); }
+      if (b.ref.equals("k") && b.key_char == app.key) { b.eventPress(); pressed_keys.add(b); }
     if (app.key == PConstants.CODED) {
       if (app.keyCode == PConstants.LEFT) keyLeft.eventPress();
       if (app.keyCode == PConstants.RIGHT) keyRight.eventPress();
@@ -145,7 +145,7 @@ public sInput_Button keyAll;
       if (app.key == PConstants.BACKSPACE) keyBackspace.eventPress();
       if (app.key == PConstants.ENTER) keyEnter.eventPress();
       keyAll.eventPress();
-      last_key = (char) app.keyCode;
+      last_key = (char) app.key;
     }
   }
 

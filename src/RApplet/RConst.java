@@ -11,6 +11,10 @@ public interface RConst {
 	static String str_copy(String s) { 
 		if (s != null) return "" + s/*.substring(0, s.length())*/; else return null; }
 	
+	static public boolean xor(boolean a, boolean b) {
+		return (a || b) && !(a && b);
+	}
+	
 	static public boolean testParseFlt(String s) {
 		return s.length() > 0 && !PApplet.str(Rapp.parseFlt(s)).equals("NaN");
 	}

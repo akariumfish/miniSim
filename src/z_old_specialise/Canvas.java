@@ -127,9 +127,9 @@ public class Canvas extends Macro_Sheet {
 	    val_scale = menuFltSlide(def_pix_size, 10, 500, "val_scale");
 	    color_keep_thresh = menuFltSlide(200, 10, 260, "clrkeep_thresh");
 	    val_decay = menuFltSlide(1, 0.99F, 1.01F, "decay");
-	    val_show = newBoo(true, "val_show", "show_canvas");
-	    val_show_bound = newBoo(true, "val_show_bound", "show_bound");
-	    val_show_grab = newBoo(true, "val_show_grab", "show_grab");
+	    val_show = newBoo(false, "val_show", "show_canvas");
+	    val_show_bound = newBoo(false, "val_show_bound", "show_bound");
+	    val_show_grab = newBoo(false, "val_show_grab", "show_grab");
 //	    selected_com = newStr("selected_com", "scom", "");
 	    val_col_back = menuColor(gui.app.color(0), "background");
 	    val_col_back.addEventChange(new nRunnable() { public void run() { 

@@ -64,18 +64,24 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	    addLinkedModel("MC_Element_MiniButton", sw_txt).setLinkedValue(vb);
 	    return cw;
 	  }
-	  
+	  Macro_Element no_mirror() { no_mirror = true; return this; } 
 	  Macro_Element mirror(boolean b) { 
-		  if (connect != null) connect.mirror(b);
-		  if (sheet_connect != null) sheet_connect.mirror(b);
-		  int f = 1;
-		  if (bloc.shelfs.get(2).drawers.size() > 0) f = 2;
-		  if (    bloc.shelfs.get(1).drawers.size() > 0 || 
-				  bloc.shelfs.get(2).drawers.size() > 0) {
-			  if 		(b && shelf_ind == 0) 	back.setPX(ref_size*2.25*f);
-			  else if 	(b && shelf_ind == f) 	back.setPX(-ref_size*2.25*f);
-			  else 								back.setPX(0);
-		  } else back.setPX(0);
+		  if (!no_mirror) {
+			  if (connect != null) connect.mirror(b);
+			  if (sheet_connect != null) sheet_connect.mirror(b);
+			  int f = 1;
+			  if (bloc.shelfs.get(2).drawers.size() > 0) f = 2;
+			  if (    bloc.shelfs.get(1).drawers.size() > 0 || 
+					  bloc.shelfs.get(2).drawers.size() > 0) {
+				  if 		(b && shelf_ind == 0) 	back.setPX(ref_size*2.25*f);
+				  else if 	(b && shelf_ind == f) 	back.setPX(-ref_size*2.25*f);
+				  else 								back.setPX(0);
+			  } else back.setPX(0);
+		  } else {
+			  if (connect != null) connect.mirror(false);
+			  if (sheet_connect != null) sheet_connect.mirror(false);
+			  back.setPX(0);
+		  }
 	      return this;
 	  }
 	  int shelf_ind = 0, row_ind = 0;
@@ -84,6 +90,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	  Macro_Connexion connect = null, sheet_connect = null;
 	  Macro_Bloc bloc;
 	  boolean sheet_viewable = false, was_viewable = false;
+	  boolean no_mirror = false;
 	  String descr;
 	  sObj val_self;
 	  nRunnable spot_select_run;
@@ -239,19 +246,18 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 //	    if (connect != null) connect.buildLayerTo(d); 
 //		return this; }
 	  public Macro_Element toLayerTop() { 
-	    if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
-    		for (nWidget w : elem_widgets) w.toLayerTop();
-//	    		back.toLayerTop();  // better
+//	    if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
     	    if (sheet_connect != null) sheet_connect.toLayerTop(); 
     	    if (connect != null) connect.toLayerTop(); 
+    		for (nWidget w : elem_widgets) w.toLayerTop();
 	    return this;
 	  }
 	  public Macro_Element widget_toLayTop() { 
-		  if (spot != null) spot.toLayerTop();
-		  back.toLayerTop();
-	    		for (nWidget w : elem_widgets) if (w != back) w.toLayerTop();
-	    	    if (sheet_connect != null) sheet_connect.toLayerTop(); 
-	    	    if (connect != null) connect.toLayerTop(); 
+	    if (spot != null) spot.toLayerTop();
+	    back.toLayerTop();
+  	    if (sheet_connect != null) sheet_connect.toLayerTop(); 
+  	    if (connect != null) connect.toLayerTop(); 
+    		for (nWidget w : elem_widgets) if (w != back) w.toLayerTop();
 	    return this;
 	  }
 	  ArrayList<nWidget> elem_widgets = new ArrayList<nWidget>();

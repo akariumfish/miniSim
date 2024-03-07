@@ -2,6 +2,7 @@ package Macro;
 
 import java.util.ArrayList;
 
+import RApplet.RConst;
 import UI.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -13,6 +14,54 @@ public class M_Sheet {}
 
 
 class MBasic extends Macro_Bloc { 
+  static class Builder extends MAbstract_Builder {
+	  Builder(Macro_Main m) { super("base", "Base", "Base Bloc", "Sheet"); 
+	  first_start_show(m); }
+	  MBasic build(Macro_Sheet s, sValueBloc b) { MBasic m = new MBasic(s); return m; }
+    }
+  sStr bloc_type;
+  nWidget bloc_field;
+  boolean builder_mode = false;
+  MBasic(Macro_Sheet _sheet) { super(_sheet, "base", "base", null); init_creator(); }
+  MBasic(Macro_Sheet _sheet, PVector pos) {  // for adding at mouse position
+	  super(_sheet, "base", "base", null); 
+	  setPosition(pos.x-ref_size*2.25F, pos.y-ref_size*1.0F);
+	  init_creator(); 
+	  if (mmain().active_construct != null) mmain().active_construct.clear();
+	  mmain().active_construct = this; }
+  void init_creator() {
+	  hide_ctrl = true;
+	  title.hide(); reduc.hide();
+      prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
+	  bloc_type = newStr("val", "val", "");
+	  addEmpty(1);
+	  bloc_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(bloc_type);
+	  bloc_field.setPosition(ref_size*0.125, ref_size*0.0625)
+	  	.setSize(ref_size*4.25, ref_size*1);
+	  bloc_type.addEventChange(new nRunnable() { public void run() { 
+		  for (MAbstract_Builder mb : mmain().bloc_builders) if (mb.type.equals(bloc_type.get())) {
+			  Macro_Abstract m = mb.build(sheet, null);//((MAbstract_Builder)builder)
+			  m.setPosition(grab_pos.get().x, grab_pos.get().y);
+			  mmain().inter.addEventNextFrame(new nRunnable(m) { public void run() {
+				  clear();
+				  m.szone_select();
+			  }});
+		  }
+	  } } );
+	  bloc_field.addEventFieldUnselect(new nRunnable() { public void run() { clear(); } } );
+	  mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() {
+		  szone_unselect();
+		  mmain().selected_macro.remove((MBasic)builder);
+		  mmain().update_select_bound();
+		  bloc_field.field_select();
+	  }});
+  }
+
+  public MBasic clear() {
+    super.clear(); 
+    if (mmain().active_construct == this) mmain().active_construct = null;
+    return this; }
+  
   Macro_Element elem_com;
   
   sBoo param_view, mirror_view;
@@ -24,14 +73,14 @@ class MBasic extends Macro_Bloc {
   boolean rebuilding = false;
   MBasic(Macro_Sheet _sheet, String t, sValueBloc _bloc) { 
     super(_sheet, t, t, _bloc);
-    
+    builder_mode = true;
     links_save = newStr("links_save", "links_save", "");
     
     param_view = newBoo("com_param_view", "com_param_view", false);
 	mirror_view = newBoo("mirror_view", "mirror_view", false);
 	param_view.addEventChange(new nRunnable() { public void run() { 
-        if (param_view.get()) param_ctrl.setText("P");
-        else param_ctrl.setText("N");
+        if (param_view.get()) param_ctrl.setText("N").setInfo("hide param");
+        else param_ctrl.setText("P").setInfo("show param");
 	}});
     get_mirror().setRunnable(new nRunnable() { public void run() { 
     		mirror_view.set(!mirror_view.get());
@@ -41,8 +90,8 @@ class MBasic extends Macro_Bloc {
         param_view.set(!param_view.get());
         rebuild();
     } });
-    if (param_view.get()) param_ctrl.setText("P");
-    else param_ctrl.setText("N");
+    if (param_view.get()) param_ctrl.setText("N").setInfo("hide param");
+    else param_ctrl.setText("P").setInfo("show param");
     init();
     if (param_view.get()) build_param();
     else build_normal();
@@ -53,8 +102,17 @@ class MBasic extends Macro_Bloc {
   
   void init_end() {
 	  super.init_end();
-	  for (Macro_Element m : elements) m.mirror(mirror_view.get());
-	  load_co_links();
+	  if (builder_mode) {
+		  for (Macro_Element m : elements) {
+			  m.mirror(mirror_view.get());
+			  nRunnable link_change_run = new nRunnable() {public void run() {
+				  save_co_links(); } };
+			  if (m.connect != null) m.connect.addEventChangeLink(link_change_run);
+			  if (m.sheet_connect != null) 
+				  m.sheet_connect.addEventChangeLink(link_change_run);
+		  }
+		  load_co_links();
+	  }
   }
   void load_co_links() {
       for (Macro_Element e : elements) {
@@ -121,9 +179,6 @@ class MBasic extends Macro_Bloc {
       if (was_select) mv.szone_select();
     }
   }
-  public MBasic clear() {
-    super.clear(); 
-    return this; }
   public MBasic toLayerTop() {
     super.toLayerTop(); 
     return this; }
@@ -280,59 +335,78 @@ class MBaseMenu extends MBasic {
 	void load_preset() {
 		if (preset_explorer.selected_bloc != null) {
 			mmain().inter.data.transfer_bloc_values(preset_explorer.selected_bloc, value_bloc);
+		}
 	}
-}
   
 
-sInt menuIntSlide(int v, int _min, int _max, String r) {
-	boolean new_val = value_bloc.getValue(r) == null;
-	sInt f = newInt(v, r, r);
-	if (new_val) f.set_limit(_min, _max);
-	addEventsBuildMenu(new nRunnable(f) { public void run() { 
-	  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
-	  .addModel("Label_Small_Text-S1-P1", ((sInt)builder).ref)
-	    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
-	  .addWatcherModel("Auto_Watch_Label-S1-P3")
-	    .setLinkedValue(((sInt)builder))
-	    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
-	  .addWidget(new nSlide(custom_tab.gui, ref_size * 6, ref_size * 0.75F)
-	    .setValue( ( ((sInt)builder).get() - ((sInt)builder).getmin() ) / 
-	               ( ((sInt)builder).getmax() - ((sInt)builder).getmin() ) )
-	    .addEventSlide(new nRunnable(((sInt)builder)) { public void run(float c) { 
-	      ((sInt)builder).set( (int)( ((sInt)builder).getmin() + 
-	                                c * (((sInt)builder).getmax() - ((sInt)builder).getmin()) ) ); 
-	    } } )
-	    .setPosition(4*ref_size, ref_size * 2 / 16) ).getShelf()
-	  .addSeparator(0.125);
-	} });
-	return f;
-}
-protected sFlt menuFltSlide(float v, float _min, float _max, String r) {
-	boolean new_val = value_bloc.getValue(r) == null;
-	sFlt f = newFlt(v, r, r);
-	if (new_val) f.set_limit(_min, _max);
-	addEventsBuildMenu(new nRunnable(f) { public void run() { 
-	  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
-	  .addModel("Label_Small_Text-S1-P1", ((sFlt)builder).ref)
-	    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
-	  .addWatcherModel("Auto_Watch_Label-S1-P3")
-	    .setLinkedValue(((sFlt)builder))
-        .setSX(ref_size*2.0)
-        .setPX(ref_size*2.875)
-	    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
-	  .addWidget(new nSlide(custom_tab.gui, ref_size * 5, ref_size * 0.75F)
-	    .setValue( ( ((sFlt)builder).get() - ((sFlt)builder).getmin() ) / 
-	               ( ((sFlt)builder).getmax() - ((sFlt)builder).getmin() ) )
-	    .addEventSlide(new nRunnable(((sFlt)builder)) { public void run(float c) { 
-	      ((sFlt)builder).set( ((sFlt)builder).getmin() + 
-	                           c * (((sFlt)builder).getmax() - ((sFlt)builder).getmin()) ); 
-	    } } )
-	    .setPosition(5*ref_size, ref_size * 2 / 16) ).getShelf()
-	  .addSeparator(0.125);
-	} });
-	return f;
-}
-public sCol menuColor(int v, String r) {
+	
+	protected sValue menuWatch(sValue f) {
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+			if (custom_tab != null) custom_tab.getShelf()
+			.addDrawerWatch(((sValue)builder), 10, 1)
+			.addSeparator(0.125);
+		} });
+		return f;
+  	}
+	public void menuRun(sRun r1, sRun r2, sRun r3) {
+	    addEventsBuildMenu(new nRunnable() { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addCtrlModel("Auto_Button-S2-P1", r1.ref).setLinkedValue(r1).getDrawer()
+	        .addCtrlModel("Auto_Button-S2-P2", r2.ref).setLinkedValue(r2).getDrawer()
+	        .addCtrlModel("Auto_Button-S2-P3", r3.ref).setLinkedValue(r3).getShelf()
+	        .addSeparator(0.125);
+	    } });
+	}
+	sInt menuIntSlide(int v, int _min, int _max, String r) {
+		boolean new_val = value_bloc.getValue(r) == null;
+		sInt f = newInt(v, r, r);
+		if (new_val) f.set_limit(_min, _max);
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
+		  .addModel("Label_Small_Text-S1-P1", ((sInt)builder).ref)
+		    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+		  .addWatcherModel("Auto_Watch_Label-S1-P3")
+		    .setLinkedValue(((sInt)builder))
+		    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
+		  .addWidget(new nSlide(custom_tab.gui, ref_size * 6, ref_size * 0.75F)
+		    .setValue( ( ((sInt)builder).get() - ((sInt)builder).getmin() ) / 
+		               ( ((sInt)builder).getmax() - ((sInt)builder).getmin() ) )
+		    .addEventSlide(new nRunnable(((sInt)builder)) { public void run(float c) { 
+		      ((sInt)builder).set( (int)( ((sInt)builder).getmin() + 
+		                                c * (((sInt)builder).getmax() - ((sInt)builder).getmin()) ) ); 
+		    } } )
+		    .setPosition(4*ref_size, ref_size * 2 / 16) ).getShelf()
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
+	protected sFlt menuFltSlide(float v, float _min, float _max, String r) {
+		boolean new_val = value_bloc.getValue(r) == null;
+		sFlt f = newFlt(v, r, r);
+		if (new_val) f.set_limit(_min, _max);
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf().addDrawer(10, 1)
+		  .addModel("Label_Small_Text-S1-P1", ((sFlt)builder).ref)
+		    .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+		  .addWatcherModel("Auto_Watch_Label-S1-P3")
+		    .setLinkedValue(((sFlt)builder))
+	        .setSX(ref_size*2.0)
+	        .setPX(ref_size*2.875)
+		    .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
+		  .addWidget(new nSlide(custom_tab.gui, ref_size * 5, ref_size * 0.75F)
+		    .setValue( ( ((sFlt)builder).get() - ((sFlt)builder).getmin() ) / 
+		               ( ((sFlt)builder).getmax() - ((sFlt)builder).getmin() ) )
+		    .addEventSlide(new nRunnable(((sFlt)builder)) { public void run(float c) { 
+		      ((sFlt)builder).set( ((sFlt)builder).getmin() + 
+		                           c * (((sFlt)builder).getmax() - ((sFlt)builder).getmin()) ); 
+		    } } )
+		    .setPosition(5*ref_size, ref_size * 2 / 16) ).getShelf()
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
+	public sCol menuColor(int v, String r) {
     sCol f = newCol(r, r, v);
     addEventsBuildMenu(new nRunnable(f) { public void run() { 
       if (custom_tab != null) custom_tab.getShelf()
@@ -347,66 +421,84 @@ public sCol menuColor(int v, String r) {
         .addSeparator(0.125);
     } });
     return f;
-  }
-public sBoo menuBoo(boolean v, String r) {
-    sBoo f = newBoo(r, r, v);
-    addEventsBuildMenu(new nRunnable(f) { public void run() { 
-      if (custom_tab != null) custom_tab.getShelf()
-        .addDrawer(10, 1)
-        .addCtrlModel("Auto_Button-S2-P2", r).setLinkedValue(f).getShelf()
-        .addSeparator(0.125);
-    } });
-    return f;
-  }
-protected sInt menuIntWatch(int v, String r) {
-sInt f = newInt(v, r, r);
-addEventsBuildMenu(new nRunnable(f) { public void run() { 
-  if (custom_tab != null) custom_tab.getShelf()
-  .addDrawerWatch(((sInt)builder), 10, 1)
-  .addSeparator(0.125);
-} });
-return f;
-}
-sFlt menuFltIncr(float v, float _f, String r) {
-sFlt f = newFlt(v, r, r);
-f.ctrl_factor = _f;
-addEventsBuildMenu(new nRunnable(f) { public void run() { 
-  if (custom_tab != null) custom_tab.getShelf()
-  .addDrawerIncrValue(((sFlt)builder), ((sFlt)builder).ctrl_factor, 10, 1)
-  .addSeparator(0.125);
-} });
-return f;
-}
-public sFlt menuFltFact(float v, float _f, String r) {
-sFlt f = newFlt(v, r, r);
-f.ctrl_factor = _f;
-addEventsBuildMenu(new nRunnable(f) { public void run() { 
-  if (custom_tab != null) custom_tab.getShelf()
-  .addDrawerFactValue(((sFlt)builder), ((sFlt)builder).ctrl_factor, 10, 1)
-  .addSeparator(0.125);
-} });
-return f;
-}
-public sInt menuIntIncr(int v, float _f, String r) {
-sInt f = newInt(v, r, r);
-f.ctrl_factor = _f;
-addEventsBuildMenu(new nRunnable(f) { public void run() { 
-  if (custom_tab != null) custom_tab.getShelf()
-  .addDrawerIncrValue(((sInt)builder), ((sInt)builder).ctrl_factor, 10, 1)
-  .addSeparator(0.125);
-} });
-return f;
-}
-sInt menuIntFact(int v, float _f, String r) {
-sInt f = newInt(v, r, r);
-f.ctrl_factor = _f;
-addEventsBuildMenu(new nRunnable(f) { public void run() { 
-  if (custom_tab != null) custom_tab.getShelf()
-  .addDrawerFactValue(((sInt)builder), ((sInt)builder).ctrl_factor, 10, 1)
-  .addSeparator(0.125);
-} });
-return f;
-}
+  	}
+	public sBoo menuBoo(sBoo f) {
+	    addEventsBuildMenu(new nRunnable(f) { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addLinkedModel("Auto_Button-S2-P2", f.ref).setLinkedValue(f).getShelf()
+	        .addSeparator(0.125);
+	    } });
+	    return f;
+	}
+	public void menuBoo(sBoo b1, sBoo b2) {
+	    addEventsBuildMenu(new nRunnable() { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addLinkedModel("Auto_Button-S3-P1", b1.ref).setLinkedValue(b1).getDrawer()
+	        .addLinkedModel("Auto_Button-S3-P2", b2.ref).setLinkedValue(b2).getShelf()
+	        .addSeparator(0.125);
+	    } });
+	}
+	public sBoo menuBoo(boolean v, String r) {
+	    sBoo f = newBoo(r, r, v);
+	    addEventsBuildMenu(new nRunnable(f) { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addCtrlModel("Auto_Button-S2-P2", r).setLinkedValue(f).getShelf()
+	        .addSeparator(0.125);
+	    } });
+	    return f;
+	}
+	protected sInt menuIntWatch(int v, String r) {
+		sInt f = newInt(v, r, r);
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerWatch(((sInt)builder), 10, 1)
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
+	sFlt menuFltIncr(float v, float _f, String r) {
+		sFlt f = newFlt(v, r, r);
+		f.ctrl_factor = _f;
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerIncrValue(((sFlt)builder), ((sFlt)builder).ctrl_factor, 10, 1)
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
+	public sFlt menuFltFact(float v, float _f, String r) {
+		sFlt f = newFlt(v, r, r);
+		f.ctrl_factor = _f;
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerFactValue(((sFlt)builder), ((sFlt)builder).ctrl_factor, 10, 1)
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
+	public sInt menuIntIncr(int v, float _f, String r) {
+		sInt f = newInt(v, r, r);
+		f.ctrl_factor = _f;
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerIncrValue(((sInt)builder), ((sInt)builder).ctrl_factor, 10, 1)
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
+	sInt menuIntFact(int v, float _f, String r) {
+		sInt f = newInt(v, r, r);
+		f.ctrl_factor = _f;
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerFactValue(((sInt)builder), ((sInt)builder).ctrl_factor, 10, 1)
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
 }
 
 
@@ -419,7 +511,8 @@ return f;
 
 class MCursor extends MBasic { 
   static class MCursor_Builder extends MAbstract_Builder {
-    MCursor_Builder() { super("cursor", "Cursor", "add a cursor", "Sheet"); }
+    MCursor_Builder(Macro_Main m) { super("cursor", "Cursor", "add a cursor", "Sheet"); 
+	  first_start_show(m); }
   MCursor build(Macro_Sheet s, sValueBloc b) { MCursor m = new MCursor(s, b); return m; }
   }
   public nCursor cursor;
@@ -511,240 +604,226 @@ class MCursor extends MBasic {
 
 
 
-
-class MPack extends MBasic { 
+class MNode extends MBasic { 
   static class Builder extends MAbstract_Builder {
-	  Builder() { super("pack", "Pack", "Packing links", "Sheet"); }
-	  MPack build(Macro_Sheet s, sValueBloc b) { MPack m = new MPack(s, b); return m; }
+	  Builder(Macro_Main m) { super("node", "Node", "Connections Node", "Sheet"); 
+	  first_start_show(m); }
+	  MNode build(Macro_Sheet s, sValueBloc b) { MNode m = new MNode(s, b); return m; }
     }
-  sInt co_nb;
-  Macro_Connexion link; 
-  ArrayList<MPack> packs;
-  ArrayList<Macro_Connexion> connects;
-  
-  MPack(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "pack", _bloc); }
-	public void init() {
-		co_nb = newInt(2, "co_nb");
-		addSSelectToInt(0, co_nb);
-		co_nb.set_limit(2, 8);
-		packs = new ArrayList<MPack>();
-		connects = new ArrayList<Macro_Connexion>();
-	}	
-	public void build_param() {
-		link = addInput(0, "link");
-		nRunnable link_run = new nRunnable() { public void run() {packs.clear();
-		for (Macro_Connexion m : link.connected_inputs) 
-			if (m.elem.bloc.val_type.get().equals("pack")) 
-				packs.add((MPack)m.elem.bloc);
-		if (link.direct_co != null)
-			for (Macro_Connexion m : link.direct_co.connected_inputs) 
-				if (m.elem.bloc.val_type.get().equals("pack")) 
-					packs.add((MPack)m.elem.bloc);
-		}};
-		link.set_link().addEventLink(link_run).addEventUnLink(link_run);
-		for (int i = 0 ; i < co_nb.get() ; i++) {
-			Macro_Connexion c = addOutput(0, "out"+(i+1));
-			connects.add(c);
-		}
-		finish();
-	}	
-	public void build_normal() {
-		link = addOutput(0, "link");
-		nRunnable link_run = new nRunnable() { public void run() {packs.clear();
-		for (Macro_Connexion m : link.connected_inputs) 
-			if (m.elem.bloc.val_type.get().equals("pack")) 
-				packs.add((MPack)m.elem.bloc);
-		if (link.direct_co != null)
-			for (Macro_Connexion m : link.direct_co.connected_inputs) 
-				if (m.elem.bloc.val_type.get().equals("pack")) 
-					packs.add((MPack)m.elem.bloc);
-		}};
-		link.set_link().addEventLink(link_run).addEventUnLink(link_run);
-		for (int i = 0 ; i < co_nb.get() ; i++) {
-			Macro_Connexion c = addInput(0, "in"+(i+1));
-		  	nObjectPair pr = new nObjectPair();
-		  	pr.obj1 = c; pr.obj2 = i;
-		  	c.addEventReceive(new nRunnable(pr) { public void run() {
-
-				packs.clear();
-				for (Macro_Connexion m : link.connected_inputs) 
-					if (m.elem.bloc.val_type.get().equals("pack")) 
-						packs.add((MPack)m.elem.bloc);
-				if (link.direct_co != null)
-					for (Macro_Connexion m : link.direct_co.connected_inputs) 
-						if (m.elem.bloc.val_type.get().equals("pack")) 
-							packs.add((MPack)m.elem.bloc);
-				for (MPack p : packs) 
-					p.connects.get((int) ((nObjectPair)builder).obj2).send(
-						((Macro_Connexion) ((nObjectPair)builder).obj1).lastPack());
-			}});
-			connects.add(c);
-		}
-		finish();
-	}
-	public void finish() {
-		
-		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-		co_nb.addEventChange(new nRunnable() { public void run() { 
-			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	  			  if (!rebuilding) rebuild(); }}); }}); }});
-	}
-  public MPack clear() {
-    super.clear(); 
-    return this; }
-  public MPack toLayerTop() {
-    super.toLayerTop(); 
-    return this; }
-}
-
-
-
-class MMPoints extends MBasic { 
-  static class Builder extends MAbstract_Builder {
-	  Builder() { super("points", "MultiPoint", "", "Sheet"); }
-	  MMPoints build(Macro_Sheet s, sValueBloc b) { MMPoints m = new MMPoints(s, b); return m; }
-    }
-  sInt co_nb;
+  sInt co_nb; sBoo as_in, as_out, as_label, as_link;
+  Macro_Connexion in_link,out_link; 
+  ArrayList<MNode> nodes;
   ArrayList<Macro_Connexion> out_list;
   ArrayList<Macro_Connexion> in_list;
-  
-  MMPoints(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "points", _bloc); }
+  boolean is_new_point = false;
+  MNode(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "node", _bloc); }
 	public void init() {
-		co_nb = newInt(2, "co_nb");
-		co_nb.set_limit(2, 8);
+		co_nb = newInt(1, "co_nb");
+		co_nb.set_limit(1, 8);
+
+		as_in = newBoo(true, "as_in");
+		as_out = newBoo(true, "as_out");
+		as_label = newBoo(false, "as_label");
+		as_link = newBoo(false, "as_link");
+		  
+		nodes = new ArrayList<MNode>();
 		out_list = new ArrayList<Macro_Connexion>();
 		in_list = new ArrayList<Macro_Connexion>();
+		
+		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+			nRunnable change_run = new nRunnable() { public void run() { 
+				  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  			  if (!rebuilding) rebuild(); }}); }};
+		  	co_nb.addEventChange(change_run);
+		  	as_in.addEventChange(change_run); 
+		  	as_out.addEventChange(change_run); 
+		  	as_in.addEventChange(new nRunnable() { public void run() { if (!as_in.get()) as_out.set(true); }}); 
+		  	as_out.addEventChange(new nRunnable() { public void run() { if (!as_out.get()) as_in.set(true); }}); 
+		  	as_label.addEventChange(change_run); 
+		  	as_link.addEventChange(change_run); 
+		}});
 	}	
 	public void build_param() {
-		addSSelectToInt(0, co_nb);
-		addEmptyS(1);
-		addEmptyS(2);
+		addSSelectToInt(0, co_nb).no_mirror();
+		addEmptyS(2).no_mirror();
+		addSelectL(1, as_in, as_out, as_label, as_link, "in", "out", "label", "link").no_mirror();
 		build_normal();
 	}	
 	public void build_normal() {
-		finish();
-	}
-	public void finish() {
-		for (int i = 0 ; i < co_nb.get() ; i++) {
-			Macro_Connexion c = addInput(0, "in"+(i+1));
-			in_list.add(c);
-		  	Macro_Connexion o = addOutput(2, "out"+(i+1));
-			out_list.add(o);
-		  	nObjectPair pr = new nObjectPair();
-		  	pr.obj1 = c; pr.obj2 = o;
-		  	c.addEventReceive(new nRunnable(pr) { public void run() {
-		  		nObjectPair p = (nObjectPair)builder;
-		  		if (((Macro_Connexion)p.obj1).lastPack() != null) 
-		  			((Macro_Connexion)p.obj2)
-		  			.send(((Macro_Connexion)p.obj1).lastPack());
-			}});
-			sStr l = newStr("label"+(i+1), "label"+(i+1));
-			addLinkedSField(1, l).setPX(ref_size*-1.8).setSX(ref_size*5.5);
+		if (!param_view.get() && co_nb.get() == 1 && 
+				as_in.get() && as_out.get() && !as_label.get()) {
+			if (loading_from_bloc) build_point();
+			return;
+		}
+		int in_col = 0; int out_col = 2; int lab_col = 1;
+		if (RConst.xor(as_in.get(), as_out.get())) {
+			if (!as_label.get()) out_col = 0;
+			else {
+				if (as_in.get()) { in_col = 0; out_col = 1; lab_col = 1; addEmptyS(0); }
+				if (as_out.get()) { in_col = 0; out_col = 1; lab_col = 0; addEmptyS(1); }
+			}
+		} else {
+			if (!as_label.get() ) out_col = 1;
+			else { out_col = 2; lab_col = 1; if (as_link.get()) addEmptyS(1); }
 		}
 		
-		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-		co_nb.addEventChange(new nRunnable() { public void run() { 
-			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	  			  if (!rebuilding) rebuild(); }}); }}); }});
+		if (as_link.get() && (as_out.get() || as_in.get())) {
+			nRunnable link_run;
+			if (as_out.get()) {
+				in_link = addInput(in_col, "link");
+				in_link.set_link();
+			}
+			if (as_in.get()) {
+				out_link = addOutput(out_col, "link");
+				link_run = new nRunnable() { public void run() { update_nodelist(); }};
+				out_link.set_link().addEventLink(link_run).addEventUnLink(link_run);
+			}
+		}
+		for (int i = 0 ; i < co_nb.get() ; i++) {
+			Macro_Connexion o = null;
+			if (as_out.get()) {
+			  	if (!as_in.get()) o = addSheetInput(out_col, "out"+(i+1)).connect;
+			  	else o = addOutput(out_col, "out"+(i+1));
+			  	o.set_undefine();
+				out_list.add(o);
+			}
+			if (as_in.get()) {
+			  	nObjectTrio pr = new nObjectTrio();
+			  	pr.obj2 = o;
+				Macro_Connexion c = null;
+				if (!as_out.get()) c = addSheetOutput(in_col, "in"+(i+1)).connect;
+				else c = addInput(in_col, "in"+(i+1));
+			  	c.set_undefine();
+				in_list.add(c);
+				if (o != null) c.direct_connect(o);
+			  	pr.obj1 = c; pr.obj3 = i;
+			  	c.addEventReceive(new nRunnable(pr) { public void run() {
+			  		update_nodelist();
+					nObjectTrio p = (nObjectTrio)builder;
+					int id = (int) p.obj3;
+					Macro_Connexion in = (Macro_Connexion) p.obj1;
+					for (MNode n : nodes) {
+						if (id < n.co_nb.get())
+						n.in_list.get(id).receive(in, in.lastPack());
+					}
+//			  		if (p.obj2 != null && in.lastPack() != null) 
+//			  			((Macro_Connexion)p.obj2).send(in.lastPack());
+				}});
+			}
+			if (as_label.get()) {
+				sStr l = newStr("label"+(i+1), "label"+(i+1));
+				nLinkedWidget w = addLinkedSField(lab_col, l);
+				if (as_in.get() && as_out.get()) 
+					w.setPosition(ref_size*-1.625, ref_size*0.125).setSX(ref_size*5.5);
+				else if (as_in.get()) 
+					w.setPosition(ref_size*-1.375, ref_size*0.125).setSX(ref_size*3.5);
+				else if (as_out.get()) 
+					w.setPosition(ref_size*0.125, ref_size*0.125).setSX(ref_size*3.5);
+			}
+		}
 	}
-  public MMPoints clear() {
-    super.clear(); 
-    return this; }
-  public MMPoints toLayerTop() {
-    super.toLayerTop(); 
-    return this; }
-}
-
-
-
-class MPoint extends MBasic { 
-	static class MPoint_Builder extends MAbstract_Builder {
-		MPoint_Builder(Macro_Main m) { super("point", "Point", "connection node", "Sheet"); 
-			first_start_show(m); }
-      	MPoint build(Macro_Sheet s, sValueBloc b) { MPoint m = new MPoint(s, b); return m; }
-    }
-  	Macro_Connexion in, out; 
-  	sStr val_label;
-  	MPoint(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "point", _bloc); }
-	public void init() {
-		val_label = newStr("val_label", "val_label");
-	}	
-	public void build_param() {
-		in = addInput(0, "in", new nRunnable() {public void run() { 
-    			if (in.lastPack() != null) out.send(in.lastPack()); }});
-		out = addOutput(2, "out");
-		addLinkedSField(1, val_label).setPX(ref_size*-1.8).setSX(ref_size*5.5);
-	}	
-	public void build_normal() {
-		in = addInput(0, "in", new nRunnable() {public void run() { 
-    			if (in.lastPack() != null) out.send(in.lastPack()); }});
-		out = addOutput(0, "out");
-	}	
-  public MPoint clear() {
-    super.clear(); 
-    return this; }
-  public MPoint toLayerTop() {
-    super.toLayerTop(); 
-    return this; }
-}
-
-
-
-
-class MSheetCo extends MBasic {
-	static class MSheetCo_Builder extends MAbstract_Builder {
-		MSheetCo_Builder() { 
-			super("co", "Sheet Co", "connexions with sheet parent", "Sheet"); }
-		MSheetCo build(Macro_Sheet s, sValueBloc b) { MSheetCo m = new MSheetCo(s, b); return m; }
+	void test_connect(Macro_Connexion out) {
+		for (Macro_Connexion m : out.connected_inputs) {
+			if (m.elem.bloc.val_type.get().equals("node")) {
+				MNode n = (MNode)m.elem.bloc;
+				if (m.linkable && m.base_info.equals("link")) {
+					nodes.add((MNode)m.elem.bloc);
+					test_connect(n.out_link);
+				}
+				for (int i = 1 ; i < 9 ; i++) if (m.base_info.equals("in"+i)) {
+					for (Macro_Connexion c : m.direct_cos) test_connect(c);
+					for (MNode n2 : n.nodes) for (Macro_Connexion c : n2.in_list) {
+						if (c.base_info.equals("in"+i)) {
+							//test_connect(c);
+							for (Macro_Connexion c2 : c.direct_cos) test_connect(c2);
+						}
+					}
+				}
+			}
+			if (m.elem.bloc.val_type.get().equals("gate")) {
+				MGate g = (MGate)m.elem.bloc;
+				test_connect(g.get_active_out());
+			}	
+		}
 	}
-  Macro_Element elem;
-  nLinkedWidget view;
-  sStr val_view, links_save;
-  
-  MSheetCo(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "co", _bloc); }
-  public void init() {
-    val_view = newStr("val", "val", "");
-  }
-  public void build_param() {
-    view = addEmptyS(0).addLinkedModel("MC_Element_SField");
-    view.setLinkedValue(val_view);
-    val_view.addEventChange(new nRunnable() { public void run() { 
-        if (sheet != mmain()) elem.sheet_connect.setInfo(val_view.get());
-        elem.connect.setInfo(val_view.get());
-    } });
-    elem = addSheetOutput(1, "out");
-    if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
-    elem.connect.setInfo(val_view.get());
-  }
+	void update_nodelist() {
+		nodes.clear();
+		test_connect(out_link);
+		for (Macro_Connexion c : out_link.direct_cos) test_connect(c);
+	}
 
-  public void build_normal() {
-    view = addEmptyS(1).addLinkedModel("MC_Element_SField");
-    view.addEventFieldChange(new nRunnable() { public void run() { 
-      elem.sheet_connect.setInfo(val_view.get());
-    } });
-    view.setLinkedValue(val_view);
-    elem = addSheetInput(0, "in");
-    if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
-  }
+	//as link angle
+	MNode(Macro_Sheet _sheet, Macro_Connexion building_co, PVector pos) { 
+		super(_sheet, "node", null); 
+		if (building_co.linkable) as_link.set(true);
+		if (!loading_from_bloc) build_point();
+		if (building_co.type == OUTPUT) {
+			pos.x -= pos.x%GRID_SNAP_FACT;
+			pos.y -= pos.y%GRID_SNAP_FACT;
+			setPosition(pos.x-ref_size*0.375F, pos.y-ref_size*1.0F);
+			building_co.connect_to(in_list.get(0));
+			building_co.end_building_line();
+			out_list.get(0).start_building_line();
+		} else {
+			pos.x -= pos.x%GRID_SNAP_FACT;
+			pos.y -= pos.y%GRID_SNAP_FACT;
+			setPosition(pos.x-ref_size*1.0F, pos.y-ref_size*1.0F);
+			building_co.connect_to(out_list.get(0));
+			building_co.end_building_line();
+			in_list.get(0).start_building_line();
+		}
+	}
   
-  public MSheetCo clear() {
-    super.clear(); return this; }
+	void build_point() {
+		hideCtrl();
+		if (param_open != null) param_open.setPX(-ref_size * 0.75);
+		if (mirror_sw != null) mirror_sw.setPX(-ref_size * 1.25);
+//		grabber.hide();
+	    Macro_Element ei = new Macro_Element(this, "", "MC_Element_Single", "in1", INPUT, OUTPUT, true);
+		ei.back.setSX(ref_size*0);
+	    ei.drawer_width = ref_size*1.25F;
+	    if (ei.sheet_connect != null) ei.connect.direct_connect(ei.sheet_connect);
+	    ei.connect.msg_view.setSX(0);
+	    if (ei.sheet_connect != null) ei.sheet_connect.msg_view.setSX(0);
+	    addElement(0, ei); 
+		in_list.add(ei.connect);
+	    Macro_Element eo = new Macro_Element(this, "", "MC_Element_Single", "out1", OUTPUT, INPUT, true);
+	    eo.back.setSX(ref_size*0);
+	    eo.drawer_width = ref_size*1.25F;
+	    if (eo.sheet_connect != null) eo.sheet_connect.direct_connect(eo.connect);
+	    eo.connect.msg_view.setSX(0);
+	    if (eo.sheet_connect != null) eo.sheet_connect.msg_view.setSX(0);
+	    addElement(0, eo); 
+		out_list.add(eo.connect);
+	    getShelf(0).removeDrawer(eo);
+	    eo.ref.setParent(ei.ref);
+		eo.ref.setPX(ref_size*0).setPY(ref_size*0);
+		ei.ref.setPX(ref_size*0.75); 
+		if (as_link.get()) {
+			ei.connect.set_link();
+			eo.connect.set_link();
+		} 
+		ei.connect.direct_connect(eo.connect);
+		if (ei.sheet_connect != null && eo.sheet_connect != null) 
+			ei.sheet_connect.direct_connect(eo.sheet_connect);
+	}
+	public MNode clear() {
+		super.clear(); 
+		return this; }
 }
+
 
 
 class MSheetBloc extends MBasic { 
 	static class MSheetMain_Builder extends MAbstract_Builder {
 		MSheetMain_Builder() { 
-			super("sheetmain", "Old - SheetBloc", "sheet tools", "Old"); 
-//			visible = false;
-			show_in_buildtool = false; }
+			super("sheetmain", "Old - SheetBloc", "sheet tools", "Old"); }
 		MSheetBloc build(Macro_Sheet s, sValueBloc b) { MSheetBloc m = new MSheetBloc(s, b); return m; }
 	}
 	static class Builder extends MAbstract_Builder {
-		Builder() { 
+		Builder(Macro_Main m) { 
 		super("sheetbloc", "SheetBloc", "sheet tools", "Sheet"); 
-//		visible = false;
-		show_in_buildtool = false; }
+		first_start_show(m); }
 	MSheetBloc build(Macro_Sheet s, sValueBloc b) { MSheetBloc m = new MSheetBloc(s, b); return m; }
 }
 	Macro_Element menu_elem;
@@ -914,3 +993,222 @@ class MSheetBloc extends MBasic {
 		super.toLayerTop(); 
 		return this; }
 }
+
+
+//class MPack extends MBasic { 
+//static class Builder extends MAbstract_Builder {
+//	  Builder() { super("pack", "Pack", "Packing links", "Sheet"); }
+//	  MPack build(Macro_Sheet s, sValueBloc b) { MPack m = new MPack(s, b); return m; }
+//  }
+//sInt co_nb;
+//Macro_Connexion link; 
+//ArrayList<MPack> packs;
+//ArrayList<Macro_Connexion> connects;
+//
+//MPack(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "pack", _bloc); }
+//	public void init() {
+//		co_nb = newInt(2, "co_nb");
+//		addSSelectToInt(0, co_nb);
+//		co_nb.set_limit(2, 8);
+//		packs = new ArrayList<MPack>();
+//		connects = new ArrayList<Macro_Connexion>();
+//	}	
+//	public void build_param() {
+//		link = addInput(0, "link");
+//		nRunnable link_run = new nRunnable() { public void run() {packs.clear();
+//		for (Macro_Connexion m : link.connected_inputs) 
+//			if (m.elem.bloc.val_type.get().equals("pack")) 
+//				packs.add((MPack)m.elem.bloc);
+//		if (link.direct_co != null)
+//			for (Macro_Connexion m : link.direct_co.connected_inputs) 
+//				if (m.elem.bloc.val_type.get().equals("pack")) 
+//					packs.add((MPack)m.elem.bloc);
+//		}};
+//		link.set_link().addEventLink(link_run).addEventUnLink(link_run);
+//		for (int i = 0 ; i < co_nb.get() ; i++) {
+//			Macro_Connexion c = addOutput(0, "out"+(i+1));
+//			connects.add(c);
+//		}
+//		finish();
+//	}	
+//	public void build_normal() {
+//		link = addOutput(0, "link");
+//		nRunnable link_run = new nRunnable() { public void run() {packs.clear();
+//		for (Macro_Connexion m : link.connected_inputs) 
+//			if (m.elem.bloc.val_type.get().equals("pack")) 
+//				packs.add((MPack)m.elem.bloc);
+//		if (link.direct_co != null)
+//			for (Macro_Connexion m : link.direct_co.connected_inputs) 
+//				if (m.elem.bloc.val_type.get().equals("pack")) 
+//					packs.add((MPack)m.elem.bloc);
+//		}};
+//		link.set_link().addEventLink(link_run).addEventUnLink(link_run);
+//		for (int i = 0 ; i < co_nb.get() ; i++) {
+//			Macro_Connexion c = addInput(0, "in"+(i+1));
+//		  	nObjectPair pr = new nObjectPair();
+//		  	pr.obj1 = c; pr.obj2 = i;
+//		  	c.addEventReceive(new nRunnable(pr) { public void run() {
+//
+//				packs.clear();
+//				for (Macro_Connexion m : link.connected_inputs) 
+//					if (m.elem.bloc.val_type.get().equals("pack")) 
+//						packs.add((MPack)m.elem.bloc);
+//				if (link.direct_co != null)
+//					for (Macro_Connexion m : link.direct_co.connected_inputs) 
+//						if (m.elem.bloc.val_type.get().equals("pack")) 
+//							packs.add((MPack)m.elem.bloc);
+//				for (MPack p : packs) 
+//					p.connects.get((int) ((nObjectPair)builder).obj2).send(
+//						((Macro_Connexion) ((nObjectPair)builder).obj1).lastPack());
+//			}});
+//			connects.add(c);
+//		}
+//		finish();
+//	}
+//	public void finish() {
+//		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//		co_nb.addEventChange(new nRunnable() { public void run() { 
+//			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//	  			  if (!rebuilding) rebuild(); }}); }}); }});
+//	}
+//public MPack clear() {
+//  super.clear(); 
+//  return this; }
+//public MPack toLayerTop() {
+//  super.toLayerTop(); 
+//  return this; }
+//}
+//
+//
+//
+//class MMPoints extends MBasic { 
+//static class Builder extends MAbstract_Builder {
+//	  Builder() { super("points", "MultiPoint", "", "Sheet"); }
+//	  MMPoints build(Macro_Sheet s, sValueBloc b) { MMPoints m = new MMPoints(s, b); return m; }
+//  }
+//sInt co_nb;
+//ArrayList<Macro_Connexion> out_list;
+//ArrayList<Macro_Connexion> in_list;
+//
+//MMPoints(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "points", _bloc); }
+//	public void init() {
+//		co_nb = newInt(2, "co_nb");
+//		co_nb.set_limit(2, 8);
+//		out_list = new ArrayList<Macro_Connexion>();
+//		in_list = new ArrayList<Macro_Connexion>();
+//	}	
+//	public void build_param() {
+//		addSSelectToInt(0, co_nb);
+//		addEmptyS(1);
+//		addEmptyS(2);
+//		build_normal();
+//	}	
+//	public void build_normal() {
+//		finish();
+//	}
+//	public void finish() {
+//		for (int i = 0 ; i < co_nb.get() ; i++) {
+//			Macro_Connexion c = addInput(0, "in"+(i+1));
+//			in_list.add(c);
+//		  	Macro_Connexion o = addOutput(2, "out"+(i+1));
+//			out_list.add(o);
+//		  	nObjectPair pr = new nObjectPair();
+//		  	pr.obj1 = c; pr.obj2 = o;
+//		  	c.addEventReceive(new nRunnable(pr) { public void run() {
+//		  		nObjectPair p = (nObjectPair)builder;
+//		  		if (((Macro_Connexion)p.obj1).lastPack() != null) 
+//		  			((Macro_Connexion)p.obj2)
+//		  			.send(((Macro_Connexion)p.obj1).lastPack());
+//			}});
+//			sStr l = newStr("label"+(i+1), "label"+(i+1));
+//			addLinkedSField(1, l).setPX(ref_size*-1.8).setSX(ref_size*5.5);
+//		}
+//		
+//		mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//		co_nb.addEventChange(new nRunnable() { public void run() { 
+//			  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//	  			  if (!rebuilding) rebuild(); }}); }}); }});
+//	}
+//public MMPoints clear() {
+//  super.clear(); 
+//  return this; }
+//public MMPoints toLayerTop() {
+//  super.toLayerTop(); 
+//  return this; }
+//}
+//
+//
+//
+//class MPoint extends MBasic { 
+//	static class MPoint_Builder extends MAbstract_Builder {
+//		MPoint_Builder() { super("point", "Point", "connection node", "Sheet"); }
+//    	MPoint build(Macro_Sheet s, sValueBloc b) { MPoint m = new MPoint(s, b); return m; }
+//  }
+//	Macro_Connexion in, out; 
+//	sStr val_label;
+//	MPoint(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "point", _bloc); }
+//	public void init() {
+//		val_label = newStr("val_label", "val_label");
+//	}	
+//	public void build_param() {
+//		in = addInput(0, "in", new nRunnable() {public void run() { 
+//  			if (in.lastPack() != null) out.send(in.lastPack()); }});
+//		out = addOutput(2, "out");
+//		addLinkedSField(1, val_label).setPX(ref_size*-1.8).setSX(ref_size*5.5);
+//	}	
+//	public void build_normal() {
+//		in = addInput(0, "in", new nRunnable() {public void run() { 
+//  			if (in.lastPack() != null) out.send(in.lastPack()); }});
+//		out = addOutput(0, "out");
+//	}	
+//public MPoint clear() {
+//  super.clear(); 
+//  return this; }
+//public MPoint toLayerTop() {
+//  super.toLayerTop(); 
+//  return this; }
+//}
+//
+//
+//
+//
+//class MSheetCo extends MBasic {
+//	static class MSheetCo_Builder extends MAbstract_Builder {
+//		MSheetCo_Builder() { 
+//			super("co", "Sheet Co", "connexions with sheet parent", "Sheet"); }
+//		MSheetCo build(Macro_Sheet s, sValueBloc b) { MSheetCo m = new MSheetCo(s, b); return m; }
+//	}
+//Macro_Element elem;
+//nLinkedWidget view;
+//sStr val_view, links_save;
+//
+//MSheetCo(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "co", _bloc); }
+//public void init() {
+//  val_view = newStr("val", "val", "");
+//}
+//public void build_param() {
+//  view = addEmptyS(0).addLinkedModel("MC_Element_SField");
+//  view.setLinkedValue(val_view);
+//  val_view.addEventChange(new nRunnable() { public void run() { 
+//      if (sheet != mmain()) elem.sheet_connect.setInfo(val_view.get());
+//      elem.connect.setInfo(val_view.get());
+//  } });
+//  elem = addSheetOutput(1, "out");
+//  if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
+//  elem.connect.setInfo(val_view.get());
+//}
+//
+//public void build_normal() {
+//  view = addEmptyS(1).addLinkedModel("MC_Element_SField");
+//  view.addEventFieldChange(new nRunnable() { public void run() { 
+//    elem.sheet_connect.setInfo(val_view.get());
+//  } });
+//  view.setLinkedValue(val_view);
+//  elem = addSheetInput(0, "in");
+//  if (elem.sheet_connect != null) elem.sheet_connect.setInfo(val_view.get());
+//}
+//
+//public MSheetCo clear() {
+//  super.clear(); return this; }
+//}
+

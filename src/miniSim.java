@@ -10,65 +10,47 @@ public class miniSim {
 
 		BUG FIX
 
-some connection lens still viewable when bloc reducted?
-
-link blue color missing when co is used as spot, but work 
-
 sequance do inf loop > crash
 
 
 
-	VERSION .5 : 
-		IMPORTANT FIX
 
-better sheet spot :
-	in spot creation mode add a bp to create empty space
-		is saved?
-		cant be deleted
 
 
 	VERSION .6 : 
-connect :
-	run link throug pack and gate :
-	bloc as a method to add a link co with param : in/out, run at link/unlink, name
-		when co made get connected block, 
-		if pack go throug, if gate go throug if active, in both :
-			save it, change if next link delete, bloc deleted
-			add method to pack or gate bloc to keep informed
-		else store it then call runnable
-			method to return connected bloc (like lastPack())
+Link :
+	hilight linked blocs and linking path when hovering link
+	bloc as a method to add a link co with param : in or out, name, run at link/unlink
+		when co made get connected block, call runnable
+			method to return linked bloc (like lastPack())
 		when co deleted call runnable
 			method to return unlinked bloc
 	link connection have a validated state activated by blocs when link is in use
 		change line color sigtly
 
-		BLOCS MODIF TO DO
-MMain :
-	method in main to add sBoo or sRun to a shortcut tab in main menu
-		select in list, enter key, press bp > set shortcut
-		Ctrl+key shortcut possible
-	method in main to auto create a sBoo or sRun linked to a widget in maintoolpan
-		auto add to shortcut menu
-	add bp in main toolpan for selectAll cut and duplicate selected
-		A select/unselect all bloc in current sheet  (unselect if all are already selected)
-		D del W duplic X cut C copy V paste
-	merge save as / save to in main toolpan
-	add a field and a bp to build toolpan > new template, a switch > viewable or not
-	have a global tick/reset/rngseed base
-		for tick/reset bloc have option to use it or have an input
-		merge macro main and Mtick
-		tickrate is regulated by packet process
-			if too much pack for a frame, tick counter dont increment  
-MPack : 		Rename in connect?
-	row can have 
-		optional texts or valviewer (S or L) in col 2
-		both in and out, do normal packet and link pass > replace mpoint and sheet co
-		each pack row can select a pack channel, 
-			meanning it can send to another row index
-		if too mush options use 2 row by pack co
-	by def its 1 row with just in and out
-		in this case only do them both in col 0 (as a MPoint) 
-		and move them to be aligned ?
+		NEW WORKING BLOCS
+MShape output : area
+MStructure :
+	replic : pos (vec) scale,rot,linew (float) fill,line,type (int)
+		fixed size array of vector for shape vertice coords (max 4 vector)
+	array of replics to draw to a camera
+	pencil replic used for holding next adding position, 
+		use linked form as shape with own pos and rot
+	param in : pen_pos, pen_rot, pen_scale, mov_pos, mov_rot, mov_scale, 
+		index, array max size, drawing layer
+	outputs : pos, rot, scale, array current size,
+		drawn area, bounding box, center and radius
+	methods  as inputbang plus bp :		
+			add method in bloc for 	inbang+bp infloat+field(S/L) 
+									inbool+switch incol/vec/str+picker
+		add copy of pencil to array applying scale factor, 
+		move pencil to, move pencil of param value, move pencil to center, 
+		output param of pencil, output param of replic at given index,
+		delete oldest replic, delete newest replic, delete all replics,
+		delete replic at given index
+MCamera
+	draw linked struct at pos and rot given by linked sheet cursors
+	each struct is drawn to cursors with a priority equal to their layer
 
 >>>>>> VERSION STABLE <<<<<<<
 
@@ -76,15 +58,18 @@ MPack : 		Rename in connect?
 
 
 
-
-
-
-
-	VERSION .7 : 
+MMain :
+	method in main to add sBoo or sRun to a shortcut tab in main menu
+		select in list, enter key, press bp > set shortcut
+		Ctrl+key shortcut possible
+	hit space : add MBasic at mouse (construct_run in mmain)
+	method in main to auto create a sBoo or sRun linked to a widget in maintoolpan
+		auto add to shortcut menu
+	add a field and a bp to build toolpan > new template, a switch > viewable or not
+	have a global tick/reset/rngseed base
+		for tick/reset bloc have option to use it or have an input
 Bloc Modif :
 		BASE BLOC
-MBase : when build the first time is only a field, if input word is a type it become this type
-	hit space : add empty at mouse (a switch in mmain toolpanel can activate this)
 MButton : 
 	button can output to widget text named channel
 	other size : 2X bigger, multiple button of same type in row
@@ -100,11 +85,16 @@ MComment : renaming in MText ?
 	as bp to insert line end
 	can has multiple inputs (small int select for number)
 	as bp to insert input last packet getText() (small int select for input cible)
+MNode
+	in point mode hide grabber until hovering lens
+	row can have optional valviewer
+	each row can select a node channel, 
+			meanning it can send to another row index
+		if too mush options use 2 row by pack co
 MChan : as an input to set channel
-MGate option :
-	change gate switch text in param mode
-	as inverted output
-	at bang in state co let packet throug for next frame
+MGate mode : at bang in state : 
+	switch state
+	co let +1 packet throug for this frame / next frame
 MVar and MValue :
 	different passing mode
 		send val if : A any in ; B bang in ; C on val change ; S at build
@@ -115,7 +105,6 @@ MRamp :
 	param : linear/sine 1/SAW/LP UP/DW 
 MSequance : input / field to set all delay at once
 
-	VERSION .8 : 
 		NEW BLOC
 MPanel :
 	draw a rectangle from the bloc pos of the size of a windowpanel
@@ -134,36 +123,6 @@ MZone :
 MPOV : extend sheet object, use sheet specialize ?
 	as gotoview, nextcam, and deploy as big trig in spots by default
 	as a MZone automatically inside to set the view
-
-	VERSION .9 : 
-		NEW WORKING BLOCS
-MForm 
-	fixed size array of vector for shape vertice coords
-	typz : RECT, LINE, TRIG, CIRCLE, ARROW   >>  max 4 vector
-	param : scale,linew (float) fill,line,type (int)
-	methods : center, size x2,/2,x1.1,/1.1 rot various angle
-	output : area
-MStruct :
-	replic : pos (vec) scale,rot,linew (float) fill,line,type (int)
-		fixed size array of vector for shape vertice coords (max 4 vector)
-	array of replics to draw to a camera
-	pencil replic used for holding next adding position, 
-		use linked form as shape as own pos and rot
-	param in : pen_pos, pen_rot, pen_scale, mov_pos, mov_rot, mov_scale, 
-		index, array max size, drawing layer
-	outputs : pos, rot, scale, array current size,
-		drawn area, bounding box, center and radius
-	methods  as inputbang plus bp :		
-			add method in bloc for 	inbang+bp infloat+field(S/L) 
-									inbool+switch incol/vec/str+picker
-		add copy of pencil to array applyong scale factor, 
-		move pencil to, move pencil of param value, move pencil to center, 
-		output param of pencil, output param of replic at given index,
-		delete oldest replic, delete newest replic, delete all replics,
-		delete replic at given index
-MCamera
-	draw linked struct at pos and rot given by linked sheet cursors
-	each struct is drawn to cursors with a priority equal to their layer
 MCollision
 	has two linked structure, on bang test if theirs replics are colliding
 	output a boolean with the result, the number of collision pair,
@@ -224,6 +183,7 @@ finished project golder for easy viewing
 dont bloc zoom on cam widgets?
 
 	--Hard:
+some connection lens still viewable when bloc reducted
 when selecting a preset auto hide uncompatible
 save last deleted link, bloc : sRun to undo
 
@@ -254,6 +214,10 @@ distence mesuring tool
 big lag when selecting an heavy sheet caused by to LayerTop() recursive calls
 		>>>> sheet bloc number limited
 
+
+tickrate is regulated by packet process		TEST IT
+	if too much pack for a frame, tick counter dont increment  
+			
 mesure and store the relative process time used by different things
 
 logarythmic slides

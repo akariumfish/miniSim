@@ -204,6 +204,11 @@ public class nConstructor {
     
     do_places(base, "-S3-P1", ref_size*0.5F, 0, ref_size*4, ref_size);
     do_places(base, "-S3-P2", ref_size*5.5F, 0, ref_size*4, ref_size);
+
+    do_places(base, "-S2/1-P1", ref_size*0.4F, 0, ref_size*2.0F, ref_size);
+    do_places(base, "-S2/1-P2", ref_size*2.8F, 0, ref_size*2.0F, ref_size);
+    do_places(base, "-S2/1-P3", ref_size*5.2F, 0, ref_size*2.0F, ref_size);
+    do_places(base, "-S2/1-P4", ref_size*7.6F, 0, ref_size*2.0F, ref_size);
     
     do_places(base, "-S2-P1", ref_size*0.5F, 0, ref_size*2.5F, ref_size);
     do_places(base, "-S2-P2", ref_size*3.75F, 0, ref_size*2.5F, ref_size);

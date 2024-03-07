@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Macro.Macro_Main;
 import Macro.Macro_Sheet;
+import sData.nRunnable;
 import sData.sValueBloc;
 
 public abstract class Sheet_Specialize {
@@ -40,7 +41,14 @@ public abstract class Sheet_Specialize {
 	      if (m != null) {
 	        m.sheet_specialize = this; m.specialize.set(name); if (unique) m.unclearable = true;
 //	        m.open();
-	  		if (b == null) m.init_end(); 
+	  		if (b == null) { 
+	  			m.init_end(); 
+	  			if (unique) {
+	  				mmain.inter.addEventTwoFrame(new nRunnable(m) { public void run() { 
+	  		  			((Macro_Sheet)builder).open(); 
+	  				}});
+	  			}
+	  		}
 //	        if (b == null && default_template.length() > 0 && mmain.saved_template.getBloc(default_template) != null) {
 //	          Macro_Sheet prev_select = mmain.selected_sheet;
 //	          m.select();

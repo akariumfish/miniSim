@@ -310,8 +310,8 @@ class MRamp extends Macro_Bloc {
     len_field.setInfo("period in tick");
     phi_field.setInfo("dephasing in tick");
     
-    addSelectS(0, valLIN, valSIN, "Lin", "Sin");
-    addSelectL(1, valONE, valRPT, valINV, valLOOP, "1", "RP", "IV", "LP");
+    addSelectS_Excl(0, valLIN, valSIN, "Lin", "Sin");
+    addSelectL_Excl(1, valONE, valRPT, valINV, valLOOP, "1", "RP", "IV", "LP");
     
     got_reset();
   }

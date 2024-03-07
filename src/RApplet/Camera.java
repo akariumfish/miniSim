@@ -30,7 +30,7 @@ public class Camera {
 	input = i;
     grid = new sBoo(d, true, "show_grid", "grid");
     can_grab = new sBoo(d, true, "can_grab", "grab");
-    cam_scale = new sFlt(d, 1.0F, "cam_scale", "scale");
+    cam_scale = new sFlt(d, 0.5F, "cam_scale", "scale");
     cam_scale.set_limit(min_scale, max_scale);
     cam_grid_spacing = new sFlt(d, 325F, "cam_grid_spacing", "grid_spacing");
     up_view_run = new nRunnable() { public void run() {

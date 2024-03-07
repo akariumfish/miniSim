@@ -204,7 +204,8 @@ class MSlide extends MBasic {
 
 class MButton extends MBasic {
 	static class Builder extends MAbstract_Builder {
-		Builder() { super("button", "Button", "", "GUI"); }
+		Builder(Macro_Main m) { super("button", "Button", "", "GUI"); 
+		first_start_show(m); }
 		MButton build(Macro_Sheet s, sValueBloc b) { MButton m = new MButton(s, b); return m; }
 	}
 	sBoo mode;

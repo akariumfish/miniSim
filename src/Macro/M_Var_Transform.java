@@ -42,7 +42,7 @@ class MVecCalc extends MBasic {
 	}
 	public void build_param() { 
 		addEmpty(1);
-		addSelectL(0, valXY, valROT, valMAG, "x y", "rot", "mag");
+		addSelectL_Excl(0, valXY, valROT, valMAG, "x y", "rot", "mag");
 
 		addEmpty(1);
 	    Macro_Element m = new Macro_Element(this, "", "MC_Element_Double", null, NO_CO, NO_CO, false);
@@ -280,7 +280,7 @@ class MBoolCalc extends MBasic {
 	}
 	public void build_param() { 
 		addEmpty(1);
-		addSelectL(0, valAND, valOR, valXOR, "&&", "||", "X||");
+		addSelectL_Excl(0, valAND, valOR, valXOR, "&&", "||", "X||");
 		addEmpty(1);
 		addEmptyL(0).addLinkedModel("MC_Element_Button_Selector_1", "!")
 			.setLinkedValue(valNOT);
@@ -419,7 +419,7 @@ class MTransform extends MBasic {
 					m.addLinkedModel("MC_Element_Button", "").setLinkedValue(filt_boo_true)
 					.setSX(ref_size * 1.9).setPX(ref_size * 4.175);
 	  		}
-			addSelectS(0, fltr_count, fltr_frame, "CNT", "FRM");
+			addSelectS_Excl(0, fltr_count, fltr_frame, "CNT", "FRM");
 			if (fltr_count.get() || fltr_frame.get()) addSelectToInt(1, fltr_time_count);
 			else { addEmptyL(1); addEmpty(2); }
 		}
@@ -1135,7 +1135,8 @@ class MVar extends MBasic {
 
 class MValue extends MBasic { 
   static class MValue_Builder extends MAbstract_Builder {
-      MValue_Builder() { super("value", "sValues", "access sValues", "Data"); }
+      MValue_Builder(Macro_Main m) { super("value", "sValues", "access sValues", "Data"); 
+      	first_start_show(m); }
       MValue build(Macro_Sheet s, sValueBloc b) { MValue m = new MValue(s, b); return m; }
     }
   sValue cible; sValueBloc bloc_cible;
@@ -1292,9 +1293,10 @@ class MValue extends MBasic {
   void setValue(sRun v) {
     rval = v;
     val_run = new nRunnable() { public void run() { 
-    		if (last_send_framenb + 1 < gui.app.global_frame_count)
+//    		if (last_send_framenb + 1 < gui.app.global_frame_count)
     			out.send(Macro_Packet.newPacketBang()); 
-    		last_send_framenb = gui.app.global_frame_count; }};
+//    		last_send_framenb = gui.app.global_frame_count; 
+    		}};
     in_run = new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isBang()) { 
         rval.run(); 

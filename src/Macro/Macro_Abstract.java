@@ -91,15 +91,17 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
 		  } else szone_select();
 	  }
 	  void szone_select() {
-	    if (mmain().selected_sheet != sheet) sheet.select();
-	    mmain().selected_macro.add(this);
-	    szone_selected = true;
-	    mmain().update_select_bound();
-	    if (openning.get() == REDUC) grab_front.setOutline(true);
-	    else front.setOutline(true);
-	    title_fixe = true;
-	    title.show();
-	    toLayerTop();
+		  if (!szone_selected) {
+		    if (mmain().selected_sheet != sheet) sheet.select();
+		    mmain().selected_macro.add(this);
+		    szone_selected = true;
+		    mmain().update_select_bound();
+		    if (openning.get() == REDUC) grab_front.setOutline(true);
+		    else front.setOutline(true);
+		    title_fixe = true;
+		    if (!hide_ctrl) title.show();
+		    toLayerTop();
+		  }
 	  }
 	  void szone_unselect() {//carefull! still need to remove from mmain.selected_macro and run mmain.update_select_bound
 	    szone_selected = false;
@@ -115,7 +117,9 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
     if (openning.get() != OPEN) {
       openning.set(OPEN);
       grabber.show(); grab_front.show(); panel.show(); back.hide(); 
-      front.show(); title.show(); reduc.show(); 
+      front.show(); 
+      if (!hide_ctrl) { title.show(); reduc.show(); }
+      else { title.hide(); reduc.hide(); }
       reduc.setPosition(-ref_size * 0.75, ref_size*0.5)
 	    .setSize(ref_size*0.4, ref_size*0.75);
       moving();
@@ -128,10 +132,11 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
       openning.set(REDUC);
       grabber.show(); grab_front.show(); panel.hide(); back.hide(); 
       front.hide(); 
-      if (!title_fixe) title.hide(); else title.show(); 
-      reduc.show(); 
-      reduc.show().setPosition(ref_size * 0.5, ref_size*0.5)
-	    .setSize(ref_size*0.4, ref_size*0.5);
+      if (!hide_ctrl) { 
+	      if (!title_fixe) title.hide(); else title.show(); 
+	      reduc.show().setPosition(ref_size * 0.5, ref_size*0.5)
+		    .setSize(ref_size*0.4, ref_size*0.5);
+      } else { title.hide(); reduc.hide(); }
       moving();
     }
     return this;
@@ -155,9 +160,13 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
     return this;
   }
   Macro_Abstract changeOpenning() {
-    if (openning.get() == OPEN) { reduc(); }
-    else if (openning.get() == REDUC) { open(); }
-    else if (openning.get() == DEPLOY) { open(); }
+	    if (openning.get() == OPEN) { reduc(); }
+	    else if (openning.get() == REDUC) { open(); }
+	    else if (openning.get() == DEPLOY) { open(); }
+	    return this; }
+  Macro_Abstract hideCtrl() {
+	  hide_ctrl = true;
+	  title.hide(); reduc.hide(); prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
     return this; }
   
 
@@ -165,7 +174,7 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
   public nGUI gui;
   Macro_Sheet sheet;    int sheet_depth = 0;
   boolean szone_selected = false, title_fixe = false;
-public boolean unclearable = false;
+public boolean unclearable = false, hide_ctrl = false;
 boolean loading_from_bloc = false;
   public float ref_size = 40;
   sVec grab_pos; sStr val_type;
@@ -234,8 +243,8 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
       value_bloc = sheet.value_bloc.newBloc(n_ref);
       
     } else {
-    	loading_from_bloc = true;
-    	value_bloc = _bloc;
+	    	loading_from_bloc = true;
+	    	value_bloc = _bloc;
     }
 //    mlogln("build abstract "+ty+" "+n+" "+ _bloc+"    as "+value_bloc.ref);
     
@@ -395,7 +404,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     openning.addEventChange(title_run);
     
     grabber.addEventMouseEnter(new nRunnable() { public void run() { 
-      if (openning.get() == REDUC) title.show(); } });
+      if (openning.get() == REDUC && !hide_ctrl) title.show(); } });
     grabber.addEventMouseLeave(new nRunnable() { public void run() { 
       if (openning.get() == REDUC && !title_fixe) title.hide(); } });
     
@@ -563,6 +572,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
   public sStr newStr(String r) { return newStr(r, r, ""); }
   public sRun newRun(nRunnable d, String r, String s) { return newRun(r, s, d); }
   public sRun newRun(nRunnable d, String r) { return newRun(r, r, d); }
+  public sRun newRun(String r, nRunnable d) { return newRun(r, r, d); }
   public sRun newRun(String r) { return newRun(r, r, null); }
   public sObj newObj(String r) { return newObj(r, r); }
   
