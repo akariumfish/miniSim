@@ -141,8 +141,8 @@ public class nWidget {
 
   public nWidget tempPassif(boolean b) { 
     if (b != temp_passif) {
-    		if (!b && hover != null) hover.active = hoverHideState; 
-    		else if (hover != null) { hoverHideState = hover.active; hover.active = false; }
+    		if (!b && hover != null) hover.active = tempPassifPreState; 
+    		else if (hover != null) { tempPassifPreState = hover.active; hover.active = false; }
     }
     return this;
   }
@@ -524,6 +524,7 @@ boolean constantOutlineWeight = false;
   private boolean placeLeft = false, placeRight = false, placeUp = false, placeDown = false;
   private boolean hide = false, drawerHideState = true, hoverHideState = true, show_text = true;
   private boolean shapeRound = false, shapeLosange = false, showInfo = false;
+  private boolean tempPassifPreState = false;
   private int layer = 0, textAlignX = PApplet.CENTER, textAlignY = PApplet.CENTER;
  
   ArrayList<nRunnable> eventPositionChange = new ArrayList<nRunnable>();

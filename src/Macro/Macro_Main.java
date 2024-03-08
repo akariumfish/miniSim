@@ -934,7 +934,7 @@ nExplorer sheet_explorer;
 	  frame_tick();
 	  
 	  if (gui.in.getClick(' ')) {
-		  gui.app.logln("space");
+//		  gui.app.logln("space");
 		  if (buildingLine) {
 			  new MNode(selected_sheet, line_building_co, gui.mouseVector);
 		  } else {

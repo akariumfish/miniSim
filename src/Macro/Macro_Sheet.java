@@ -244,9 +244,12 @@ public class Macro_Sheet extends Macro_Abstract {
       }
       panel.toLayerTop(); 
       front.toLayerTop(); back_front.toLayerTop(); 
-      prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
-      title.toLayerTop(); grabber.toLayerTop(); deployer.toLayerTop(); 
-      reduc.toLayerTop(); 
+      grabber.toLayerTop(); 
+//      if (!hide_ctrl) {
+	      prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
+	      title.toLayerTop(); deployer.toLayerTop(); 
+	      reduc.toLayerTop(); 
+//	      }
       return this;
   }
   
@@ -338,7 +341,8 @@ public class Macro_Sheet extends Macro_Abstract {
 		  add_spot(new_spot_side, elem);
 		  cancel_new_spot();
 	  } else {
-		   remove_spot(elem.descr);
+		  remove_spot(elem.descr);
+		  cancel_new_spot();
 	  }
   }
   void cancel_new_spot() {

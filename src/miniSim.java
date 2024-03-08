@@ -10,9 +10,15 @@ public class miniSim {
 
 		BUG FIX
 
+when using spot elem widget dont always come back from temp passif
+
+link save for param dont work (only certain link are saved)
+	or too much link created at loading
+
 sequance do inf loop > crash
 
-
+add method in bloc for 	inbang+bp infloat+field(S/L) 
+						inbool+switch incol/vec/str+picker
 
 
 
@@ -27,30 +33,6 @@ Link :
 			method to return unlinked bloc
 	link connection have a validated state activated by blocs when link is in use
 		change line color sigtly
-
-		NEW WORKING BLOCS
-MShape output : area
-MStructure :
-	replic : pos (vec) scale,rot,linew (float) fill,line,type (int)
-		fixed size array of vector for shape vertice coords (max 4 vector)
-	array of replics to draw to a camera
-	pencil replic used for holding next adding position, 
-		use linked form as shape with own pos and rot
-	param in : pen_pos, pen_rot, pen_scale, mov_pos, mov_rot, mov_scale, 
-		index, array max size, drawing layer
-	outputs : pos, rot, scale, array current size,
-		drawn area, bounding box, center and radius
-	methods  as inputbang plus bp :		
-			add method in bloc for 	inbang+bp infloat+field(S/L) 
-									inbool+switch incol/vec/str+picker
-		add copy of pencil to array applying scale factor, 
-		move pencil to, move pencil of param value, move pencil to center, 
-		output param of pencil, output param of replic at given index,
-		delete oldest replic, delete newest replic, delete all replics,
-		delete replic at given index
-MCamera
-	draw linked struct at pos and rot given by linked sheet cursors
-	each struct is drawn to cursors with a priority equal to their layer
 
 >>>>>> VERSION STABLE <<<<<<<
 
@@ -104,6 +86,7 @@ MRamp :
 	in : start stop reset periode phi startval endval
 	param : linear/sine 1/SAW/LP UP/DW 
 MSequance : input / field to set all delay at once
+	debug
 
 		NEW BLOC
 MPanel :
@@ -123,6 +106,16 @@ MZone :
 MPOV : extend sheet object, use sheet specialize ?
 	as gotoview, nextcam, and deploy as big trig in spots by default
 	as a MZone automatically inside to set the view
+
+		NEW WORKING BLOCS
+MShape output : area
+MStructure : array of shape replics to draw to a camera
+	param in : index, array max size, drawing layer
+	outputs : pos, rot, scale, array current size,
+		drawn area, bounding box, center and radius
+	methods  as inputbang plus bp :		
+		copy pencil to index, output param of pencil, output param of replic at given index,
+		delete replic at given index
 MCollision
 	has two linked structure, on bang test if theirs replics are colliding
 	output a boolean with the result, the number of collision pair,
@@ -214,6 +207,7 @@ distence mesuring tool
 big lag when selecting an heavy sheet caused by to LayerTop() recursive calls
 		>>>> sheet bloc number limited
 
+bloc grabbing can be constrained to one axis at will
 
 tickrate is regulated by packet process		TEST IT
 	if too much pack for a frame, tick counter dont increment  
@@ -223,7 +217,6 @@ mesure and store the relative process time used by different things
 logarythmic slides
 mtemplate : load / save bang > run
 sheet selector : select sheet choosen by name on bang
-pack / unpack > build complex packet
 save log at crash? how to detect crash?
 
 	-New Creating Process :

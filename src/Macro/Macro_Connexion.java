@@ -323,8 +323,19 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
             break;
           }
         }
-      } } )
-      ;
+        
+        if (!buildingLine) for (Macro_Connexion m : connected_inputs) {
+            if ( (sheet.mmain().selected_sheet == m.sheet || 
+          		  sheet.mmain().selected_sheet == sheet) && 
+          		  (RConst.distancePointToLine(
+  				  elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
+  				  getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y)
+  				  < 3 * ref.look.outlineWeight / gui.scale ||
+  				  lens.isHovered || m.lens.isHovered) && 
+          		  (sheet.mmain().show_link.get() || (lens.isHovered || m.lens.isHovered) ) ) {
+            	elem.bloc.light_on();
+        } }
+    }});
     
     ref_draw = new Drawable(gui.drawing_pile, 0) { public void drawing() {
       //logln("draw " + descr + " sheet " + sheet.value_bloc.ref + " op " + sheet.openning.get());
@@ -385,6 +396,19 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     lens.setParent(ref);
     sheet.child_connect.add(this);
   }
+  
+	void enlight() {
+  		ref.setOutlineColor(gui.app.color(255, 0, 255));
+  		ref.setStandbyColor(gui.app.color(255, 0, 255));
+  		ref.setLabelColor(gui.app.color(255, 0, 255));
+  		ref.setClickedColor(gui.app.color(255, 0, 255));
+  		elem.bloc.mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
+  			ref.setOutlineColor(gui.app.color(200, 100, 100));
+  			ref.setStandbyColor(gui.app.color(200));
+  			ref.setLabelColor(gui.app.color(20, 180, 240));
+      		ref.setClickedColor(gui.app.color(10, 110, 250));
+  		}});
+	}
 
   Macro_Connexion hide_msg() { 
 	  msg_view
@@ -604,6 +628,8 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   ArrayList<nRunnable> eventLinkRun = new ArrayList<nRunnable>();
   Macro_Connexion addEventChangeLink(nRunnable r) { 
 	  eventUnLinkRun.add(r); eventLinkRun.add(r); return this; }
+  Macro_Connexion removeEventChangeLink(nRunnable r) { 
+	  eventUnLinkRun.remove(r); eventLinkRun.remove(r); return this; }
   Macro_Connexion addEventLink(nRunnable r) { eventLinkRun.add(r); return this; }
   Macro_Connexion removeEventLink(nRunnable r) { eventLinkRun.remove(r); return this; }
   Macro_Connexion addEventUnLink(nRunnable r) { eventUnLinkRun.add(r); return this; }

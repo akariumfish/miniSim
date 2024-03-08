@@ -24,14 +24,21 @@ class MCam extends MBaseMenu {
 	}
 	Drawable drawable;
 	Macro_Connexion struct_link, sheet_in;
-	ArrayList<Macro_Sheet> csheets = new ArrayList<Macro_Sheet>();
-	ArrayList<MShape> shapes = new ArrayList<MShape>();
-	ArrayList<MStructure> structs = new ArrayList<MStructure>();
+	ArrayList<MCursor> cursors;
+	ArrayList<Macro_Sheet> csheets;
+	ArrayList<MShape> shapes;
+	ArrayList<MStructure> structs;
 	nRunnable up_sheet_run, up_draw_run;
-	sBoo show, show_preview;
+	sBoo show, show_preview, show_shape, show_struct;
 	MCam(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "cam", _bloc); }
 	void init() {
 		super.init();   
+
+		cursors = new ArrayList<MCursor>();
+		csheets = new ArrayList<Macro_Sheet>();
+		shapes = new ArrayList<MShape>();
+		structs = new ArrayList<MStructure>();
+		
 		drawable = new Drawable() { 
 			public void drawing() { draw_to_cam(); } } ;
 		mmain().inter.addToCamDrawerPile(drawable);
@@ -45,7 +52,10 @@ class MCam extends MBaseMenu {
 		addTrigS(1, "menu", menu_run);
 		show = newRowBoo(true, "show");
 		show_preview = newRowBoo(true, "preview");
-		menuBoo(show); menuBoo(show_preview);
+		menuBoo(show, show_preview);
+		show_shape = newBoo(true, "shape");
+		show_struct = newBoo(true, "struct");
+		menuBoo(show_shape, show_struct);
 		build_normal();
 	}
 	void build_normal() {
@@ -54,17 +64,29 @@ class MCam extends MBaseMenu {
 			addTrigS(1, "menu", menu_run);
 			show = newBoo(true, "show");
 			show_preview = newBoo(true, "preview");
+			show_shape = newBoo(true, "shape");
+			show_struct = newBoo(true, "struct");
 			menuBoo(show, show_preview);
+			menuBoo(show_shape, show_struct);
 		}
-		sheet_in = addInput(0, "sheet");
+		sheet_in = addInput(0, "sheet/cursor");
 		up_sheet_run = new nRunnable() { public void run() {
 			for (Macro_Sheet mf : csheets) mf.priority.removeEventChange(up_sheet_run);
+			for (MCursor mf : cursors) mf.priority.removeEventChange(up_sheet_run);
 			csheets.clear();
+			cursors.clear();
 			int cnt = 0;
 			int prio = 100;
 			for (Macro_Connexion co : sheet_in.connected_outputs) {
 				if (co.elem.bloc.val_type.get().equals("sheetbloc")) {
 					Macro_Sheet mf = ((Macro_Sheet)co.elem.bloc.sheet);
+					cnt++;
+					if (mf.priority.get() < prio) {
+						prio = mf.priority.get();
+					}
+				}
+				if (co.elem.bloc.val_type.get().equals("cursor")) {
+					MCursor mf = ((MCursor)co.elem.bloc);
 					cnt++;
 					if (mf.priority.get() < prio) {
 						prio = mf.priority.get();
@@ -77,6 +99,14 @@ class MCam extends MBaseMenu {
 						Macro_Sheet mf = ((Macro_Sheet)co.elem.bloc.sheet);
 						if (mf.priority.get() == prio) {
 							csheets.add(mf);
+							mf.priority.addEventChange(up_sheet_run);
+							cnt--;
+						}
+					}
+					if (co.elem.bloc.val_type.get().equals("cursor")) {
+						MCursor mf = ((MCursor)co.elem.bloc);
+						if (mf.priority.get() == prio) {
+							cursors.add(mf);
 							mf.priority.addEventChange(up_sheet_run);
 							cnt--;
 						}
@@ -143,13 +173,24 @@ class MCam extends MBaseMenu {
 		if (show.get()) {
 			if (csheets.size() > 0) { 
 				for (Macro_Sheet mf : csheets) for (nCursor cur : mf.sheet_cursors_list) {
-					for (MStructure m : structs) m.draw(gui.app, cur.pos(), cur.dir().heading());
-//					for (MShape m : shapes) m.draw(gui.app, cur.pos(), cur.dir());
+					if (show_struct.get()) 
+						for (MStructure m : structs) m.draw(gui.app, cur.pos(), cur.dir().heading());
+					if (show_shape.get()) 
+						for (MShape m : shapes) m.draw(gui.app, cur.pos(), cur.dir());
+				} 
+			}
+			if (cursors.size() > 0) { 
+				for (MCursor mf : cursors) {
+					if (show_struct.get()) 
+						for (MStructure m : structs) m.draw(gui.app, mf.cursor.pos(), 
+							mf.cursor.dir().heading());
+					if (show_shape.get()) 
+						for (MShape m : shapes) m.draw(gui.app, mf.cursor.pos());
 				} 
 			}
 			if (show_preview.get()) {
 				PVector p = grab_pos.get().add(ref_size*3.375F, ref_size*2.75F);
-//				for (MStructure m : structs) m.draw(gui.app, p, 0);
+				for (MStructure m : structs) m.draw(gui.app, p, 0);
 				for (MShape m : shapes) m.draw(gui.app, p);
 			}
 		}
@@ -171,7 +212,7 @@ class MCam extends MBaseMenu {
 
 class MShape extends MBaseMenu { 
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("shape", "shape", "basic form", "Work"); 
+		Builder(Macro_Main m) { super("shape", "Shape", "Basic shapes", "Work"); 
 		first_start_show(m); }
 		MShape build(Macro_Sheet s, sValueBloc b) { MShape m = new MShape(s, b); return m; }
 	}
@@ -180,11 +221,14 @@ class MShape extends MBaseMenu {
 	sInt val_type; sCol vcol_fill, vcol_line; sFlt val_scale, val_linew;
 	nCtrlWidget[] type_selects;
 	Macro_Connexion link;
+	ArrayList<MStructure> structs;
+	
 	MShape(Macro_Sheet _sheet, sValueBloc _bloc) { 
 		super(_sheet, "shape", _bloc); 
 	}
 	void init() {
 		super.init();
+		structs = new ArrayList<MStructure>();
 		val_type = newInt(0, "type");
 		val_scale = menuFltSlide(10, 1, 50, "val_scale");
 		val_linew = menuFltSlide(0.5F, 0, 1.0F, "val_linew");
@@ -216,27 +260,26 @@ class MShape extends MBaseMenu {
 			if (i == 1) list_vertices[i].sety(10);
 		}
 		median = new PVector(0, 0);
+		nRunnable val_run = new nRunnable() {public void run() { 
+			link_shape_change(); }};
+		val_type.addEventChange(val_run);
+		val_scale.addEventChange(val_run);
+		val_linew.addEventChange(val_run);
+		vcol_fill.addEventChange(val_run);
+		vcol_line.addEventChange(val_run);
+	}
+	public MShape clear() {
+		super.clear(); 
+		structs.clear();
+		return this; 
 	}
 	void build_param() {
-		addInputBang(0, "menu", menu_run);
-		addTrigS(1, "menu", menu_run);
-		addEmptyS(1);
-		Macro_Element m = addEmptyL(0);
-		type_selects = new nCtrlWidget[shape_nb];
-		for (int i = 0 ; i < shape_nb ; i++) {
-			type_selects[i] = m.addCtrlModel("MC_Element_Button_Selector_"+(i+1), shapes_names[i])
-				.setRunnable(new nRunnable(i) {public void run() {
-					val_type.set((Integer)builder);
-				}});
-		}
 		build_normal();
 	}
 	void build_normal() {
-		if (!param_view.get()) {
-			addInputBang(0, "menu", menu_run);
-			addTrigS(1, "menu", menu_run);
-		}
-		link = addOutput(1,"link");
+		addInputBang(0, "menu", menu_run);
+		addTrigS(1, "menu", menu_run);
+		link = addOutput(1,"shape_link");
 		link.set_link();
 	}
 	public void build_custom_menu(nFrontPanel sheet_front) {
@@ -263,7 +306,10 @@ class MShape extends MBaseMenu {
 				gui.app.line(cent.x, cent.y, cent.x - 100, cent.y);
 				gui.app.line(cent.x, cent.y, cent.x, cent.y - 100);
 				add_points = true;
-				draw(gui.app, cent, 0, (1 / radius) * val_scale.get() * 2.0F, 
+				float f = 1;
+				if (val_scale.get() < 12) f = 5;
+				if (val_scale.get() < 2) f = 10;
+				draw(gui.app, cent, 0, (f / radius) * val_scale.get() * 2.0F, 
 						vcol_fill.get(), vcol_line.get(), (1 / radius) * val_linew.get() * 2.0F);
 				add_points = false;
 			} };
@@ -275,14 +321,16 @@ class MShape extends MBaseMenu {
 			}
 		  
 		  	dr.getShelf().addSeparator(0.125).addDrawer(10.25, 1)
-		  		.addCtrlModel("Button-S2/1-P1", shapes_names[0])
+		  		.addCtrlModel("Button-S1.5/1-P1", shapes_names[0])
 		  			.setRunnable(new nRunnable(this) { public void run() { val_type.set(0); }}).getDrawer()
-				.addCtrlModel("Button-S2/1-P2", shapes_names[1])
+				.addCtrlModel("Button-S1.5/1-P2", shapes_names[1])
 					.setRunnable(new nRunnable(this) { public void run() { val_type.set(1); }}).getDrawer()
-				.addCtrlModel("Button-S2/1-P3", shapes_names[2])
+				.addCtrlModel("Button-S1.5/1-P3", shapes_names[2])
 					.setRunnable(new nRunnable(this) { public void run() { val_type.set(2); }}).getDrawer()
-				.addCtrlModel("Button-S2/1-P4", shapes_names[3])
-					.setRunnable(new nRunnable(this) { public void run() { val_type.set(3); }}).getShelf()
+				.addCtrlModel("Button-S1.5/1-P4", shapes_names[3])
+					.setRunnable(new nRunnable(this) { public void run() { val_type.set(3); }}).getDrawer()
+				.addCtrlModel("Button-S1.5/1-P5", shapes_names[4])
+					.setRunnable(new nRunnable(this) { public void run() { val_type.set(4); }}).getShelf()
 			.addSeparator(0.125).addDrawer(10.25, 1)
 				.addCtrlModel("Button-S2-P1", "Center")
 					.setRunnable(new nRunnable(this) { public void run() { center(); }}).getDrawer()
@@ -291,13 +339,13 @@ class MShape extends MBaseMenu {
 				.addCtrlModel("Button-S2-P3", "Equilat")
 					.setRunnable(new nRunnable(this) { public void run() { equilat(); }}).getShelf()
 			.addSeparator(0.125).addDrawer(10.25, 1)
-				.addCtrlModel("Button-S1-P1", "X2")
+				.addCtrlModel("Button-S1-P2", "X2")
 					.setRunnable(new nRunnable(this) { public void run() { resize(2); }}).getDrawer()
-				.addCtrlModel("Button-S1-P2", "/2")
+				.addCtrlModel("Button-S1-P3", "/2")
 					.setRunnable(new nRunnable(this) { public void run() { resize(0.5F); }}).getDrawer()
-				.addCtrlModel("Button-S1-P8", "CCW")
+				.addCtrlModel("Button-S1-P7", "CCW")
 					.setRunnable(new nRunnable(this) { public void run() { rot(RConst.PI/4.0F); }}).getDrawer()
-				.addCtrlModel("Button-S1-P9", "CW")
+				.addCtrlModel("Button-S1-P8", "CW")
 					.setRunnable(new nRunnable(this) { public void run() { rot(-RConst.PI/4.0F); }}).getShelf()
 			.addSeparator(0.125);
 		  
@@ -317,7 +365,9 @@ class MShape extends MBaseMenu {
 	
 	PVector temp, median;
 	float radius = 0, median_radius;
-	
+	void link_shape_change() {
+		for (MStructure s : structs) if (s.shape_cible == this) s.get_shape(this);
+	}
 	void update_info() { 
 		median.set(0, 0); radius = 0; median_radius = 0;
 		float d = 0; 
@@ -342,6 +392,7 @@ class MShape extends MBaseMenu {
 			}
 		}
 		update_info();
+		link_shape_change();
 	}
 	void center() {
 		update_info();
@@ -352,6 +403,7 @@ class MShape extends MBaseMenu {
 			list_vertices[i].set(temp);
 		}
 		update_info();
+		link_shape_change();
 	}
 	void equilat() {
 		update_info();
@@ -361,6 +413,7 @@ class MShape extends MBaseMenu {
 			temp.rotate(2*RConst.PI / shapes_vertices[val_type.get()]);
 		}
 		update_info();
+		link_shape_change();
 	}
 	void resize(float fact) {
 		update_info();
@@ -370,6 +423,7 @@ class MShape extends MBaseMenu {
 			list_vertices[i].set(temp);
 		}
 		update_info();
+		link_shape_change();
 	}
 	void rot(float fact) {
 		update_info();
@@ -388,6 +442,7 @@ class MShape extends MBaseMenu {
 			list_vertices[i].set(temp);
 		}
 		update_info();
+		link_shape_change();
 	}
 	void move_to(int cible) {
 		if (cible > 0 && cible <= shapes_vertices[val_type.get()]) {
@@ -397,6 +452,7 @@ class MShape extends MBaseMenu {
 				list_vertices[i].set(list_vertices[i].get().add(temp));
 			}
 			update_info();
+			link_shape_change();
 		}
 	}
 	public void draw(Rapp a, PVector pos) { 
@@ -410,9 +466,9 @@ class MShape extends MBaseMenu {
 			draw_vec[i].set(list_vertices[i].get());
 			draw_vec[i] = draw_vec[i].rotate(head).mult(scale).add(pos);
 		}
-		app.fill(fill);
-		app.stroke(line);
-		if (lw > 0) app.strokeWeight(lw * scale); else app.noStroke();
+		app.fill(vcol_fill.get());
+		app.stroke(vcol_line.get());
+		if (val_linew.get() > 0) app.strokeWeight(val_linew.get() * scale); else app.noStroke();
 		app.ellipseMode(PApplet.CENTER);
 		if (val_type.get() == TRIG)
 			app.triangle(	draw_vec[0].x, draw_vec[0].y, 
@@ -423,18 +479,21 @@ class MShape extends MBaseMenu {
 						draw_vec[1].x, draw_vec[1].y);
 		else if (val_type.get() == CIRCLE)
 			app.ellipse(	draw_vec[0].x, draw_vec[0].y, 
-						draw_vec[1].x - draw_vec[0].x, draw_vec[1].y - draw_vec[0].y);
+						PApplet.max((draw_vec[1].x - draw_vec[0].x) * 2, 
+								(draw_vec[1].y - draw_vec[0].y) * 2) * 2,
+						PApplet.max((draw_vec[1].x - draw_vec[0].x) * 2, 
+								(draw_vec[1].y - draw_vec[0].y) * 2) * 2);
 		else if (val_type.get() == ARROW) {
 			app.line(	draw_vec[0].x, draw_vec[0].y, 
 						draw_vec[1].x, draw_vec[1].y);
 			app.line(	draw_vec[0].x, draw_vec[0].y, 
 						draw_vec[2].x, draw_vec[2].y);
 		} else if (val_type.get() == RECT) {
+			app.rectMode(PApplet.CORNERS);
 			app.rect(	draw_vec[0].x, draw_vec[0].y, 
-					draw_vec[1].x, draw_vec[1].y, 
-					draw_vec[2].x, draw_vec[2].y, 
-					draw_vec[3].x, draw_vec[3].y);
-	}
+						draw_vec[1].x, draw_vec[1].y);
+		}	
+		app.rectMode(PApplet.CORNER);
 		if (add_points) {
 			app.fill(200, 200, 0);
 			app.noStroke();
@@ -442,9 +501,6 @@ class MShape extends MBaseMenu {
 				app.ellipse(draw_vec[i].x, draw_vec[i].y, 10, 10);
 		}
 	}
-	public MShape clear() {
-		super.clear(); 
-		return this; }
 	public MShape toLayerTop() {
 		super.toLayerTop(); 
 		return this;
@@ -460,22 +516,24 @@ class MShape extends MBaseMenu {
 class MStructure extends MBaseMenu { 
 
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("struct", "Structure", "structure of forms", "Work"); 
+		Builder(Macro_Main m) { super("struct", "Structure", "structure of shapes", "Work"); 
 		first_start_show(m); }
 		MStructure build(Macro_Sheet s, sValueBloc b) { MStructure m = new MStructure(s, b); return m; }
 	}
 	
 	class Replic {
-		PVector pos = new PVector();
+		PVector pos;
 		float scale = 0.0F, rot = 0.0F, linew = 0.1F; int col_fill, col_line, type = 0;
 		PVector[] vertice_vec; 
 		
 		Replic() {
+			pos = new PVector(0, 0);
 			vertice_vec = new PVector[max_vertices];
 			for (int i = 0 ; i < max_vertices ; i++) 
-				vertice_vec[i] = new PVector();
-			col_fill = gui.app.color(220, 220, 0);
-			col_line = gui.app.color(0, 220, 220);
+				vertice_vec[i] = new PVector(0, 0);
+			col_fill = gui.app.color(220, 220, 0, 255);
+			col_line = gui.app.color(0, 220, 220, 255);
+			type = 0; scale = 0; rot = 0;
 		}
 		boolean as_values = false;
 		sVec val_pos; sFlt val_scale, val_rot, val_linew; 
@@ -525,6 +583,18 @@ class MStructure extends MBaseMenu {
 				vertice_vec[i].set(0, 0);
 			if (as_values) data_to_value();
 		}
+		void clean() {
+			reset();
+			if (as_values) {
+				val_pos.clear();
+				val_scale.clear();
+				val_rot.clear();
+				val_linew.clear();
+				vcol_fill.clear();
+				vcol_line.clear();
+				val_type.clear();
+			}
+		}
 		String to_str(float p) { return PApplet.str(p) + INFO_TOKEN; }
 		String to_str(int p) { return PApplet.str(p) + INFO_TOKEN; }
 		String to_str(PVector p) {
@@ -559,7 +629,7 @@ class MStructure extends MBaseMenu {
 		public void draw(Rapp app, PVector p, float head) {
 			if (scale > 0) {
 				for (int i = 0 ; i < max_vertices ; i++) {
-					draw_vec[i].set(vertice_vec[i].get());
+					draw_vec[i].set(vertice_vec[i]);
 					draw_vec[i] = draw_vec[i].rotate(rot).mult(scale).add(pos)
 										.rotate(head).add(p);
 				}
@@ -576,33 +646,31 @@ class MStructure extends MBaseMenu {
 								draw_vec[1].x, draw_vec[1].y);
 				else if (type == CIRCLE)
 					app.ellipse(	draw_vec[0].x, draw_vec[0].y, 
-								draw_vec[1].x - draw_vec[0].x, draw_vec[1].y - draw_vec[0].y);
+								PApplet.max((draw_vec[1].x - draw_vec[0].x) * 2, 
+										(draw_vec[1].y - draw_vec[0].y) * 2),
+								PApplet.max((draw_vec[1].x - draw_vec[0].x) * 2, 
+										(draw_vec[1].y - draw_vec[0].y) * 2));
 				else if (type == ARROW) {
 					app.line(	draw_vec[0].x, draw_vec[0].y, 
 								draw_vec[1].x, draw_vec[1].y);
 					app.line(	draw_vec[0].x, draw_vec[0].y, 
 								draw_vec[2].x, draw_vec[2].y);
 				} else if (type == RECT) {
+					app.rectMode(PApplet.CORNERS);
 					app.rect(	draw_vec[0].x, draw_vec[0].y, 
-								draw_vec[1].x, draw_vec[1].y, 
-								draw_vec[2].x, draw_vec[2].y, 
-								draw_vec[3].x, draw_vec[3].y);
+								draw_vec[1].x, draw_vec[1].y);
 				}	
+				app.rectMode(PApplet.CORNER);
 			}
 		}
 	}
 	public void draw(Rapp a, PVector p, float head) { 	
-//		gui.app.logln("draw"+replics.size());
-		 //if (replics.get(i).scale > 0)
-		for (int i = del_index.get() ; i <= add_index.get() && i < max_replic.get() ; i++) 
-			//if (replics.get(i).scale > 0) 
-				replics.get(i).draw(a, p, head);
-//		for (Replic r : replics) r.draw(a, p, head);
+		for (Replic r : replics) if (r.scale > 0) r.draw(a, p, head);
 		if (show_pen.get()) pencil.draw(a, p, head);
 	}
 	public void get_shape() { get_shape(shape_cible); }
 	public void get_shape(MShape ms) {
-		if (shape_cible != null) {
+		if (ms != null) {
 			pencil.val_scale.set(ms.val_scale.get());
 			pencil.val_linew.set(ms.val_linew.get());
 			pencil.vcol_fill.set(ms.vcol_fill.get());
@@ -611,6 +679,12 @@ class MStructure extends MBaseMenu {
 			for (int i = 0 ; i < max_vertices ; i++) 
 				pencil.vertice_vec[i].set(ms.list_vertices[i].get());
 		}
+	}
+	void pencil_from_mouv() {
+		get_shape();
+		pencil.val_pos.set(mouv_x.get(), mouv_y.get());
+		pencil.val_scale.set(mouv_scale.get());
+		pencil.val_rot.set(mouv_rot.get());
 	}
 	void mouv_pencil() {
 		get_shape();
@@ -624,70 +698,70 @@ class MStructure extends MBaseMenu {
 		pencil.val_rot.set(0);
 	}
 	void addReplic() {
-		if (use_count.get() < max_replic.get()) {
-			get_shape();
-			replics.get(add_index.get()).copy_from(pencil);
-			add_index.add(1);
-			if (add_index.get() >= max_replic.get()) add_index.set(0);
-			use_count.add(1);
-			save_replics();
-		}
+		if (modif_index.get() < replics.size()-1) modif_index.add(1);
+		else modif_index.set(0);
+		get_shape();
+		replics.get(modif_index.get()).copy_from(pencil);
+		save_replics();
 	}
 	void delReplic() {
-		if (use_count.get() > 0) {
-			replics.get(del_index.get()).reset();
-			del_index.add(1);
-			if (del_index.get() >= max_replic.get()) del_index.set(0);
-			use_count.add(-1);
-			save_replics();
-		}
+		if (modif_index.get() < replics.size()-1) modif_index.add(1);
+		else modif_index.set(0);
+		replics.get(modif_index.get()).reset();
+		save_replics();
+	}
+	void delLastReplic() {
+		if (modif_index.get() > 0) modif_index.add(-1);
+		else modif_index.set(replics.size()-1);
+		replics.get(modif_index.get()).reset();
+		save_replics();
 	}
 
 	void save_replics() {
 		replics_save.set(OBJ_TOKEN);
-		for (int i = del_index.get() ; i < add_index.get() && i < max_replic.get() ; i++) 
-			replics_save.add(replics.get(i).to_str() + OBJ_TOKEN);
-		gui.app.logln("save "+replics_save.get());
+		for (Replic r : replics) replics_save.add(r.to_str() + OBJ_TOKEN);
 	}
 	void init_array() {
-		ArrayList<Replic> temp = new ArrayList<Replic>();
-		for (int i = 0 ; i < PApplet.max(max_replic.get(), replics.size()) ; i++) {
-			if (i >= replics.size()) replics.add(new Replic());
-			if (i >= max_replic.get()) temp.add(replics.get(i));
-			if (i < max_replic.get()) replics.get(i).reset();
-		}
-		for (Replic r : temp) replics.remove(r);
-		use_count.set(0); add_index.set(0); del_index.set(0);
-		mouv_x.set(0); mouv_y.set(0); mouv_scale.set(1); mouv_rot.set(0);
-		get_shape();
-
-		gui.app.logln("pre load save "+replics_save.get());
+		for (Replic r : replics) r.clean();
+		replics.clear();
+		for (int i = 0 ; i < max_replic.get() ; i++) {
+			Replic r = new Replic();
+			replics.add(r); }
+		for (Replic r : replics) r.reset();
+		modif_index.set(0);
+	}
+	void load_array() {
 		if (replics_save.get().length() > 0) {
 			String[] l = PApplet.splitTokens(replics_save.get(), OBJ_TOKEN);
 			int count = 0;
 			for (String s : l) {
-				if (count < replics.size() && use_count.get() + 1 < max_replic.get()) {
+				if (count <= replics.size()) {
 					Replic r = replics.get(count);
 					r.from_str(s);
-					add_index.add(1); use_count.add(1);
-				} else break;
+				} 
 				count++;
 			}
-			del_index.set(0);
-			if (add_index.get() >= max_replic.get()) add_index.set(0);
 		}
+	}
+	void full_clean() {
+		for (Replic r : replics) r.clean();
+		replics.clear();
+		modif_index.set(0); 
+		mouv_x.set(0); mouv_y.set(0); mouv_scale.set(1); mouv_rot.set(0);
+		replics_save.set(OBJ_TOKEN);
+		init_array();
 		save_replics();
-		gui.app.logln("post load save "+replics_save.get());
 	}
 	PVector[] draw_vec;
 	
-	sInt max_replic, add_index, del_index, use_count; 
+	sInt max_replic, modif_index; 
 	sStr replics_save;
 	ArrayList<MShape> shapes;
 	MShape shape_cible;
 	ArrayList<Replic> replics;
 	Replic pencil;
-	sRun add_run, del_run, clear_run, move_run, moveadd_run, center_run;
+	sRun add_run, del_run, dellast_run, clear_run, move_run, moveadd_run, moveto_run, 
+			center_run, movezero_run;
 	Macro_Connexion shape_link, cam_link;
 	nRunnable up_link_run;
 	sBoo show_pen;
@@ -697,11 +771,9 @@ class MStructure extends MBaseMenu {
 	void init() {
 		super.init();  
 		replics_save = newStr("replics_save", "replics_save", "");
-		max_replic = menuIntIncr(100, 100, "max_replic");
+		max_replic = menuIntIncr(40, 100, "max_replic");
 		if (!loading_from_bloc) max_replic.set_limit(1, 500);
-		add_index = newInt(0, "add_index");
-		del_index = newInt(0, "del_index");
-		use_count = newInt(0, "use_count");
+		modif_index = newInt(0, "modif_index");
 		show_pen = newBoo(true, "show_pen");
 		shapes = new ArrayList<MShape>();
 		replics = new ArrayList<Replic>();
@@ -714,26 +786,36 @@ class MStructure extends MBaseMenu {
 
 		add_run = newRun("add", new nRunnable(this) { public void run() { addReplic(); }});
 		del_run = newRun("del", new nRunnable(this) { public void run() { delReplic(); }});
-		clear_run = newRun("clear", new nRunnable(this) { public void run() { init_array(); }});
+		dellast_run = newRun("dellast", new nRunnable(this) { public void run() { 
+			delLastReplic(); }});
+		clear_run = newRun("clear", new nRunnable(this) { public void run() { 
+			full_clean(); }});
 		move_run = newRun("move", new nRunnable(this) { public void run() { mouv_pencil(); }});
+		moveto_run = newRun("move to", new nRunnable(this) { public void run() { 
+			pencil_from_mouv(); }});
 		moveadd_run = newRun("move-add", new nRunnable(this) { public void run() { 
 			mouv_pencil(); addReplic(); }});
 		center_run = newRun("center", new nRunnable(this) { public void run() { 
 			pencil_to_center(); }});
-		menuRun(add_run, del_run, clear_run);
-		menuRun(move_run, moveadd_run, center_run);
+		movezero_run = newRun("movezero", new nRunnable(this) { public void run() { 
+			mouv_x.set(0); mouv_y.set(0); mouv_scale.set(1); mouv_rot.set(0); }});
+		menuRun(add_run, center_run, movezero_run);
+		menuRun(move_run, moveto_run, moveadd_run);
+		menuRun(del_run, dellast_run, clear_run);
 
 		mouv_x = menuFltSlide(0, -1000, 1000, "mouv_x");
 		mouv_y = menuFltSlide(0, -1000, 1000, "mouv_y");
 		mouv_scale = menuFltSlide(1, 0, 10, "mouv_scale");
 		mouv_rot = menuFltSlide(0, -RConst.PI, RConst.PI, "mouv_rot");
 
-		menuWatch(add_index); menuWatch(del_index); menuWatch(use_count);
+		menuWatch(modif_index);
 		menuWatch(pencil.val_pos); menuWatch(pencil.val_rot); menuWatch(pencil.val_scale);
 		max_replic.addEventChange(new nRunnable(this) { public void run() { 
 			init_array(); }});
 		
 		init_array();
+		
+		load_array();
 	}
 	void build_param() {
 		addEmptyS(2).addLinkedModel("MC_Element_SButton").setLinkedValue(show_pen);
@@ -755,8 +837,11 @@ class MStructure extends MBaseMenu {
 			addTrigS(1, "menu", menu_run);
 		}
 
-		up_link_run = new nRunnable() { public void run() {
-			for (MShape mf : shapes) mf.priority.removeEventChange(up_link_run);
+		up_link_run = new nRunnable(this) { public void run() {
+			for (MShape mf : shapes) {
+				mf.structs.remove((MStructure)builder);
+				mf.priority.removeEventChange(up_link_run);
+			}
 			shapes.clear();
 			shape_cible = null;
 			int cnt = 0;
@@ -777,6 +862,7 @@ class MStructure extends MBaseMenu {
 						if (mf.priority.get() == prio) {
 							shapes.add(mf);
 							shape_cible = mf;
+							mf.structs.add((MStructure)builder);
 							get_shape(mf);
 							mf.priority.addEventChange(up_link_run);
 							cnt--;
@@ -789,7 +875,7 @@ class MStructure extends MBaseMenu {
 		addEmptyS(1);
 		cam_link = addOutput(2,"cam");
 		cam_link.set_link();
-		shape_link = addInput(0,"pencil shape");
+		shape_link = addInput(0,"pencil_shape");
 		shape_link.set_link().addEventLink(up_link_run).addEventUnLink(up_link_run);
 		Macro_Element e = addInputToValue(0, add_run).elem;
 		e.addCtrlModel("MC_Element_SButton", "add").setRunnable(add_run.get());
@@ -803,12 +889,18 @@ class MStructure extends MBaseMenu {
 		e.addCtrlModel("MC_Element_SButton", "move-add").setRunnable(moveadd_run.get());
 		e = addInputToValue(2, center_run).elem;
 		e.addCtrlModel("MC_Element_SButton", "center").setRunnable(center_run.get());
+		e = addInputToValue(0, dellast_run).elem;
+		e.addCtrlModel("MC_Element_SButton", "del last").setRunnable(dellast_run.get());
+		e = addInputToValue(2, moveto_run).elem;
+		e.addCtrlModel("MC_Element_SButton", "move to").setRunnable(moveto_run.get());
+		addEmptyS(1);
 	}
 //	public void build_custom_menu(nFrontPanel sheet_front) {
 //		
 //	}
 	public MStructure clear() {
-		save_replics();
+		replics.clear();
+		shapes.clear();
 		super.clear(); 
 		return this; 
 	}

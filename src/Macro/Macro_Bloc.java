@@ -634,10 +634,130 @@ public class Macro_Bloc extends Macro_Abstract {
     ArrayList<Macro_Element> elements = new ArrayList<Macro_Element>();
 	nCtrlWidget param_open, mirror_sw;
 
-  ArrayList<nRunnable> eventClearRun = new ArrayList<nRunnable>();
-  Macro_Bloc addEventClear(nRunnable r) { eventClearRun.add(r); return this; }
+	  ArrayList<nRunnable> eventClearRun = new ArrayList<nRunnable>();
+	  Macro_Bloc addEventClear(nRunnable r) { eventClearRun.add(r); return this; }
+	  
+	  ArrayList<nRunnable> eventLinkChangeRun = new ArrayList<nRunnable>();
+	  Macro_Bloc addEventLinkChange(nRunnable r) { eventLinkChangeRun.add(r); return this; }
   
-  
+
+		ArrayList<Macro_Bloc> link_blocs = new ArrayList<Macro_Bloc>();
+	  ArrayList<Macro_Connexion> watched_cos = new ArrayList<Macro_Connexion>();
+	  nRunnable link_change_run;
+//	  
+	void light_on() {
+		update_linklist();
+		for (Macro_Connexion mb : watched_cos) mb.enlight();
+//        for (Macro_Bloc mb : link_blocs) {
+//        		mb.grabber.setOutlineColor(gui.app.color(255, 0, 255));
+//        		mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
+//        			mb.grabber.setOutlineColor(gui.app.color(180, 150, 120));
+//        		}});
+//        }
+//        for (Macro_Connexion mb : watched_cos) {
+//        		mb.ref.setOutlineColor(gui.app.color(255, 0, 255));
+//        		mb.ref.setStandbyColor(gui.app.color(255, 0, 255));
+//        		mb.ref.setLabelColor(gui.app.color(255, 0, 255));
+//        		mb.ref.setClickedColor(gui.app.color(255, 0, 255));
+//        		mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
+//        			mb.ref.setOutlineColor(gui.app.color(200, 100, 100));
+//        			mb.ref.setStandbyColor(gui.app.color(200));
+//        			mb.ref.setLabelColor(gui.app.color(20, 180, 240));
+//            		mb.ref.setClickedColor(gui.app.color(10, 110, 250));
+//        		}});
+//        }
+	}
+	void init_end() {
+		super.init_end();
+		mmain().inter.addEventTwoFrame(new nRunnable() { public void run() { update_linklist(); }});
+		
+
+//	    grabber.addEventMouseEnter(new nRunnable() { public void run() { 
+//	      if (openning.get() == REDUC && !hide_ctrl) title.show(); } });
+//	    grabber.addEventMouseLeave(new nRunnable() { public void run() { 
+//	    		update_linklist(); } });
+	    
+	}
+	void test_connect(Macro_Connexion out) {
+		if (!watched_cos.contains(out)) watched_cos.add(out);
+		if (out != null) 
+		for (Macro_Connexion m : out.connected_inputs) {
+			if (m.elem.bloc.val_type.get().equals("node")) {
+				watched_cos.add(m);
+				MNode n = (MNode)m.elem.bloc;
+				link_blocs.add(m.elem.bloc);
+				if (m.linkable) {
+					watched_cos.add(n.in_link);
+					watched_cos.add(n.out_link);
+					test_connect(n.out_link);
+					if (n.in_link != null) for (Macro_Connexion c2 : n.in_link.direct_cos) {
+						watched_cos.add(c2);
+						test_connect(c2);
+					}
+					if (n.out_link != null) for (Macro_Connexion c2 : n.out_link.direct_cos) {
+						watched_cos.add(c2);
+						test_connect(c2);
+					}
+				} 
+//				else for (int i = 1 ; i < 9 ; i++) if (m.base_info.equals("in"+i)) {
+//					for (Macro_Connexion c : m.direct_cos) { 
+//						watched_cos.add(c); test_connect(c); }
+//					for (MNode n2 : n.nodes) for (Macro_Connexion c : n2.in_list) {
+//						if (c.base_info.equals("in"+i)) {
+//							link_blocs.add(n);
+//							link_blocs.add(n2);
+//							watched_cos.add(n.in_link);
+//							watched_cos.add(n.out_link);
+//							watched_cos.add(c);
+//							test_connect(c);
+//							watched_cos.add(n2.in_link);
+//							watched_cos.add(n2.out_link);
+//							test_connect(n2.out_link);
+//							for (Macro_Connexion c2 : c.direct_cos) { 
+//								watched_cos.add(c2); test_connect(c2); }
+//						}
+//					}
+//				}
+//			}
+//			else if (m.elem.bloc.val_type.get().equals("gate")) {
+//				MGate g = (MGate)m.elem.bloc;
+//				watched_cos.add(m);
+//				test_connect(g.get_active_out());
+			} else if (m.linkable || m.link_undefine) {
+				watched_cos.add(m);
+				link_blocs.add(m.elem.bloc);
+				m.elem.bloc.link_blocs.add(out.elem.bloc);
+			}
+		}
+	}
+	boolean updating = false;
+	void update_linklist() {
+		if (!updating) {
+			updating = true;
+			for (Macro_Connexion m : watched_cos) m.removeEventChangeLink(link_change_run);
+			watched_cos.clear();
+			link_blocs.clear();
+			for (Macro_Element e : elements) if (e.connect != null) {
+				watched_cos.add(e.connect);
+	  	    	  	test_connect(e.connect);
+	  			for (Macro_Connexion c : e.connect.direct_cos) {
+					watched_cos.add(c);
+	  				test_connect(c); 
+	  			}
+			  	if (e.sheet_connect != null) {
+					watched_cos.add(e.sheet_connect);
+			  		test_connect(e.sheet_connect);
+		  			for (Macro_Connexion c : e.sheet_connect.direct_cos) {
+						watched_cos.add(c);
+		  				test_connect(c); 
+		  			}
+			  	}
+			}
+			gui.app.logln("uplinklst end bloc:"+link_blocs.size() + " co:"+watched_cos.size());
+			for (Macro_Connexion m : watched_cos) m.addEventChangeLink(link_change_run);
+			updating = false;
+		}
+	}
   
   Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
 	    super(_sheet, t, n, _bloc);
@@ -645,6 +765,8 @@ public class Macro_Bloc extends Macro_Abstract {
 	    addShelf(); 
 	    addShelf();
 	    addShelf();
+	    link_change_run = new nRunnable() {public void run() {
+	    	mmain().inter.addEventTwoFrame(new nRunnable() { public void run() { update_linklist(); }}); } };
 		col_rows_nb[0] = 0; col_rows_nb[1] = 0; col_rows_nb[2] = 0;
 	  }
   Macro_Bloc(Macro_Sheet _sheet, String t, sValueBloc _bloc) {
@@ -653,6 +775,8 @@ public class Macro_Bloc extends Macro_Abstract {
 	    addShelf(); 
 	    addShelf();
 	    addShelf();
+	    link_change_run = new nRunnable() {public void run() {
+	    	mmain().inter.addEventTwoFrame(new nRunnable() { public void run() { update_linklist(); }}); } };
 		col_rows_nb[0] = 0; col_rows_nb[1] = 0; col_rows_nb[2] = 0;			
 	  }
   int[] col_rows_nb = new int[3];
@@ -740,10 +864,11 @@ public class Macro_Bloc extends Macro_Abstract {
 	for (Macro_Element e : elements) if (e.spot != null) e.widget_toLayTop(); 
 
 	front.toLayerTop(); grab_front.toLayerTop(); 
-
-	title.toLayerTop(); grabber.toLayerTop(); reduc.toLayerTop(); 
-	prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
-
+	grabber.toLayerTop(); reduc.toLayerTop(); 
+	if (!hide_ctrl) {
+		title.toLayerTop(); 
+		prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); 
+	}
     if (param_open != null) param_open.toLayerTop();
     if (mirror_sw != null) mirror_sw.toLayerTop();
     return this;
@@ -757,18 +882,21 @@ public class Macro_Bloc extends Macro_Abstract {
   
   Macro_Bloc open() {
     super.open();
+    if (param_open != null) if (!hide_ctrl) param_open.show(); else param_open.hide(); 
     for (Macro_Element m : elements) m.show();
     toLayerTop();
     return this;
   }
   Macro_Bloc reduc() {
     super.reduc();
+    if (param_open != null) if (!hide_ctrl) param_open.show(); else param_open.hide(); 
     for (Macro_Element m : elements) m.reduc();
     toLayerTop();
     return this;
   }
   Macro_Bloc show() {
     super.show();
+    if (param_open != null) if (!hide_ctrl) param_open.show(); else param_open.hide(); 
     for (Macro_Element m : elements) m.show();
     toLayerTop();
     return this;
@@ -777,6 +905,7 @@ public class Macro_Bloc extends Macro_Abstract {
     super.hide(); 
     for (Macro_Element m : elements) m.hide();
     //toLayerTop();
+    if (param_open != null) param_open.hide();
     return this;
   }
 }

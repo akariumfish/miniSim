@@ -59,9 +59,11 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
 	  public Macro_Abstract toLayerTop() { 
 		  if (!gui.app.DEBUG_NOTOLAYTOP) super.toLayerTop(); 
 		  panel.toLayerTop();  
-		  front.getDrawable(); grab_front.getDrawable(); 
-		  title.getDrawable(); grabber.getDrawable(); reduc.getDrawable(); 
-		  prio_sub.getDrawable(); prio_add.getDrawable(); prio_view.getDrawable(); 
+		  front.toLayerTop(); grab_front.toLayerTop(); grabber.toLayerTop(); 
+		  if (!hide_ctrl) {
+			  title.toLayerTop(); reduc.toLayerTop(); 
+			  prio_sub.toLayerTop(); prio_add.toLayerTop(); prio_view.toLayerTop(); }
+		  
 	    return this; }
 //	  public Macro_Abstract buildLayer() { 
 //		  gui.app.logln(value_bloc.ref+ " build layer");
@@ -118,8 +120,12 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
       openning.set(OPEN);
       grabber.show(); grab_front.show(); panel.show(); back.hide(); 
       front.show(); 
-      if (!hide_ctrl) { title.show(); reduc.show(); }
-      else { title.hide(); reduc.hide(); }
+      if (!hide_ctrl) { title.show(); reduc.show(); 
+      	prio_sub.show(); prio_add.show(); prio_view.show(); }
+      else { 
+    	  	title.hide(); prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
+    	  	reduc.show(); //grabber.hide(); 
+    	  }
       reduc.setPosition(-ref_size * 0.75, ref_size*0.5)
 	    .setSize(ref_size*0.4, ref_size*0.75);
       moving();
@@ -131,12 +137,15 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
     if (openning.get() != REDUC) {
       openning.set(REDUC);
       grabber.show(); grab_front.show(); panel.hide(); back.hide(); 
-      front.hide(); 
+      front.hide(); reduc.show();
       if (!hide_ctrl) { 
 	      if (!title_fixe) title.hide(); else title.show(); 
-	      reduc.show().setPosition(ref_size * 0.5, ref_size*0.5)
-		    .setSize(ref_size*0.4, ref_size*0.5);
-      } else { title.hide(); reduc.hide(); }
+	      prio_sub.show(); prio_add.show(); prio_view.show();
+      } else { 
+    	  	title.hide(); prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
+    	  }
+      reduc.setPosition(ref_size * 0.5, ref_size*0.5)
+	    .setSize(ref_size*0.4, ref_size*0.5);
       moving();
     }
     return this;
@@ -157,6 +166,7 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
     }
     grabber.hide(); grab_front.hide(); panel.hide(); back.hide(); 
     front.hide(); title.hide(); reduc.hide(); 
+    prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
     return this;
   }
   Macro_Abstract changeOpenning() {
@@ -166,7 +176,8 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
 	    return this; }
   Macro_Abstract hideCtrl() {
 	  hide_ctrl = true;
-	  title.hide(); reduc.hide(); prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
+	  title.hide(); prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
+	  //grabber.hide();//reduc.hide(); 
     return this; }
   
 
