@@ -14,6 +14,7 @@ public class sStr extends sValue {
 		  	super(b, "str", n, s); val = RConst.copy(v); def = RConst.copy(val); }
 	  public String get() { return RConst.copy(val); }
 	  public void set(String v) { 
+		  run_events_allset(); 
 	    if (!v.equals(val)) { 
 	      if (limited && v.length() > max) val = v.substring(0, max); else val = RConst.copy(v); 
 	      

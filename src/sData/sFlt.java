@@ -32,7 +32,7 @@ public class sFlt extends sValue implements RConst {
 	  public float get() { return val; }
 	  public void set(double v) { set((float)v); }
 	  public void set(float v) { 
-		  
+		  run_events_allset(); 
 	    if (limited_max && v > max) v = max; if (limited_min && v < min) v = min;
 	    if (v != val) { if (log) bloc.data.app.logln(ref+"issetto"+v); val = v; doChange(); } }
 	  

@@ -102,15 +102,19 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	          bloc.sheet.selecting_element((Macro_Element)builder); } };
 	    back.addEventTrigger(spot_select_run);
 	    
-	    descr = BLOC_TOKEN+bloc.value_bloc.ref+BLOC_TOKEN+"_elem_"+bloc.elements.size();
+//	    if (_model.equals("MC_Element_Empty"))
+//	    		descr = BLOC_TOKEN+bloc.value_bloc.ref+BLOC_TOKEN+"_empty";
+//	    else 
+	    	descr = BLOC_TOKEN+bloc.value_bloc.ref+BLOC_TOKEN+"_elem_"+bloc.elements.size();
 	    
 	    if (sheet_view) bloc.sheet.child_elements.add(this);
 	    if (back != null && sco_side != NO_CO && bloc.sheet != bloc.mmain()) 
 	      sheet_connect = new Macro_Connexion(this, bloc.sheet.sheet, sco_side, _info, true); //_info
 	    if (back != null && co_side != NO_CO) 
 	      connect = new Macro_Connexion(this, bloc.sheet, co_side, _info, false); //_info
-	    //if (sheet_connect != null) sheet_connect.hide(); 
-	    //if (connect != null) connect.hide(); 
+	    if (sheet_connect != null && connect != null) {
+			connect.direct_connect(sheet_connect);
+			sheet_connect.direct_connect(connect); }
 	  }
 	  String side = "";
 	  void set_spot(nWidget _spot, String sd) { 

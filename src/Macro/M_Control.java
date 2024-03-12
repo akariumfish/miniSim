@@ -47,6 +47,8 @@ class MInput extends MBasic {
 	}
 	boolean inib = false;
 	public void build_param() { 
+	    build_normal();
+	    
 		addEmptyS(1); //if (modeCROSS.get()) addEmptyS(2);
 		nDrawer m = addEmptyL(0);
 	    m.addLinkedModel("MC_Element_Button_Selector_2", "K").setLinkedValue(modeKEY);
@@ -63,9 +65,11 @@ class MInput extends MBasic {
 		  	modeMOUSE.addEventChange(mode_run);
 		  	modeMKEY.addEventChange(mode_run);
 	  	}});
-	    build_normal();
 	}
 	public void build_normal() {
+		if (!param_view.get() && !modeKEY.get() && !modeCROSS.get() && 
+				!modeMOUSE.get() && !modeMKEY.get()) {
+			param_view.set(true); rebuild(); }
 		if (modeCROSS.get()) {
 		    in_m = addInput(0, "magnitude").addEventReceive(new nRunnable() { public void run() { 
 		    		if (in_m.lastPack() != null && in_m.lastPack().isFloat() && 
@@ -195,12 +199,12 @@ class MGate extends MBasic {
     label = newStr("label", "label");
   }
   public void build_param() {
+	build_normal();
 	addEmpty(1);
   	addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(label);
   	label.addEventChange(new nRunnable() { public void run() { 
  		if (swtch != null) swtch.setText(label.get());
  	} } );
-	build_normal();
   }
   public void build_normal() {
     in_m = addInput(0, "in");
@@ -209,10 +213,6 @@ class MGate extends MBasic {
 //    	  	if (state.get()) out.send(in_m.lastPack());
 //    	  	else out_inv.send(in_m.lastPack());
 //    } });
-    state.addEventChange(new nRunnable() { public void run() { 
-    		if (state.get()) { in_m.direct_deconnect(out_inv); in_m.direct_connect(out); } 
-    		else { in_m.direct_deconnect(out); in_m.direct_connect(out_inv); }
-    }});
     in_b = addInput(0, "gate").addEventReceive(new nRunnable() { public void run() { 
       if (in_b.lastPack() != null && in_b.lastPack().isBool()) 
         state.set(in_b.lastPack().asBool()); 
@@ -225,8 +225,13 @@ class MGate extends MBasic {
     in_m.set_undefine();
   	out_inv.set_undefine();
   	out.set_undefine();
-    swtch = out_inv.elem.addLinkedModel("MC_Element_SButton", label.get()).setLinkedValue(state);
-    swtch.setPX(-ref_size*1.5);
+    swtch = in_b.elem.addLinkedModel("MC_Element_SButton", label.get())
+    		.setLinkedValue(state);
+    swtch.setPX(ref_size*0.5);
+    state.addEventChange(new nRunnable() { public void run() { 
+		if (state.get()) { in_m.direct_deconnect(out); in_m.direct_deconnect(out_inv); in_m.direct_connect(out); } 
+		else { in_m.direct_deconnect(out); in_m.direct_deconnect(out_inv); in_m.direct_connect(out_inv); }
+    }});
   }
   public Macro_Connexion get_active_out() { 
 	  if (state.get()) return out; else return out_inv; }
@@ -245,14 +250,18 @@ class MChan extends Macro_Bloc {
 		  MChan build(Macro_Sheet s, sValueBloc b) { MChan m = new MChan(s, b); return m; }
 	  }
 	  
-  Macro_Connexion in, out;
+  Macro_Connexion in_chan, in, out;
   sStr val_cible; 
   nLinkedWidget ref_field; 
   MChan(Macro_Sheet _sheet, sValueBloc _bloc) { 
     super(_sheet, "chan", "chan", _bloc); 
     val_cible = newStr("cible", "cible", "");
-    ref_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
     addEmpty(1); 
+    in_chan = addInput(0, "chan").addEventReceive(new nRunnable() { public void run() { 
+        if (in.lastPack() != null && in.lastPack().isStr()) val_cible.set(in.lastPack().asStr());
+      } });
+    in_chan.elem.back.copy(gui.theme.getModel("MC_Element_Double"));
+    ref_field = in_chan.elem.addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
     in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
       if (in.lastPack() != null) receive(in.lastPack());
     } });
@@ -274,7 +283,7 @@ class MChan extends Macro_Bloc {
 
 
 
-class MBin extends Macro_Bloc {
+class MBin extends MBasic {
 
 	  static class MBin_Builder extends MAbstract_Builder {
 		  MBin_Builder() { super("bin", "Binary", "", "Control"); }
@@ -285,34 +294,42 @@ class MBin extends Macro_Bloc {
   nLinkedWidget swtch; 
   sBoo state;
   MBin(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "bin", "bin", _bloc); 
-    state = newBoo("state", "state", false);
-    
-    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isBool() && 
-          in.lastPack().asBool()) out.send(Macro_Packet.newPacketBang()); 
-      else if (in.lastPack() != null && in.lastPack().isBang()) out.send(Macro_Packet.newPacketBool(true));
-      else if (state.get() && in.lastPack() != null) out.send(Macro_Packet.newPacketBang());  } });
-    out = addOutput(1, "out")
-      .setDefBool();
-      
-    swtch = out.elem.addLinkedModel("MC_Element_SButton").setLinkedValue(state);
-    swtch.setInfo("all to bang");
+	  super(_sheet, "bin", _bloc); 
+	  state = newBoo("state", "state", false); 
+      out = addOutput(1, "out").setDefBool();
+      swtch = out.elem.addLinkedModel("MC_Element_SButton").setLinkedValue(state);
+      swtch.setInfo("all to bang");
+	  in = addInput(0, "in", new nRunnable() { public void run() { 
+        if (in.lastPack() != null && in.lastPack().isBool() && 
+            in.lastPack().asBool()) out.send(Macro_Packet.newPacketBang()); 
+        else if (in.lastPack() != null && in.lastPack().isBang()) 
+        		out.send(Macro_Packet.newPacketBool(true));
+        else if (state.get() && in.lastPack() != null) 
+        		out.send(Macro_Packet.newPacketBang());  } });
   }
+  void init() { 
+	  super.init(); }
+  void init_end() { 
+	  super.init_end(); }
+  void buil_param() { }
+  void buil_normal() { }
   public MBin clear() {
     super.clear(); return this; }
+  public MBin toLayerTop() {
+	    super.toLayerTop(); 
+	    return this; }
 }
 
-class MNot extends Macro_Bloc {
+class MNot extends MBasic {
 
-	  static class MNot_Builder extends MAbstract_Builder {
-		  MNot_Builder() { super("not", "Not", "", "Control"); }
-		  MNot build(Macro_Sheet s, sValueBloc b) { MNot m = new MNot(s, b); return m; }
-	  }
+  static class MNot_Builder extends MAbstract_Builder {
+	  MNot_Builder() { super("not", "Not", "", "Control"); }
+	  MNot build(Macro_Sheet s, sValueBloc b) { MNot m = new MNot(s, b); return m; }
+  }
 	  
   Macro_Connexion in, out;
   MNot(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "not", "not", _bloc); 
+    super(_sheet, "not", _bloc); 
     
     in = addInput(0, "in").setFilterBool().addEventReceive(new nRunnable() { public void run() { 
       if (in.lastPack() != null && in.lastPack().isBool()) {
@@ -321,6 +338,15 @@ class MNot extends Macro_Bloc {
     out = addOutput(1, "out")
       .setDefBool();
   }
+  void init() { 
+	  super.init(); }
+  void init_end() { 
+	  super.init_end(); }
+  void buil_param() { }
+  void buil_normal() { }
+  public MNot toLayerTop() {
+	    super.toLayerTop(); 
+	    return this; }
   public MNot clear() {
     super.clear(); return this; }
 }
@@ -329,94 +355,123 @@ class MNot extends Macro_Bloc {
 
 
 
-class MCounter extends Macro_Bloc { 
-  static class MCount_Builder extends MAbstract_Builder {
-	  MCount_Builder() { super("count", "Counter", "", "Control"); }
-      MCounter build(Macro_Sheet s, sValueBloc b) { MCounter m = new MCounter(s, b); return m; }
+class MCounter extends MBasic { 
+	static class MCount_Builder extends MAbstract_Builder {
+	  	MCount_Builder() { super("count", "Counter", "", "Control"); }
+	  	MCounter build(Macro_Sheet s, sValueBloc b) { MCounter m = new MCounter(s, b); return m; }
     }
-  sInt count_val, max_val;
-  sBoo lim_max;
-  Macro_Connexion out, end;
-  nRunnable get_run, rst_run, add_run, sub_run;
-  MCounter(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "count", "count", _bloc); 
-    count_val = newInt("count_val", "count_val", 0);
-    
-    addEmptyS(0).addWatcherModel("MC_Element_SText").setLinkedValue(count_val);
-    addEmptyS(1);
-    out = addOutput(2, "out");
-    addEmptyS(0); addEmptyS(1);
-    end = addOutput(2, "end");
-    get_run = new nRunnable() {public void run() { 
-		out.send(Macro_Packet.newPacketFloat((float)count_val.get())); }};
-	rst_run = new nRunnable() {public void run() { 
-		count_val.set(0); out.send(Macro_Packet.newPacketFloat((float)count_val.get())); 
-		end.sendBang();
-	}};
-	add_run = new nRunnable() {public void run() { 
-		count_val.add(1); 
-		if (lim_max.get() && count_val.get() >= max_val.get()) {
-			rst_run.run();
-		} else {
-			out.send(Macro_Packet.newPacketFloat((float)count_val.get())); 
-		}
-	}};
-	sub_run = new nRunnable() {public void run() { 
-		count_val.add(-1); out.send(Macro_Packet.newPacketFloat((float)count_val.get())); }};
-    addInputBang(0, "get", get_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "get")
-    		.setRunnable(get_run);
-    addInputBang(0, "rst", rst_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "rst")
-		.setRunnable(rst_run);
-    addInputBang(1, "add", add_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "add")
-		.setRunnable(add_run);
-    addInputBang(1, "sub", sub_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "sub")
-		.setRunnable(sub_run);
-    addEmptyS(2); addEmptyS(2);
-    
-    addEmpty(1); addEmptyS(2);
-    nDrawer dr = addEmptyL(0);
-    lim_max = newBoo("lim_max", false);
-    dr.addLinkedModel("MC_Element_SButton").setLinkedValue(lim_max);
-    max_val = newRowInt(10, "max_val");
-    
-  }
-  public MCounter clear() {
-    super.clear(); 
-    return this; }
-  public MCounter toLayerTop() {
-    super.toLayerTop(); 
-    return this; }
+  	sInt count_val, max_val;
+  	sBoo lim_max;
+  	Macro_Connexion out, end;
+  	nRunnable get_run, rst_run, add_run, sub_run;
+	boolean build_flag = false;
+  	MCounter(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "count", _bloc); }
+	void init() {
+		super.init();
+	    count_val = newInt("count_val", "count_val", 0);
+	    lim_max = newBoo("lim_max", false);
+	    max_val = newInt(10, "max_val");
+	}
+	void init_end() { 
+		super.init_end(); 
+
+	  	nRunnable mode_run = new nRunnable() { public void run() {
+	  		if (!build_flag)
+	  			mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  				if (!rebuilding) rebuild(); }});
+	  		build_flag = true;
+	  	} };
+	  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  		lim_max.addEventChange(mode_run);
+	  	}});
+	}
+	void build_param() { 
+	    addEmpty(1);
+	    nDrawer dr = addEmptyL(0);
+	    dr.addLinkedModel("MC_Element_Button", "limit").setLinkedValue(lim_max);
+	    
+		build_normal(); 
+	}
+	void build_normal() {
+	    addEmptyS(0).addWatcherModel("MC_Element_SText").setLinkedValue(count_val);
+	    if (!lim_max.get()) addEmptyS(0);
+	    else addInputToValue(0, max_val)
+	    				.elem.addLinkedModel("MC_Element_SField").setLinkedValue(max_val);
+	    out = addOutput(1, "count_out");
+	    end = addOutput(1, "end");
+	    get_run = new nRunnable() {public void run() { 
+			out.send(Macro_Packet.newPacketFloat((float)count_val.get())); }};
+		rst_run = new nRunnable() {public void run() { 
+			count_val.set(0); out.send(Macro_Packet.newPacketFloat((float)count_val.get())); 
+			end.sendBang();
+		}};
+		add_run = new nRunnable() {public void run() { 
+			count_val.add(1); 
+			if (lim_max.get() && count_val.get() >= max_val.get()) {
+				rst_run.run();
+			} else {
+				out.send(Macro_Packet.newPacketFloat((float)count_val.get())); 
+			}
+		}};
+		sub_run = new nRunnable() {public void run() { 
+			count_val.add(-1); out.send(Macro_Packet.newPacketFloat((float)count_val.get())); }};
+	    addInputBang(0, "get", get_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "get")
+	    		.setRunnable(get_run);
+	    addInputBang(0, "rst", rst_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "rst")
+			.setRunnable(rst_run);
+	    addInputBang(1, "add", add_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "add")
+			.setRunnable(add_run);
+	    addInputBang(1, "sub", sub_run).hide_msg().elem.addCtrlModel("MC_Element_SButton", "sub")
+			.setRunnable(sub_run);
+	}
+	public MCounter clear() {
+		super.clear(); 
+		return this; }
+	public MCounter toLayerTop() {
+		super.toLayerTop(); 
+		return this; }
 }
 
 
 
 
 
-class MSetReset extends Macro_Bloc {
+class MSetReset extends MBasic {
 	static class Builder extends MAbstract_Builder {
 		Builder() { super("strst", "SetReset", "", "Control"); }
 		MSetReset build(Macro_Sheet s, sValueBloc b) { MSetReset m = new MSetReset(s, b); return m; }
 	}
-	Macro_Connexion in_set, in_rst, out_state, out_over;
+	Macro_Connexion out_state, out_over;
 	sBoo state;
-	MSetReset(Macro_Sheet _sheet, sValueBloc _bloc) { 
-		super(_sheet, "strst", _bloc); 
+	MSetReset(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "strst", _bloc);  }
+	void init() {
+		super.init();
 		state = newBoo("state", "state", false);
+	}
+	void init_end() { super.init_end(); }
+	void build_param() { build_normal(); }
+	void build_normal() {
 		out_state = addOutput(1, "state");
+		out_state.elem.addWatcherModel("MC_Element_SText")
+		.setLinkedValue(state).setBackground();
 		out_over = addOutput(1, "over");
-		in_set = addInputBang(0, "set", new nRunnable() {public void run() { 
+		nRunnable set_run = new nRunnable() {public void run() { 
 			boolean flag = false;
 			if (state.get()) flag = true;
 			state.set(true);
 			out_state.sendBool(true);
 			if (flag) { out_over.sendBang(); }
-		}});
-		in_rst = addInputBang(0, "reset", new nRunnable() {public void run() { 
+		}};
+		addInputBang(0, "set", set_run)
+			.elem.addCtrlModel("MC_Element_SButton", "set").setRunnable(set_run);
+		nRunnable rst_run = new nRunnable() {public void run() { 
 			boolean flag = false;
 			if (!state.get()) flag = true;
 			state.set(false);
 			if (flag) out_state.sendBool(false);
-		}});
+		}};
+		addInputBang(0, "reset", rst_run)
+			.elem.addCtrlModel("MC_Element_SButton", "reset").setRunnable(rst_run);
 	}
 	public MSetReset clear() {
 		super.clear(); return this; }

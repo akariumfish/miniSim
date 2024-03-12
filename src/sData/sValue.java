@@ -27,6 +27,8 @@ public abstract class sValue implements RConst {
 	  public sValue removeEventChange(nRunnable r) { eventsChange.remove(r); return this; }
 	  public sValue addEventAllChange(nRunnable r) { eventsAllChange.add(r); return this; }
 	  public sValue removeEventAllChange(nRunnable r) { eventsAllChange.remove(r); return this; }
+	  public sValue addEventAllGet(nRunnable r) { eventsAllGet.add(r); return this; }
+	  public sValue removeEventAllGet(nRunnable r) { eventsAllGet.remove(r); return this; }
 	  void doChange() { 
 		  if (!pauseevent) { 
 			  if (doevent && data.doevent) nRunnable.runEvents(eventsAllChange); 
@@ -64,7 +66,14 @@ public abstract class sValue implements RConst {
 	  }
 	  ArrayList<nRunnable> eventsChange = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsAllChange = new ArrayList<nRunnable>();
+	  ArrayList<nRunnable> eventsAllGet = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsDelete = new ArrayList<nRunnable>();
+	  public void run_events_change() {
+		  if (doevent && data.doevent) nRunnable.runEvents(eventsChange); }
+	  public void run_events_allchange() {
+		  if (doevent && data.doevent) nRunnable.runEvents(eventsAllChange); }
+	  public void run_events_allset() {
+		  if (doevent && data.doevent) nRunnable.runEvents(eventsAllGet); }
 	  void save_to_bloc(Save_Bloc sb) {
 //	    vlogln("sv save " + ref);
 	    sb.newData("ref", ref);

@@ -13,6 +13,7 @@ public class sObj extends sValue {
 	  public boolean isSheet() { return is_sheet; }
 	  sObj(sValueBloc b, String n, Object r) { super(b, "obj", n, "obj");  val = r; }
 	  public sObj set(Object r) { 
+		  run_events_allset(); 
 //	    if (r instanceof sValue) return set((sValue)r); 
 //	    if (r instanceof sValueBloc) return set((sValueBloc)r);  
 	    if (r instanceof Macro_Sheet) return set((Macro_Sheet)r);  

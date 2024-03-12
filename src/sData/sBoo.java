@@ -8,7 +8,7 @@ public class sBoo extends sValue {
 	  boolean val = false, def;
 	  public sBoo(sValueBloc b, boolean v, String n, String s) { super(b, "boo", n, s); val = v; def = val; }
 	  public boolean get() { return val; }
-	  public void set(boolean v) { if (v != val) { val = v; doChange(); } }
+	  public void set(boolean v) { run_events_allset(); if (v != val) { val = v; doChange(); } }
 	  void save_to_bloc(Save_Bloc svb) { super.save_to_bloc(svb);
 	    svb.newData("val", val);
 	  }

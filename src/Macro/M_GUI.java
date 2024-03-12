@@ -4,24 +4,9 @@ import java.util.ArrayList;
 
 import RApplet.RConst;
 import RApplet.Rapp;
-import UI.Drawable;
-import UI.nCtrlWidget;
-import UI.nDrawer;
-import UI.nLinkedWidget;
-import UI.nSlide;
-import UI.nToolPanel;
-import UI.nWatcherWidget;
-import UI.nWidget;
-import UI.nWindowPanel;
-import processing.core.PConstants;
-import sData.nRunnable;
-import sData.sBoo;
-import sData.sFlt;
-import sData.sInt;
-import sData.sStr;
-import sData.sValue;
-import sData.sValueBloc;
-import sData.sVec;
+import UI.*;
+import processing.core.*;
+import sData.*;
 
 public class M_GUI {}
 
@@ -94,6 +79,7 @@ class MQuickFloat extends MBasic {
 		build_param();
 	}
 	public void build_param() { 
+		addEmpty(1); addEmpty(1); addEmpty(1); 
 		Macro_Element e = addEmptyL(0);
 		e.addCtrlModel("MC_Element_Button_Selector_1", "0.1")
 		.setRunnable(new nRunnable() { public void run() { val_fact.set(0.1); } });
@@ -104,13 +90,13 @@ class MQuickFloat extends MBasic {
 		e.addCtrlModel("MC_Element_Button_Selector_4", "100")
 		.setRunnable(new nRunnable() { public void run() {val_fact.set(100); } });
 		addLinkedSWidget(2, val_fact);
-		addEmpty(1); e = addEmptyL(0); line(e, 1);
+		e = addEmptyL(0); line(e, 1);
 		e.addLinkedModel("MC_Element_Button_Selector_4", "-")
 		.setLinkedValue(val_neg);
-		addEmpty(1); e = addEmptyL(0); line(e, 4);
+		e = addEmptyL(0); line(e, 4);
 		e.addCtrlModel("MC_Element_Button_Selector_4", "0")
 		.setRunnable(new nRunnable() { public void run() { out.sendFloat(0); } });
-		addEmpty(1); e = addEmptyL(0); line(e, 7);
+		e = addEmptyL(0); line(e, 7);
 	  	out = addOutput(2, "out").setDefFloat();
 	}
 	private void line(Macro_Element e, int r) {
@@ -202,368 +188,313 @@ class MSlide extends MBasic {
 
 
 
-class MButton extends MBasic {
+
+
+
+
+
+
+
+
+class MMButton extends MBasic {
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("button", "Button", "", "GUI"); 
+		Builder(Macro_Main m) { super("mbutton", "MultiButton", "", "GUI"); 
 		first_start_show(m); }
-		MButton build(Macro_Sheet s, sValueBloc b) { MButton m = new MButton(s, b); return m; }
+		MMButton build(Macro_Sheet s, sValueBloc b) { MMButton m = new MMButton(s, b); return m; }
 	}
-	sBoo mode;
-	Macro_Connexion in, out_t;
-	nLinkedWidget swtch, wMode; 
-	sBoo state;
-	nCtrlWidget trig; 
-	sBoo setup_send;
-	sInt size;
-	sStr label;
-	MButton(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "button", _bloc); }
-	public void init() {}
-	public void build_param() {
+	sBoo mode, setup_send, show_rownb; //show_screen; 
+	sInt row_nb, size; sCol butt_col;
+	boolean build_flag = false;
+	ArrayList<sBoo> vals;
+	ArrayList<sStr> labels;
+	ArrayList<Macro_Connexion> cos;
+	  
+	MMButton(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "mbutton", _bloc); }
+	public void init() {
+		row_nb = newInt(2, "row_nb");
 		mode = newBoo(false, "mode");
-		addEmpty(1);
-		wMode = addEmptyL(0).addLinkedModel("MC_Element_Button").setLinkedValue(mode);
-		mode.addEventChange(new nRunnable() { public void run() { 
-			if (mode.get()) wMode.setText("Switch");
-			else wMode.setText("Trigger");
-		}});
-		
-		size = newSelectInt(0, 2, "size");
-		size.set_limit(1, 2);
-		label = newFieldStr(0, "label", "");
-		setup_send = newSwitchBoo(0, false, "stp_snd");
-	  	state = newBoo("state", "state", false);
-		
-		build_button();
-	}
-	public void build_normal() {
-		mode = newBoo("mode", "mode", false);
 		size = newInt(2, "size");
-	  	label = newStr("label", "");
-	  	setup_send = newBoo("stp_snd", "stp_snd", false);
-	  	state = newBoo("state", "state", false);
-	  	
-	  	build_button();
-	}
-	void build_button() {
-	  	if (!mode.get()) {
-		 	if (size.get() == 1) {
-			  	Macro_Element e = addEmptyS(0);
-			  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
-				  	out_t.send(Macro_Packet.newPacketBang());
-			  	} });
-			 	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-			 		.setLinkedValue(setup_send);
-		    
-			  	out_t = addOutput(1, "trig").setDefBang();
-		  	} else {
-			  	out_t = addOutput(1, "trig").setDefBang();
-	
-			  	addEmptyS(0);
-			  	addEmptyS(1);
-			  	Macro_Element e = addEmptyS(0);
-			  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
-			  		out_t.send(Macro_Packet.newPacketBang());
-			  	} });
-			  	trig.setSY(ref_size*2).setPY(-ref_size*15/16);
-			  	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-			  		.setLinkedValue(setup_send).setPX(ref_size*0.25);
-		  	}
-		 	
-		 	label.addEventChange(new nRunnable() { public void run() {
-		 		trig.setText(label.get()); } });
-		 	
-		  	if (setup_send.get()) 
-		  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-			  	out_t.send(Macro_Packet.newPacketBang());
-		  	} });
-	  	} else {
-		    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-			    	if (in.lastPack() != null && in.lastPack().isBang()) {
-			    		state.swtch();
-			    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
-			    	} 
-			    	if (in.lastPack() != null && in.lastPack().isBool()) {
-	    	  			if(state.get() != in.lastPack().asBool()) {
-			    	  		state.swtch();
-				    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
-		    	  		}
-			    	} 
-		    } });
-		    nRunnable swt_run = new nRunnable() { public void run() {
-			    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-			    		out_t.send(Macro_Packet.newPacketBool(state.get()));
-			    	}});
-			}};
-	  		if (size.get() == 2) {
-	  		    addEmptyS(1);
-	  		    out_t = addOutput(1, "out")
-	  		    		.setDefBool();
-	  		    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button", label.get()).setLinkedValue(state);
-	  		    swtch.setSY(ref_size*2).setPY(-ref_size*15/16);
-			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
-			    swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-		  			.setLinkedValue(setup_send).setPX(ref_size*0.25);
-	  		} else {
-			    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton", label.get()).setLinkedValue(state);
-			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
-		  		swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-			 		.setLinkedValue(setup_send);
-			    out_t = addOutput(2, "out")
-			    		.setDefBool();
-	  		}
+		if (!loading_from_bloc) size.set_limit(1, 3);
 
-		 	label.addEventChange(new nRunnable() { public void run() {
-		 		swtch.setText(label.get()); } });
-		 	
-  		    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-		    		out_t.send(Macro_Packet.newPacketBool(state.get()));
-		    } });
-	  	}
-	}
-	public MButton clear() {
-		super.clear(); return this; }
-}
+	  	setup_send = newBoo(false, "stp_snd");
+//	  	show_screen = newBoo(false, "show_screen");
+	  	butt_col = newCol("butt_col");
+		if (!loading_from_bloc) butt_col.set(gui.app.color(10, 40, 80));
 
-
-
-
-
-class MTrig extends MBasic {
-	static class MTrig_Builder extends MAbstract_Builder {
-		MTrig_Builder() { super("trig", "Trigger", "", "GUI"); }
-		MTrig build(Macro_Sheet s, sValueBloc b) { MTrig m = new MTrig(s, b); return m; }
-	}
-	  
-	Macro_Connexion out_t;
-	nCtrlWidget trig; 
-	sBoo setup_send;
-	sInt size;
-	sStr label;
-	MTrig(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "trig", _bloc); }
-	public void init() {
+		show_rownb = newBoo(true, "show_rownb");
 		
+		vals = new ArrayList<sBoo>();
+		labels = new ArrayList<sStr>();
+		cos = new ArrayList<Macro_Connexion>();
 	}
+	void init_end() {
+		super.init_end();
+	  	nRunnable mode_run = new nRunnable() { public void run() {
+	  		if (!build_flag)
+	  			mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  				if (!rebuilding) rebuild(); }});
+	  		build_flag = true;
+	  	} };
+	  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  		row_nb.addEventChange(mode_run);
+	  		mode.addEventChange(mode_run);
+			size.addEventChange(mode_run);
+	  		mirror_view.addEventChange(mode_run);
+	  	}});
+		if (setup_send.get()) 
+			mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
+				if (mode.get()) {
+					int count = 0;
+					for (sValue v : vals) if (count < cos.size()) 
+						cos.get(count).send(v.asPacket()); count++; 
+				} else for (Macro_Connexion v : cos) v.sendBang();
+		}});
+  	}
 	public void build_param() {
-		size = newSelectInt(0, 1, "size");
-		size.set_limit(1, 2);
-		label = newFieldStr(0, "label", "");
-		setup_send = newSwitchBoo(0, false, "stp_snd");
+		addEmptyS(1).no_mirror(); 
+		nWidget w = addEmptyL(0).no_mirror()
+				.addLinkedModel("MC_Element_Button").setLinkedValue(mode);
+		mode.addEventChange(new nRunnable(w) { public void run() { 
+			if (mode.get()) ((nWidget)builder).setText("Switch");
+			else ((nWidget)builder).setText("Trigger"); }});
+    		addSelectToInt(0, size).no_mirror();
+		
+	  	addEmptyS(1).no_mirror(); 
+	  	Macro_Element e = addEmptyL(0).no_mirror();
+	  	e.addLinkedModel("MC_Element_Button")
+	  	.setLinkedValue(setup_send).setText("setupsnd")
+	  	.setSX(ref_size*2.0).setPX(ref_size*0.125);
+	  	e.addLinkedModel("MC_Element_Button")
+  		.setLinkedValue(show_rownb).setText("rows")
+  		.setSX(ref_size*2.0).setPX(ref_size*2.375);
+	  	
+  		addInputToValue(0, butt_col).elem.no_mirror();
+		e = addEmptyS(1).no_mirror();
+		addSWatcher(e, butt_col);//.setPX(-ref_size*0.6875);
+		e.addValuePanel(butt_col);
+		
+	  	build_normal();
 	}
 	public void build_normal() {
-		size = newInt(1, "size");
-	  	label = newStr("label", "");
-	  	setup_send = newBoo("stp_snd", "stp_snd", false);
-	 	if (size.get() == 1) {
-		  	Macro_Element e = addEmptyS(0);
-		  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
-			  	out_t.send(Macro_Packet.newPacketBang());
-		  	} });
-	    
-		  	out_t = addOutput(1, "trig").setDefBang();
-	  	} else {
-		  	out_t = addOutput(1, "trig").setDefBang();
+	    if (show_rownb.get()) {
+		    	addEmptyS(1).addWatcherModel("MC_Element_SField").setLinkedValue(row_nb)
+		    	.setPX(-ref_size*3 / 16).setSX(ref_size*1.375)
+		    	.getDrawer().addCtrlModel("MC_Element_SButton", "+")
+		    	.setRunnable(new nRunnable() { public void run() { 
+		    		row_nb.add(1); rebuild(); }})
+	    		.setPX(ref_size*1.1250).setSX(ref_size*1.0);
+		    	addInputToValue(0, row_nb)
+		    	.elem.addCtrlModel("MC_Element_SButton", "-")
+		    	.setRunnable(new nRunnable() { public void run() { 
+		    		if (row_nb.get() > 1) row_nb.add(-1); rebuild(); }})
+		    	.setPX(ref_size*1.1250).setSX(ref_size*1.0);
+	    }
+		for (int i = 0 ; i < row_nb.get() ; i++) { 
+			sStr vs = newStr("label"+i, "label"+i);
+		  	nLinkedWidget w = null;
+		  	Macro_Connexion o = null;
+//			if (size.get() == 2) { }
+//			else if (size.get() == 3) { addEmptyS(0); addEmptyS(0); addEmptyS(1); }
+		  	if (size.get() == 1) {
+			  	o = addOutput(1, "out"+i).setDefBang();
+			  	if (o != null) cos.add(o);
+			  	Macro_Element e = addEmptyS(0);
+		  		if (vs != null && param_view.get()) 
+		  			w = e.addLinkedModel("MC_Element_SButton");
+			  	else if (vs != null) 
+			  		w = e.addLinkedModel("MC_Element_Button", vs.get());
+		  		else w = e.addLinkedModel("MC_Element_SButton", "Button"+i);
+		  	} else if (size.get() == 2) {
+		  		addEmptyS(0); addEmptyS(1);
+			  	o = addOutput(1, "out"+i).setDefBang();
+			  	if (o != null) cos.add(o);
+			  	Macro_Element e = addEmptyS(0);
+			  	if (vs != null && param_view.get()) 
+			  		w = e.addLinkedModel("MC_Element_Button");
+			  	else if (vs != null) 
+			  		w = e.addLinkedModel("MC_Element_Button", vs.get());
+		  		else w = e.addLinkedModel("MC_Element_Button", "Button"+i);
+		 		w.setSY(ref_size*2).setPY(-ref_size*15/16);
+				if (mirror_view.get()) w.setPX(-ref_size*2.125);
+		 	} else if (size.get() == 3) {
+		 		addEmptyS(0); addEmptyS(1); addEmptyS(0); addEmptyS(1); 
+			  	o = addOutput(1, "out"+i).setDefBang();
+			  	if (o != null) cos.add(o);
+			  	Macro_Element e = addEmptyS(0);
+			  	if (vs != null && param_view.get()) 
+			  		w = e.addLinkedModel("MC_Element_Button");
+			  	else if (vs != null) 
+			  		w = e.addLinkedModel("MC_Element_Button", vs.get());
+		  		else w = e.addLinkedModel("MC_Element_Button", "Button"+i);
+		 		w.setSize(ref_size*4.0, ref_size*3.0).setPY(-ref_size*2.125F);
+				if (mirror_view.get()) w.setPX(-ref_size*2.125);
+		 	}
+		  	w.setStandbyColor(butt_col.get());
+		  	if (param_view.get()) {
+		  		if (vs != null) w.setLinkedValue(vs);
+		  	} else if (!mode.get()) {
+			  	w.setRunnable(new nRunnable(o) { public void run() {
+				  	((Macro_Connexion)builder).send(Macro_Packet.newPacketBang());
+			  	} }); 
+		  	} else {
+				sBoo v = newBoo(false, "state"+i);
+				if (v != null) {
+					vals.add(v);
+			  		w.setLinkedValue(v);
+			  		changeValueToOutput(o, v);
+				}
+		  	}
+		}
+	}
+	public MMButton clear() {
+		super.clear(); return this; }
+	public MMButton toLayerTop() {
+		super.toLayerTop(); return this; }
+}
 
-		  	addEmptyS(0);
-		  	Macro_Element e = addEmptyL(0);
-		  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
-		  		out_t.send(Macro_Packet.newPacketBang());
-		  	} });
-		  	trig.setSY(ref_size*2).setPY(-ref_size*17/16);
+
+
+
+
+
+
+class MText extends MBasic { 
+	static class Builder extends MAbstract_Builder {
+		Builder(Macro_Main m) { super("text", "Text", "", "GUI"); 
+		first_start_show(m); }
+		MText build(Macro_Sheet s, sValueBloc b) { MText m = new MText(s, b); return m; }
+	}
+
+    boolean build_flag = false;
+	sBoo show_log, do_draw;
+	Macro_Connexion in;
+	sStr val_com;
+	sFlt w_f, h_f, draw_scale; sCol draw_col;
+	Drawable drawable;
+
+	MText(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "text", _bloc); }
+	void init() {
+		val_com = newStr("val_com", "");
+		w_f = newFlt("w_f", "w_f", 3.875F);
+		h_f = newFlt("h_f", "h_f", 0.875F);
+		draw_scale = newFlt("draw_scale", "draw_scale", 2.0F);
+		draw_col = newCol("draw_col");
+		show_log = newBoo(false, "show_log");
+		do_draw = newBoo(false, "do_draw");
+		if (!loading_from_bloc) draw_col.set(gui.app.color(200));
+		drawable = new Drawable() { 
+			public void drawing() { draw_to_cam(); } } ;
+		mmain().inter.addToCamDrawerPile(drawable);
+	}
+	void init_end() {
+		super.init_end();
+	  	nRunnable mode_run = new nRunnable() { public void run() {
+	  		if (!build_flag)
+	  			mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  				if (!rebuilding) rebuild(); }});
+	  		build_flag = true;
+	  	} };
+	  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  		show_log.addEventChange(mode_run);
+	  		do_draw.addEventChange(mode_run);
+	  		mirror_view.addEventChange(mode_run);
+	  	}});
+	}
+	void build_param() {
+		addEmptyS(1).no_mirror();
+		addEmptyL(0).no_mirror().addCtrlModel("MC_Element_Button_Selector_1", "W-")
+		.setRunnable(new nRunnable() { public void run() { 
+			if (w_f.get() > 3.875) { w_f.set(3.875); rebuild(); return; }
+			if (w_f.get() >   1.375) { w_f.set(1.375); rebuild(); return; }
+		} }).getDrawer().addCtrlModel("MC_Element_Button_Selector_2", "W+")
+		.setRunnable(new nRunnable() { public void run() { 
+			if (w_f.get() < 3.875) { w_f.set(3.875); rebuild(); return; } 
+			if (w_f.get() < 5.75) { w_f.set(5.75); rebuild(); return; }
+		} }).getDrawer().addCtrlModel("MC_Element_Button_Selector_3", "H-")
+		.setRunnable(new nRunnable() { public void run() { 
+			if (h_f.get() > 1.125) { h_f.add(-1.125); rebuild(); }
+		} }).getDrawer().addCtrlModel("MC_Element_Button_Selector_4", "H+")
+		.setRunnable(new nRunnable() { public void run() { 
+			if (h_f.get() < 5) { h_f.add(1.125); rebuild(); }
+		} });
+
+	  	addEmptyS(1).no_mirror(); 
+	  	Macro_Element e = addEmptyL(0).no_mirror();
+	  	e.addLinkedModel("MC_Element_Button")
+	  		.setLinkedValue(show_log).setText("log")
+	  		.setSX(ref_size*2.0).setPX(ref_size*0.125);
+	  	e.addLinkedModel("MC_Element_Button")
+	  		.setLinkedValue(do_draw).setText("draw")
+	  		.setSX(ref_size*2.0).setPX(ref_size*2.375);
+	  	
+	  	if (do_draw.get()) { 
+	  		addInputToValue(0, draw_col).elem.no_mirror();
+			e = addEmptyS(1).no_mirror();
+			addLinkedSWidget(e, draw_col);
+			e.addValuePanel(draw_col);
+	  		addInputToValue(0, draw_scale).elem.no_mirror();
+			e = addEmptyS(1).no_mirror();
+			addLinkedSWidget(e, draw_scale)
+			  .setPX(ref_size*7.0/16.0).getDrawer()
+			  .addCtrlModel("MC_Element_MiniButton", "1")
+			  .setRunnable(new nRunnable() { public void run() { 
+				  draw_scale.set(1);
+			  }}).setPX(ref_size*0.125).getDrawer()
+		  .addCtrlModel("MC_Element_MiniButton", "+")
+			  .setRunnable(new nRunnable() { public void run() { 
+				  draw_scale.add(1);
+			  }}).setPX(ref_size*1.75);
 	  	}
-	  	if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-		  	out_t.send(Macro_Packet.newPacketBang());
-	  	} });
+		build_normal();
 	}
-	public MTrig clear() {
-		super.clear(); return this; }
+	void build_normal() {
+		if (h_f.get() > 1) { addEmptyS(1); }
+		if (h_f.get() > 2) { addEmptyS(1); }
+		if (h_f.get() > 4) { addEmptyS(1); }
+		if (h_f.get() > 5) { addEmptyS(1); }
+		if (show_log.get()) {
+			//show in log
+			addEmptyS(1);
+			in = addInput(0, "in", new nRunnable() { public void run() { 
+			if (in.lastPack() != null) {
+	    	  		if (in.lastPack().isBang()) gui.app.logln(val_com.get());
+	    	  		else gui.app.logln(val_com.get() + " : " + in.lastPack().getText());
+			} } });
+		} else addEmptyS(1);
+		if (show_log.get()) {
+			nWidget w = in.elem.addLinkedModel("MC_Element_Comment_Field")
+				.setLinkedValue(val_com)
+				.setSize(ref_size * w_f.get(), ref_size * h_f.get());
+			if (mirror_view.get()) w.setPX(-ref_size*2.125);
+		} else {
+			nWidget w = addEmptyS(0).addLinkedModel("MC_Element_Comment_Field")
+				.setLinkedValue(val_com)
+				.setSize(ref_size * w_f.get(), ref_size * h_f.get());
+			if (mirror_view.get()) w.setPX(-ref_size*2.125);
+		}
+	}
+	public void draw_to_cam() {
+		if (do_draw.get()) {  //show_draw
+			gui.app.pushMatrix();
+			gui.app.translate(reduc.getX() + ref_size*1.75F, reduc.getY());
+			if (w_f.get() == 5.75) 
+				gui.app.translate(ref_size*2.5F, 0);
+			gui.app.scale(draw_scale.get()); 
+			gui.app.fill(draw_col.get());
+			gui.app.text(val_com.get(), 0, 0);
+			gui.app.popMatrix();
+		}
+	}
+	public MText clear() {
+		super.clear(); 
+		drawable.clear();
+		return this; }
+	public MText toLayerTop() {
+		super.toLayerTop(); 
+		return this; }
 }
 
 
-
-
-
-
-class MSwitch extends MBasic {
-	static class MSwitch_Builder extends MAbstract_Builder {
-		MSwitch_Builder() { super("switch", "Switch", "", "GUI"); }
-		MSwitch build(Macro_Sheet s, sValueBloc b) { MSwitch m = new MSwitch(s, b); return m; }
-	}
-	  
-	Macro_Connexion in, out_t;
-	nLinkedWidget swtch; 
-	sBoo state;
-	MSwitch(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "switch", _bloc); }
-	public void init() {
-	    state = newBoo("state", "state", false);
-	}
-	public void build_param() {
-
-	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-	      if (in.lastPack() != null && in.lastPack().isBang()) {
-	        swtch.setSwitchState(!swtch.isOn());
-	      } 
-	      if (in.lastPack() != null && in.lastPack().isBool()) {
-	        swtch.setSwitchState(in.lastPack().asBool());
-	      } 
-	    } });
-	    addEmptyS(1);
-	    
-	    out_t = addOutput(1, "out")
-	      .setDefBool();
-	      
-	    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button").setLinkedValue(state);
-	    swtch.setSY(ref_size*2).setPY(-ref_size*17/16);
-	    
-	    state.addEventChange(new nRunnable() { public void run() {
-	      out_t.send(Macro_Packet.newPacketBool(state.get()));
-	    } });
-	    
-	    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	      out_t.send(Macro_Packet.newPacketBool(state.get()));
-	    } });
-	}
-	public void build_normal() {
-	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-	      if (in.lastPack() != null && in.lastPack().isBang()) {
-	    	  	state.swtch();
-	    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
-	      } 
-	      if (in.lastPack() != null && in.lastPack().isBool()) {
-	    	  	if(state.get() != in.lastPack().asBool()) {
-	    	  		state.swtch();
-		    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
-	    	  	}
-	      } 
-	    } });
-	    nRunnable swt_run = new nRunnable() { public void run() {
-		    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-		    		out_t.send(Macro_Packet.newPacketBool(state.get()));
-		    	}});
-		}};
-
-	    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton").setLinkedValue(state);
-	    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
-	    
-	    
-	    out_t = addOutput(2, "out")
-	      .setDefBool();
-	    
-	    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-	      out_t.send(Macro_Packet.newPacketBool(state.get()));
-	    } });
-	    
-	}
-	public MSwitch clear() {
-		super.clear(); return this; }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class MComment extends MBasic { 
-	  static class MComment_Builder extends MAbstract_Builder {
-		  MComment_Builder() { super("com", "Comment", "", "GUI"); }
-		  MComment build(Macro_Sheet s, sValueBloc b) { MComment m = new MComment(s, b); return m; }
-	  }
-	  
-  Macro_Connexion in;
-  
-  Macro_Element elem_param;
-  
-  sStr val_com;
-  sFlt w_f, h_f;
-  
-  nLinkedWidget com_field;
-  nCtrlWidget w_add, w_sub, h_add, h_sub;
-  
-  MComment(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "com", _bloc); }
-  void init() {
-    val_com = newStr("val_com", "val_com", "");
-      w_f = newFlt("w_f", "w_f", 3.875F);
-      h_f = newFlt("h_f", "h_f", 0.875F);
-  }
-  void build_param() {
-
-      in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-          if (in.lastPack() != null) {
-            if (in.lastPack().isBang()) gui.app.logln(val_com.get());
-            else gui.app.logln(val_com.get() + " : " + in.lastPack().getText());
-          }
-      } });
-      
-      elem_param = addEmptyL(1);
-      w_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_1", "W-")
-        .setRunnable(new nRunnable() { public void run() { 
-          if (w_f.get() > 3.875) {
-        w_f.set(3.875);
-        rebuild();
-        return;
-      }
-            if (w_f.get() >   1.375) {
-              w_f.set(1.375);
-              rebuild();
-            return;
-              }
-        } });
-      w_add = elem_param.addCtrlModel("MC_Element_Button_Selector_2", "W+")
-        .setRunnable(new nRunnable() { public void run() { 
-          if (w_f.get() < 3.875) {
-              w_f.set(3.875);
-              rebuild();
-              return;
-          } 
-          if (w_f.get() < 5.75) {
-            w_f.set(5.75);
-            rebuild();
-          return;
-          }
-        } });
-      h_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_3", "H-")
-        .setRunnable(new nRunnable() { public void run() { 
-        if (h_f.get() > 1.125) {
-          h_f.add(-1.125);
-          rebuild();
-        }
-      } });
-      h_add = elem_param.addCtrlModel("MC_Element_Button_Selector_4", "H+")
-        .setRunnable(new nRunnable() { public void run() { 
-        if (h_f.get() < 5) {
-          h_f.add(1.125);
-          rebuild();
-        }
-      } });
-      w_sub.setFont((int)(ref_size/2.8)); w_add.setFont((int)(ref_size/2.8));
-      h_sub.setFont((int)(ref_size/2.8)); h_add.setFont((int)(ref_size/2.8));
-  }
-  void build_normal() {
-    addEmptyS(1);
-      if (h_f.get() > 1) addEmptyS(1);
-      if (h_f.get() > 2) addEmptyS(1);
-      if (h_f.get() > 4) addEmptyS(1);
-      if (h_f.get() > 5) addEmptyS(1);
-    elem_com = addEmptyS(0);
-      com_field = elem_com.addLinkedModel("MC_Element_Comment_Field").setLinkedValue(val_com);
-      com_field.setSize(ref_size * w_f.get(), ref_size * h_f.get());
-  }
-  public MComment clear() {
-    super.clear(); 
-    return this; }
-  public MComment toLayerTop() {
-    super.toLayerTop(); 
-    return this; }
-}
 
 
 
@@ -1662,4 +1593,365 @@ class MPanel extends Macro_Bloc {
 
 
 
+
+
+
+
+
+
+
+
+
+
+class MButton extends MBasic {
+	static class Builder extends MAbstract_Builder {
+		Builder(Macro_Main m) { super("button", "Button", "", "GUI"); 
+		first_start_show(m); }
+		MButton build(Macro_Sheet s, sValueBloc b) { MButton m = new MButton(s, b); return m; }
+	}
+	sBoo mode;
+	Macro_Connexion in, out_t;
+	nLinkedWidget swtch, wMode; 
+	sBoo state;
+	nCtrlWidget trig; 
+	sBoo setup_send;
+	sInt size;
+	sStr label;
+	MButton(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "button", _bloc); }
+	public void init() {}
+	public void build_param() {
+		mode = newBoo(false, "mode");
+		addEmpty(1);
+		wMode = addEmptyL(0).addLinkedModel("MC_Element_Button").setLinkedValue(mode);
+		mode.addEventChange(new nRunnable() { public void run() { 
+			if (mode.get()) wMode.setText("Switch");
+			else wMode.setText("Trigger");
+		}});
+		
+		size = newSelectInt(0, 2, "size");
+		size.set_limit(1, 2);
+		label = newFieldStr(0, "label", "");
+		setup_send = newSwitchBoo(0, false, "stp_snd");
+	  	state = newBoo("state", "state", false);
+		
+		build_button();
+	}
+	public void build_normal() {
+		mode = newBoo("mode", "mode", false);
+		size = newInt(2, "size");
+	  	label = newStr("label", "");
+	  	setup_send = newBoo("stp_snd", "stp_snd", false);
+	  	state = newBoo("state", "state", false);
+	  	
+	  	build_button();
+	}
+	void build_button() {
+	  	if (!mode.get()) {
+		 	if (size.get() == 1) {
+			  	Macro_Element e = addEmptyS(0);
+			  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
+				  	out_t.send(Macro_Packet.newPacketBang());
+			  	} });
+			 	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+			 		.setLinkedValue(setup_send);
+		    
+			  	out_t = addOutput(1, "trig").setDefBang();
+		  	} else {
+			  	out_t = addOutput(1, "trig").setDefBang();
+	
+			  	addEmptyS(0);
+			  	addEmptyS(1);
+			  	Macro_Element e = addEmptyS(0);
+			  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
+			  		out_t.send(Macro_Packet.newPacketBang());
+			  	} });
+			  	trig.setSY(ref_size*2).setPY(-ref_size*15/16);
+			  	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+			  		.setLinkedValue(setup_send).setPX(ref_size*0.25);
+		  	}
+		 	
+		 	label.addEventChange(new nRunnable() { public void run() {
+		 		trig.setText(label.get()); } });
+		 	
+		  	if (setup_send.get()) 
+		  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+			  	out_t.send(Macro_Packet.newPacketBang());
+		  	} });
+	  	} else {
+		    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+			    	if (in.lastPack() != null && in.lastPack().isBang()) {
+			    		state.swtch();
+			    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+			    	} 
+			    	if (in.lastPack() != null && in.lastPack().isBool()) {
+	    	  			if(state.get() != in.lastPack().asBool()) {
+			    	  		state.swtch();
+				    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+		    	  		}
+			    	} 
+		    } });
+		    nRunnable swt_run = new nRunnable() { public void run() {
+			    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+			    		out_t.send(Macro_Packet.newPacketBool(state.get()));
+			    	}});
+			}};
+	  		if (size.get() == 2) {
+	  		    addEmptyS(1);
+	  		    out_t = addOutput(1, "out")
+	  		    		.setDefBool();
+	  		    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button", label.get()).setLinkedValue(state);
+	  		    swtch.setSY(ref_size*2).setPY(-ref_size*15/16);
+			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+			    swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+		  			.setLinkedValue(setup_send).setPX(ref_size*0.25);
+	  		} else {
+			    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton", label.get()).setLinkedValue(state);
+			    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+		  		swtch.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+			 		.setLinkedValue(setup_send);
+			    out_t = addOutput(2, "out")
+			    		.setDefBool();
+	  		}
+	
+		 	label.addEventChange(new nRunnable() { public void run() {
+		 		swtch.setText(label.get()); } });
+		 	
+			    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		    		out_t.send(Macro_Packet.newPacketBool(state.get()));
+		    } });
+	  	}
+	}
+	public MButton clear() {
+		super.clear(); return this; }
+}
+
+
+
+
+
+
+
+
+//class MTrig extends MBasic {
+//	static class MTrig_Builder extends MAbstract_Builder {
+//		MTrig_Builder() { super("trig", "Trigger", "", "GUI"); }
+//		MTrig build(Macro_Sheet s, sValueBloc b) { MTrig m = new MTrig(s, b); return m; }
+//	}
+//	  
+//	Macro_Connexion out_t;
+//	nCtrlWidget trig; 
+//	sBoo setup_send;
+//	sInt size;
+//	sStr label;
+//	MTrig(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "trig", _bloc); }
+//	public void init() {
+//		
+//	}
+//	public void build_param() {
+//		size = newSelectInt(0, 1, "size");
+//		size.set_limit(1, 2);
+//		label = newFieldStr(0, "label", "");
+//		setup_send = newSwitchBoo(0, false, "stp_snd");
+//	}
+//	public void build_normal() {
+//		size = newInt(1, "size");
+//	  	label = newStr("label", "");
+//	  	setup_send = newBoo("stp_snd", "stp_snd", false);
+//	 	if (size.get() == 1) {
+//		  	Macro_Element e = addEmptyS(0);
+//		  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
+//			  	out_t.send(Macro_Packet.newPacketBang());
+//		  	} });
+//	    
+//		  	out_t = addOutput(1, "trig").setDefBang();
+//	  	} else {
+//		  	out_t = addOutput(1, "trig").setDefBang();
+//
+//		  	addEmptyS(0);
+//		  	Macro_Element e = addEmptyL(0);
+//		  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
+//		  		out_t.send(Macro_Packet.newPacketBang());
+//		  	} });
+//		  	trig.setSY(ref_size*2).setPY(-ref_size*17/16);
+//	  	}
+//	  	if (setup_send.get()) mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//		  	out_t.send(Macro_Packet.newPacketBang());
+//	  	} });
+//	}
+//	public MTrig clear() {
+//		super.clear(); return this; }
+//}
+//
+//
+//
+//
+//
+//
+//class MSwitch extends MBasic {
+//	static class MSwitch_Builder extends MAbstract_Builder {
+//		MSwitch_Builder() { super("switch", "Switch", "", "GUI"); }
+//		MSwitch build(Macro_Sheet s, sValueBloc b) { MSwitch m = new MSwitch(s, b); return m; }
+//	}
+//	  
+//	Macro_Connexion in, out_t;
+//	nLinkedWidget swtch; 
+//	sBoo state;
+//	MSwitch(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "switch", _bloc); }
+//	public void init() {
+//	    state = newBoo("state", "state", false);
+//	}
+//	public void build_param() {
+//
+//	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+//	      if (in.lastPack() != null && in.lastPack().isBang()) {
+//	        swtch.setSwitchState(!swtch.isOn());
+//	      } 
+//	      if (in.lastPack() != null && in.lastPack().isBool()) {
+//	        swtch.setSwitchState(in.lastPack().asBool());
+//	      } 
+//	    } });
+//	    addEmptyS(1);
+//	    
+//	    out_t = addOutput(1, "out")
+//	      .setDefBool();
+//	      
+//	    swtch = addEmptyS(0).addLinkedModel("MC_Element_Button").setLinkedValue(state);
+//	    swtch.setSY(ref_size*2).setPY(-ref_size*17/16);
+//	    
+//	    state.addEventChange(new nRunnable() { public void run() {
+//	      out_t.send(Macro_Packet.newPacketBool(state.get()));
+//	    } });
+//	    
+//	    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//	      out_t.send(Macro_Packet.newPacketBool(state.get()));
+//	    } });
+//	}
+//	public void build_normal() {
+//	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+//	      if (in.lastPack() != null && in.lastPack().isBang()) {
+//	    	  	state.swtch();
+//	    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+//	      } 
+//	      if (in.lastPack() != null && in.lastPack().isBool()) {
+//	    	  	if(state.get() != in.lastPack().asBool()) {
+//	    	  		state.swtch();
+//		    	    out_t.send(Macro_Packet.newPacketBool(state.get()));
+//	    	  	}
+//	      } 
+//	    } });
+//	    nRunnable swt_run = new nRunnable() { public void run() {
+//		    	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//		    		out_t.send(Macro_Packet.newPacketBool(state.get()));
+//		    	}});
+//		}};
+//
+//	    swtch = addEmptyS(1).addLinkedModel("MC_Element_SButton").setLinkedValue(state);
+//	    swtch.addEventSwitchOn(swt_run).addEventSwitchOff(swt_run);
+//	    
+//	    
+//	    out_t = addOutput(2, "out")
+//	      .setDefBool();
+//	    
+//	    mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//	      out_t.send(Macro_Packet.newPacketBool(state.get()));
+//	    } });
+//	    
+//	}
+//	public MSwitch clear() {
+//		super.clear(); return this; }
+//}
+
+//class MComment extends MBasic { 
+//	  static class MComment_Builder extends MAbstract_Builder {
+//		  MComment_Builder() { super("com", "Comment", "", "GUI"); }
+//		  MComment build(Macro_Sheet s, sValueBloc b) { MComment m = new MComment(s, b); return m; }
+//	  }
+//	  
+//Macro_Connexion in;
+//
+//Macro_Element elem_param;
+//
+//sStr val_com;
+//sFlt w_f, h_f;
+//
+//nLinkedWidget com_field;
+//nCtrlWidget w_add, w_sub, h_add, h_sub;
+//
+//MComment(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "com", _bloc); }
+//void init() {
+//  val_com = newStr("val_com", "val_com", "");
+//    w_f = newFlt("w_f", "w_f", 3.875F);
+//    h_f = newFlt("h_f", "h_f", 0.875F);
+//}
+//void build_param() {
+//
+//    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+//        if (in.lastPack() != null) {
+//          if (in.lastPack().isBang()) gui.app.logln(val_com.get());
+//          else gui.app.logln(val_com.get() + " : " + in.lastPack().getText());
+//        }
+//    } });
+//    addEmpty(2);
+//    elem_param = addEmptyL(1);
+//    w_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_1", "W-")
+//      .setRunnable(new nRunnable() { public void run() { 
+//        if (w_f.get() > 3.875) {
+//      w_f.set(3.875);
+//      rebuild();
+//      return;
+//    }
+//          if (w_f.get() >   1.375) {
+//            w_f.set(1.375);
+//            rebuild();
+//          return;
+//            }
+//      } });
+//    w_add = elem_param.addCtrlModel("MC_Element_Button_Selector_2", "W+")
+//      .setRunnable(new nRunnable() { public void run() { 
+//        if (w_f.get() < 3.875) {
+//            w_f.set(3.875);
+//            rebuild();
+//            return;
+//        } 
+//        if (w_f.get() < 5.75) {
+//          w_f.set(5.75);
+//          rebuild();
+//        return;
+//        }
+//      } });
+//    h_sub = elem_param.addCtrlModel("MC_Element_Button_Selector_3", "H-")
+//      .setRunnable(new nRunnable() { public void run() { 
+//      if (h_f.get() > 1.125) {
+//        h_f.add(-1.125);
+//        rebuild();
+//      }
+//    } });
+//    h_add = elem_param.addCtrlModel("MC_Element_Button_Selector_4", "H+")
+//      .setRunnable(new nRunnable() { public void run() { 
+//      if (h_f.get() < 5) {
+//        h_f.add(1.125);
+//        rebuild();
+//      }
+//    } });
+//    w_sub.setFont((int)(ref_size/2.8)); w_add.setFont((int)(ref_size/2.8));
+//    h_sub.setFont((int)(ref_size/2.8)); h_add.setFont((int)(ref_size/2.8));
+//    build_normal();
+//}
+//void build_normal() {
+//  addEmptyS(1);
+//    if (h_f.get() > 1) addEmptyS(1);
+//    if (h_f.get() > 2) addEmptyS(1);
+//    if (h_f.get() > 4) addEmptyS(1);
+//    if (h_f.get() > 5) addEmptyS(1);
+//  elem_com = addEmptyS(0);
+//    com_field = elem_com.addLinkedModel("MC_Element_Comment_Field").setLinkedValue(val_com);
+//    com_field.setSize(ref_size * w_f.get(), ref_size * h_f.get());
+//}
+//public MComment clear() {
+//  super.clear(); 
+//  return this; }
+//public MComment toLayerTop() {
+//  super.toLayerTop(); 
+//  return this; }
+//}
    

@@ -319,7 +319,8 @@ public class Macro_Sheet extends Macro_Abstract {
 		  }
 		  for (Macro_Element m : child_elements) {
 			  if (m.sheet_viewable) {
-				  m.back.setTrigger().setLook("MC_Element_For_Spot"); /*event in init de l'element*/ 
+				  m.back.setTrigger().setLook("MC_Element_For_Spot"); 
+				  /*event in init de l'element*/ 
 				  for (nWidget w : m.elem_widgets) if (w != m.back) w.tempPassif(true);
 			  } 
 			  if (m.spot != null) {
@@ -332,6 +333,7 @@ public class Macro_Sheet extends Macro_Abstract {
 		  mmain().inter.addEventFrame(new_spot_run);
 	  } else {
 		  add_spot(side, null);
+		  cancel_new_spot();
 	  }
   }
   ArrayList<nWidget> spot_empty_widget = new ArrayList<nWidget>();
@@ -347,9 +349,11 @@ public class Macro_Sheet extends Macro_Abstract {
   }
   void cancel_new_spot() {
 	for (nWidget w : spot_empty_widget) w.setBackground();
-    for (Macro_Element m : child_elements) if (m.sheet_viewable) {
-      m.back.setBackground().setLook("MC_Element"); 
-	  if (m.spot != null) m.spot.setBackground(); 
+    for (Macro_Element m : child_elements) {
+		for (nWidget w : m.elem_widgets) w.tempPassif(false);
+		m.back.setBackground(); 
+		if (m.sheet_viewable) m.back.setLook("MC_Element"); 
+		if (m.spot != null) m.spot.setBackground(); 
     }
     mmain().inter.removeEventFrame(new_spot_run);
     if (openning.get() == DEPLOY && mmain().selected_sheet == this) {
@@ -358,9 +362,6 @@ public class Macro_Sheet extends Macro_Abstract {
     else {
       left_spot_add.setBackground().setLook("MC_Add_Spot_Passif").setText(""); 
       right_spot_add.setBackground().setLook("MC_Add_Spot_Passif").setText(""); }
-    for (Macro_Element m : child_elements) {
-    		for (nWidget w : m.elem_widgets) w.tempPassif(false);
-    }
     building_spot = false; new_spot_side = "";
   }
 
@@ -381,8 +382,8 @@ public class Macro_Sheet extends Macro_Abstract {
 	        nDrawer d = getShelf(0).addDrawer(2.25, 1.125);
 	        spot = d.addModel("MC_Panel_Spot_Back")
 	        		.setTextVisibility(false)
-	        		.setText(ttl)
-	        		.setTrigger();
+	        		.setText(ttl);
+//	        		.setTrigger();
 	    	    spot.addEventTrigger(new nRunnable(spot) {public void run() {
 	        			remove_empty_spot("left", (nWidget)builder); }});
 	        getShelf(0).insertDrawer(left_spot_drawer);
@@ -392,8 +393,8 @@ public class Macro_Sheet extends Macro_Abstract {
 	        nDrawer d = getShelf(1).addDrawer(2.25, 1.125);
 	        spot = d.addModel("MC_Panel_Spot_Back")
 	        		.setTextVisibility(false)
-	        		.setText(ttl)
-	        		.setTrigger();
+	        		.setText(ttl);
+//	        		.setTrigger();
 	        spot.addEventTrigger(new nRunnable(spot) {public void run() {
 	        			remove_empty_spot("right", (nWidget)builder); }});
 	        getShelf(1).insertDrawer(right_spot_drawer);
@@ -433,7 +434,6 @@ public class Macro_Sheet extends Macro_Abstract {
 	        spot = d.addModel("MC_Panel_Spot_Back");
 	        getShelf(1).insertDrawer(right_spot_drawer);
 	      }
-	      
 	      elem.set_spot(spot,side);
 	      String new_str = "";
 	      new_str += left_s+GROUP_TOKEN+right_s;
@@ -441,7 +441,7 @@ public class Macro_Sheet extends Macro_Abstract {
 	      if (spot != null) {
 	        if (openning.get() != REDUC && openning.get() != HIDE) spot.show();
 	        else spot.hide();
-	        spot.setTrigger();
+//	        spot.setTrigger();
 	      }
 	      
 	      moving();

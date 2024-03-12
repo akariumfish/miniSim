@@ -1,5 +1,7 @@
 package Macro;
 
+import java.util.ArrayList;
+
 import RApplet.*;
 import UI.*;
 import processing.core.*;
@@ -208,17 +210,21 @@ class MNumCalc extends MBasic {
 			build_param();
 			return;
 		}
-		in1 = addInput(0, "in").setFilterNumber().setLastFloat(0)
+		in1 = addInput(0, "in1").setFilterNumber().setLastFloat(0)
 	  		.addEventReceive(new nRunnable() { public void run() { 
-	  		      if (in1.lastPack() != null && in1.lastPack().isFloat() && in1.lastPack().asFloat() != pin1) {
+	  		      if (in1.lastPack() != null && in1.lastPack().isFloat() ) {
+	  		    	  	  //&& in1.lastPack().asFloat() != pin1
 	  		          pin1 = in1.lastPack().asFloat(); receive(); } 
-	  		      else if (in1.lastPack() != null && in1.lastPack().isInt() && in1.lastPack().asInt() != pin1) {
+	  		      else if (in1.lastPack() != null && in1.lastPack().isInt() ) {
+	  		    	  	  //&& in1.lastPack().asInt() != pin1
 	  		          pin1 = in1.lastPack().asInt(); receive(); } } });
-	  	in2 = addInput(0, "in").setFilterNumber().setLastFloat(0)
+	  	in2 = addInput(0, "in2").setFilterNumber().setLastFloat(0)
 	  		.addEventReceive(new nRunnable() { public void run() { 
-	  		      if (in2.lastPack() != null && in2.lastPack().isFloat() && in2.lastPack().asFloat() != pin2) {
+	  		      if (in2.lastPack() != null && in2.lastPack().isFloat()) {
+	  		    	  	  //&& in2.lastPack().asFloat() != pin2
 	  		          pin2 = in2.lastPack().asFloat(); view.setText(RConst.trimFlt(pin2)); receive(); }
-	  		      else if (in2.lastPack() != null && in2.lastPack().isInt() && in2.lastPack().asInt() != pin2) {
+	  		      else if (in2.lastPack() != null && in2.lastPack().isInt()) {
+	  		    	  	  //&& in2.lastPack().asInt() != pin2
 	  		          pin2 = in2.lastPack().asInt(); view.setText(RConst.trimFlt(pin2)); receive(); } } });
 	  
 	  	out = addOutput(1, "out")
@@ -712,16 +718,18 @@ MColRGB(Macro_Sheet _sheet, sValueBloc _bloc) {
   super(_sheet, "colRGB", "colRGB", _bloc); 
   
   in1 = addInput(0, "c/r").addEventReceive(new nRunnable() { public void run() { 
-    if (in1.lastPack() != null && in1.lastPack().isCol() && 
-        !in1.lastPack().equalsCol(col)) {
+    if (in1.lastPack() != null && in1.lastPack().isCol() ) {
+    //	&& !in1.lastPack().equalsCol(col)) {
       col = in1.lastPack().asCol();
       float m = gui.app.red(col); float d = gui.app.green(col); float f = gui.app.blue(col);
-      if (m != r) { r = m; out1.send(Macro_Packet.newPacketFloat(r)); }
-      if (d != g) { g = d; out2.send(Macro_Packet.newPacketFloat(g)); }
-      if (f != b) { b = f; out3.send(Macro_Packet.newPacketFloat(b)); }
+//      if (m != r || d != g || f != b) { 
+    	  	r = m; out1.send(Macro_Packet.newPacketFloat(r)); 
+      	g = d; out2.send(Macro_Packet.newPacketFloat(g)); 
+      	b = f; out3.send(Macro_Packet.newPacketFloat(b)); 
+//      }
       col = gui.app.color(r,g,b);
-    } else if (in1.lastPack() != null && in1.lastPack().isFloat() && 
-               in1.lastPack().asFloat() != g) {
+    } else if (in1.lastPack() != null && in1.lastPack().isFloat() ) {
+		//&& in1.lastPack().asFloat() != r
       r = in1.lastPack().asFloat();
       view1.changeText(""+r); 
       col = gui.app.color(r,g,b);
@@ -729,8 +737,8 @@ MColRGB(Macro_Sheet _sheet, sValueBloc _bloc) {
     }
   } });
   in2 = addInput(0, "g").addEventReceive(new nRunnable() { public void run() { 
-    if (in2.lastPack() != null && in2.lastPack().isFloat() && 
-               in2.lastPack().asFloat() != g) {
+    if (in2.lastPack() != null && in2.lastPack().isFloat() ) {
+		//&& in2.lastPack().asFloat() != g
       g = in2.lastPack().asFloat();
       view2.changeText(""+g); 
       col = gui.app.color(r,g,b);
@@ -738,8 +746,8 @@ MColRGB(Macro_Sheet _sheet, sValueBloc _bloc) {
     }
   } });
   in3 = addInput(0, "b").addEventReceive(new nRunnable() { public void run() { 
-    if (in3.lastPack() != null && in3.lastPack().isFloat() && 
-               in3.lastPack().asFloat() != b) {
+    if (in3.lastPack() != null && in3.lastPack().isFloat() ) {
+		//&& in3.lastPack().asFloat() != b
       b = in3.lastPack().asFloat();
       view3.changeText(""+b); 
       col = gui.app.color(r,g,b);
@@ -871,13 +879,16 @@ class MVar extends MBasic {
   Macro_Connexion in, out;
   nWidget val_widget;
   Macro_Element val_elem;
+  
+  sInt row_nb; 
+  ArrayList<sValue> vals;
   MVar(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "var", _bloc); }
 
   	void init() {
 		setup_send = newBoo("stp_snd", "stp_snd", false);
 		change_send = newBoo("update_send", "update_send", false);
 		all_send = newBoo("all_send", "all_send", true);
-		var_type = newStr("var_type");
+		var_type = newStr("var_type", "flt");
 		ival = newInt(0, "int_value");
 		fval = newFlt(0, "float_value");
 		bval = newBoo(false, "bool_value");
@@ -886,11 +897,14 @@ class MVar extends MBasic {
 		cval = newCol("col_value");
 		rval = newRun("run_value");
 		oval = newObj("obj_value");
+
+		row_nb = newInt(4, "row_nb");
+		vals = new ArrayList<sValue>();
   	}
 
     void build_normal() { 
 		in = addInput(0, "set", new nRunnable() { public void run() {
-			if (in.lastPack() != null)
+			if (in.lastPack() != null) {
 				if (in.lastPack().isBang() && cible != null) out.send(cible.asPacket());
 				if (in.lastPack().isBool()) { 
 					bval.set(in.lastPack().asBool()); chooseValue(bval); }
@@ -904,6 +918,7 @@ class MVar extends MBasic {
 					cval.set(in.lastPack().asCol()); chooseValue(cval); }
 				else if (in.lastPack().isVec()) { 
 					vval.set(in.lastPack().asVec()); chooseValue(vval); }
+			}
 		} });
 		addEmptyS(1).addCtrlModel("MC_Element_SButton", "send")
 			.setRunnable(new nRunnable() { public void run() {
@@ -939,6 +954,7 @@ class MVar extends MBasic {
 	    else if (var_type.get().equals("vec")) chooseValue(vval);
 	    else if (var_type.get().equals("col")) chooseValue(cval);
 	    else if (var_type.get().equals("obj")) chooseValue(oval);
+	    
     }
   
     void build_param() { 
@@ -956,7 +972,7 @@ class MVar extends MBasic {
     	}}).addTrigSelector(6, "Col", new nRunnable() { public void run() {
     		cval.set(0); chooseValue(cval);
     	}}); 
-    	build_normal();
+    		build_normal();
     }
 
 	void clearValue() {
@@ -1126,6 +1142,184 @@ class MVar extends MBasic {
     super.toLayerTop(); 
     return this; }
 }
+
+
+
+
+
+
+
+class MMVar extends MBasic { 
+	  static class Builder extends MAbstract_Builder {
+		  Builder(Macro_Main m) { super("mvar", "MultiVar", "", "Data"); 
+		  first_start_show(m); }
+		  MMVar build(Macro_Sheet s, sValueBloc b) { MMVar m = new MMVar(s, b); return m; }
+	  }
+	  boolean build_flag = false;
+	  sStr var_type; 
+	  sBoo setup_send, change_send, all_send, bang_send;
+	  sBoo show_view, show_rownb;
+	  sInt row_nb; 
+	  ArrayList<sValue> vals;
+	  ArrayList<Macro_Connexion> cos;
+	  MMVar(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "mvar", _bloc); }
+	  	void init() {
+			setup_send = newBoo("stp_snd", "stp_snd", false);
+			change_send = newBoo("update_send", "update_send", false);
+			all_send = newBoo("all_send", "all_send", false);
+			bang_send = newBoo("bang_send", "bang_send", true);
+			show_view = newBoo("show_view", "show_view", true);
+			show_rownb = newBoo("show_rownb", "show_rownb", true);
+			var_type = newStr("var_type", "flt");
+			row_nb = newInt(4, "row_nb");
+			vals = new ArrayList<sValue>();
+			cos = new ArrayList<Macro_Connexion>();
+	  	}
+	  	void init_end() {
+	  		super.init_end();
+			if (setup_send.get()) 
+				mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
+					int count = 0;
+					for (sValue v : vals) {
+						if (count < cos.size()) cos.get(count).send(v.asPacket()); count++; }
+			}});
+	  	}
+	    void build_param() { 
+	    		build_normal();
+	    		
+  		  	addEmptyS(1); 
+  		  	Macro_Element e = addEmptyXL(0).no_mirror();
+  		  	e.addLinkedModel("MC_Element_Button")
+  		  	.setLinkedValue(setup_send).setText("setup")
+  		  	.setSX(ref_size*2.0).setPX(ref_size*0.125);
+  		  	e.addLinkedModel("MC_Element_Button")
+		 	.setLinkedValue(bang_send).setText("bang")
+		 	.setSX(ref_size*2.0).setPX(ref_size*2.375);
+  		  	e.addLinkedModel("MC_Element_Button")
+		  	.setLinkedValue(show_view).setText("view")
+		  	.setSX(ref_size*2.0).setPX(ref_size*4.625);
+  		  	addEmptyS(1); 
+  		  	e = addEmptyXL(0).no_mirror();
+  		  	e.addLinkedModel("MC_Element_Button")
+  		  	.setLinkedValue(change_send).setText("changec")
+  		  	.setSX(ref_size*2.0).setPX(ref_size*0.125);
+  		  	e.addLinkedModel("MC_Element_Button")
+	  		.setLinkedValue(all_send).setText("all")
+	  		.setSX(ref_size*2.0).setPX(ref_size*2.375);
+  		  	e.addLinkedModel("MC_Element_Button")
+		  	.setLinkedValue(show_rownb).setText("rows")
+		  	.setSX(ref_size*2.0).setPX(ref_size*4.625);
+  		  	
+			addEmpty(1);
+		    	addEmptyXL(0).no_mirror()
+		    	.addTrigSelector(1, "Boo", new nRunnable() { public void run() {
+		    		var_type.set("boo"); rebuild();
+		    	}}).addTrigSelector(2, "Int", new nRunnable() { public void run() {
+		    		var_type.set("int"); rebuild();
+		    	}}).addTrigSelector(3, "Flt", new nRunnable() { public void run() {
+		    		var_type.set("flt"); rebuild();
+		    	}}).addTrigSelector(4, "Str", new nRunnable() { public void run() {
+		    		var_type.set("str"); rebuild();
+		    	}}).addTrigSelector(5, "Vec", new nRunnable() { public void run() {
+		    		var_type.set("vec"); rebuild();
+		    	}}).addTrigSelector(6, "Col", new nRunnable() { public void run() {
+		    		var_type.set("col"); rebuild();  }}); 
+		    	
+		  	nRunnable mode_run = new nRunnable() { public void run() {
+		  		if (!build_flag)
+		  			mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  				if (!rebuilding) rebuild(); }});
+		  		build_flag = true;
+		  	} };
+		  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  		var_type.addEventChange(mode_run);
+		  		row_nb.addEventChange(mode_run);
+		  		bang_send.addEventChange(mode_run);
+		  		change_send.addEventChange(mode_run);
+		  		all_send.addEventChange(mode_run);
+		  		show_view.addEventChange(mode_run);
+		  		show_rownb.addEventChange(mode_run);
+		  		change_send.addEventChange(new nRunnable() { public void run() {
+		  			if (all_send.get()) all_send.set(false); }});
+		  		all_send.addEventChange(new nRunnable() { public void run() {
+		  			if (change_send.get()) change_send.set(false); }});
+		  	}});
+	    }
+	    void build_normal() { 
+		    for (int i = 0 ; i < row_nb.get() ; i++) {
+	    			sValue v = null;
+		    		if      (var_type.get().equals("flt")) v = newFlt(0, "flt"+i);
+				else if (var_type.get().equals("int")) v = newInt(0, "int"+i);
+			    else if (var_type.get().equals("boo")) v = newBoo(false, "boo"+i);
+			    else if (var_type.get().equals("str")) v = newStr("str"+i);
+			    else if (var_type.get().equals("run")) v = newRun("run"+i);
+			    else if (var_type.get().equals("vec")) v = newVec("vec"+i);
+			    else if (var_type.get().equals("col")) v = newCol("col"+i);
+			    else if (var_type.get().equals("obj")) v = newObj("obj"+i);
+		    		if (v != null) {
+		    			vals.add(v);
+		    			Macro_Connexion o = null;
+		    			int out_col = 2;
+		    			if (!show_view.get() && !param_view.get()) out_col = 1;
+		    			if (!show_view.get() && param_view.get()) addEmptyS(1);
+		    			//valchange
+		    			if (change_send.get()) o = addValueChangeToOutput(out_col, v);
+		    			//all in
+		    			else if (all_send.get()) o = addAllValueGetToOutput(out_col, v);
+		    			//else
+		    			else if (bang_send.get() || setup_send.get()) 
+		    				o = addOutput(out_col, v.ref);
+		    			if (o != null) {
+		    				cos.add(o);
+			    			//send bp
+			    			nObjectPair pout = new nObjectPair();
+			    			pout.obj1 = v; pout.obj2 = o;
+			    			o.elem.addCtrlModel("MC_Element_SButton", "send")
+				    			.setRunnable(new nRunnable(pout) { public void run() {
+				    		    	  nObjectPair pair = ((nObjectPair)builder);
+				    		    	  	((Macro_Connexion)pair.obj2).send(((sValue)pair.obj1).asPacket()); } })
+				    			.getDrawer();
+		    			}
+		    			Macro_Connexion in = null;
+		    			// bang get on
+		    			if (bang_send.get() && o != null) 
+		    				in = addInputToValue(0, v).addBangGet(v, o);
+		    			else in = addInputToValue(0, v);
+		    			//view
+		    			if (show_view.get()) {
+			    			if (var_type.get().equals("vec") || 
+			    				var_type.get().equals("col")) {
+			    				Macro_Element e = addEmptyS(1);
+			    				addLinkedLWidget(e, v).setPX(-ref_size*0.6875);
+			    				e.addValuePanel(v); }
+			    			else addLinkedLWidget(addEmptyS(1), v).setPX(-ref_size*0.6875); 
+			    		} else if (in != null) {
+			    			addSWatcher(in.elem, v); 
+			    		}
+		    		}
+		    }
+		    if (show_rownb.get()) {
+			    	addEmptyS(1).addWatcherModel("MC_Element_SField").setLinkedValue(row_nb)
+			    	.setPX(-ref_size*3 / 16).setSX(ref_size*1.375)
+			    	.getDrawer().addCtrlModel("MC_Element_SButton", "+")
+			    	.setRunnable(new nRunnable() { public void run() { 
+			    		row_nb.add(1); rebuild(); }})
+		    		.setPX(ref_size*1.1250).setSX(ref_size*1.0);
+			    	addInputToValue(0, row_nb)
+			    	.elem.addCtrlModel("MC_Element_SButton", "-")
+			    	.setRunnable(new nRunnable() { public void run() { 
+			    		if (row_nb.get() > 1) row_nb.add(-1); rebuild(); }})
+			    	.setPX(ref_size*1.1250).setSX(ref_size*1.0);
+		    }
+	    }
+	    public MMVar clear() {
+	    		super.clear(); 
+	    		return this; }
+	    public MMVar toLayerTop() {
+	    		super.toLayerTop(); 
+	    		return this; }
+	}
+
 
 
 

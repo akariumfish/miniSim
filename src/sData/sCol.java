@@ -22,6 +22,7 @@ public class sCol extends sValue {
 	public float getalpha() { return app.alpha(val); }
 	public int get() { return val; }
 	public sCol set(int c) { 
+		run_events_allset(); 
 		if (c != val) {
 			val = c;  
 			doChange(); 

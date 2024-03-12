@@ -25,7 +25,8 @@ class MBasic extends Macro_Bloc {
   MBasic(Macro_Sheet _sheet) { super(_sheet, "base", "base", null); init_creator(); }
   MBasic(Macro_Sheet _sheet, PVector pos) {  // for adding at mouse position
 	  super(_sheet, "base", "base", null); 
-	  setPosition(pos.x-ref_size*2.25F, pos.y-ref_size*1.0F);
+	  setPosition(	pos.x-sheet.grab_pos.get().x-ref_size*2.25F, 
+			  		pos.y-sheet.grab_pos.get().y-ref_size*1.0F);
 	  init_creator(); 
 	  if (mmain().active_construct != null) mmain().active_construct.clear();
 	  mmain().active_construct = this; }
@@ -88,12 +89,12 @@ class MBasic extends Macro_Bloc {
 		for (Macro_Element m : elements)
 			  m.mirror(mirror_view.get());
 	}});
-    get_mirror().setRunnable(new nRunnable() { public void run() { 
+    if (!param_view.get()) get_mirror().setRunnable(new nRunnable() { public void run() { 
     		mirror_view.set(!mirror_view.get());
-//        rebuild();
     		save_co_links();
     		for (Macro_Element m : elements)
     			  m.mirror(mirror_view.get());
+//          rebuild();
     } });
 	param_ctrl = get_param_openner().setRunnable(new nRunnable() { public void run() { 
         param_view.set(!param_view.get());
@@ -112,9 +113,8 @@ class MBasic extends Macro_Bloc {
   void init_end() {
 	  super.init_end();
 	  if (builder_mode) {
-		  
 		  for (Macro_Element m : elements) {
-			  m.mirror(mirror_view.get());
+			  if (!param_view.get()) m.mirror(mirror_view.get());
 			  if (m.connect != null) m.connect.addEventChangeLink(link_change_run);
 			  if (m.sheet_connect != null) 
 				  m.sheet_connect.addEventChangeLink(link_change_run);
@@ -124,7 +124,6 @@ class MBasic extends Macro_Bloc {
   }
   void load_co_links() {
 	  for (Macro_Element m : elements) {
-		  m.mirror(mirror_view.get());
 		  if (m.connect != null) m.connect.removeEventChangeLink(link_change_run);
 		  if (m.sheet_connect != null) 
 			  m.sheet_connect.removeEventChangeLink(link_change_run);
@@ -136,7 +135,6 @@ class MBasic extends Macro_Bloc {
     	      }
       }
       for (Macro_Element m : elements) {
-		  m.mirror(mirror_view.get());
 		  if (m.connect != null) m.connect.addEventChangeLink(link_change_run);
 		  if (m.sheet_connect != null) 
 			  m.sheet_connect.addEventChangeLink(link_change_run);
@@ -152,7 +150,7 @@ class MBasic extends Macro_Bloc {
 			  for (String d : co_links) {
 				  String[] e = PApplet.splitTokens(d, BLOC_TOKEN);
 				  for (Macro_Connexion c : co.sheet.child_connect) 
-					  if (e.length > 1 && c.base_info.equals(e[1]) &&
+					  if (e.length > 1 && c.elem.descr.equals(e[1]) &&
 						  c.elem.bloc.value_bloc.ref.equals(e[0])) {
 					  co.connect_to(c);
 				  }
@@ -176,7 +174,7 @@ class MBasic extends Macro_Bloc {
 	if (co_list != null && co_list.size() > 0) {
 		links_save.add(co.base_info + GROUP_TOKEN);
 		for (Macro_Connexion c : co_list) {
-			links_save.add(c.elem.bloc.value_bloc.ref + BLOC_TOKEN + c.base_info + INFO_TOKEN);
+			links_save.add(c.elem.bloc.value_bloc.ref + BLOC_TOKEN + c.elem.descr + INFO_TOKEN);
 		}
 		links_save.add(OBJ_TOKEN);
 	}
@@ -208,6 +206,25 @@ class MBasic extends Macro_Bloc {
     return this; }
 }
 
+
+
+
+class MBaseTick extends MBasic { 
+	sBoo global_tick;
+	MBaseTick(Macro_Sheet _sheet, String t, sValueBloc _bloc) { super(_sheet, t, _bloc); }
+	void init() { 
+		super.init(); 
+		global_tick = newBoo(true, "global_tick");
+		mmain().baseticked_list.add(this); }
+	void build_param() { super.build_param(); }
+	void build_normal() { super.build_normal(); }
+	void init_end() { super.init_end(); }
+	void rebuild() { super.rebuild(); }
+	void tick() { ; }
+	void receive_tick() { if (global_tick.get()) tick(); }
+	public MBaseTick toLayerTop() { super.toLayerTop(); return this; }
+	public MBaseTick clear() { super.clear(); mmain().baseticked_list.remove(this); return this; }
+}
 
 
 
@@ -540,7 +557,54 @@ class MBaseMenu extends MBasic {
 
 
 
-
+class MZone extends MBasic { 
+  static class Builder extends MAbstract_Builder {
+    Builder(Macro_Main m) { super("zone", "Zone", "--", "Sheet"); 
+	  first_start_show(m); }
+    MZone build(Macro_Sheet s, sValueBloc b) { MZone m = new MZone(s, b); return m; }
+  }
+  sVec corner_pos;
+  nLinkedWidget corner_widg;
+  nWidget zone_widg;
+  Drawable zone_draw;
+  
+  MZone(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "zone", _bloc); }
+  void init() {
+	  corner_pos = newVec("corner_pos");
+	  if (!loading_from_bloc) corner_pos.set(ref_size*3.0F, ref_size*3.0F);
+  }
+  void build_param() {
+	  build_normal();
+  }
+  void build_normal() {
+	  Macro_Element e = addEmptyS(0);
+	  
+	  zone_widg = e.addModel("Field");
+	  zone_widg.setPosition(ref_size * 2 / 16, ref_size * 2 / 16).setPassif();
+	  
+	  corner_pos.addEventChange(new nRunnable() { public void run() {
+		  zone_widg.setSize(corner_pos.get().x, 	corner_pos.get().y); }});
+	  
+	  zone_draw = new Drawable(gui.drawing_pile, 0) { public void drawing() {
+		  gui.app.noFill(); gui.app.stroke(220);
+		  gui.app.rect(	zone_widg.getX(), 	zone_widg.getY(), 
+				  		corner_pos.get().x+corner_widg.getSX(), 	
+				  		corner_pos.get().y+corner_widg.getSY());
+	  } };
+	  zone_widg.setDrawable(zone_draw);
+	  
+	  corner_widg = e.addLinkedModel("MC_SpeTrig");
+	  corner_widg.alignUp().alignLeft();
+	  corner_widg.setLinkedValue(corner_pos);
+  }
+  public MZone clear() {
+    super.clear(); 
+    zone_draw.clear();
+    return this; }
+  public MZone toLayerTop() {
+    super.toLayerTop(); 
+    return this; }
+}
 
 class MCursor extends MBasic { 
   static class MCursor_Builder extends MAbstract_Builder {
@@ -653,6 +717,7 @@ class MNode extends MBasic {
   ArrayList<MNode> nodes;
   ArrayList<Macro_Connexion> out_list;
   ArrayList<Macro_Connexion> in_list;
+  int in_col = 0; int out_col = 2; int lab_col = 1;
   MNode(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "node", _bloc); }
 	public void init() {
 		co_nb = newInt(1, "co_nb");
@@ -680,23 +745,6 @@ class MNode extends MBasic {
 		  	as_label.addEventChange(change_run); 
 		  	as_link.addEventChange(change_run); 
 		}});
-	}	
-	public void build_param() {
-		if (is_point.get()) {
-			build_normal();
-			return;
-		}
-		addSSelectToInt(0, co_nb).no_mirror();
-		addEmptyS(2).no_mirror();
-		addSelectL(1, as_in, as_out, as_label, as_link, "in", "out", "label", "link").no_mirror();
-		build_normal();
-	}	
-	public void build_normal() {
-		if (is_point.get()) {
-			build_point();
-			return;
-		}
-		int in_col = 0; int out_col = 2; int lab_col = 1;
 		if (RConst.xor(as_in.get(), as_out.get())) {
 			if (!as_label.get()) out_col = 0;
 			else {
@@ -708,6 +756,23 @@ class MNode extends MBasic {
 			else { out_col = 2; lab_col = 1; if (as_link.get()) addEmptyS(1); }
 		}
 		
+	}	
+	public void build_param() {
+		if (is_point.get()) {
+			build_normal();
+			return;
+		}
+		build_normal();
+		addSSelectToInt(in_col, co_nb).no_mirror();
+//		addEmptyS(2).no_mirror();
+		addSelectL(out_col, as_in, as_out, as_label, as_link, "in", "out", "label", "link")
+			.no_mirror();
+	}	
+	public void build_normal() {
+		if (is_point.get()) {
+			build_point();
+			return;
+		}
 		if (as_link.get() && (as_out.get() || as_in.get())) {
 			nRunnable link_run;
 			if (as_out.get()) {
@@ -716,9 +781,9 @@ class MNode extends MBasic {
 			}
 			if (as_in.get()) {
 				out_link = addOutput(out_col, "link_out");
-//				link_run = new nRunnable() { public void run() { update_nodelist(); }};
+				link_run = new nRunnable() { public void run() { update_nodelist(); }};
 				out_link.set_link();
-//				.addEventLink(link_run).addEventUnLink(link_run);
+				out_link.addEventLink(link_run).addEventUnLink(link_run);
 			}
 		}
 		for (int i = 0 ; i < co_nb.get() ; i++) {
@@ -740,7 +805,7 @@ class MNode extends MBasic {
 				if (o != null) c.direct_connect(o);
 			  	pr.obj1 = c; pr.obj3 = i;
 			  	c.addEventReceive(new nRunnable(pr) { public void run() {
-//			  		update_nodelist();
+			  		update_nodelist();
 					nObjectTrio p = (nObjectTrio)builder;
 					int id = (int) p.obj3;
 					Macro_Connexion in = (Macro_Connexion) p.obj1;
@@ -767,43 +832,46 @@ class MNode extends MBasic {
 	}
 
 	ArrayList<Macro_Bloc> link_blocs = new ArrayList<Macro_Bloc>();
-//	void test_connect(Macro_Connexion out) {
-//		if (out != null) for (Macro_Connexion m : out.connected_inputs) {
-//			if (m.elem.bloc.val_type.get().equals("node")) {
-//				MNode n = (MNode)m.elem.bloc;
-//				if (m.base_info.equals("link_in")) {
-//					nodes.add((MNode)m.elem.bloc);
-//					test_connect(n.out_link);
-//					for (Macro_Connexion c2 : n.out_link.direct_cos) test_connect(c2);
-//				} 
-//				else for (int i = 1 ; i < 9 ; i++) if (m.base_info.equals("in"+i)) {
-//					for (Macro_Connexion c : m.direct_cos) test_connect(c);
-//					for (MNode n2 : n.nodes) for (Macro_Connexion c : n2.in_list) {
-//						if (c.base_info.equals("in"+i)) {
-//							test_connect(c);
-//							for (Macro_Connexion c2 : c.direct_cos) test_connect(c2);
-//						}
-//					}
-//				}
-//			}
-//			else if (m.elem.bloc.val_type.get().equals("gate")) {
-//				MGate g = (MGate)m.elem.bloc;
-//				test_connect(g.get_active_out());
-//			} else if (m.linkable) {
-//				link_blocs.add(m.elem.bloc);
-////				if (!m.elem.bloc.link_blocs.contains(out.elem.bloc)) 
-////					m.elem.bloc.link_blocs.add(out.elem.bloc);
-//			}
-//		}
-//	}
-//	void update_nodelist() {
-//		nodes.clear();
-//		link_blocs.clear();
-//		if (out_link != null) {
-//			test_connect(out_link);
-//			for (Macro_Connexion c : out_link.direct_cos) test_connect(c); 
-//		}
-//	}
+	void test_connect(Macro_Connexion out) {
+		if (out != null) for (Macro_Connexion m : out.connected_inputs) {
+			if (m.elem.bloc.val_type.get().equals("node")) {
+				MNode n = (MNode)m.elem.bloc;
+				if (m.base_info.equals("link_in")) {
+					nodes.add((MNode)m.elem.bloc);
+					if (n.out_link != null) {
+						test_connect(n.out_link);
+						for (Macro_Connexion c2 : n.out_link.direct_cos) 
+							test_connect(c2);
+					}
+				} 
+				else for (int i = 1 ; i < 9 ; i++) if (m.base_info.equals("in"+i)) {
+					for (Macro_Connexion c : m.direct_cos) test_connect(c);
+					for (MNode n2 : n.nodes) for (Macro_Connexion c : n2.in_list) {
+						if (c.base_info.equals("in"+i)) {
+							test_connect(c);
+							for (Macro_Connexion c2 : c.direct_cos) test_connect(c2);
+						}
+					}
+				}
+			}
+			else if (m.elem.bloc.val_type.get().equals("gate")) {
+				MGate g = (MGate)m.elem.bloc;
+				test_connect(g.get_active_out());
+			} else if (m.linkable) {
+				link_blocs.add(m.elem.bloc);
+//				if (!m.elem.bloc.link_blocs.contains(out.elem.bloc)) 
+//					m.elem.bloc.link_blocs.add(out.elem.bloc);
+			}
+		}
+	}
+	void update_nodelist() {
+		nodes.clear();
+		link_blocs.clear();
+		if (out_link != null) {
+			test_connect(out_link);
+			for (Macro_Connexion c : out_link.direct_cos) test_connect(c); 
+		}
+	}
 
 	//as link angle
 	boolean angle_constructor = false;
@@ -836,7 +904,7 @@ class MNode extends MBasic {
 		hideCtrl();
 		if (param_open != null) param_open.setPX(-ref_size * 0.75);
 		if (mirror_sw != null) mirror_sw.setPX(-ref_size * 1.25);
-		grabber.hide();
+//		grabber.hide();
 	    Macro_Element ei = new Macro_Element(this, "", "MC_Element_Single", "in1", INPUT, OUTPUT, true);
 	      elements.add(ei);
 		ei.back.setSX(ref_size*0);
@@ -875,11 +943,11 @@ class MNode extends MBasic {
 				is_point.set(false);
 				if (!rebuilding) rebuild();
 			} else {
-				if (	out_list.get(0).connected_inputs.size() > 0 && 
-						in_list.get(0).connected_outputs.size() > 0 ) reduc();
-				else {
-					//auto close after co
-				}
+//				if (	out_list.get(0).connected_inputs.size() > 0 && 
+//						in_list.get(0).connected_outputs.size() > 0 ) reduc();
+//				else {
+//					//auto close after co
+//				}
 			}
 		}});
 	}

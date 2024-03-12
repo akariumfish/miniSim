@@ -15,10 +15,11 @@ public class sVec extends sValue implements RConst {
 	  public PVector get() { return new PVector(val.x, val.y); }
 	  public sVec setx(double v) { return setx((float)v); }
 	  public sVec sety(double v) { return sety((float)v); }
-	  public sVec setx(float v) { if (v != val.x) { val.x = v; doChange(); } return this; }
-	  public sVec sety(float v) { if (v != val.y) { val.y = v; doChange(); } return this; }
+	  public sVec setx(float v) { run_events_allset(); if (v != val.x) { val.x = v; doChange(); } return this; }
+	  public sVec sety(float v) { run_events_allset(); if (v != val.y) { val.y = v; doChange(); } return this; }
 	  public sVec set(double _x, double _y) { return set((float)_x, (float)_y); }
 	  public sVec set(float _x, float _y) { 
+		  run_events_allset(); 
 	    if (_x != val.x || _y != val.y) {
 	      val.x = _x; 
 	      val.y = _y; 

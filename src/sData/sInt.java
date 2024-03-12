@@ -31,6 +31,7 @@ public class sInt extends sValue {
 	  public void set(double v) { set((int)v); }
 	  public void set(float v) { set((int)v); }
 	  public void set(int v) { 
+		  run_events_allset(); 
 		    if (limited_max && v > max) v = max; if (limited_min && v < min) v = min;
 		    if (v != val) { val = v; doChange(); } }
 	  void save_to_bloc(Save_Bloc svb) { super.save_to_bloc(svb);

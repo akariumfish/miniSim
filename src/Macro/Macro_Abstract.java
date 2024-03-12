@@ -140,10 +140,10 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
       front.hide(); reduc.show();
       if (!hide_ctrl) { 
 	      if (!title_fixe) title.hide(); else title.show(); 
-	      prio_sub.show(); prio_add.show(); prio_view.show();
       } else { 
-    	  	title.hide(); prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
+    	  	title.hide(); 
     	  }
+      prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
       reduc.setPosition(ref_size * 0.5, ref_size*0.5)
 	    .setSize(ref_size*0.4, ref_size*0.5);
       moving();

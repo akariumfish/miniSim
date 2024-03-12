@@ -324,17 +324,18 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           }
         }
         
-        if (!buildingLine) for (Macro_Connexion m : connected_inputs) {
-            if ( (sheet.mmain().selected_sheet == m.sheet || 
-          		  sheet.mmain().selected_sheet == sheet) && 
-          		  (RConst.distancePointToLine(
-  				  elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
-  				  getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y)
-  				  < 3 * ref.look.outlineWeight / gui.scale ||
-  				  lens.isHovered || m.lens.isHovered) && 
-          		  (sheet.mmain().show_link.get() || (lens.isHovered || m.lens.isHovered) ) ) {
-            	elem.bloc.light_on();
-        } }
+//        if (!buildingLine) for (Macro_Connexion m : connected_inputs) {
+//            if ( (sheet.mmain().selected_sheet == m.sheet || 
+//          		  sheet.mmain().selected_sheet == sheet) && 
+//          		  (RConst.distancePointToLine(
+//  				  elem.bloc.mmain().gui.mouseVector.x, elem.bloc.mmain().gui.mouseVector.y, 
+//  				  getCenter().x, getCenter().y, m.getCenter().x, m.getCenter().y)
+//  				  < 3 * ref.look.outlineWeight / gui.scale ||
+//  				  lens.isHovered || m.lens.isHovered) && 
+//          		  (sheet.mmain().show_link.get() || (lens.isHovered || m.lens.isHovered) ) ) {
+//            	elem.bloc.light_on();
+//            	m.elem.bloc.light_on();
+//        } }
     }});
     
     ref_draw = new Drawable(gui.drawing_pile, 0) { public void drawing() {
@@ -608,7 +609,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   }
 
   void direct_connect(Macro_Connexion o) { 
-	  if (linkable) o.set_link(); else o.set_nolink();
+	  if (linkable) o.set_link(); //else o.set_nolink();
 	  direct_cos.add(o); 
   }
   void direct_deconnect(Macro_Connexion o) { 

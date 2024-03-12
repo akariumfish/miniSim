@@ -170,22 +170,25 @@ nExplorer sheet_explorer;
   void build_macro_menus() {
     if (macro_tool != null) macro_tool.clear();
     macro_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
-    macro_tool.addShelf().addDrawer(4.375, 1)
-    		.addLinkedModel("Menu_Button_Small_Outline-S1-P1", "S")
+    macro_tool.addShelf().addDrawer(5.5, 1)
+	    .addLinkedModel("Menu_Button_Small_Outline-S1-P1", "I")
+	      .setLinkedValue(show_info)
+	      .setInfo("show/hide links").setFont((int)(ref_size/1.9)).getDrawer()
+    		.addLinkedModel("Menu_Button_Small_Outline-S1-P2", "S")
 		  .setLinkedValue(show_macro)
 		  .setInfo("show/hide macros").setFont((int)(ref_size/1.9)).getDrawer()
-        .addLinkedModel("Menu_Button_Small_Outline-S1-P2", "P")
+        .addLinkedModel("Menu_Button_Small_Outline-S1-P3", "P")
           .setLinkedValue(do_packet)
           .setInfo("do packet processing").setFont((int)(ref_size/1.9)).getDrawer()
-        .addLinkedModel("Menu_Button_Small_Outline-S1-P3", "L")
+        .addLinkedModel("Menu_Button_Small_Outline-S1-P4", "L")
           .setLinkedValue(show_link)
           .setInfo("show/hide links").setFont((int)(ref_size/1.9)).getDrawer()
-        .addLinkedModel("Menu_Button_Small_Outline-S1-P4", "LV")
+        .addLinkedModel("Menu_Button_Small_Outline-S1-P5", "LV")
           .setLinkedValue(link_volatil)
           .setInfo("show hided links when hovering connexions").setFont((int)(ref_size/1.9)).getDrawer()
           .getShelfPanel()
       .addShelf().addDrawer(7.75F, 1)
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P1", "D")
+        .addCtrlModel("Menu_Button_Small_Outline-S1-P1", "Del")
           .setRunnable(new nRunnable() { public void run() { del_selected(); }})
           .setInfo("Delete selected bloc").setFont((int)(ref_size/1.9)).getDrawer()
         .addCtrlModel("Menu_Button_Small_Outline-S1-P2", "X")
@@ -239,7 +242,7 @@ nExplorer sheet_explorer;
     
   }
   void build_buildtool() {
-	  int build_row = 12;
+	  int build_row = 22;
 	  nShelf sh = null;
 	  int row_count = 0;
 //	  int shelf_cible = 0;
@@ -261,7 +264,7 @@ nExplorer sheet_explorer;
 		    		row_count = 0;
 		    		sh = build_tool.addShelf();
 		    	}
-		      sh.addDrawer(3F, 0.75F).addCtrlModel("Menu_Button_Small_Outline-S3/0.75", bloc_builders.get(i).title)
+		      sh.addDrawer(3F, 0.7F).addCtrlModel("Menu_Button_Small_Outline-S3/0.75", bloc_builders.get(i).title)
 		        .setRunnable(new nRunnable(bloc_builders.get(i).type) { public void run() { 
 		          selected_sheet.addByType(((String)builder)); }})
 		        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
@@ -277,7 +280,7 @@ nExplorer sheet_explorer;
 				row_count = 0;
 				sh = build_tool.addShelf();
 			}
-		    sh.addDrawer(3F, 0.75F)
+		    sh.addDrawer(3F, 0.7F)
 		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.name)
 		    .setRunnable(new nRunnable(t) { public void run() { 
 		      ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
@@ -291,7 +294,7 @@ nExplorer sheet_explorer;
 				row_count = 0;
 				sh = build_tool.addShelf();
 			}
-		    sh.addDrawer(3F, 0.75F)
+		    sh.addDrawer(3F, 0.7F)
 		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.ref)
 		    .setRunnable(new nRunnable(t) { public void run() { 
 		    		paste_tmpl(((sValueBloc)builder));
@@ -684,10 +687,14 @@ nExplorer sheet_explorer;
     int adding_count = 0;
     float phf = 0.0F;
 //    float move_fct = 3 * GRID_SNAP_FACT;
-    float move_fct = Math.max(select_bound_widg.getPhantomRect().size.x, select_bound_widg.getPhantomRect().size.y);
-    move_fct /= ref_size;
-    move_fct = move_fct + 2 * GRID_SNAP_FACT;
-    move_fct = move_fct - move_fct%(GRID_SNAP_FACT*3);
+    float move_fct_x = select_bound_widg.getPhantomRect().size.x;
+    float move_fct_y = select_bound_widg.getPhantomRect().size.y;
+    move_fct_x /= ref_size;
+    move_fct_x = move_fct_x + 2 * GRID_SNAP_FACT;
+    move_fct_x = move_fct_x - move_fct_x%(GRID_SNAP_FACT*3);
+    move_fct_y /= ref_size;
+    move_fct_y = move_fct_y + 2 * GRID_SNAP_FACT;
+    move_fct_y = move_fct_y - move_fct_y%(GRID_SNAP_FACT*3);
     boolean found = false;
     while (!found) {
       boolean col = false;
@@ -714,7 +721,7 @@ nExplorer sheet_explorer;
       if (!col) found = true;
       else {
 	      for (Macro_Abstract m : selected_macro) 
-	    	  	m.group_move(ref_size * adding_dir_x * move_fct, ref_size * adding_dir_y * move_fct);
+	    	  	m.group_move(ref_size * adding_dir_x * move_fct_x, ref_size * adding_dir_y * move_fct_y);
 	      adding_count++;
   		  if (adding_count >= adding_side_l) {
 			adding_count = 0;
@@ -997,7 +1004,7 @@ nExplorer sheet_explorer;
   nRunnable packet_frame_run;
   
   //, show_sheet_tool
-  sBoo show_gui, show_macro, show_link, link_volatil, show_build_tool, show_macro_tool, do_packet;
+  sBoo show_info, show_gui, show_macro, show_link, link_volatil, show_build_tool, show_macro_tool, do_packet;
   sStr new_temp_name, database_path, shown_builder, shown_spe, shown_templ; 
   sRun del_select_run, copy_run, paste_run, duplic_run, cut_run, selall_run, reduc_run, construct_run;
   public sInterface inter;
@@ -1024,6 +1031,7 @@ Macro_Sheet search_sheet = this;
   ArrayList<MPanel> pan_macros = new ArrayList<MPanel>();
   ArrayList<MTool> tool_macros = new ArrayList<MTool>();
   ArrayList<nCursor> cursors_list = new ArrayList<nCursor>();
+  ArrayList<MBaseTick> baseticked_list = new ArrayList<MBaseTick>();
   MSheetBloc main_sheetbloc;
   MPanel last_added_panel;
   MTool last_added_tool;
@@ -1106,6 +1114,9 @@ public Macro_Main(sInterface _int) {
       screen_gui.isShown = show_gui.get();
       inter.show_info = show_gui.get();
     }});
+    show_info = newBoo("show_info", "show_info", true);
+    show_info.addEventChange(new nRunnable(this) { public void run() { 
+    		inter.show_info = show_info.get(); }});
     
     do_packet = newBoo(true, "do_packet", "do_packet");
     
@@ -1135,37 +1146,39 @@ public Macro_Main(sInterface _int) {
     			new MBasic(selected_sheet, gui.mouseVector); }});
     
 
+    	  add_bloc_builders(new MZone.Builder(this));
+
       add_bloc_builders(new Macro_Sheet.MSheet_Builder(this));
       add_bloc_builders(new MBasic.Builder(this));
       add_bloc_builders(new MNode.Builder(this));
       add_bloc_builders(new MSheetBloc.Builder(this));
       add_bloc_builders(new MCursor.MCursor_Builder(this));
-      add_bloc_builders(new MButton.Builder(this));
+      add_bloc_builders(new MMButton.Builder(this));
+      add_bloc_builders(new MText.Builder(this));
       add_bloc_builders(new MValue.MValue_Builder(this));
+      add_bloc_builders(new MMVar.Builder(this));
       add_bloc_builders(new MGate.MGate_Builder(this));
       add_bloc_builders(new MShape.Builder(this));
       add_bloc_builders(new MStructure.Builder(this));
       add_bloc_builders(new MCam.Builder(this));
-      
       add_bloc_builders(new MChan.MChan_Builder());
       add_bloc_builders(new MRamp.MRamp_Builder());
-      add_bloc_builders(new MCounter.MCount_Builder());
       add_bloc_builders(new MSequance.Builder());
+      add_bloc_builders(new MCounter.MCount_Builder());
       add_bloc_builders(new MSetReset.Builder());
       add_bloc_builders(new MInput.Builder());
-      add_bloc_builders(new MSlide.MSlide_Builder());
-      add_bloc_builders(new MComment.MComment_Builder());
-      add_bloc_builders(new MVar.MVar_Builder());
+      add_bloc_builders(new MQuickFloat.Builder());
+
       add_bloc_builders(new MRandom.MRandom_Builder());
+	  add_bloc_builders(new MBin.MBin_Builder());
+	  add_bloc_builders(new MNot.MNot_Builder());
+      add_bloc_builders(new MSlide.MSlide_Builder());
       add_bloc_builders(new MVecCalc.MVecCalc_Builder());
       add_bloc_builders(new MBoolCalc.Builder());
       add_bloc_builders(new MNumCalc.Builder());
       add_bloc_builders(new MTransform.Builder());
-      add_bloc_builders(new MQuickFloat.Builder());
-      add_bloc_builders(new MValView.Builder());
-	  add_bloc_builders(new MBin.MBin_Builder());
-	  add_bloc_builders(new MNot.MNot_Builder());
-      
+
+      add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());
       add_bloc_builders(new MToolBin.MToolBin_Builder());
       add_bloc_builders(new MToolTri.MToolTri_Builder());
@@ -1174,12 +1187,12 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MPanSld.MPanSld_Builder());
       add_bloc_builders(new MPanBin.MPanBin_Builder());
       add_bloc_builders(new MPanel.MPanel_Builder());
-      add_bloc_builders(new MFrame.MFrame_Builder());
-      add_bloc_builders(new MPulse.MPulse_Builder());
+      add_bloc_builders(new MVar.MVar_Builder());
 
-      
-      
-
+//    add_bloc_builders(new MComment.MComment_Builder());
+//    add_bloc_builders(new MValView.Builder());
+//    add_bloc_builders(new MPulse.MPulse_Builder());
+//    add_bloc_builders(new MFrame.MFrame_Builder());
 //    add_bloc_builders(new MForm.MForm_Builder());
 //    add_bloc_builders(new MStructure.MStructure_Builder());
 //    add_bloc_builders(new MPatern.MPatern_Builder());
@@ -1385,6 +1398,7 @@ public Macro_Main(sInterface _int) {
 	  float tick_pile = 0; //pile des tick a exec
 
 	  int run_tck_cnt = 0, met_tck_cnt = 0;
+	  int run_rst_cnt = 0, met_rst_cnt = 0;
 
 	void init_tick() {
 	    tick_counter = newInt(0, "tick_counter", "tick");
@@ -1399,14 +1413,12 @@ public Macro_Main(sInterface _int) {
 	    auto_reset_turn = newInt(4000, "auto_reset_turn", "auto turn");
 	    SEED = newInt(548651008, "SEED", "SEED");
 	
-	    srun_tick = newRun("sim_tick", "tick", new nRunnable() { 
-	    	  public void run() { 
+	    srun_tick = newRun("sim_tick", "tick", new nRunnable() { public void run() { 
 	    		  run_tck_cnt++; 
-	    		  while (run_tck_cnt > met_tck_cnt) tick();
-//	    		  if (tick_out != null) tick_out.send(Macro_Packet.newPacketBang());
-	    	} } );
-	    srun_reset = newRun("sim_reset", "reset", new nRunnable() { 
-	      public void run() { reset(); } } );
+	    		  while (run_tck_cnt > met_tck_cnt) tick(); 	} } );
+	    srun_reset = newRun("sim_reset", "reset", new nRunnable() { public void run() { 
+	    		run_rst_cnt++; 
+	    		while (run_rst_cnt > met_rst_cnt) reset(); } } );
 	    srun_rngr = newRun("sim_rng_reset", "rst rng", new nRunnable() { 
 	      public void run() { resetRng(); } } );
 	    srun_nxtf = newRun("sim_next_frame", "nxt frm", new nRunnable() { 
@@ -1452,13 +1464,27 @@ public Macro_Main(sInterface _int) {
 	  reset();
 	}
 	void reset() {
-		gui.app.randomSeed(SEED.get());
+	  gui.app.randomSeed(SEED.get());
 	  tick_counter.set(0);
 	  mmain().inter.framerate.reset();
 	  run_tck_cnt = 0; met_tck_cnt = 0;
-	//  if (rst_out != null) rst_out.send(Macro_Packet.newPacketBang());
+	  met_rst_cnt++; 
+	  while (run_rst_cnt < met_rst_cnt) srun_reset.run();
 	}
-	
+
+	void tick() {
+	  //auto reset
+	  if (auto_reset.get() && auto_reset_turn.get() <= tick_counter.get()) {
+	    if (auto_reset_rng_seed.get()) {
+	      SEED.set((int)(gui.app.random(1000000000)));
+	    }
+	    reset();
+	  }
+	  tick_counter.set(tick_counter.get()+1);
+	  for (MBaseTick b : baseticked_list) b.receive_tick();
+	  met_tck_cnt++; 
+	  while (run_tck_cnt < met_tck_cnt) srun_tick.run();
+	}
 	void frame_tick() {
 	  if (!pause.get()) {
 	  	tick_sec.set(mmain().inter.framerate.median_framerate.get() * tick_by_frame.get());
@@ -1491,18 +1517,6 @@ public Macro_Main(sInterface _int) {
 	
 	}
 	
-	void tick() {
-		  met_tck_cnt++; 
-		  while (run_tck_cnt < met_tck_cnt) srun_tick.run();
-	  //auto reset
-	  if (auto_reset.get() && auto_reset_turn.get() <= tick_counter.get()) {
-	    if (auto_reset_rng_seed.get()) {
-	      SEED.set((int)(gui.app.random(1000000000)));
-	    }
-	    reset();
-	  }
-	  tick_counter.set(tick_counter.get()+1);
-	}
   
   
   
@@ -1644,7 +1658,7 @@ public Macro_Main(sInterface _int) {
 			    .setOutlineSelectedColor(theme.app.color(130, 230, 240))
 			    .setOutlineWeight(ref_size / 16F)
 			    .setFont((int)(ref_size/2))
-			    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
+			    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
 			    .setSize(ref_size*3.125, ref_size*0.875)
 			    );
 	  theme.addModel("MC_Element_Comment_Field", theme.newWidget("mc_ref")
@@ -1653,17 +1667,17 @@ public Macro_Main(sInterface _int) {
 			    .setOutlineSelectedColor(theme.app.color(130, 230, 240))
 			    .setOutline(true)
 			    .setOutlineWeight(ref_size / 16F)
-			    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
+			    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
 		        .setTextAlignment(PConstants.LEFT, PConstants.TOP)
 		        .setTextAutoReturn(true)
 		        .setFont((int)(ref_size / 1.7))
 			    );
 	  theme.addModel("MC_Element_SField", theme.newWidget("MC_Element_Field")
-	    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
+	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
 	    .setSize(ref_size*1.375, ref_size*0.875)
 	    );
 	  theme.addModel("MC_Element_LField", theme.newWidget("MC_Element_Field")
-	    .setPosition(ref_size*3 / 16, ref_size * 1 / 16)
+	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
 	    .setSize(ref_size*5.25, ref_size*0.875)
 	    );
 	  theme.addModel("MC_Element_Text", theme.newWidget("mc_ref")
@@ -1672,15 +1686,15 @@ public Macro_Main(sInterface _int) {
 	    .setOutlineSelectedColor(theme.app.color(200))
 	    .setOutlineWeight(ref_size / 16F)
 	    .setFont((int)(ref_size/2))
-	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
+	    .setPosition(ref_size*3 / 16, ref_size * 3 / 16)
 	    .setSize(ref_size*3.125, ref_size*0.75)
 	    );
 	  theme.addModel("MC_Element_SText", theme.newWidget("MC_Element_Text")
-	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
+	    .setPosition(ref_size*3 / 16, ref_size * 3 / 16)
 	    .setSize(ref_size*1.375, ref_size*0.75)
 	    );
 	  theme.addModel("MC_Element_LText", theme.newWidget("MC_Element_Text")
-	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
+	    .setPosition(ref_size*3 / 16, ref_size * 3 / 16)
 	    .setSize(ref_size*5.25, ref_size*0.75)
 	    );
 	  theme.addModel("MC_Element_Button", theme.newWidget("mc_ref")
@@ -1691,7 +1705,7 @@ public Macro_Main(sInterface _int) {
 	    .setOutlineWeight(ref_size / 16F)
 	    .setOutline(true)
 	    .setFont((int)(ref_size/2))
-	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
+	    .setPosition(ref_size*3 / 16, ref_size * 3 / 16)
 	    .setSize(ref_size*3.125, ref_size*0.75)
 	    );
 	  theme.addModel("MC_Element_SButton", theme.newWidget("MC_Element_Button")
@@ -1699,11 +1713,11 @@ public Macro_Main(sInterface _int) {
 	    .setSize(ref_size*1.375, ref_size*0.75)
 	    );
 	  theme.addModel("MC_Element_LButton", theme.newWidget("MC_Element_Button")
-	    .setPosition(ref_size*3 / 16, ref_size * 2 / 16)
+	    .setPosition(ref_size*3 / 16, ref_size * 3 / 16)
 	    .setSize(ref_size*5.25, ref_size*0.75)
 	    );
 	  theme.addModel("MC_Element_MiniButton", theme.newWidget("MC_Element_Button")
-	    .setPosition(ref_size*1 / 16, ref_size * 4 / 16)
+	    .setPosition(ref_size*1 / 16, ref_size * 5 / 16)
 	    .setSize(ref_size*6 / 16, ref_size*0.5)
 	    .setFont((int)(ref_size/3))
 	    );

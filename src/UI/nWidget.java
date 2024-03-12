@@ -140,10 +140,11 @@ public class nWidget {
   public nWidget setLook(String r) { look.copy(gui.theme.getLook(r)); return this; }
 
   public nWidget tempPassif(boolean b) { 
-    if (b != temp_passif) {
-    		if (!b && hover != null) hover.active = tempPassifPreState; 
-    		else if (hover != null) { tempPassifPreState = hover.active; hover.active = false; }
+    if (hover != null && b != temp_passif) {
+    		if (!b) hover.active = tempPassifPreState; 
+    		else { tempPassifPreState = hover.active; hover.active = false; }
     }
+	temp_passif = b;
     return this;
   }
   

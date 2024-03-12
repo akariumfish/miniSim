@@ -8,101 +8,50 @@ public class miniSim {
 
 /* DONT HIT ENTER HERE FFS!!
 
-		BUG FIX
+		FIX
 
-when using spot elem widget dont always come back from temp passif
+finish mirror (wrong pos when mirrored : verify all blocs)
 
-link save for param dont work (only certain link are saved)
-	or too much link created at loading
+mbasic link saving based on co info find false positive > too much link created
+	based on co descr badly support param view switch cause optional elem are on top
+	widget build in param counted differently than those in normal 
+	widget numbered by their row + col, if dont move dont change name
+		> no naming perturbation
 
-sequance do inf loop > crash
+add method in bloc :
+	ctrl of input envent mode : onbang / on right type / never
+	ctrl of holding svalues event mode : onchange / onallchange / never
+				inbang+bp ( name, runnable/sRun/sBoo )
+				infloat+field(S/L) ( name, sInt/sFlt )
+				infloat+minitrigs/trigs add+sub(S/L) ( name, sInt/sFlt )
+				inbool+switch ( name, sBoo )
+				inall+trig col/vec/str picker ( name, sCol/sVec/sStr )
+	link connection adding methods > new object Mecro_Link extends Macro_Connect ?
+	
+use bloc methods everywhere in bloc construction to shorten it and serialize it
+	easyier connection modif
 
-add method in bloc for 	inbang+bp infloat+field(S/L) 
-						inbool+switch incol/vec/str+picker
-
-
-
-
-	VERSION .6 : 
-Link :
-	hilight linked blocs and linking path when hovering link
-	bloc as a method to add a link co with param : in or out, name, run at link/unlink
-		when co made get connected block, call runnable
-			method to return linked bloc (like lastPack())
-		when co deleted call runnable
-			method to return unlinked bloc
-	link connection have a validated state activated by blocs when link is in use
-		change line color sigtly
-
->>>>>> VERSION STABLE <<<<<<<
+finish bloc cleanup / verif > see start.sdata
 
 
-
-
-
-MMain :
-	method in main to add sBoo or sRun to a shortcut tab in main menu
-		select in list, enter key, press bp > set shortcut
-		Ctrl+key shortcut possible
-	hit space : add MBasic at mouse (construct_run in mmain)
-	method in main to auto create a sBoo or sRun linked to a widget in maintoolpan
-		auto add to shortcut menu
-	add a field and a bp to build toolpan > new template, a switch > viewable or not
-	have a global tick/reset/rngseed base
-		for tick/reset bloc have option to use it or have an input
-Bloc Modif :
-		BASE BLOC
-MButton : 
-	button can output to widget text named channel
-	other size : 2X bigger, multiple button of same type in row
-	multi button in row, have own text and connections
-	in param bp are field to set text
-	in param : size, row nb, color, trigger/Switch, setup_send
-	String packet can set text >> with a comment it can change channel
-MComment : renaming in MText ?
-	can select field size while viewong it with mbase
-	can text to log at bang, can output text
-	print text to screen or camera at given coords and size
-		can choose color?
-	as bp to insert line end
-	can has multiple inputs (small int select for number)
-	as bp to insert input last packet getText() (small int select for input cible)
-MNode
-	in point mode hide grabber until hovering lens
-	row can have optional valviewer
-	each row can select a node channel, 
-			meanning it can send to another row index
-		if too mush options use 2 row by pack co
-MChan : as an input to set channel
-MGate mode : at bang in state : 
-	switch state
-	co let +1 packet throug for this frame / next frame
-MVar and MValue :
-	different passing mode
-		send val if : A any in ; B bang in ; C on val change ; S at build
-		do this for bloc auto row
-	duplicable in row (like sequance) can choose to show in out field (S/L)
-MRamp : 
-	in : start stop reset periode phi startval endval
-	param : linear/sine 1/SAW/LP UP/DW 
-MSequance : input / field to set all delay at once
-	debug
 
 		NEW BLOC
+MZone : draw a rectangle from the bloc pos to a grabbable widget on the opposing corner
+	can output info such as coordinates and area
 MPanel :
 	draw a rectangle from the bloc pos of the size of a windowpanel
 	can see other blocs inside of him
 	use it to build menus and toolpanels (show all bloc elems inside of him)
 MHeader : 
+	is a mzone
+	glue all bloc inside, hide their grabber
+		OR
 	as a bloc selection bp to make group (hided in normal mode if he as a group)
 		get current selection if he is selected
 	glue group of bloc together, 
 	when selecting one, the others get selected automaticaly so they always move together
 	as a big grabbable to easily move glued group 
 		act as and move to it the selection center screenwidget
-MZone :
-	draw a rectangle from the bloc pos to a grabbable widget on the opposing corner
-	can output info such as coordinates and area
 MPOV : extend sheet object, use sheet specialize ?
 	as gotoview, nextcam, and deploy as big trig in spots by default
 	as a MZone automatically inside to set the view
@@ -114,27 +63,105 @@ MStructure : array of shape replics to draw to a camera
 	outputs : pos, rot, scale, array current size,
 		drawn area, bounding box, center and radius
 	methods  as inputbang plus bp :		
-		copy pencil to index, output param of pencil, output param of replic at given index,
-		delete replic at given index
+		add pencil to index, output param of pencil, output param of replic at given index,
+		delete replic at given index, 
+		mirror pencil to center/modifier
 MCollision
 	has two linked structure, on bang test if theirs replics are colliding
 	output a boolean with the result, the number of collision pair,
 		the collision area.
 	find a way to make it output the index pair (use pack?)
 
+Link :
+	bloc with link :
+		node cursor sheetbloc shape struct camera collision canvas
+	bloc passing link : node gate chan
+	hilight linked blocs and linking path when hovering link
+	bloc as a method to add a link co with param : in or out, name, run at link/unlink
+		when co made get connected block, call runnable
+			method to return linked bloc (like lastPack())
+		when co deleted call runnable
+			method to return unlinked bloc
+	link connection have a validated state activated by blocs when link is in use
+		change line color sigtly
+
+MMain :
+	method in main to add sBoo or sRun to a shortcut tab in main menu
+		select in list, enter key, press bp > set shortcut
+		Ctrl+key shortcut possible
+	method in main to auto create a sBoo or sRun linked to a widget in maintoolpan
+		auto add to shortcut menu
+	add a field and a bp to build toolpan > new template, a switch > viewable or not
+
 >>>>>> VERSION 0.4 <<<<<<<
 		
 
 
 
+		IDEE
+	--Blocs:
+MNode
+	in point mode hide grabber until hovering lens
+	row can have optional valviewer
+	each row can select a node channel, 
+			meanning it can send to another row index
+		if too mush options use 2 row by pack co
+	each row is a channel?
+MGate : multi row : index set output
+	mode : at bang in state : 
+		switch state / co let +1 packet throug for this frame / next frame
+Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
+cursors can be selected by rightclick-drag and moved with blocs
+keep your mouse on a cursor for 0.5s > a bar appear under it, 
+	its a slider to change scale, 
+	always appear centered, go from 0.25x current scale to 4x current scale
+	ephemere : will disappear if mouse stop hovering it or the cursor
+MEnveloppe : 
+	star value then series of row with a tick length, an end value, and a courbure
+	tick (ext/glob) to crawl it
+counted tick generator 1 bang > X bangs immediately
+distence mesuring tool
+MMvar : option : one bang send all
+MText : as bp to insert line end
+	as bp to insert input last packet getText() (small int select for input cible)
+			can has multiple inputs (small int select for number)
+MButton : 
+	screen widget when too dezoomed (on/off)
+	multiple button of same type in ROW
+	button can output to widget text named channel
+	String packet can set text >> with a MText it can change channel
+
+	--utils :
+dont bloc zoom on cam widgets?
+build a widget parent relation viewing tool, 
+	nWidget methods output limited( DONE ) partial and full description as text
+	nGUI method output a text file with the complete structure formatted( mid DONE ), 
+	parent child relation shown with limited descr and line nb of full descr
+	can add debug label to widget, they will show first line with theyr full descr and hyerarchy line
+conf file with general param loaded once at start
+	fullscreen on/off
+	autoload
+	file to open (last openned)
+trad README French
+finished project folder for easy viewing
+	'open finished' bp, search file in sub folder, cant save on it again
+	'save final' bp to save in this folder 
+		verify if new file name is existing to stop you from overwriting
+
+	--Hard:
+some connection lens still viewable when bloc reducted
+when selecting a preset auto hide uncompatible
+save last deleted link, bloc : sRun to undo
+block can have more than 3 col
+
 		MACRO BLOC REVIEW
 Blocs List :
 		DONE
-	Flux : point, chan, gate
-	Sheet : Macro_Sheet, Sheet_Main, SheetCo, Cursor
+	Flux : node, chan, gate
+	Sheet : Macro_Sheet, Sheet_Main, Cursor
 	Stock/access : Variable, sValue
 	Input : StandardInputs
-	Modify / Interpret : VecCalc, BoolCalc, NumCalc, Random
+	Modify / Interpret : VecCalc, BoolCalc, NumCalc, Random, bin, not
 		Transform/Filter :
 			filtered : type : bang, bool, num, vec ; types limits : bool:TorF
 				time : cnt(delay), frame
@@ -155,45 +182,6 @@ Blocs List :
 	GUI : GUIPanel, GUILabel, GUIButton, GUIGraph, GUISlide, GToolPanel
 	
 	Other : Midi, Preset
-
-
-		IDEE
-	--utils :
-build a widget parent relation viewing tool, 
-	nWidget methods output limited( DONE ) partial and full description as text
-	nGUI method output a text file with the complete structure formatted( mid DONE ), 
-	parent child relation shown with limited descr and line nb of full descr
-	can add debug label to widget, they will show first line with theyr full descr and hyerarchy line
-conf file with general param loaded once at start
-	fullscreen on/off
-	autoload
-	file to open (last openned)
-trad README French
-finished project golder for easy viewing
-	'open finished' bp, search file in sub folder, cant save on it again
-	'save final' bp to save in this folder 
-		verify if new file name is existing to stop you from overwriting
-dont bloc zoom on cam widgets?
-
-	--Hard:
-some connection lens still viewable when bloc reducted
-when selecting a preset auto hide uncompatible
-save last deleted link, bloc : sRun to undo
-
-	--Blocs:
-Mcursor : add obj input to get cursor, use it's pos and dir as referentiel (parent - child) 
-cursors can be selected by rightclick-drag and moved with blocs
-keep your mouse on a cursor for 0.5s > a bar appear under it, 
-	its a slider to change scale, 
-	always appear centered, go from 0.25x current scale to 4x current scale
-	ephemere : will disappear if mouse stop hovering it or the cursor
-MEnveloppe : 
-	series of row with a tick length, an end value, and a courbure
-	tick to crawl it
-counted tick generator
-switch to show/hide mouse coord and fps
-trig n switch : screen widget when too dezoomed (on/off) ; picker for bp color
-distence mesuring tool
 
 
 

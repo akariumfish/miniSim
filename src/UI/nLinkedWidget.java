@@ -34,7 +34,13 @@ public class nLinkedWidget extends nWidget {
 	  String base_text = "";
 	  int pres = 3;
 	  public nLinkedWidget(nGUI g) { super(g); }
-	  
+
+	  public nLinkedWidget setRunnable(nRunnable b) { 
+	  	val_run = b;
+	  	addEventTrigger(new nRunnable(this) { public void run() { 
+	  		val_run.run(); } } );
+	  	setTrigger();
+	  	return this; }
 	  nLinkedWidget setLinkedValue(sRun b) { 
 	    rval = b;
 	    addEventTrigger(new nRunnable(this) { public void run() { 
