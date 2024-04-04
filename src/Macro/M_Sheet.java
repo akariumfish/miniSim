@@ -755,7 +755,6 @@ class MNode extends MBasic {
 			if (!as_label.get() ) out_col = 1;
 			else { out_col = 2; lab_col = 1; if (as_link.get()) addEmptyS(1); }
 		}
-		
 	}	
 	public void build_param() {
 		if (is_point.get()) {

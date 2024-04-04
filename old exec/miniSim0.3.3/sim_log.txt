@@ -1,7 +1,8 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-379:  :exit
+576:  :setup_load from random_mouvement.sdata
+2059:  :exit
 null
 null
 null

@@ -35,17 +35,17 @@ contact growsDev@gmail.com.
 ..
 
 ---FRANCAIS---MINISIM---
-Il y a quelque preview dans le dossier image.
+Il y a quelques previews dans le dossier image.
 
-Demarrage :
+Démarrage :
 Ouvre https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.4.rar
- ; clique sur "view raw" pour telecharger le fichier 
- ; decompresse le quelque par et lance miniSim0.x.x.exe .
+ ; clique sur "view raw" pour télécharger le fichier 
+ ; décompresse le quelque-part et lance miniSim0.x.x.exe .
 
-Si le programme ne ce lance pas il faut probablement installé Java RE 8
+Si le programme ne se lance pas il faut probablement installer Java RE 8
 https://www.java.com/fr/download/manual.jsp .
 
-Sache que je ne suis pas un pro, et que ce programme n'est certainement pas construit comme il faudrais.
+Sache que je ne suis pas un pro, et que ce programme n'est certainement pas construit comme il faudrait.
 
 Merci de ton intérêt, pas encore de doc, bonne chance ... (désolé)
 
