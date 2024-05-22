@@ -13,14 +13,14 @@
 1: M:0_Sim add_spot right ~1_sheetbloc~_elem_1
 1: M:0_Sim add_spot end 
 2:- :setup_load from start.sdata
-3:-M:Main_Sheet setupFromBloc sData.sValueBloc@b01534
+3:-M:Main_Sheet setupFromBloc sData.sValueBloc@1567eff
 3: M:0_Canvas redo_link end 
 3: M:0_Canvas redo_spot 
 3: M:0_Canvas redo_spot end 
 3: M:0_Sim redo_link end 
 3: M:0_Sim redo_spot 
 3: M:0_Sim redo_spot end 
-3: M:0_Canvas setupFromBloc sData.sValueBloc@167c62d
+3: M:0_Canvas setupFromBloc sData.sValueBloc@b5d0d7
 3: M:add bloc 0_sheetbloc try his name 0_sheetbloc found suffix _sheetbloc
 3: M: try new name 0_sheetbloc
 3: M:0_sheetbloc found his name
@@ -62,7 +62,7 @@
 3: M:2_sheetbloc found his name
 3: M:Main_Sheet addCopyofBloc 2_sheetbloc    as 2_sheetbloc
 3: M:Main_Sheet addCopyofBloc end
-3: M:0_Sim setupFromBloc sData.sValueBloc@194cdc9
+3: M:0_Sim setupFromBloc sData.sValueBloc@16ea4e3
 3: M:add bloc 1_sheetbloc try his name 1_sheetbloc found suffix _sheetbloc
 3: M: try new name 1_sheetbloc
 3: M:1_sheetbloc found his name
@@ -114,7 +114,7 @@
 3: M:Main_Sheet redo_spot end 
 3: M:Main_Sheet redo_link end 
 3: M:Main_Sheet setupFromBloc end
-293:- :exit
+460:- :exit
 null
 null
 null

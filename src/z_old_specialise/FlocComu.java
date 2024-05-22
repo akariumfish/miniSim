@@ -161,9 +161,9 @@ public static class FlocPrint extends Sheet_Specialize {
     sim_front.toLayerTop();
   }
   
-//  void selected_comu(Community c) { 
-//    if (c != null && c.type_value.get().equals("grow")) gcom = (GrowerComu)c;
-//  }
+  void selected_comu(Community c) { 
+    if (c != null && c.type_value.get().equals("grow")) gcom = (GrowerComu)c;
+  }
   
   sFlt POURSUITE, FOLLOW, SPACING, SPEED, HALO_SIZE, HALO_DENS, POINT_FORCE, grow_prob ;
   sInt LIMIT, AGE ;

@@ -974,7 +974,7 @@ class MSheetBloc extends MBasic {
 	nLinkedWidget stp_view; sBoo menu_open, menu_reduc; sVec menu_pos; sInt menu_tab;
 	nRunnable grab_run, reduc_run, close_run, tab_run;
 	  nRunnable goto_run;
-	  Macro_Connexion out_sheet;
+	  Macro_Connexion out_sheet;//, out_obj;
 	  sBoo show1, show2, show3, show4;
 	MSheetBloc(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "sheetbloc", _bloc); 
 //		unclearable = true; 
@@ -1033,6 +1033,10 @@ class MSheetBloc extends MBasic {
 	    		menu(); } });
 	    out_sheet = addOutput(2, "sheet link");
 	    out_sheet.set_link();
+//		menu_elem.addTrigS("get obj", new nRunnable() { public void run() {
+//			out_obj.send(Macro_Packet.newPacketObject(sheet)); } })
+//		.setInfo("get object");
+//	    out_obj = addOutput(2, "object");
 
 	    addEmptyS(2); 
 	    addTrigS(0, "show", "show all sheet cursor", new nRunnable() { public void run() {
@@ -1076,6 +1080,10 @@ class MSheetBloc extends MBasic {
 
 	    out_sheet = addOutput(1, "sheet link");
 	    out_sheet.set_link();
+//		menu_elem.addTrigS("get obj", new nRunnable() { public void run() {
+//			out_obj.send(Macro_Packet.newPacketObject(sheet)); } })
+//		.setInfo("get object");
+//	    out_obj = addOutput(2, "object");
 
 	    if (show2.get() || show3.get() || show4.get()) addEmptyS(2); 
 	    addTrigS(0, "show", "show all sheet cursor", new nRunnable() { public void run() {

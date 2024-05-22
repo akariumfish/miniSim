@@ -86,10 +86,10 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    sim_front.toLayerTop();
 	  }
 	  
-//	  void selected_comu(Community c) { 
-//	    //logln(value_bloc.ref + " got com " + c.name + " " + c.type_value.get());
-//	    if (c != null && c.type_value.get().equals("floc")) { fcom = (FlocComu)c; }
-//	  }
+	  void selected_comu(Community c) { 
+	    //logln(value_bloc.ref + " got com " + c.name + " " + c.type_value.get());
+	    if (c != null && c.type_value.get().equals("floc")) { fcom = (FlocComu)c; }
+	  }
 
 	  GrowerComu(Simulation _c, String n, sValueBloc t) { 
 	    super(_c, n, "grow", 1000, t);

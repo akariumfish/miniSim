@@ -1,10 +1,7 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-451:- :setup_load from spirale2.sdata
-1053:- :full_data_save to start.sdata
-2743:- :full_data_save to start.sdata
-2810:- :exit
+1382:- :exit
 null
 null
 null

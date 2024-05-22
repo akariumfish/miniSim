@@ -1,8 +1,11 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-576:  :setup_load from random_mouvement.sdata
-2059:  :exit
+1889:  :setup_load from exploding_struct.sdata
+3539:  :setup_load from random_mouvement.sdata
+10534:  :setup_load from spesheet.sdata
+10723:  :setup_load from spiral.sdata
+12912:  :exit
 null
 null
 null

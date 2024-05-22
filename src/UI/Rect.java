@@ -10,7 +10,7 @@ public class Rect {
 	public Rect() {}
 	public Rect(float x, float y, float w, float h) {pos.x = x; pos.y = y; size.x = w; size.y = h;}
 	public Rect(Rect r) {pos.x = r.pos.x; pos.y = r.pos.y; size.x = r.size.x; size.y = r.size.y;}
-	void draw(Rapp a) { 
+	public void draw(Rapp a) { 
 		  a.rect(pos.x, pos.y, size.x, size.y); 
 	}
 	public Rect copy(Rect r) { 
@@ -33,7 +33,7 @@ public class Rect {
 	          r1.pos.y + r1.size.y > r2.pos.y   );
 	}
 	
-	static boolean rectCollide(PVector p, Rect rect) {
+	public static boolean rectCollide(PVector p, Rect rect) {
 	  return (p.x >= rect.pos.x && p.x <= rect.pos.x + rect.size.x &&
 	          p.y >= rect.pos.y && p.y <= rect.pos.y + rect.size.y );
 	}

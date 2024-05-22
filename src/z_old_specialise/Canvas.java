@@ -9,6 +9,7 @@ import UI.Drawable;
 import UI.nCursor;
 import UI.nFrontPanel;
 import UI.nFrontTab;
+import UI.nList;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
@@ -48,52 +49,52 @@ public class Canvas extends Macro_Sheet {
 	      .addSeparator(0.125)
 	      ;
 	      
-//	    selector_list = tab.getShelf(0)
-//	      .addSeparator(0.25)
-//	      .addList(4, 10, 1);
-//	    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
-//	      nList sl = ((nList)builder); 
-//	      //logln("a "+sl.last_choice_index +"  "+ sim.list.size());
-//	      if (sl.last_choice_index < sim.list.size()) 
-//	        selected_comu(sim.list.get(sl.last_choice_index));
-//	        //selected_com.set(sim.list.get(sl.last_choice_index).name);
-//	    } } );
-//	    
-//	    selector_list.getShelf()
-//	      .addSeparator(0.125)
-//	      .addDrawer(10.25, 0.75)
-//	      .addWatcherModel("Label-S4", "Selected: ").setLinkedValue(selected_com).getShelf()
-//	      .addSeparator(0.125)
-//	      ;
-//	    
-//	    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
-//	    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
-//	    
-//	    update_com_selector_list();
+	    selector_list = tab.getShelf(0)
+	      .addSeparator(0.25)
+	      .addList(4, 10, 1);
+	    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
+	      nList sl = ((nList)builder); 
+	      //logln("a "+sl.last_choice_index +"  "+ sim.list.size());
+	      if (sl.last_choice_index < sim.list.size()) 
+	        selected_comu(sim.list.get(sl.last_choice_index));
+	        selected_com.set(sim.list.get(sl.last_choice_index).name);
+	    } } );
+	    
+	    selector_list.getShelf()
+	      .addSeparator(0.125)
+	      .addDrawer(10.25, 0.75)
+	      .addWatcherModel("Label-S4", "Selected: ").setLinkedValue(selected_com).getShelf()
+	      .addSeparator(0.125)
+	      ;
+	    
+	    selector_entry = new ArrayList<String>(); // mmain().data.getCountOfType("flt")
+	    selector_value = new ArrayList<Community>(); // mmain().data.getCountOfType("flt")
+	    
+	    update_com_selector_list();
 	    
 	    sheet_front.toLayerTop();
 	  }
-//	  void update_com_selector_list() {
-//	    selector_entry.clear();
-//	    selector_value.clear();
-//	    for (Community v : sim.list) { 
-//	      selector_entry.add(v.name); 
-//	      selector_value.add(v);
-//	    }
-//	    if (selector_list != null) selector_list.setEntrys(selector_entry);
-//	  }
-//	  
-//	  void selected_comu(Community c) { 
-////	    if (c != null && c.type_value.get().equals("floc")) { fcom = (FlocComu)c; selected_com.set(fcom.name); }
-//	  }
+	  void update_com_selector_list() {
+	    selector_entry.clear();
+	    selector_value.clear();
+	    for (Community v : sim.list) { 
+	      selector_entry.add(v.name); 
+	      selector_value.add(v);
+	    }
+	    if (selector_list != null) selector_list.setEntrys(selector_entry);
+	  }
+	  
+	  void selected_comu(Community c) { 
+	    if (c != null && c.type_value.get().equals("floc")) { fcom = (FlocComu)c; selected_com.set(fcom.name); }
+	  }
 	  
 	  public FlocComu fcom;
 	  
-//	  ArrayList<String> selector_entry;
-//	  ArrayList<Community> selector_value;
-//	  Community selected_value;
-//	  String selected_entry;
-//	  nList selector_list;
+	  ArrayList<String> selector_entry;
+	  ArrayList<Community> selector_value;
+	  Community selected_value;
+	  String selected_entry;
+	  nList selector_list;
 	  
 	  nRunnable tick_run, rst_run; Drawable cam_draw;
 	  nCursor ref_cursor;
@@ -102,7 +103,7 @@ public class Canvas extends Macro_Sheet {
 	  sInt val_w, val_h, can_div;
 	  sFlt val_scale, color_keep_thresh, val_decay;
 	  sBoo val_show, val_show_bound, val_show_grab;
-//	  sStr selected_com;
+	  sStr selected_com;
 	  sCol val_col_back;
 	  sRun val_rst_run;
 
@@ -130,7 +131,7 @@ public class Canvas extends Macro_Sheet {
 	    val_show = newBoo(false, "val_show", "show_canvas");
 	    val_show_bound = newBoo(false, "val_show_bound", "show_bound");
 	    val_show_grab = newBoo(false, "val_show_grab", "show_grab");
-//	    selected_com = newStr("selected_com", "scom", "");
+	    selected_com = newStr("selected_com", "scom", "");
 	    val_col_back = menuColor(gui.app.color(0), "background");
 	    val_col_back.addEventChange(new nRunnable() { public void run() { 
 	      reset();
@@ -186,7 +187,8 @@ public class Canvas extends Macro_Sheet {
 	    
 	    addEventSetupLoad(new nRunnable() { public void run() { 
 	      mmain().inter.addEventNextFrame(new nRunnable() {public void run() { 
-//	        for (Community c : sim.list) if (c.name.equals(selected_com.get())) selected_comu(c);
+	    	    reset();
+	        for (Community c : sim.list) if (c.name.equals(selected_com.get())) selected_comu(c);
 	        cam_draw.toLayerBottom();
 	      }}); } } );
 	  }
