@@ -405,21 +405,21 @@ class Box extends Entity {
     if (com().draw_dot.get()) {
       int point_size = (int)(com().box_point_size.get());
       int c = 0;
-      //com().app.color c3 = com().val_col3.get();
-      //strokeWeight(point_size);
-//      for (float i = rect.pos.x + (rect.size.x%point_size)/2 + point_size/2; i < rect.pos.x + rect.size.x ; i += point_size) 
-//        for (float j = rect.pos.y + (rect.size.y%point_size)/2 + point_size/2; j < rect.pos.y + rect.size.y ; j += point_size) {
-//        	com().app.noStroke();
-//          fill(red(c3), green(c3), blue(c3), c);
-//          ellipseMode(CENTER);
-//          com().app.ellipse(i, j, point_size/2, point_size/2);
-//          c+=(generation*int(point_size));
-//          c %= 255;
-//        }
+      int c3 = com().val_col3.get();
+      com().app.strokeWeight(point_size);
+      for (float i = rect.pos.x + (rect.size.x%point_size)/2 + point_size/2; i < rect.pos.x + rect.size.x ; i += point_size) 
+        for (float j = rect.pos.y + (rect.size.y%point_size)/2 + point_size/2; j < rect.pos.y + rect.size.y ; j += point_size) {
+        	com().app.noStroke();
+        	  com().app.fill(com().app.red(c3), com().app.green(c3), com().app.blue(c3), c);
+          com().app.ellipseMode(PApplet.CENTER);
+          com().app.ellipse(i, j, point_size/2, point_size/2);
+          c+=(generation*(int)(point_size));
+          c %= 255;
+        }
     }
-//    com().app.fill(lining);
-//    textFont(getFont(int(rect.size.y/3)));
-//    com().app.text(""+generation, rect.pos.x + rect.size.x/3, rect.pos.y + rect.size.y/1.41);
+    com().app.fill(lining);
+    com().app.textFont(com().app.getFont((int)(rect.size.y/3)));
+    com().app.text(""+generation, rect.pos.x + rect.size.x/3, rect.pos.y + rect.size.y/1.41F);
     return this; }
   Box clear() { return this; }
   BoxComu com() { return ((BoxComu)com); }

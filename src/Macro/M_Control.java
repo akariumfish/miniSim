@@ -207,12 +207,12 @@ class MGate extends MBasic {
  	} } );
   }
   public void build_normal() {
-    in_m = addInput(0, "in");
-//    .addEventReceive(new nRunnable() { public void run() { 
-//      if (in_m.lastPack() != null)
-//    	  	if (state.get()) out.send(in_m.lastPack());
-//    	  	else out_inv.send(in_m.lastPack());
-//    } });
+    in_m = addInput(0, "in")
+    .addEventReceive(new nRunnable() { public void run() { 
+      if (in_m.lastPack() != null)
+    	  	if (state.get()) out.send(in_m.lastPack());
+    	  	else out_inv.send(in_m.lastPack());
+    } });
     in_b = addInput(0, "gate").addEventReceive(new nRunnable() { public void run() { 
       if (in_b.lastPack() != null && in_b.lastPack().isBool()) 
         state.set(in_b.lastPack().asBool()); 
@@ -242,41 +242,52 @@ class MGate extends MBasic {
 
 
 
-
-class MChan extends Macro_Bloc { 
-
+class MChan extends MBasic {
 	  static class MChan_Builder extends MAbstract_Builder {
-		  MChan_Builder() { super("chan", "Chan", "", "Control"); }
+		  MChan_Builder() { super("chan", "Channel", "", "Control"); }
 		  MChan build(Macro_Sheet s, sValueBloc b) { MChan m = new MChan(s, b); return m; }
 	  }
-	  
-  Macro_Connexion in_chan, in, out;
-  sStr val_cible; 
-  nLinkedWidget ref_field; 
-  MChan(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "chan", "chan", _bloc); 
-    val_cible = newStr("cible", "cible", "");
-    addEmpty(1); 
-    in_chan = addInput(0, "chan").addEventReceive(new nRunnable() { public void run() { 
-        if (in.lastPack() != null && in.lastPack().isStr()) val_cible.set(in.lastPack().asStr());
-      } });
-    in_chan.elem.back.copy(gui.theme.getModel("MC_Element_Double"));
-    ref_field = in_chan.elem.addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
-    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
-      if (in.lastPack() != null) receive(in.lastPack());
-    } });
-    out = addOutput(1, "out");
-    
-    mmain().chan_macros.add(this);
-  }
-  void receive(Macro_Packet p) {
-    out.send(p);
-    for (MChan m : mmain().chan_macros) 
-      if (m != this && m.val_cible.get().equals(val_cible.get())) m.out.send(p);
-  }
-  public MChan clear() {
-    super.clear(); 
-    mmain().chan_macros.remove(this); return this; }
+
+	  Macro_Connexion in_chan, in, out;
+	  sStr val_cible; 
+	  nLinkedWidget ref_field; 
+	
+	MChan(Macro_Sheet _sheet, sValueBloc _bloc) { 
+		  super(_sheet, "chan", _bloc); 
+	}
+	void init() { 
+		super.init(); 
+
+	    val_cible = newStr("cible", "cible", "");
+	    addEmpty(1); 
+	    in_chan = addInput(0, "chan").addEventReceive(new nRunnable() { public void run() { 
+	        if (in.lastPack() != null && in.lastPack().isStr()) val_cible.set(in.lastPack().asStr());
+	      } });
+	    in_chan.elem.back.copy(gui.theme.getModel("MC_Element_Double"));
+	    ref_field = in_chan.elem.addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
+	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
+	      if (in.lastPack() != null) receive(in.lastPack());
+	    } });
+	    out = addOutput(1, "out");
+	    
+	    mmain().chan_macros.add(this);
+	}
+	void init_end() { 
+		  super.init_end(); }
+	void buil_param() { }
+	void buil_normal() { }
+
+	  void receive(Macro_Packet p) {
+	    out.send(p);
+	    for (MChan m : mmain().chan_macros) 
+	      if (m != this && m.val_cible.get().equals(val_cible.get())) m.out.send(p);
+	  }
+	public MChan clear() {
+	  super.clear(); 
+	    mmain().chan_macros.remove(this); return this; }
+	public MChan toLayerTop() {
+		    super.toLayerTop(); 
+		    return this; }
 }
 
 
@@ -468,7 +479,8 @@ class MSetReset extends MBasic {
 			boolean flag = false;
 			if (!state.get()) flag = true;
 			state.set(false);
-			if (flag) out_state.sendBool(false);
+			out_state.sendBool(false);
+			if (flag) { out_over.sendBang(); }
 		}};
 		addInputBang(0, "reset", rst_run)
 			.elem.addCtrlModel("MC_Element_SButton", "reset").setRunnable(rst_run);

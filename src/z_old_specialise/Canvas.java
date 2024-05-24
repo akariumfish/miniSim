@@ -151,7 +151,6 @@ public class Canvas extends Macro_Sheet {
 	    
 	    ref_cursor = menuSheetCursor("Canvas", false);
 	    
-	    
 	    if (ref_cursor.show != null) ref_cursor.show.set(val_show.get() && val_show_grab.get());
 	    if (ref_cursor.pval != null) ref_cursor.pval.set(val_pos.get());
 	    if (ref_cursor.pval != null) ref_cursor.pval.addEventChange(new nRunnable() { public void run() { 
@@ -243,13 +242,22 @@ public class Canvas extends Macro_Sheet {
 	    }
 	  }
 	  
-	  void tick() {
-	    if (fcom != null) {
-	      for (int i = can_st ; i < fcom.list.size() ; i += Math.max(1, can_div.get()) )
-	        if (fcom.list.get(i).active) {
-	          ((Floc)fcom.list.get(i)).draw_halo(this);
+	  void floc_tick(FlocComu f) {
+	    if (f != null) {
+	      for (int i = can_st ; i < f.list.size() ; i += Math.max(1, can_div.get()) )
+	        if (f.list.get(i).active) {
+	          ((Floc)f.list.get(i)).draw_halo(this);
 	      }
 	    }
+	  }
+	  
+	  void tick() {
+//	    if (fcom != null) {
+//	      for (int i = can_st ; i < fcom.list.size() ; i += Math.max(1, can_div.get()) )
+//	        if (fcom.list.get(i).active) {
+//	          ((Floc)fcom.list.get(i)).draw_halo(this);
+//	      }
+//	    }
 	    
 	    for (Face f : faces) f.tick();
 	    

@@ -162,10 +162,9 @@ Blocs List :
 	Stock/access : Variable, sValue
 	Input : StandardInputs
 	Modify / Interpret : VecCalc, BoolCalc, NumCalc, Random, bin, not
-		Transform/Filter :
-			filtered : type : bang, bool, num, vec ; types limits : bool:TorF
-				time : cnt(delay), frame
-			Transform : bool <> bang, vec <> XY, vec <> MagDir, all > bang/bool
+		Filter : type : bang, bool, num, vec ; types limits : bool:TorF
+			time : cnt(delay), frame
+		Transform : bool <> bang, vec <> XY, vec <> MagDir, all > bang/bool
 	Complexes : rampe, sequance, setreset, counter
 	GUI : Button, Slider, Comment
 	
@@ -192,7 +191,7 @@ Blocs List :
 
 		R & D
 		
-big lag when selecting an heavy sheet caused by to LayerTop() recursive calls
+big lag when selecting an heavy sheet caused by toLayerTop() recursive calls
 		>>>> sheet bloc number limited
 
 bloc grabbing can be constrained to one axis at will

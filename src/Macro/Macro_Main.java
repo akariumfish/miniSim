@@ -173,7 +173,7 @@ nExplorer sheet_explorer;
     macro_tool.addShelf().addDrawer(5.5, 1)
 	    .addLinkedModel("Menu_Button_Small_Outline-S1-P1", "I")
 	      .setLinkedValue(show_info)
-	      .setInfo("show/hide links").setFont((int)(ref_size/1.9)).getDrawer()
+	      .setInfo("show/hide infos").setFont((int)(ref_size/1.9)).getDrawer()
     		.addLinkedModel("Menu_Button_Small_Outline-S1-P2", "S")
 		  .setLinkedValue(show_macro)
 		  .setInfo("show/hide macros").setFont((int)(ref_size/1.9)).getDrawer()
@@ -1177,6 +1177,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MBoolCalc.Builder());
       add_bloc_builders(new MNumCalc.Builder());
       add_bloc_builders(new MTransform.Builder());
+      add_bloc_builders(new MFilter.Builder());
 
       add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());

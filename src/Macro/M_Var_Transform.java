@@ -366,16 +366,14 @@ class MBoolCalc extends MBasic {
 
 
 
-class MTransform extends MBasic {
+class MFilter extends MBasic {
 	static class Builder extends MAbstract_Builder {
-		Builder() { super("transf", "Transform", "Transform and Filter data", "Data"); }
-		MTransform build(Macro_Sheet s, sValueBloc b) { MTransform m = new MTransform(s, b); return m; }
+		Builder() { super("filter", "Filter", "Filter data", "Data"); }
+		MFilter build(Macro_Sheet s, sValueBloc b) { MFilter m = new MFilter(s, b); return m; }
 	}
 	Macro_Connexion in1, in2, out1, out2;
-	sBoo mode_filter, mode_transf, 
-		 filt_bang  , filt_boo   , filt_num  , filt_vec,
-		 filt_boo_st, filt_boo_true, fltr_count, fltr_frame,
-		 trsf_AtBG  , trsf_BtfBG , trsf_vecXY, trsf_vecMD ;
+	sBoo filt_bang  , filt_boo   , filt_num  , filt_vec,
+		 filt_boo_st, filt_boo_true, fltr_count, fltr_frame;
 	sInt fltr_time_count;
 	
 	//vec XY n MD
@@ -385,10 +383,8 @@ class MTransform extends MBasic {
     nLinkedWidget view1, view2;
     sStr val_view1, val_view2; 
     boolean build_flag = false;
-	MTransform(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "transf", _bloc); }
+    MFilter(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "filter", _bloc); }
 	public void init() {
-		mode_filter = newBoo("mode_filter", "mode_filter", false);
-		mode_transf = newBoo("mode_transf", "mode_transf", false);
 		filt_bang = newBoo("filt_bang", "filt_bang", false);
 		filt_boo = newBoo("filt_boo", "filt_boo", false);
 		filt_boo_st = newBoo("filt_boo_st", "filt_boo_st", false);
@@ -398,61 +394,28 @@ class MTransform extends MBasic {
 		fltr_time_count = newInt("fltr_time_count", "fltr_time_count", 0);
 		filt_num = newBoo("filt_num", "filt_num", false);
 		filt_vec = newBoo("filt_vec", "filt_vec", false);
-
-		trsf_AtBG = newBoo("trsf_AtBG", "trsf_AtBG", false);
-		trsf_BtfBG = newBoo("trsf_BtfBG", "trsf_BtfBG", false);
-		trsf_vecXY = newBoo("trsf_vecXY", "trsf_vecXY", false);
-		trsf_vecMD = newBoo("trsf_vecMD", "trsf_vecMD", false);
 	}
 	public void build_param() { 
 		addEmpty(1); addEmpty(2);
-		addEmptyXL(0).addLinkedModel("MC_Element_LButton", "Filter").setLinkedValue(mode_filter);
-		if (mode_filter.get()) {
-			addEmpty(1); addEmpty(2);
-			nDrawer m = addEmptyXL(0);
-			m.addLinkedModel("MC_Element_Button_Selector_1", "bang").setLinkedValue(filt_bang);
-			m.addLinkedModel("MC_Element_Button_Selector_2", "bool").setLinkedValue(filt_boo);
-			m.addLinkedModel("MC_Element_Button_Selector_3", "num").setLinkedValue(filt_num);
-			m.addLinkedModel("MC_Element_Button_Selector_4", "vec").setLinkedValue(filt_vec);
-			if (filt_boo.get()) {
-				addEmpty(1); addEmpty(2);
-				m = addEmptyXL(0);
-				m.addModel("MC_Element_Text", "bool fltr")
-				.setSX(ref_size * 1.9).setPX(ref_size * 0.125);
-				m.addLinkedModel("MC_Element_Button", "state").setLinkedValue(filt_boo_st)
-				.setSX(ref_size * 1.9).setPX(ref_size * 2.15);
-				if (filt_boo_st.get()) 
-					m.addLinkedModel("MC_Element_Button", "").setLinkedValue(filt_boo_true)
-					.setSX(ref_size * 1.9).setPX(ref_size * 4.175);
-	  		}
-			addSelectS_Excl(0, fltr_count, fltr_frame, "CNT", "FRM");
-			if (fltr_count.get() || fltr_frame.get()) addSelectToInt(1, fltr_time_count);
-			else { addEmptyL(1); addEmpty(2); }
-		}
-		addEmpty(1); addEmpty(2);
-		addEmptyXL(0).addLinkedModel("MC_Element_LButton", "Transform").setLinkedValue(mode_transf);
-		if (mode_transf.get()) {
-			addEmpty(1); addEmpty(2);
-			nDrawer m = addEmptyXL(0);
-			nWidget w1 = m.addLinkedModel("MC_Element_SButton", "All>Bang")
-				.setLinkedValue(trsf_AtBG)
-				.setSX(ref_size * 3).setPX(ref_size * 0.125);
-			nWidget w2 = m.addLinkedModel("MC_Element_SButton", "Bang<>Bool")
-				.setLinkedValue(trsf_BtfBG)
-				.setSX(ref_size * 3).setPX(ref_size * 3.25);
+		nDrawer m = addEmptyXL(0);
+		m.addLinkedModel("MC_Element_Button_Selector_1", "bang").setLinkedValue(filt_bang);
+		m.addLinkedModel("MC_Element_Button_Selector_2", "bool").setLinkedValue(filt_boo);
+		m.addLinkedModel("MC_Element_Button_Selector_3", "num").setLinkedValue(filt_num);
+		m.addLinkedModel("MC_Element_Button_Selector_4", "vec").setLinkedValue(filt_vec);
+		if (filt_boo.get()) {
 			addEmpty(1); addEmpty(2);
 			m = addEmptyXL(0);
-			nWidget w3 = m.addLinkedModel("MC_Element_SButton", "Vec<>XY")
-				.setLinkedValue(trsf_vecXY)
-				.setSX(ref_size * 3).setPX(ref_size * 0.125);
-			nWidget w4 = m.addLinkedModel("MC_Element_SButton", "Vec<>MagDir")
-				.setLinkedValue(trsf_vecMD)
-				.setSX(ref_size * 3).setPX(ref_size * 3.25);
-		    w1.addExclude(w2).addExclude(w3).addExclude(w4);
-		    w2.addExclude(w1).addExclude(w3).addExclude(w4);
-		    w3.addExclude(w2).addExclude(w1).addExclude(w4);
-		    w4.addExclude(w2).addExclude(w3).addExclude(w1);
-		}
+			m.addModel("MC_Element_Text", "bool fltr")
+			.setSX(ref_size * 1.9).setPX(ref_size * 0.125);
+			m.addLinkedModel("MC_Element_Button", "state").setLinkedValue(filt_boo_st)
+			.setSX(ref_size * 1.9).setPX(ref_size * 2.15);
+			if (filt_boo_st.get()) 
+				m.addLinkedModel("MC_Element_Button", "").setLinkedValue(filt_boo_true)
+				.setSX(ref_size * 1.9).setPX(ref_size * 4.175);
+  		}
+		addSelectS_Excl(0, fltr_count, fltr_frame, "CNT", "FRM");
+		if (fltr_count.get() || fltr_frame.get()) addSelectToInt(1, fltr_time_count);
+		else { addEmptyL(1); addEmpty(2); }
 		
 	  	nRunnable mode_run = new nRunnable() { public void run() {
 	  		if (!build_flag)
@@ -461,29 +424,27 @@ class MTransform extends MBasic {
 	  		build_flag = true;
 	  	} };
 	  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
-		  	mode_filter.addEventChange(mode_run);
 			filt_boo.addEventChange(mode_run);
 			filt_boo_st.addEventChange(mode_run);
 			fltr_count.addEventChange(mode_run);
 			fltr_frame.addEventChange(mode_run);
-		  	mode_transf.addEventChange(mode_run);
-		  	trsf_AtBG.addEventChange(mode_run);
-		  	trsf_BtfBG.addEventChange(mode_run);
-		  	trsf_vecXY.addEventChange(mode_run);
-		  	trsf_vecMD.addEventChange(mode_run);
 	  	}});
-		if (valid_params()) build_normal();
+		build_normal();
 	}
-	private boolean valid_params() {
-		return (mode_filter.get() || 
-				trsf_AtBG.get()   || 
-				trsf_BtfBG.get()  || 
-				trsf_vecXY.get()  || 
-				trsf_vecMD.get() );
+	private int t_count = 0;
+	private int fr_count = 0;
+	public void build_normal() {
+		String dscr = "";
+		out1 = addOutput(2, "out");
+		addEmptyS(1).addModel("MC_Element_SText", dscr);
+		in1 = addInput(0, "in", new nRunnable() { public void run() {
+			if (in1.lastPack() != null && valid_pack(in1.lastPack()))
+				out1.send(in1.lastPack());
+		}});
 	}
+
 	private boolean valid_pack(Macro_Packet p) {
-		if  (!mode_filter.get() || 
-				(p.isBang() && filt_bang.get()) ||
+		if  ( (p.isBang() && filt_bang.get()) ||
 				(p.isBool() && filt_boo.get() && 
 				(!filt_boo_st.get() || (p.asBool() == filt_boo_true.get())) ) ||
 				((p.isInt() || p.isFloat()) && filt_num.get()) ||
@@ -509,8 +470,104 @@ class MTransform extends MBasic {
 		}
 		return false;
 	}
-	private int t_count = 0;
-	private int fr_count = 0;
+	public MFilter clear() {
+		super.clear(); return this; }
+}
+
+
+
+class MTransform extends MBasic {
+	static class Builder extends MAbstract_Builder {
+		Builder() { super("transf", "Transform", "Transform and Filter data", "Data"); }
+		MTransform build(Macro_Sheet s, sValueBloc b) { MTransform m = new MTransform(s, b); return m; }
+	}
+	Macro_Connexion in1, in2, out1, out2;
+	sBoo trsf_AtBG  , trsf_BtfBG , trsf_vecXY, trsf_vecMD ;
+	
+	//vec XY n MD
+  	float x = 0, y = 0;
+    float mag = 1, dir = 0;
+  	PVector vec;
+    nLinkedWidget view1, view2;
+    sStr val_view1, val_view2; 
+    boolean build_flag = false;
+	MTransform(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "transf", _bloc); }
+	public void init() {
+		trsf_AtBG = newBoo("trsf_AtBG", "trsf_AtBG", false);
+		trsf_BtfBG = newBoo("trsf_BtfBG", "trsf_BtfBG", false);
+		trsf_vecXY = newBoo("trsf_vecXY", "trsf_vecXY", false);
+		trsf_vecMD = newBoo("trsf_vecMD", "trsf_vecMD", false);
+	}
+	public void build_param() { 
+		addEmpty(1); addEmpty(2);
+		nDrawer m = addEmptyXL(0);
+		nWidget w1 = m.addLinkedModel("MC_Element_SButton", "All>Bang")
+			.setLinkedValue(trsf_AtBG)
+			.setSX(ref_size * 3).setPX(ref_size * 0.125);
+		nWidget w2 = m.addLinkedModel("MC_Element_SButton", "Bang<>Bool")
+			.setLinkedValue(trsf_BtfBG)
+			.setSX(ref_size * 3).setPX(ref_size * 3.25);
+		addEmpty(1); addEmpty(2);
+		m = addEmptyXL(0);
+		nWidget w3 = m.addLinkedModel("MC_Element_SButton", "Vec<>XY")
+			.setLinkedValue(trsf_vecXY)
+			.setSX(ref_size * 3).setPX(ref_size * 0.125);
+		nWidget w4 = m.addLinkedModel("MC_Element_SButton", "Vec<>MagDir")
+			.setLinkedValue(trsf_vecMD)
+			.setSX(ref_size * 3).setPX(ref_size * 3.25);
+	    w1.addExclude(w2).addExclude(w3).addExclude(w4);
+	    w2.addExclude(w1).addExclude(w3).addExclude(w4);
+	    w3.addExclude(w2).addExclude(w1).addExclude(w4);
+	    w4.addExclude(w2).addExclude(w3).addExclude(w1);
+		
+	  	nRunnable mode_run = new nRunnable() { public void run() {
+	  		if (!build_flag)
+	  			mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+	  				if (!rebuilding) rebuild(); }});
+	  		build_flag = true;
+	  	} };
+	  	mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  	trsf_AtBG.addEventChange(mode_run);
+		  	trsf_BtfBG.addEventChange(mode_run);
+		  	trsf_vecXY.addEventChange(mode_run);
+		  	trsf_vecMD.addEventChange(mode_run);
+	  	}});
+		if (valid_params()) build_normal();
+	}
+	private boolean valid_params() {
+		return (trsf_AtBG.get()   || 
+				trsf_BtfBG.get()  || 
+				trsf_vecXY.get()  || 
+				trsf_vecMD.get() );
+	}
+//	private boolean valid_pack(Macro_Packet p) {
+//		if  (!mode_filter.get() || 
+//				(p.isBang() && filt_bang.get()) ||
+//				(p.isBool() && filt_boo.get() && 
+//				(!filt_boo_st.get() || (p.asBool() == filt_boo_true.get())) ) ||
+//				((p.isInt() || p.isFloat()) && filt_num.get()) ||
+//				(p.isVec() && filt_vec.get())) {
+//			if (!fltr_count.get() && !fltr_frame.get()) {
+//				return true;
+//			} else {
+//				if (fltr_count.get()) {
+//					t_count++;
+//					if (t_count >= fltr_time_count.get()) {
+//						mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//							t_count = 0; }});
+//						return true;
+//					}
+//				} else if (fltr_frame.get()) {
+//					if (gui.app.global_frame_count >= fr_count + fltr_time_count.get()) {
+//						mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+//							fr_count = gui.app.global_frame_count; }});
+//						return true;
+//					}
+//				}
+//			}
+//		}
+//		return false;
+//	}
 	public void build_normal() {
 		if (!valid_params()) {
 			param_view.set(true);
@@ -523,21 +580,21 @@ class MTransform extends MBasic {
 			out1 = addOutput(2, "out");
 			addEmptyS(1).addModel("MC_Element_SText", dscr);
 			in1 = addInput(0, "in", new nRunnable() { public void run() {
-				if (in1.lastPack() != null && valid_pack(in1.lastPack()))
+				if (in1.lastPack() != null)
 					out1.sendBang();
 			}});
 		} else if (trsf_BtfBG.get()) {
 			out1 = addOutput(2, "out");
 			addEmptyS(1).addModel("MC_Element_SText", dscr);
 			in1 = addInput(0, "in", new nRunnable() { public void run() {
-				if (in1.lastPack() != null && valid_pack(in1.lastPack())) {
+				if (in1.lastPack() != null) {
 					if (in1.lastPack().isBang()) out1.sendBool(true);
 					if (in1.lastPack().isBool()) out1.sendBang();
 				}
 			}});
 		} else if (trsf_vecXY.get()) {
 		    in1 = addInput(0, "v/x").addEventReceive(new nRunnable() { public void run() { 
-		        if (in1.lastPack() != null && valid_pack(in1.lastPack()) && in1.lastPack().isVec() && 
+		        if (in1.lastPack() != null && in1.lastPack().isVec() && 
 		        			(in1.lastPack().asVec().x != vec.x || in1.lastPack().asVec().y != vec.y)) {
 			        	vec.set(in1.lastPack().asVec());
 			        	float m = vec.x; float d = vec.y;
@@ -552,7 +609,7 @@ class MTransform extends MBasic {
 		        }
 		    } });
 		    in2 = addInput(0, "y").addEventReceive(new nRunnable() { public void run() { 
-			    	if (in2.lastPack() != null && valid_pack(in2.lastPack()) && in2.lastPack().isFloat() && 
+			    	if (in2.lastPack() != null && in2.lastPack().isFloat() && 
 			    			in2.lastPack().asFloat() != y) {
 			    		y = in2.lastPack().asFloat();
 			    		view2.changeText(RConst.trimFlt(y)); 
@@ -611,7 +668,7 @@ class MTransform extends MBasic {
 		    } });
 		} else if (trsf_vecMD.get()) {
 			in1 = addInput(0, "v/mag").addEventReceive(new nRunnable() { public void run() { 
-				if (in1.lastPack() != null && valid_pack(in1.lastPack()) && in1.lastPack().isVec() && 
+				if (in1.lastPack() != null && in1.lastPack().isVec() && 
 						(in1.lastPack().asVec().x != vec.x || in1.lastPack().asVec().y != vec.y)) {
 					vec.set(in1.lastPack().asVec());
 					float m = vec.mag(); float d = vec.heading();
@@ -628,7 +685,7 @@ class MTransform extends MBasic {
 				}
 			} });
 			in2 = addInput(0, "dir").addEventReceive(new nRunnable() { public void run() { 
-				if (in2.lastPack() != null && valid_pack(in2.lastPack()) && in2.lastPack().isFloat() && 
+				if (in2.lastPack() != null && in2.lastPack().isFloat() && 
 						in2.lastPack().asFloat() != dir) {
 					dir = in2.lastPack().asFloat();
 					view2.changeText(RConst.trimFlt(dir)); 
@@ -685,22 +742,11 @@ class MTransform extends MBasic {
 	        			out1.send(Macro_Packet.newPacketVec(vec));
 	         	}
 	        } });
-		} else if (mode_filter.get()) {
-			out1 = addOutput(2, "out");
-			addEmptyS(1).addModel("MC_Element_SText", dscr);
-			in1 = addInput(0, "in", new nRunnable() { public void run() {
-				if (in1.lastPack() != null && valid_pack(in1.lastPack()))
-					out1.send(in1.lastPack());
-			}});
-		}
+		} 
 	}
 	public MTransform clear() {
 		super.clear(); return this; }
 }
-
-
-
-
 
 
 
@@ -796,7 +842,7 @@ public MColRGB clear() {
 
 
 
-class MRandom extends Macro_Bloc { 
+class MRandom extends MBasic { 
 	  static class MRandom_Builder extends MAbstract_Builder {
 		  MRandom_Builder() { super("rng", "Random", "", "Data"); }
 		  MRandom build(Macro_Sheet s, sValueBloc b) { MRandom m = new MRandom(s, b); return m; }
@@ -806,53 +852,61 @@ class MRandom extends Macro_Bloc {
   nLinkedWidget view1, view2;
   sStr val_view1, val_view2; 
   MRandom(Macro_Sheet _sheet, sValueBloc _bloc) { 
-    super(_sheet, "rng", "rng", _bloc); 
-    
-    in = addInput(0, "bang").setFilterBang().addEventReceive(new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isBang()) {
-        out.send(Macro_Packet.newPacketFloat(gui.app.random(min, max))); } } });
-    
-    out = addOutput(1, "out")
-      .setDefFloat();
-      
-    val_view1 = newStr("min", "min", "0");
-    val_view2 = newStr("max", "max", "1");
-    
-    String t = val_view1.get();
-    if (t.length() > 0) {
-      if (t.equals("0") || t.equals("0.0")) { min = 0; }
-      else if (Rapp.parseFlt(t) != 0) { min = Rapp.parseFlt(t); }
-    }
-    t = val_view2.get();
-    if (t.length() > 0) {
-      if (t.equals("0") || t.equals("0.0")) { max = 0; }
-      else if (Rapp.parseFlt(t) != 0) { max = Rapp.parseFlt(t); }
-    }
-    view1 = addEmptyS(0).addLinkedModel("MC_Element_SField").setLinkedValue(val_view1);
-    view1.setInfo("min");
-    view1.addEventFieldChange(new nRunnable() { public void run() { 
-      String t = view1.getText();
-      if (t.length() > 0) {
-        if (t.equals("0") || t.equals("0.0")) { min = 0; }
-        else if (Rapp.parseFlt(t) != 0) { min = Rapp.parseFlt(t); }
-      }
-      if (min > max) { float a = min; min = max; max = a; }
-      //view1.setText(RConst.trimStringFloat(min)); 
-      //view2.setText(RConst.trimStringFloat(max)); 
-    } });
-    view2 = addEmptyS(1).addLinkedModel("MC_Element_SField").setLinkedValue(val_view2);
-    view2.setInfo("max");
-    view2.addEventFieldChange(new nRunnable() { public void run() { 
-      String t = view2.getText();
-      if (t.length() > 0) {
-        if (t.equals("0") || t.equals("0.0")) { max = 0; }
-        else if (Rapp.parseFlt(t) != 0) { max = Rapp.parseFlt(t); }
-      }
-      if (min > max) { float a = min; min = max; max = a; }
-      //view1.setText(RConst.trimStringFloat(min)); 
-      //view2.setText(RConst.trimStringFloat(max)); 
-    } });
+    super(_sheet, "rng", _bloc); 
   }
+	void init() { 
+		super.init(); 
+
+	    in = addInput(0, "bang").setFilterBang().addEventReceive(new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isBang()) {
+	        out.send(Macro_Packet.newPacketFloat(gui.app.random(min, max))); } } });
+	    
+	    out = addOutput(1, "out")
+	      .setDefFloat();
+	      
+	    val_view1 = newStr("min", "min", "0");
+	    val_view2 = newStr("max", "max", "1");
+	    
+	    String t = val_view1.get();
+	    if (t.length() > 0) {
+	      if (t.equals("0") || t.equals("0.0")) { min = 0; }
+	      else if (Rapp.parseFlt(t) != 0) { min = Rapp.parseFlt(t); }
+	    }
+	    t = val_view2.get();
+	    if (t.length() > 0) {
+	      if (t.equals("0") || t.equals("0.0")) { max = 0; }
+	      else if (Rapp.parseFlt(t) != 0) { max = Rapp.parseFlt(t); }
+	    }
+	    view1 = addEmptyS(0).addLinkedModel("MC_Element_SField").setLinkedValue(val_view1);
+	    view1.setInfo("min");
+	    view1.addEventFieldChange(new nRunnable() { public void run() { 
+	      String t = view1.getText();
+	      if (t.length() > 0) {
+	        if (t.equals("0") || t.equals("0.0")) { min = 0; }
+	        else if (Rapp.parseFlt(t) != 0) { min = Rapp.parseFlt(t); }
+	      }
+	      if (min > max) { float a = min; min = max; max = a; }
+	      //view1.setText(RConst.trimStringFloat(min)); 
+	      //view2.setText(RConst.trimStringFloat(max)); 
+	    } });
+	    view2 = addEmptyS(1).addLinkedModel("MC_Element_SField").setLinkedValue(val_view2);
+	    view2.setInfo("max");
+	    view2.addEventFieldChange(new nRunnable() { public void run() { 
+	      String t = view2.getText();
+	      if (t.length() > 0) {
+	        if (t.equals("0") || t.equals("0.0")) { max = 0; }
+	        else if (Rapp.parseFlt(t) != 0) { max = Rapp.parseFlt(t); }
+	      }
+	      if (min > max) { float a = min; min = max; max = a; }
+	      //view1.setText(RConst.trimStringFloat(min)); 
+	      //view2.setText(RConst.trimStringFloat(max)); 
+	    } });
+	}
+	void init_end() { 
+		  super.init_end(); }
+	void buil_param() { }
+	void buil_normal() { }
+
   public MRandom clear() {
     super.clear(); return this; }
 }
@@ -1327,6 +1381,8 @@ class MMVar extends MBasic {
 
 
 
+
+
 class MValue extends MBasic { 
   static class MValue_Builder extends MAbstract_Builder {
       MValue_Builder(Macro_Main m) { super("value", "sValues", "access sValues", "Data"); 
@@ -1343,7 +1399,10 @@ class MValue extends MBasic {
   nRunnable in_run, val_run;
   boolean btmp; int itmp; float ftmp; String stmp = ""; 
   PVector vtmp = new PVector(); int ctmp = 0;
-
+  
+  sVec vmod;
+  Macro_Connexion tmod;
+  
   MValue(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "value", _bloc); }
 
   void init() {
@@ -1429,6 +1488,7 @@ class MValue extends MBasic {
 		.addEventClose(new nRunnable() { public void run() { panel_open.set(false); } } );
     } }); 
     val_elem = addEmptyL(0);
+
     
     mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
     	setValue(); } } );
@@ -1580,6 +1640,16 @@ class MValue extends MBasic {
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
+    vmod = newRowVec("mov_fact");
+    tmod = addInput(0, "modif", new nRunnable() { public void run() {
+		if (tmod.lastPack() != null && tmod.lastPack().isBang() 
+    			) {
+			mmain().app.logln("f");
+			((sVec)cible).add(vmod);
+			vval.set(((sVec)cible).get());
+			vtmp.set(vval.get());
+		}
+} });
   }
   void setValue(sCol v) {
     cval = v;

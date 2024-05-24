@@ -240,6 +240,7 @@ class MMButton extends MBasic {
 	  		mode.addEventChange(mode_run);
 			size.addEventChange(mode_run);
 	  		mirror_view.addEventChange(mode_run);
+	  		show_rownb.addEventChange(mode_run);
 	  	}});
 		if (setup_send.get()) 
 			mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
@@ -1650,7 +1651,7 @@ class MButton extends MBasic {
 		 	if (size.get() == 1) {
 			  	Macro_Element e = addEmptyS(0);
 			  	trig = e.addCtrlModel("MC_Element_SButton", label.get()).setRunnable(new nRunnable() { public void run() {
-				  	out_t.send(Macro_Packet.newPacketBang());
+				  	out_t.sendBang();
 			  	} });
 			 	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
 			 		.setLinkedValue(setup_send);
@@ -1663,7 +1664,7 @@ class MButton extends MBasic {
 			  	addEmptyS(1);
 			  	Macro_Element e = addEmptyS(0);
 			  	trig = e.addCtrlModel("MC_Element_Button", label.get()).setRunnable(new nRunnable() { public void run() {
-			  		out_t.send(Macro_Packet.newPacketBang());
+			  		out_t.sendBang();
 			  	} });
 			  	trig.setSY(ref_size*2).setPY(-ref_size*15/16);
 			  	trig.getDrawer().addLinkedModel("MC_Element_MiniButton", "st")

@@ -669,10 +669,29 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 	    pack_info = RConst.copy(p.def);
 	    for (String m : p.messages) pack_info = pack_info + " " + m;
 	    
-	    // ici on doit pouvoir quantifier la fraction de longueur 
-	    // a afficher par frame a l'actuelle vitesse de process
-	    // le compte des fraction de longueur deja affiché est donné par 
-	    // mmain . packpross_pile
+	    
+	    if (sheet.mmain().loading_delay == 0)
+		    hasSend = Math.max(6, PApplet.parseInt( Math.min( 
+		    		sheet.mmain().inter.framerate.median_framerate.get(), 
+		    		sheet.mmain().inter.framerate.median_framerate.get() / 
+		    		sheet.mmain().packpross_by_frame.get()) ));
+	    gui.app.plogln(descr+" send");
+	    packet_to_send.add(p);
+	    sheet.ask_packet_process(this);
+
+      for (Macro_Connexion m : direct_cos) 
+	      if (m.type == OUTPUT) m.send_from_dir(p);
+//	      else if (m.type == INPUT) m.receive(this, p);
+	  return this;
+  }
+  Macro_Connexion send_from_dir(Macro_Packet p) {
+//	  if (!sended_since_last_pross || true) { // || !is_duplic_packet(p)
+//		    sended_since_last_pross = true;
+	    msg_view.setText(p.getText());
+	    last_def = RConst.copy(p.def);
+	    lens.setInfo(infoText+" "+last_def);
+	    pack_info = RConst.copy(p.def);
+	    for (String m : p.messages) pack_info = pack_info + " " + m;
 	    
 	    
 	    if (sheet.mmain().loading_delay == 0)
@@ -683,10 +702,9 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 	    gui.app.plogln(descr+" send");
 	    packet_to_send.add(p);
 	    sheet.ask_packet_process(this);
-//	  }
+
 	  return this;
   }
-  
   ArrayList<Macro_Packet> packet_to_send = new ArrayList<Macro_Packet>();
   
   boolean process_send() {
@@ -697,9 +715,6 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
     if (!flag) process_resum += ">>>"+descr+" send ";
     for (Macro_Packet p : packet_to_send) {
       process_resum = process_resum + p.getText() + " ";
-      for (Macro_Connexion m : direct_cos) 
-	      if (m.type == OUTPUT) m.send(p);
-//	      else if (m.type == INPUT) m.receive(this, p);
       int prio = 0;
       for (Macro_Connexion m : connected_inputs) 
         if (prio < m.elem.bloc.priority.get() ) prio = m.elem.bloc.priority.get();
@@ -765,7 +780,25 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       packet_sender.add(s);
       sheet.ask_packet_process(this);
     }
+  for (Macro_Connexion m : direct_cos) 
+//    if (m.type == OUTPUT) m.send(last_packet);
+//    else 
+  	  if (m.type == INPUT) m.receive_from_dir(s, p);
+
   }
+  void receive_from_dir(Macro_Connexion s, Macro_Packet p) {
+	    if (filter == null || p.def.equals(filter) || 
+	    		(filter_bang_pass && p.def.equals("bang")) || 
+	        (filter.equals("bin") && (p.def.equals("bool") || p.def.equals("bang"))) ||
+	        (filter.equals("num") && (p.def.equals("float") || p.def.equals("int"))) ||
+	        (filter.equals("val") && (p.def.equals("float") || p.def.equals("int") || 
+	                                  p.def.equals("bool"))) ) {
+	    	  gui.app.plogln(descr+"receive");
+	      packet_received.add(p);
+	      packet_sender.add(s);
+	      sheet.ask_packet_process(this);
+	    }
+	  }
   ArrayList<Macro_Packet> packet_received = new ArrayList<Macro_Packet>();
   ArrayList<Macro_Connexion> packet_sender = new ArrayList<Macro_Connexion>();
   
@@ -797,10 +830,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
           if (last_packet.isVec()) nRunnable.runEvents(eventReceiveVecRun);
           if (last_packet.isCol()) nRunnable.runEvents(eventReceiveColRun);
           
-          for (Macro_Connexion m : direct_cos) 
-	    	      if (m.type == OUTPUT) m.send(last_packet);
-	    	      else if (m.type == INPUT) m.receive(packet_sender.get(i), last_packet);
-          
+       
           msg_view.setText(last_packet.getText());
           hasReceived = 15;
       }

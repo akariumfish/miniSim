@@ -25,6 +25,6 @@ str
 shr
 prev_savepth
 val
-start.sdata
+rainbow.sdata
 0
 0

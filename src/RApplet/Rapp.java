@@ -81,7 +81,7 @@ public class Rapp extends PApplet implements RConst {
 		  interf.addSpecializedSheet(new Face.FacePrint(canv));
 		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
 		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
-		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
+		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul, canv));
 		  interf.addSpecializedSheet(new BoxComu.BoxPrint(simul));
 		  
 		  

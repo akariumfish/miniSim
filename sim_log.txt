@@ -1,7 +1,20 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-1382:- :exit
+37558:  :full_data_save to rainbow.sdata
+37755:  :setup_load from rainbow.sdata
+39087:  :full_data_save to rainbow.sdata
+39247:  :full_data_save to rainbow.sdata
+39268:  :setup_load from rainbow.sdata
+42212:  :full_data_save to rainbow.sdata
+42259:  :setup_load from rainbow.sdata
+42458:  :full_data_save to rainbow.sdata
+45001:  :full_data_save to rainbow.sdata
+50873:  :full_data_save to rainbow.sdata
+50901:  :setup_load from rainbow.sdata
+53357:  :full_data_save to rainbow.sdata
+53410:  :setup_load from rainbow.sdata
+54024:  :exit
 null
 null
 null

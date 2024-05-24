@@ -107,8 +107,8 @@ class MBasic extends Macro_Bloc {
     else build_normal();
   }
   void init() { ; }
-  void build_param() { addEmptyS(0); addEmptyS(1); }
-  void build_normal() { addEmptyS(0); addEmptyS(1); }
+  void build_param() { }//addEmptyS(0); addEmptyS(1); }
+  void build_normal() { }//addEmptyS(0); addEmptyS(1); }
   
   void init_end() {
 	  super.init_end();
@@ -616,6 +616,7 @@ class MCursor extends MBasic {
     public sVec pval = null;
     public sVec dval = null;
     public sBoo show = null;
+    public sVec mval;
   nRunnable sheet_grab_run, pval_run, movingchild_run;
   Macro_Connexion in, out;
   Macro_Connexion out_link;
@@ -666,6 +667,11 @@ class MCursor extends MBasic {
 		} };
 		sheet.grab_pos.addEventAllChange(sheet_grab_run);
 	}
+    addEmptyS(1);
+    in = addInput(0, "move", new nRunnable() { public void run() {
+        if (in.lastPack() != null && in.lastPack().isBang()) // && pval != null && mval != null
+      	  	cursor.pval.add(mval.get());
+    } });
   }
 
   protected void group_move_custom(float x, float y) {
@@ -680,12 +686,14 @@ class MCursor extends MBasic {
 	  show = newRowBoo(false, "show"); //!!!!! is hided by default
 	  pval = newRowVec("pos");
 	  dval = newRowVec("dir");
+	  mval = newRowVec("mov");
 	  init_cursor();
   }
   void build_normal() {
 	  show = newBoo(false, "show"); //!!!!! is hided by default
 	  pval = newVec("pos");
 	  dval = newVec("dir");
+	  mval = newRowVec("mov");
 	  init_cursor();
 	    out_link = addOutput(2, "cursor_link");
 	    out_link.set_link();
@@ -1030,7 +1038,8 @@ class MSheetBloc extends MBasic {
 		    .setInfo("open sheet general menu");
 		menu_elem.addLinkedMiniSwitch("st", menu_open);
 	    addInputBang(0, "open menu", new nRunnable() { public void run() { 
-	    		menu(); } });
+	    		mmain().inter.addEventTwoFrame(new nRunnable() { public void run() {
+	    		menu(); } }); } });
 	    out_sheet = addOutput(2, "sheet link");
 	    out_sheet.set_link();
 //		menu_elem.addTrigS("get obj", new nRunnable() { public void run() {

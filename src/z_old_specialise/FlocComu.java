@@ -68,7 +68,8 @@ class Floc extends Entity {
   Floc tick() {
     age++;
     if (age > max_age) {
-      if (com().create_grower.get() && com().gcom != null && com().app.crandom(com().grow_prob.get()) > 0.5) {
+      if (com().create_grower.get() && com().gcom != null && 
+    		  com().app.crandom(com().grow_prob.get()) > 0.5) {
         Grower ng = com().gcom.newEntity();
         if (ng != null) ng.define(new PVector(pos.x, pos.y), new PVector(1, 0).rotate(mov.heading()));
       }
@@ -87,6 +88,9 @@ class Floc extends Entity {
     //point toward cursor
     if (com().point_to_cursor.get()) headTo(com().adding_cursor.pos(), com().POINT_FORCE.get() / cible_cnt);
     pos.add(mov);
+    
+    
+    
     return this;
   }
   Floc draw() {
@@ -123,9 +127,11 @@ public class FlocComu extends Community {
 
 public static class FlocPrint extends Sheet_Specialize {
   Simulation sim;
+  Canvas can;
   public FlocPrint(Simulation s) { super("Floc"); sim = s; }
+  public FlocPrint(Simulation s, Canvas c) { super("Floc"); sim = s; can = c; }
   public void default_build() { }
-  public FlocComu get_new(Macro_Sheet s, String n, sValueBloc b) { return new FlocComu(sim, n, b); }
+  public FlocComu get_new(Macro_Sheet s, String n, sValueBloc b) { return new FlocComu(sim, can, n, b); }
 }
 
 
@@ -176,41 +182,46 @@ public static class FlocPrint extends Sheet_Specialize {
   
   sObj grow_obj;
   GrowerComu gcom;
-  
-  FlocComu(Simulation _c, String n, sValueBloc b) { super(_c, n, "floc", 50, b); 
-    POURSUITE = newFlt(0.3F, "POURSUITE", "poursuite");
-    FOLLOW = newFlt(0.0036F, "FOLLOW", "follox");
-    SPACING = newFlt(95, "SPACING", "space");
-    SPEED = newFlt(2, "SPEED", "speed");
-    grow_prob = newFlt(1, "grow_prob", "grow_prob");
-    LIMIT = newInt(1600, "limit", "limit");
-    AGE = newInt(2000, "age", "age");
-    HALO_SIZE = newFlt(80, "HALO_SIZE", "Size");
-    HALO_DENS = newFlt(0.15F, "HALO_DENS", "Dens");
-    POINT_FORCE = newFlt(0.01F, "POINT_FORCE", "point");
-    
-    DRAWMODE_DEF = newBoo(true, "DRAWMODE_DEF", "draw1");
-    DRAWMODE_DEBUG = newBoo(false, "DRAWMODE_DEBUG", "draw2");
-    
-    create_grower = newBoo(true, "create_grower", "create grow");
-    point_to_mouse = newBoo(false, "point_to_mouse", "to mouse");
-    point_to_center = newBoo(false, "point_to_center", "to center");
-    point_to_cursor = newBoo(false, "point_to_cursor", "to cursor");
-    //init_canvas();
-    
-    val_col_def = menuColor(app.color(220), "val_col_def");
-    val_col_deb = menuColor(app.color(255, 0, 0), "val_col_deb");
-    val_col_halo = menuColor(app.color(255, 0, 0), "val_col_halo");
-    scale = menuFltSlide(10, 5, 100, "length");
-    
-    grow_obj = newObj("grow_obj", "grow_obj");
-    grow_obj.addEventChange(new nRunnable() { public void run() {
-      if (grow_obj.isSheet()) {
-        Macro_Sheet ms = grow_obj.asSheet();
-        if (ms.specialize.get().equals("Grower")) gcom = (GrowerComu)ms;
-      }
-    }});
-    
+  Canvas canv;
+
+  FlocComu(Simulation _c, Canvas c, String n, sValueBloc b) { super(_c, n, "floc", 50, b); 
+  	canv = c;
+    can_init();
+  }
+  void can_init() {
+	    POURSUITE = newFlt(0.3F, "POURSUITE", "poursuite");
+	    FOLLOW = newFlt(0.0036F, "FOLLOW", "follox");
+	    SPACING = newFlt(95, "SPACING", "space");
+	    SPEED = newFlt(2, "SPEED", "speed");
+	    grow_prob = newFlt(1, "grow_prob", "grow_prob");
+	    LIMIT = newInt(1600, "limit", "limit");
+	    AGE = newInt(2000, "age", "age");
+	    HALO_SIZE = newFlt(80, "HALO_SIZE", "Size");
+	    HALO_DENS = newFlt(0.15F, "HALO_DENS", "Dens");
+	    POINT_FORCE = newFlt(0.01F, "POINT_FORCE", "point");
+	    
+	    DRAWMODE_DEF = newBoo(true, "DRAWMODE_DEF", "draw1");
+	    DRAWMODE_DEBUG = newBoo(false, "DRAWMODE_DEBUG", "draw2");
+	    
+	    create_grower = newBoo(true, "create_grower", "create grow");
+	    point_to_mouse = newBoo(false, "point_to_mouse", "to mouse");
+	    point_to_center = newBoo(false, "point_to_center", "to center");
+	    point_to_cursor = newBoo(false, "point_to_cursor", "to cursor");
+	    //init_canvas();
+	    
+	    val_col_def = menuColor(app.color(220), "val_col_def");
+	    val_col_deb = menuColor(app.color(255, 0, 0), "val_col_deb");
+	    val_col_halo = menuColor(app.color(255, 0, 0), "val_col_halo");
+	    scale = menuFltSlide(10, 5, 100, "length");
+	    
+	    grow_obj = newObj("grow_obj", "grow_obj");
+	    grow_obj.addEventChange(new nRunnable() { public void run() {
+	      if (grow_obj.isSheet()) {
+	        Macro_Sheet ms = grow_obj.asSheet();
+	        if (ms.specialize.get().equals("Grower")) gcom = (GrowerComu)ms;
+	      }
+	    }});
+	  
   }
   
   void custom_pre_tick() {
@@ -220,7 +231,9 @@ public static class FlocPrint extends Sheet_Specialize {
             ((Floc)e1).pair(((Floc)e2));
           
   }
-  void custom_post_tick() {}
+  void custom_post_tick() {
+	  canv.floc_tick(this);
+  }
   void custom_frame() {
     //can.drawHalo(this);
   }
