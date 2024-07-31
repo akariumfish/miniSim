@@ -1012,7 +1012,7 @@ nExplorer sheet_explorer;
   public sValueBloc saved_template;
 public sValueBloc saved_preset;
 sValueBloc database_setup_bloc;
-  nGUI cam_gui;
+  public nGUI cam_gui;
 public nGUI screen_gui;
   nInfo info;
   nSelectZone szone;
@@ -1032,6 +1032,7 @@ Macro_Sheet search_sheet = this;
   ArrayList<MTool> tool_macros = new ArrayList<MTool>();
   ArrayList<nCursor> cursors_list = new ArrayList<nCursor>();
   ArrayList<MBaseTick> baseticked_list = new ArrayList<MBaseTick>();
+  ArrayList<MGrow> grow_list = new ArrayList<MGrow>();
   MSheetBloc main_sheetbloc;
   MPanel last_added_panel;
   MTool last_added_tool;
@@ -1178,6 +1179,8 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MNumCalc.Builder());
       add_bloc_builders(new MTransform.Builder());
       add_bloc_builders(new MFilter.Builder());
+      add_bloc_builders(new MVecLerp.Builder());
+      add_bloc_builders(new MGrow.Builder(this));
 
       add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());
@@ -1483,6 +1486,7 @@ public Macro_Main(sInterface _int) {
 	  }
 	  tick_counter.set(tick_counter.get()+1);
 	  for (MBaseTick b : baseticked_list) b.receive_tick();
+	  for (MGrow b : grow_list) b.receive_tick();
 	  met_tck_cnt++; 
 	  while (run_tck_cnt < met_tck_cnt) srun_tick.run();
 	}

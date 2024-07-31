@@ -13,7 +13,132 @@ public class M_Works {}
 
 
 
-
+class MGrow extends MBaseMenu { 
+	static class Builder extends MAbstract_Builder {
+		Builder(Macro_Main m) { super("grow", "Grower", "", "Work"); 
+		first_start_show(m); }
+		MGrow build(Macro_Sheet s, sValueBloc b) { MGrow m = new MGrow(s, b); return m; }
+	}
+	sBoo global_tick;
+	Drawable drawable;
+	sBoo show;
+	public nCursor cursor;
+    public sVec pval;
+    public sVec dval; 
+    nRunnable sheet_grab_run, pval_run, movingchild_run;
+    Macro_Connexion in, out;
+	MGrow(Macro_Sheet _sheet, sValueBloc _bloc) { 
+		super(_sheet, "grow", _bloc); 
+	}
+	public void init() {
+		super.init();
+		show = newRowBoo(true, "show");
+		mmain().grow_list.add(this);
+		drawable = new Drawable() { 
+			public void drawing() { draw_to_cam(); } } ;
+		mmain().inter.addToCamDrawerPile(drawable);
+	    pval = newRowVec("pos");
+	    dval = newRowVec("dir");
+	    init_cursor();
+	}
+	void init_cursor() {
+	  cursor = new nCursor(mmain(), value_bloc, true);
+	  mmain().cursors_list.add(cursor);
+	  sheet.sheet_cursors_list.add(cursor);
+	  sheet.cursor_count++;
+	  
+	  cursor.addEventClear(new nRunnable(cursor) { public void run() { 
+		  cursor = null;
+	      sheet.sheet_cursors_list.remove(((nCursor)builder));
+	    mmain().cursors_list.remove(((nCursor)builder)); 
+	    sheet.cursor_count--;
+	  }});
+    }
+	void build_param() { 
+		super.build_param(); 
+		build_normal();
+	}
+	void build_normal() { 
+	  super.build_normal(); 
+	  menuBoo(show);
+	  sRun add = newRun("add branch", new nRunnable() { public void run() {
+		  newBranch();
+	  }});
+	  menuRun(add);
+	}
+	void init_end() { 
+		super.init_end(); 
+	}
+	void rebuild() { 
+		super.rebuild(); 
+	}
+	void receive_tick() { tick(); }
+	public void draw_to_cam() {
+		if (show.get()) {
+			for (Branch b : branch_list) b.draw();
+		}
+	}
+	void tick() { 
+		for (Branch b : branch_list) b.tick();
+	}
+	ArrayList<Branch> branch_list = new ArrayList<Branch>();
+	void newBranch() {
+		Branch b = new Branch(pval.get());
+		branch_list.add(b);
+	}
+	public class Branch {
+		ArrayList<Section> section_list = new ArrayList<Section>();
+		PVector branch_end;
+		int length;
+		Branch(PVector b) {
+			branch_end = new PVector();
+			branch_end.set(b);
+			length = (int) gui.app.random(10, 20);
+		}
+		void add_section() {
+			PVector mod = new PVector(0, 30);
+			float r = 3.14F / 4.0F;
+			mod = mod.rotate(gui.app.random(-r, r));
+			mod.add(branch_end);
+			Section s = new Section(branch_end, mod);
+			section_list.add(s);
+			branch_end.set(mod);
+			length--;
+		}
+		int count = 0;
+		void tick() { 
+			count++;
+			if (count > 30) {
+				count = 0;
+				if (length > 0) add_section();
+			}
+		}
+		void draw() {
+			for (Section b : section_list) b.draw();
+		}
+	}
+	public class Section {
+		PVector str, end;
+		Section(PVector _s, PVector _e) {
+			str = new PVector();
+			end = new PVector();
+			str.set(_s); end.set(_e);
+		}
+		void draw() {
+			gui.app.stroke(255);
+			gui.app.strokeWeight(2);
+			gui.app.line(str.x, str.y, end.x, end.y);
+		}
+	}
+	public MGrow clear() {
+		super.clear(); 
+		drawable.clear();
+		return this; }
+	public MGrow toLayerTop() {
+		super.toLayerTop(); 
+		return this;
+	}
+}
 
 
 class MCam extends MBaseMenu { 

@@ -209,9 +209,9 @@ class MGate extends MBasic {
   public void build_normal() {
     in_m = addInput(0, "in")
     .addEventReceive(new nRunnable() { public void run() { 
-      if (in_m.lastPack() != null)
-    	  	if (state.get()) out.send(in_m.lastPack());
-    	  	else out_inv.send(in_m.lastPack());
+//      if (in_m.lastPack() != null)
+//    	  	if (state.get()) out.send(in_m.lastPack());
+//    	  	else out_inv.send(in_m.lastPack());
     } });
     in_b = addInput(0, "gate").addEventReceive(new nRunnable() { public void run() { 
       if (in_b.lastPack() != null && in_b.lastPack().isBool()) 
@@ -229,8 +229,15 @@ class MGate extends MBasic {
     		.setLinkedValue(state);
     swtch.setPX(ref_size*0.5);
     state.addEventChange(new nRunnable() { public void run() { 
-		if (state.get()) { in_m.direct_deconnect(out); in_m.direct_deconnect(out_inv); in_m.direct_connect(out); } 
-		else { in_m.direct_deconnect(out); in_m.direct_deconnect(out_inv); in_m.direct_connect(out_inv); }
+		if (state.get()) { 
+//			in_m.direct_deconnect(out); 
+			in_m.direct_deconnect(out_inv); 
+			in_m.direct_connect(out); 
+		} else { 
+			in_m.direct_deconnect(out); 
+//			in_m.direct_deconnect(out_inv); 
+			in_m.direct_connect(out_inv); 
+		}
     }});
   }
   public Macro_Connexion get_active_out() { 

@@ -681,7 +681,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 
       for (Macro_Connexion m : direct_cos) 
 	      if (m.type == OUTPUT) m.send_from_dir(p);
-//	      else if (m.type == INPUT) m.receive(this, p);
+	      else if (m.type == INPUT) m.receive(this, p);
 	  return this;
   }
   Macro_Connexion send_from_dir(Macro_Packet p) {
@@ -781,8 +781,8 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       sheet.ask_packet_process(this);
     }
   for (Macro_Connexion m : direct_cos) 
-//    if (m.type == OUTPUT) m.send(last_packet);
-//    else 
+    if (m.type == OUTPUT) m.send(p); //m.send(last_packet);
+    else 
   	  if (m.type == INPUT) m.receive_from_dir(s, p);
 
   }

@@ -36,8 +36,8 @@ public class Consol {
 		
 	}
 
-	static int depth = 2;
-	static int spread = 3;
+	static int depth = 8;
+	static int spread = 4;
 	
 	static void build_stage(String dir, int d) {
 		if (d < depth) {

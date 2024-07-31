@@ -44,6 +44,8 @@ public static class FacePrint extends Sheet_Specialize {
         .addDrawerButton(val_mirage, 10, 1)
         .addSeparator(0.125)
         .addDrawerButton(val_transf, 10, 1)
+        .addSeparator(0.125)
+        .addDrawerButton(val_show, 10, 1)
         .addSeparator(0.125);
       
       nDrawer dr = sheet_front.addTab("Shape").getShelf()
@@ -102,7 +104,7 @@ public static class FacePrint extends Sheet_Specialize {
   sFlt val_scale, vpax, vpay, vpbx, vpby, vpcx, vpcy, val_linew, val_dens, val_disp;
   sCol val_fill, val_stroke;
   public sInt val_draw_layer;
-  sBoo val_halo_type, val_halo_type2, val_mirage, val_transf;
+  sBoo val_halo_type, val_halo_type2, val_mirage, val_transf, val_show;
   
   
 //  ArrayList<nCursor> duplication_cursors = new ArrayList<nCursor>();
@@ -124,6 +126,7 @@ public static class FacePrint extends Sheet_Specialize {
     val_halo_type2 = newBoo(false, "val_halo_type2", "val_halo_type2");
     val_mirage = newBoo(false, "val_mirage", "val_mirage");
     val_transf = newBoo(false, "val_transf", "val_transf");
+    val_show = newBoo(false, "val_show", "val_show");
     vpax = newFlt(shape.face.p1.x, "vpax", "vpax");
     vpay = newFlt(shape.face.p1.y, "vpay", "vpay");
     vpbx = newFlt(shape.face.p2.x, "vpbx", "vpbx");
@@ -189,22 +192,24 @@ public static class FacePrint extends Sheet_Specialize {
 	  }
   }
   
-  public void draw(Rapp a) { 	
-	  shape.draw(a, false); 
-	  if (val_mirage.get()) {
-		  PVector tp = new PVector();
-		  PVector td = new PVector();
-		  tp.set(shape.pos); td.set(shape.dir);
-		  for (nCursor c : sheet_cursors_list) if (c != ref_cursor) {
-			  shape.pos.set(c.pos()); 
-//			  if (c.dir().mag() > 0.01) { 
-				  shape.dir.set(1, 0);
-				  shape.dir.rotate(c.dir().heading());
-				  shape.dir.setMag(td.mag());
-//			  } //else shape.dir.set(td);
-			  shape.draw(a, false); 
+  public void draw(Rapp a) { 
+	  if (val_show.get()) {
+		  shape.draw(a, false); 
+		  if (val_mirage.get()) {
+			  PVector tp = new PVector();
+			  PVector td = new PVector();
+			  tp.set(shape.pos); td.set(shape.dir);
+			  for (nCursor c : sheet_cursors_list) if (c != ref_cursor) {
+				  shape.pos.set(c.pos()); 
+	//			  if (c.dir().mag() > 0.01) { 
+					  shape.dir.set(1, 0);
+					  shape.dir.rotate(c.dir().heading());
+					  shape.dir.setMag(td.mag());
+	//			  } //else shape.dir.set(td);
+				  shape.draw(a, false); 
+			  }
+			  shape.pos.set(tp); shape.dir.set(td);
 		  }
-		  shape.pos.set(tp); shape.dir.set(td);
 	  }
   }
   

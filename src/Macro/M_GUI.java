@@ -1139,7 +1139,7 @@ class MPanGrph extends MPanTool {
         gui.app.strokeWeight(ref_size / 40);
         gui.app.stroke(255);
         for (int i = 1; i < larg; i++) if (i != gc) {
-          //stroke(255);
+//        	gui.app.stroke(255);
         	gui.app.line( graph.getX() + (i-1), 
                 graph.getY() + graph.getSY() - ref_size / 4 - (graph_data[(i-1)] * (graph.getSY()-ref_size*3/4) / max), 
                 graph.getX() + i, 

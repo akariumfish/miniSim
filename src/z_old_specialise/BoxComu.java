@@ -301,6 +301,7 @@ class Box extends Entity {
         f.destroy();
         //lose hp ^^
         generation--;
+        if (generation < 0) this.destroy();
       }
     }
     

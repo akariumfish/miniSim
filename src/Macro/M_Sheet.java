@@ -389,6 +389,14 @@ class MBaseMenu extends MBasic {
 		} });
 		return f;
   	}
+	public void menuRun(sRun r1) {
+	    addEventsBuildMenu(new nRunnable() { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addCtrlModel("Auto_Button-S3-P1", r1.ref).setLinkedValue(r1).getShelf()
+	        .addSeparator(0.125);
+	    } });
+	}
 	public void menuRun(sRun r1, sRun r2) {
 	    addEventsBuildMenu(new nRunnable() { public void run() { 
 	      if (custom_tab != null) custom_tab.getShelf()

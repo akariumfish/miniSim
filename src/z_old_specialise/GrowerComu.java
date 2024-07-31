@@ -1,6 +1,7 @@
 package z_old_specialise;
 
 import Macro.*;
+import RApplet.RConst;
 import RApplet.Rapp;
 import UI.*;
 import processing.core.PApplet;
@@ -39,14 +40,18 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  sFlt leaf_size_fact; 
 	  sFlt floc_prob;
 	  
-	  sBoo create_floc, use_organ, AGE_ON;
+	  sFlt cible_force, cible_zone, backfact;
+	  
+	  sBoo create_floc, AGE_ON, zone_view; //use_organ, 
 	  sInt activeGrower;
 	  sRun srun_killg;
 
-	  sCol val_col_live, val_col_leaf;
+	  sCol val_col_live, val_col_leaf, col_back;
 	  
 	  FlocComu fcom;
 	  sObj floc_obj;
+	  
+	  nCursor obj_cur;
 
 	  void comPanelBuild(nFrontPanel sim_front) {
 	    nFrontTab tab = sim_front.addTab("Control");
@@ -72,8 +77,6 @@ public static class GrowerPrint extends Sheet_Specialize {
 	      .addSeparator(0.125)
 	      .addDrawerActFactValue("die", dieP.ON, dieP.DIFFICULTY, 2, 10, 1)
 	      .addSeparator(0.125)
-	      ;
-	    sim_front.getTab(2).getShelf()
 	      .addDrawerFactValue(DEVIATION, 2, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(L_MIN, 2, 10, 1)
@@ -81,6 +84,14 @@ public static class GrowerPrint extends Sheet_Specialize {
 	      .addDrawerFactValue(L_MAX, 2, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(L_DIFFICULTY, 2, 10, 1)
+	      .addSeparator(0.125)
+	      ;
+	    sim_front.getTab(1).getShelf()
+	      .addDrawerFactValue(cible_force, 2, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFactValue(cible_zone, 2, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerButton(zone_view, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 	    sim_front.toLayerTop();
@@ -100,7 +111,12 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    TEEN_AGE = newFlt(50, "young", "young");
 	    OLD_AGE = newFlt(100, "age", "age");
 	    floc_prob = newFlt(1, "floc_prob", "floc_prob");
+	    cible_force = newFlt(0.01F, "cible_force", "cible");
+	    backfact = newFlt(1.2F, "backfact", "backfact");
 
+	    cible_zone = newFlt(1000F, "cible_zone", "zone");
+	    zone_view = newBoo(false, "zone_view", "zone_view");
+	    
 	    growP = new RandomTryParam(this, 0.2F, true, "grow");
 	    sproutP = new RandomTryParam(this, 3000, true, "sprout");
 	    stopP = new RandomTryParam(this, 2, true, "stop");
@@ -108,16 +124,18 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    dieP = new RandomTryParam(this, 40, true, "die");
 
 	    create_floc = newBoo(true, "create_floc", "create floc");
-	    use_organ = newBoo(true, "use_organ", "use_organ");
+//	    use_organ = newBoo(true, "use_organ", "use_organ");
 	    AGE_ON = newBoo(true, "AGE_ON", "AGE_ON");
 	    activeGrower = newInt(0, "active_grower", "growers nb");
 	    
 	    val_col_live = menuColor(gui.app.color(220), "val_col_live");
 	    val_col_leaf = menuColor(gui.app.color(0, 220, 0), "val_col_leaf");
+	    col_back = menuColor(gui.app.color(0, 220, 0), "col_back");
 	    
-	    MAX_LINE_WIDTH = menuFltSlide(1.5F, 0.1F, 3, "max_line_width");
-	    MIN_LINE_WIDTH = menuFltSlide(0.2F, 0.1F, 3, "min_line_width");
-	    leaf_size_fact = menuFltSlide(1, 1, 4, "leaf_size_fact");
+	    MAX_LINE_WIDTH = menuFltSlide(1.5F, 0.01F, 8, "max_line_width");
+	    MIN_LINE_WIDTH = menuFltSlide(0.2F, 0.01F, 8, "min_line_width");
+	    leaf_size_fact = menuFltSlide(1, 1, 8, "leaf_size_fact");
+	    backfact = menuFltSlide(1, 1, 8, "backfact");
 	    
 	    srun_killg = newRun("kill_grower", "kill", new nRunnable() { public void run() { 
 	        for (Entity e : list) {
@@ -145,10 +163,21 @@ public static class GrowerPrint extends Sheet_Specialize {
 	      }
 	    }});
 	    
+
+	    obj_cur = menuCursor(""+n+"_objectif", false);
+	    
 	  }
 	  void custom_cam_draw_pre_entity() {
+//		  for (Entity g : list) if (g.active) ((Grower)g).backdraw();
 	  }
 	  void custom_cam_draw_post_entity() {
+		  if (zone_view.get()) {
+			  gui.app.stroke(220);
+			  gui.app.strokeWeight(1);
+			  gui.app.noFill();
+			  gui.app.ellipse(obj_cur.x() - cible_zone.get(), obj_cur.y() - cible_zone.get(), 
+					  cible_zone.get()*2, cible_zone.get()*2);
+		  }
 	  }
 	  void custom_pre_tick() {
 	    activeGrower.set(grower_Nb());
@@ -162,7 +191,10 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  boolean first_reset = true;
 	  Grower addEntity() {
 	    Grower ng = newEntity();
-	    if (ng != null) ng.define(adding_cursor.pos(), adding_cursor.dir());
+	    if (ng != null) {
+	    		if (adding_cursor.hasDir()) ng.define(adding_cursor.pos(), adding_cursor.dir());
+	    		else ng.define(adding_cursor.pos(), new PVector(0,0));
+	    }
 //	    int cost = 5;
 	    //if (ng != null && sim.organ != null) {
 	      //if (sim.organ.active_entity.get() > cost - 1 && 
@@ -256,12 +288,36 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    start = 0.0F;
 	    return this;
 	  }
+
+	  PVector headTo(PVector p, PVector mov, PVector c, float s) {
+	    PVector l = new PVector(c.x, c.y);
+	    l.add(-p.x, -p.y);
+	    float r1 = RConst.mapToCircularValues(mov.heading(), l.heading(), s, 
+	    		-PConstants.PI, PConstants.PI);
+
+	    PVector o = new PVector(mov.mag(), 0);
+	    o.rotate(r1);
+	    return o;
+	  }
 	  Grower define(PVector _p, PVector _d) {
 	    pos = _p;
-	    grows = new PVector(com().L_MIN.get() + com().app.crandom(com().L_DIFFICULTY.get())*(com().L_MAX.get() - com().L_MIN.get()), 0);
-	    grows.rotate(_d.heading());
+	    grows = new PVector(com().L_MIN.get() + 
+	    		com().app.crandom(com().L_DIFFICULTY.get())*(com().L_MAX.get() - com().L_MIN.get()), 0);
+	    
+		if (_d.mag() >= 1) {
+	    		grows.rotate(_d.heading());
+	    }
+	    else {	
+	    		grows.rotate(com().app.random(-3.14F, 3.14F));
+	    }
 	    grows.rotate(com().app.random(PConstants.PI / com().DEVIATION.get()) - 
 	    			 ((PConstants.PI / com().DEVIATION.get()) / 2));
+
+	    PVector l = new PVector(com().obj_cur.pos().x, com().obj_cur.pos().y);
+	    l.add(-pos.x, -pos.y);
+	    if (l.mag()>com().cible_zone.get())
+	    		grows.set(headTo(pos, grows, com().obj_cur.pos(), com().cible_force.get()));
+	    
 	    dir = new PVector();
 	    dir = grows;
 	    grows = PVector.add(pos, grows);
@@ -342,57 +398,115 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    return this;
 	  }
 	  Grower draw() {
-	    // aging color
-	    int ca = 255;
-	    if (age > com().OLD_AGE.get() / 2) ca = PApplet.constrain(255 + (int)(com().OLD_AGE.get()/2) - (int)(age/1.2), 90, 255);
-	    //if (!end && sprouts == 0) { stroke(255, 0, 0); strokeWeight(param.MAX_LINE_WIDTH+1 / cam_scale); } //BIG red head
-	    if (!end && sprouts == 0) { 
-	    	com().app.stroke(com().val_col_live.get()); 
-	    	com().app.strokeWeight((com().MAX_LINE_WIDTH.get()+1) / com.sim.inter.cam.cam_scale.get());
-	    } else if (end) { 
-	      int res = com().app.color(com().val_col_leaf.getred() * ((float)(ca) / 255.0F), 
-	                        com().val_col_leaf.getgreen() * ((float)(ca) / 255.0F), 
-	                        com().val_col_leaf.getblue() * ((float)(ca) / 255.0F) );
-	      com().app.stroke(res); 
-	      com().app.strokeWeight((com().MAX_LINE_WIDTH.get()+1) / com.sim.inter.cam.cam_scale.get());
-	    } else { 
-	      int res = com().app.color(com().val_col_live.getred() * ((float)(ca) / 255.0F), 
-	                        com().val_col_live.getgreen() * ((float)(ca) / 255.0F), 
-	                        com().val_col_live.getblue() * ((float)(ca) / 255.0F) );
-	      com().app.stroke(res); 
-	      com().app.strokeWeight( ( (float)com().MIN_LINE_WIDTH.get() + (float)com().MAX_LINE_WIDTH.get() * (float)ca / 255.0F ) / com.sim.inter.cam.cam_scale.get() );
-	    }              
+		  //backdraw();
+		    // aging color
+		    int ca = 255;
+		    if (age > com().OLD_AGE.get() / 2) ca = PApplet.constrain(255 + (int)(com().OLD_AGE.get()/2) - (int)(age/1.2), 90, 255);
+		    //if (!end && sprouts == 0) { stroke(255, 0, 0); strokeWeight(param.MAX_LINE_WIDTH+1 / cam_scale); } //BIG red head
+		    if (!end && sprouts == 0) { 
+		    	com().app.stroke(com().val_col_live.get()); 
+		    	com().app.strokeWeight((com().MAX_LINE_WIDTH.get()+1));// / com.sim.inter.cam.cam_scale.get());
+		    } else if (end) { 
+		      int res = com().app.color(com().val_col_leaf.getred() * ((float)(ca) / 255.0F), 
+		                        com().val_col_leaf.getgreen() * ((float)(ca) / 255.0F), 
+		                        com().val_col_leaf.getblue() * ((float)(ca) / 255.0F) );
+		      com().app.stroke(res); 
+		      com().app.strokeWeight((com().MAX_LINE_WIDTH.get()+1));// / com.sim.inter.cam.cam_scale.get());
+		    } else { 
+		      int res = com().app.color(com().val_col_live.getred() * ((float)(ca) / 255.0F), 
+		                        com().val_col_live.getgreen() * ((float)(ca) / 255.0F), 
+		                        com().val_col_live.getblue() * ((float)(ca) / 255.0F) );
+		      com().app.stroke(res); 
+		      com().app.strokeWeight( ( (float)com().MIN_LINE_WIDTH.get() + (float)com().MAX_LINE_WIDTH.get() * (float)ca / 255.0F ));// / com.sim.inter.cam.cam_scale.get() );
+		    }              
 
-	    PVector e = new PVector(dir.x, dir.y);
-	    if (start < 1) e = e.setMag(e.mag() * start);
-	    //e = e.add(pos);
-	    //line(pos.x,pos.y,e.x,e.y);
-	    com().app.pushMatrix();
-	    com().app.translate(pos.x, pos.y);
-	    if (end) {
-	    	com().app.scale(com().leaf_size_fact.get());
-	    	com().app.strokeWeight( (com().MAX_LINE_WIDTH.get()+1) / 
-	                    (com.sim.inter.cam.cam_scale.get() * com().leaf_size_fact.get()) );
-	      PVector e2 = new PVector(e.x, e.y);
-	      e.div(2);
-	      e.rotate(-PConstants.PI/16);
-	      com().app.line(0, 0, e.x, e.y);
-	      com().app.line(e2.x, e2.y, e.x, e.y);
-	      e.rotate(PConstants.PI/8);
-	      com().app.line(0, 0, e.x, e.y);
-	      com().app.line(e2.x, e2.y, e.x, e.y);
-	    } else com().app.line(0, 0, e.x, e.y);
-	    com().app.popMatrix();
+		    PVector e = new PVector(dir.x, dir.y);
+		    if (start < 1) e = e.setMag(e.mag() * start);
+		    //e = e.add(pos);
+		    //line(pos.x,pos.y,e.x,e.y);
+		    com().app.pushMatrix();
+		    com().app.translate(pos.x, pos.y);
+		    if (end) {
+		    	com().app.scale(com().leaf_size_fact.get());
+		    	com().app.strokeWeight( (com().MAX_LINE_WIDTH.get()+1) );//* com().leaf_size_fact.get() );// / 
+		                    //(com.sim.inter.cam.cam_scale.get());
+		      PVector e2 = new PVector(e.x, e.y);
+		      e.div(2);
+		      e.rotate(-PConstants.PI/16);
+		      com().app.line(0, 0, e.x, e.y);
+		      com().app.line(e2.x, e2.y, e.x, e.y);
+		      e.rotate(PConstants.PI/8);
+		      com().app.line(0, 0, e.x, e.y);
+		      com().app.line(e2.x, e2.y, e.x, e.y);
+		    } else com().app.line(0, 0, e.x, e.y);
+		    com().app.popMatrix();
 
-	    //line(pos.x,pos.y,grows.x,grows.y);
+		    //line(pos.x,pos.y,grows.x,grows.y);
 
-	    //DEBUG
-	    //fill(255); ellipseMode(CENTER);
-	    //ellipse(pos.x, pos.y, 2, 2);
-	    //strokeWeight(MAX_LINE_WIDTH+1 / cam_scale);
-	    //point(grows.x,grows.y);
-	    return this;
-	  }
+		    //DEBUG
+		    //fill(255); ellipseMode(CENTER);
+		    //ellipse(pos.x, pos.y, 2, 2);
+		    //strokeWeight(MAX_LINE_WIDTH+1 / cam_scale);
+		    //point(grows.x,grows.y);
+		    return this;
+		  }
+	  Grower backdraw() {
+//		     aging color
+		    int ca = 255;
+		    if (age > com().OLD_AGE.get() / 2) ca = PApplet.constrain(255 + (int)(com().OLD_AGE.get()/2) - (int)(age/1.2), 90, 255);
+		    //if (!end && sprouts == 0) { stroke(255, 0, 0); strokeWeight(param.MAX_LINE_WIDTH+1 / cam_scale); } //BIG red head
+//		    if (!end && sprouts == 0) { 
+//		    	com().app.stroke(com().val_col_live.get()); 
+//		    	com().app.strokeWeight((com().MAX_LINE_WIDTH.get()+1) / com.sim.inter.cam.cam_scale.get());
+//		    } else if (end) { 
+//		      int res = com().app.color(com().val_col_leaf.getred() * ((float)(ca) / 255.0F), 
+//		                        com().val_col_leaf.getgreen() * ((float)(ca) / 255.0F), 
+//		                        com().val_col_leaf.getblue() * ((float)(ca) / 255.0F) );
+//		      com().app.stroke(res); 
+//		      com().app.strokeWeight((com().MAX_LINE_WIDTH.get()+1) / com.sim.inter.cam.cam_scale.get());
+//		    } else { 
+//		      int res = com().app.color(com().val_col_live.getred() * ((float)(ca) / 255.0F), 
+//		                        com().val_col_live.getgreen() * ((float)(ca) / 255.0F), 
+//		                        com().val_col_live.getblue() * ((float)(ca) / 255.0F) );
+//		      com().app.stroke(res); 
+//		      com().app.strokeWeight( ( (float)com().MIN_LINE_WIDTH.get() + (float)com().MAX_LINE_WIDTH.get() * (float)ca / 255.0F ) / com.sim.inter.cam.cam_scale.get() );
+//		    }              
+		    com().app.stroke(com().col_back.get()); 
+		    com().app.strokeWeight( ( ( (float)com().MIN_LINE_WIDTH.get() + 
+		    		(float)com().MAX_LINE_WIDTH.get() * (float)ca / 255.0F )// / com.sim.inter.cam.cam_scale.get() 
+		    		) * com().backfact.get());
+		    
+		    PVector e = new PVector(dir.x, dir.y);
+		    if (start < 1) e = e.setMag(e.mag() * start);
+		    //e = e.add(pos);
+		    //line(pos.x,pos.y,e.x,e.y);
+		    com().app.pushMatrix();
+		    com().app.translate(pos.x, pos.y);
+//		    if (end) {
+//		    	com().app.scale(com().leaf_size_fact.get());
+//		    	com().app.strokeWeight( (com().MAX_LINE_WIDTH.get()+1) / 
+//		                    (com.sim.inter.cam.cam_scale.get() * com().leaf_size_fact.get()) );
+//		      PVector e2 = new PVector(e.x, e.y);
+//		      e.div(2);
+//		      e.rotate(-PConstants.PI/16);
+//		      com().app.line(0, 0, e.x, e.y);
+//		      com().app.line(e2.x, e2.y, e.x, e.y);
+//		      e.rotate(PConstants.PI/8);
+//		      com().app.line(0, 0, e.x, e.y);
+//		      com().app.line(e2.x, e2.y, e.x, e.y);
+//		    } else 
+		    com().app.line(0, 0, e.x, e.y);
+		    com().app.popMatrix();
+
+		    //line(pos.x,pos.y,grows.x,grows.y);
+
+		    //DEBUG
+		    //fill(255); ellipseMode(CENTER);
+		    //ellipse(pos.x, pos.y, 2, 2);
+		    //strokeWeight(MAX_LINE_WIDTH+1 / cam_scale);
+		    //point(grows.x,grows.y);
+		    return this;
+		  }
 	  Grower clear() { 
 	    return this;
 	  }
