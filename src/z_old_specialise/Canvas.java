@@ -101,7 +101,7 @@ public class Canvas extends Macro_Sheet {
 	  
 	  sVec val_pos;
 	  sInt val_w, val_h, can_div;
-	  sFlt val_scale, color_keep_thresh, val_decay;
+	  sFlt val_scale, color_keep_thresh, val_decay, slow_decay;
 	  sBoo val_show, val_show_bound, val_show_grab;
 	  sStr selected_com;
 	  sCol val_col_back;
@@ -128,6 +128,7 @@ public class Canvas extends Macro_Sheet {
 	    val_scale = menuFltSlide(def_pix_size, 10, 500, "val_scale");
 	    color_keep_thresh = menuFltSlide(200, 10, 260, "clrkeep_thresh");
 	    val_decay = menuFltSlide(1, 0.99F, 1.01F, "decay");
+	    slow_decay = menuFltSlide(1.0F, 0.9F, 1.1F, "slow_decay");
 	    val_show = newBoo(false, "val_show", "show_canvas");
 	    val_show_bound = newBoo(false, "val_show_bound", "show_bound");
 	    val_show_grab = newBoo(false, "val_show_grab", "show_grab");
@@ -219,17 +220,29 @@ public class Canvas extends Macro_Sheet {
 	  float sat(int c) {
 	    return (gui.app.red(c) + gui.app.green(c) + gui.app.blue(c)) / 3; 
 	  }
-	  
+
 	  int decay(int c) {
 	    return gui.app.color(gui.app.red(c)*val_decay.get(), 
 	    		             gui.app.green(c)*val_decay.get(), 
 	    		             gui.app.blue(c)*val_decay.get()); 
 	  }
-	  
+	  int slowdecay(int c) {
+	    return gui.app.color(gui.app.red(c)*slow_decay.get(), 
+	    		             gui.app.green(c)*slow_decay.get(), 
+	    		             gui.app.blue(c)*slow_decay.get()); 
+	  }
+	  int dc_cnt = 0;
 	  private void clear_pim(PImage canvas) {
 	    for (int i = 0 ; i < canvas.pixels.length ; i++) {
 	      if (sat(canvas.pixels[i]) < color_keep_thresh.get()) canvas.pixels[i] = val_col_back.get(); 
-	      else canvas.pixels[i] = decay(canvas.pixels[i]);
+	      else {
+	    	  	canvas.pixels[i] = decay(canvas.pixels[i]);
+	    	  	dc_cnt++;
+	    	  	if (dc_cnt > 100) {
+	    	  		dc_cnt = 0;
+	    	  		canvas.pixels[i] = slowdecay(canvas.pixels[i]);
+	    	  	}
+	      }
 	    }
 	  }
 	  private void med_pim(PImage canvas1, PImage canvas2) {

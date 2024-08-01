@@ -1,5 +1,7 @@
 package z_old_specialise;
 
+import java.util.ArrayList;
+
 import Macro.*;
 import RApplet.RConst;
 import UI.*;
@@ -19,7 +21,16 @@ class Floc extends Entity {
   int age = 0;
   int max_age = 2000;
   
-  Floc(FlocComu c) { super(c); }
+  int col = 0;
+  
+  ArrayList<PVector> tail_list;
+  int tail_space = 0;
+  int osc_cnt = 0;
+  
+  Floc(FlocComu c) { 
+	super(c);
+  	tail_list = new ArrayList<PVector>();
+  }
   
   void draw_halo(Canvas canvas) {
     canvas.draw_halo(pos, halo_size, halo_density, com().val_col_halo.get());
@@ -62,6 +73,20 @@ class Floc extends Entity {
     speed = com().app.random(0.3F, 1.7F) * com().SPEED.get();
     mov.x = speed; mov.y = 0;
     mov.rotate(com().app.random(PConstants.PI * 2.0F));
+    tail_list.clear();
+    
+    int r = (int)com().app.random(com().app.red(com().val_col_def1.get()) -
+    		com().app.red(com().val_col_def2.get()));
+    int g = (int)com().app.random(com().app.green(com().val_col_def1.get()) -
+    		com().app.green(com().val_col_def2.get()));
+    int b = (int)com().app.random(com().app.blue(com().val_col_def1.get()) -
+    		com().app.blue(com().val_col_def2.get()));
+    r += com().app.red(com().val_col_def2.get());
+    g += com().app.green(com().val_col_def2.get());
+    b += com().app.blue(com().val_col_def2.get());
+    
+    col = com().app.color(r, g, b);
+    
     return this;
   }
   Floc frame() { return this; }
@@ -71,7 +96,7 @@ class Floc extends Entity {
       if (com().create_grower.get() && com().gcom != null && 
     		  com().app.crandom(com().grow_prob.get()) > 0.5) {
         Grower ng = com().gcom.newEntity();
-        if (ng != null) ng.define(new PVector(pos.x, pos.y), new PVector(1, 0).rotate(mov.heading()));
+        if (ng != null) ng.define(new PVector(pos.x, pos.y), new PVector(1, 0).rotate(mov.heading()), 0);
       }
       destroy();
     }
@@ -87,23 +112,65 @@ class Floc extends Entity {
     if (com().point_to_center.get()) headTo(new PVector(0, 0), com().POINT_FORCE.get() / cible_cnt);
     //point toward cursor
     if (com().point_to_cursor.get()) headTo(com().adding_cursor.pos(), com().POINT_FORCE.get() / cible_cnt);
+    
+    if (com().oscillant.get()) {
+    		osc_cnt+=3;
+    		if (osc_cnt >= 30) osc_cnt = 0;
+    		headTo(PConstants.PI * 2.0F * osc_cnt / 30.0F, com().POINT_FORCE.get()*2);
+    }
+    
+    if (com().point_to_side.get()) {
+    		headTo(com().side_dir.get(), com().POINT_FORCE.get());
+    }
+    
     pos.add(mov);
     
-    
+    tail_space++;
+    if (tail_space > 20.0) {
+    		tail_space = 0;
+    		PVector t = new PVector(pos.x, pos.y);
+    		if (tail_list.size() < 10) tail_list.add(t);
+    		else {
+    			tail_list.remove(0);
+    			tail_list.add(t);
+    		}
+    }
     
     return this;
   }
   Floc draw() {
-	  com().app.fill(com().val_col_def.get());
-	  com().app.stroke(com().val_col_def.get());
-	  com().app.strokeWeight(4/com.sim.cam_gui.scale);
+
+//      com().app.fill(com().val_col_deb.get());
+//      com().app.noStroke();
+	  com().app.stroke(col);
+	  com().app.strokeWeight(com().scale.get() / (1.0F));// * com.sim.cam_gui.scale
+      PVector p0 = new PVector();
+	  if (com().draw_tail.get() && tail_list.size() > 1) 
+		for (int i = 0 ; i < tail_list.size() - 1 ; i++) {
+		  PVector p1 = new PVector(tail_list.get(i).x, tail_list.get(i).y);
+		  PVector p2 = new PVector(tail_list.get(i+1).x, tail_list.get(i+1).y);
+		  PVector l = new PVector(p2.x - p1.x, p2.y - p1.y);
+		  l.mult(tail_space / 20.0F);
+//		  com().app.pushMatrix();
+//		  com().app.translate(p1.x + l.x, p1.y + l.y);
+//	      float t = (com().scale.get() * (com().ref_size / 10)) / 5.0F;
+		  if (i == tail_list.size()-2) com().app.line(pos.x, pos.y, p1.x + l.x, p1.y + l.y);
+		  if (i > 0 && i < tail_list.size()-1) com().app.line(p0.x, p0.y, p1.x + l.x, p1.y + l.y);
+//	      com().app.ellipse(0, 0, t, t);
+//	      com().app.popMatrix();
+		  p0.set(p1.x + l.x, p1.y + l.y);
+	  }
+	  
+	  com().app.fill(col);
+	  com().app.stroke(col);
+//	  com().app.strokeWeight(4/com.sim.cam_gui.scale);
 	  com().app.pushMatrix();
 	  com().app.translate(pos.x, pos.y);
 	  com().app.rotate(mov.heading());
     if (com().DRAWMODE_DEF.get()) {
-    	com().app.line(0, 0, -com().scale.get(), -com().scale.get());
-    	com().app.line(2, 0, -com().scale.get(), 0);
-    	com().app.line(0, 0, -com().scale.get(), com().scale.get());
+    		com().app.line(0, 0, -com().scale.get(), -com().scale.get());
+    		com().app.line(2, 0, -com().scale.get(), 0);
+    		com().app.line(0, 0, -com().scale.get(), com().scale.get());
     }
     com().app. fill(com().val_col_deb.get());
     //stroke(com().val_col_deb.get());
@@ -142,6 +209,8 @@ public static class FlocPrint extends Sheet_Specialize {
       .addSeparator(0.125)
       .addDrawerTripleButton(point_to_mouse, point_to_center, point_to_cursor, 10, 1)
       .addSeparator(0.125)
+      .addDrawerTripleButton(draw_tail, oscillant, point_to_side, 10.25F, 1)
+      .addSeparator(0.125)
       .addDrawerFactValue(POURSUITE, 2, 10, 1)
       .addSeparator(0.125)
       .addDrawerFactValue(FOLLOW, 2, 10, 1)
@@ -175,7 +244,7 @@ public static class FlocPrint extends Sheet_Specialize {
   sInt LIMIT, AGE ;
   sBoo DRAWMODE_DEF, DRAWMODE_DEBUG, create_grower, point_to_mouse, point_to_center, point_to_cursor;
   
-  sCol val_col_def, val_col_deb, val_col_halo;
+  sCol val_col_def1, val_col_def2, val_col_deb, val_col_halo;
   sFlt scale;
   
   int startbox = 400;
@@ -183,6 +252,9 @@ public static class FlocPrint extends Sheet_Specialize {
   sObj grow_obj;
   GrowerComu gcom;
   Canvas canv;
+  
+  sBoo draw_tail, oscillant, point_to_side;
+  sFlt side_dir;
 
   FlocComu(Simulation _c, Canvas c, String n, sValueBloc b) { super(_c, n, "floc", 50, b); 
   	canv = c;
@@ -203,13 +275,19 @@ public static class FlocPrint extends Sheet_Specialize {
 	    DRAWMODE_DEF = newBoo(true, "DRAWMODE_DEF", "draw1");
 	    DRAWMODE_DEBUG = newBoo(false, "DRAWMODE_DEBUG", "draw2");
 	    
+	    draw_tail = newBoo(false, "draw_tail", "tail");
+	    oscillant = newBoo(false, "oscillant", "oscillant");
+	    point_to_side = newBoo(false, "point_to_side", "point_to_side");
+	    side_dir = menuFltSlide(0, -3.14F, 3.14F, "side_dir");
+	    
 	    create_grower = newBoo(true, "create_grower", "create grow");
 	    point_to_mouse = newBoo(false, "point_to_mouse", "to mouse");
 	    point_to_center = newBoo(false, "point_to_center", "to center");
 	    point_to_cursor = newBoo(false, "point_to_cursor", "to cursor");
 	    //init_canvas();
-	    
-	    val_col_def = menuColor(app.color(220), "val_col_def");
+
+	    val_col_def1 = menuColor(app.color(220), "val_col_def1");
+	    val_col_def2 = menuColor(app.color(220), "val_col_def2");
 	    val_col_deb = menuColor(app.color(255, 0, 0), "val_col_deb");
 	    val_col_halo = menuColor(app.color(255, 0, 0), "val_col_halo");
 	    scale = menuFltSlide(10, 5, 100, "length");

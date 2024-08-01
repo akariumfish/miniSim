@@ -1,8 +1,17 @@
 0:- :init
 0:  :init end
 2:- :setup_load from save.sdata
-1243:  :setup_load from spiral.sdata
-1399:  :exit
+3844:  :setup_load from random_mouvement.sdata
+22256:  :full_data_save to random_mouvement.sdata
+22290:  :setup_load from random_mouvement.sdata
+23261:  :full_data_save to random_mouvement.sdata
+23300:  :setup_load from random_mouvement.sdata
+23777:  :setup_load from exploding_struct.sdata
+25257:  :full_data_save to exploding_struct.sdata
+25272:  :setup_load from exploding_struct.sdata
+25695:  :setup_load from PaternNext.sdata
+25919:  :setup_load from PaternFinal.sdata
+25970:  :exit
 null
 null
 null

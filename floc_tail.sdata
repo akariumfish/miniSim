@@ -1,5 +1,5 @@
 start.sdata
-7152
+7096
 4
 8
 __bloc_type
@@ -11,9 +11,9 @@ Interface
 __bloc_use
 
 7
-7138
+7082
 Main_Sheet
-7046
+6990
 4
 8
 __bloc_type
@@ -25,7 +25,7 @@ Main_Sheet
 __bloc_use
 
 54
-7032
+6976
 0_Canvas
 994
 4
@@ -613,9 +613,9 @@ vec
 shr
 menu_pos
 x
--492.0
+160.0
 y
--444.5
+-572.5
 0
 0
 menu_tab
@@ -631,7 +631,7 @@ int
 shr
 menu_tab
 val
-1
+2
 min
 0
 max
@@ -687,7 +687,7 @@ flt
 shr
 clrkeep_thresh
 val
-73.63637
+59.35065
 min
 10.0
 max
@@ -727,7 +727,7 @@ int
 shr
 val_h
 val
-248
+608
 min
 0
 max
@@ -865,7 +865,7 @@ flt
 shr
 slow_decay
 val
-0.9
+0.96753246
 min
 0.9
 max
@@ -903,7 +903,7 @@ flt
 shr
 val_scale
 val
-63.454544
+27.818182
 min
 10.0
 max
@@ -945,7 +945,7 @@ int
 shr
 val_w
 val
-392
+1092
 min
 0
 max
@@ -3073,9 +3073,9 @@ vec
 shr
 menu_pos
 x
-189.0
+-773.0
 y
--478.5
+-468.5
 0
 0
 menu_tab
@@ -3949,7 +3949,7 @@ int
 shr
 tick
 val
-2981
+11160
 min
 0
 max
@@ -4075,7 +4075,7 @@ int
 shr
 SEED
 val
-802501952
+732971584
 min
 0
 max
@@ -4113,7 +4113,7 @@ flt
 shr
 tck/frm
 val
-5.656854
+8.0
 min
 0.0
 max
@@ -4487,7 +4487,7 @@ val
 0
 0
 0_Floc_0
-1500
+1444
 4
 8
 __bloc_type
@@ -4498,8 +4498,8 @@ __bloc_bas
 0_Floc_0
 __bloc_use
 
-46
-1486
+43
+1430
 settings
 268
 4
@@ -5073,9 +5073,9 @@ vec
 shr
 menu_pos
 x
--416.0
+208.0
 y
--598.5
+-668.5
 0
 0
 menu_tab
@@ -5171,7 +5171,7 @@ col
 shr
 val_col_def1
 c
--19153
+-14922497
 0
 0
 val_col_def2
@@ -5305,7 +5305,7 @@ boo
 shr
 to center
 val
-0
+1
 0
 0
 max_entity
@@ -5443,7 +5443,7 @@ boo
 shr
 0_Floc_0_show
 val
-1
+0
 0
 0
 Floc_0_cursor_show
@@ -5474,30 +5474,6 @@ typ
 run
 shr
 add_pop
-0
-0
-side_dir
-24
-9
-18
-__bloc_type
-val
-ref
-side_dir
-typ
-flt
-shr
-side_dir
-val
-0.09787011
-min
--3.14
-max
-3.14
-lmin
-1
-lmax
-1
 0
 0
 pulse_add_delay 
@@ -5537,7 +5513,7 @@ flt
 shr
 point
 val
-5.5242715E-5
+0.0070710676
 min
 0.0
 max
@@ -5638,22 +5614,6 @@ val
 0
 0
 0
-point_to_side
-16
-5
-10
-__bloc_type
-val
-ref
-point_to_side
-typ
-boo
-shr
-point_to_side
-val
-0
-0
-0
 val_draw_layer
 24
 9
@@ -5747,7 +5707,7 @@ boo
 shr
 to cursor
 val
-0
+1
 0
 0
 adding_entity_nb 
@@ -5861,7 +5821,7 @@ int
 shr
 active_pop
 val
-46
+59
 min
 0
 max
@@ -5885,23 +5845,7 @@ col
 shr
 val_col_halo
 c
--13824
-0
-0
-oscillant
-16
-5
-10
-__bloc_type
-val
-ref
-oscillant
-typ
-boo
-shr
-oscillant
-val
-0
+-13276209
 0
 0
 0_Floc_0_cursor_pos
@@ -5917,9 +5861,9 @@ vec
 shr
 0_Floc_0_pos
 x
-3321.7031
+14692.799
 y
--1389.877
+-5205.209
 0
 0
 age
@@ -6281,7 +6225,7 @@ flt
 shr
 tls
 val
-9.258333
+9.066667
 min
 0.0
 max
@@ -6391,7 +6335,7 @@ flt
 shr
 tps
 val
-108.0108
+110.29412
 min
 0.0
 max
@@ -6415,7 +6359,7 @@ flt
 shr
 cfr
 val
-0.017
+0.018
 min
 0.0
 max
@@ -6499,7 +6443,7 @@ int
 shr
 SEED
 val
-577842432
+469108512
 min
 0
 max
@@ -6623,9 +6567,9 @@ vec
 shr
 pos
 x
--84.46956
+-278.07153
 y
-78.15255
+97.812386
 0
 0
 copy_run
@@ -6693,7 +6637,7 @@ int
 shr
 frsr
 val
-1924
+1606
 min
 0
 max
@@ -6749,7 +6693,7 @@ flt
 shr
 fdur
 val
-17.0
+18.0
 min
 0.0
 max
@@ -6787,7 +6731,7 @@ int
 shr
 tick
 val
-3850
+3212
 min
 0
 max
@@ -6883,7 +6827,7 @@ int
 shr
 sec
 val
-37
+113
 min
 0
 max
@@ -6923,7 +6867,7 @@ flt
 shr
 mfr
 val
-54.0054
+55.14706
 min
 0.0
 max
@@ -6947,7 +6891,7 @@ flt
 shr
 scale
 val
-0.038974345
+0.057062343
 min
 0.02
 max
@@ -7099,7 +7043,7 @@ str
 shr
 spath
 val
-floc_drawing.sdata
+floc_tail.sdata
 0
 0
 log_ext_save

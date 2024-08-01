@@ -1,25 +1,7 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-3622:- :setup_load from nodes.sdata
-4676:- :setup_load from old_world.sdata
-9935:- :full_data_save to old_world.sdata
-9968:- :setup_load from old_world.sdata
-10500:- :full_data_save to old_world.sdata
-10525:- :setup_load from old_world.sdata
-11246:- :full_data_save to old_world.sdata
-11283:- :setup_load from old_world.sdata
-11598:- :setup_load from rainbow.sdata
-12797:  :setup_load from rgbGrow.sdata
-13149:- :setup_load from shape.sdata
-17158:- :full_data_save to shape.sdata
-17534:- :setup_load from small_world.sdata
-18285:  :setup_load from snake.sdata
-20503:- :setup_load from spirale.sdata
-24392:- :full_data_save to spirale.sdata
-25338:- :setup_load from todo.sdata
-27152:- :setup_load from start.sdata
-27344:- :exit
+5589:- :exit
 null
 null
 null

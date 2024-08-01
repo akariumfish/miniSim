@@ -1530,6 +1530,7 @@ class MValue extends MBasic {
 	    val_cible.set(v.ref);
 	    cible = v; 
 	    val_widget = addLinkedLWidget(val_elem, v);
+	    if (grabber.isHided()) val_widget.hide();
 	    if      (cible.type.equals("flt")) setValue((sFlt)cible);
 	    else if (cible.type.equals("int")) setValue((sInt)cible);
 	    else if (cible.type.equals("boo")) setValue((sBoo)cible);
