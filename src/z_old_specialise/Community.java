@@ -40,9 +40,9 @@ public abstract class Community extends Macro_Sheet {
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(adding_step, 10, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(show_entity, srun_add, 10, 1)
+	      .addDrawerTripleButton(pulse_add, auto_add, srun_add, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(pulse_add, adding_cursor.show, 10, 1)
+	      .addDrawerDoubleButton(show_entity, adding_cursor.show, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(pulse_add_delay, 10, 10, 1)
 	      .addSeparator(0.125)
@@ -52,7 +52,7 @@ public abstract class Community extends Macro_Sheet {
 	      
 	    selector_list = tab.getShelf(0)
 	      .addSeparator(0.25)
-	      .addList(4, 10, 1);
+	      .addList(3, 10, 1);
 	    selector_list.addEventChange_Builder(new nRunnable() { public void run() {
 	      nList sl = ((nList)builder); 
 	      //logln("a "+sl.last_choice_index +"  "+ sim.list.size());
@@ -75,6 +75,13 @@ public abstract class Community extends Macro_Sheet {
 	    update_com_selector_list();
 	    
 	    comPanelBuild(sheet_front);
+	    if (sheet_front.collapsed) {
+	    		sheet_front.popUp();
+	    		sheet_front.collapse();
+	    } else {
+    			sheet_front.collapse();
+    			sheet_front.popUp();
+	    }
 	    sheet_front.toLayerTop();
 	  }
 	  void update_com_selector_list() {
@@ -124,7 +131,7 @@ public abstract class Community extends Macro_Sheet {
 	  int adding_counter = 0;
 	  
 	  sInt pulse_add_delay;
-	  sBoo pulse_add;
+	  sBoo auto_add, pulse_add;
 	  int pulse_add_counter = 0;
 
 	  sBoo show_entity;
@@ -150,12 +157,13 @@ public abstract class Community extends Macro_Sheet {
 	    adding_entity_nb = newInt(0, "adding_entity_nb ", "add nb");
 	    adding_step = newInt(0, "adding_step ", "add stp");
 	    show_entity = newBoo(true, "show_entity ", "show");
+	    auto_add = newBoo(true, "auto_add ", "auto_add");
 	    pulse_add = newBoo(true, "pulse_add ", "pulse");
 	    pulse_add_delay = newInt(100, "pulse_add_delay ", "pulseT");
 	    
 	    val_draw_layer = menuIntIncr(0, 1, "val_draw_layer");
 
-	    adding_cursor = menuCursor(n, true);
+	    adding_cursor = newCursor(n, true);
 
 	    srun_add = newRun("add_entity", "add_pop", new nRunnable() { 
 	      public void run() { 
@@ -202,7 +210,7 @@ public abstract class Community extends Macro_Sheet {
 	  void reset() { //deactivate all then create starting situation from parameters
 	    this.destroy_All();
 	    if (max_entity.get() != list.size()) init_array();
-	    adding_pile += adding_entity_nb.get();
+	    if (auto_add.get()) adding_pile += adding_entity_nb.get();
 	    custom_reset();
 	  }
 
@@ -212,12 +220,12 @@ public abstract class Community extends Macro_Sheet {
 	  }
 
 	  void tick() {
-	    if (pulse_add.get()) {
+	    if (auto_add.get() && pulse_add.get()) {
 	      pulse_add_counter++;
 	      if (pulse_add_counter > pulse_add_delay.get()) { pulse_add_counter = 0; srun_add.run(); }
 	    }
-	    if (adding_counter > 0) adding_counter--;
-	    while (adding_counter == 0 && adding_pile > 0) {
+	    if (auto_add.get() && adding_counter > 0) adding_counter--;
+	    while (auto_add.get() && adding_counter == 0 && adding_pile > 0) {
 	      adding_counter += adding_step.get();
 	      adding_pile--;
 	      addEntity();
@@ -230,7 +238,7 @@ public abstract class Community extends Macro_Sheet {
 	  }
 
 	  void draw_Cam() { 
-	    for (Entity e : list) if (e.active) e.draw();
+	    if (show_entity.get()) for (Entity e : list) if (e.active) e.draw();
 	  }
 	  void draw_Screen() { 
 	    custom_screen_draw();

@@ -856,7 +856,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
 //  protected MMenu sheet_menu_bloc = null;
   
   int cursor_count = 0;
-  nCursor newCursor(String r, boolean b) {
+  protected nCursor newCursor(String r, boolean b) {
 	    cursor_count++;
 	    nCursor c = new nCursor(this, r, r, b);
 	    mmain().cursors_list.add(c);
@@ -1027,7 +1027,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     } });
     return f;
   }
-  sFlt menuFltIncr(float v, float _f, String r) {
+  public sFlt menuFltIncr(float v, float _f, String r) {
     sFlt f = newFlt(v, r, r);
     f.ctrl_factor = _f;
     addEventsBuildMenu(new nRunnable(f) { public void run() { 
@@ -1057,7 +1057,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     } });
     return f;
   }
-  sInt menuIntFact(int v, float _f, String r) {
+  public sInt menuIntFact(int v, float _f, String r) {
     sInt f = newInt(v, r, r);
     f.ctrl_factor = _f;
     addEventsBuildMenu(new nRunnable(f) { public void run() { 

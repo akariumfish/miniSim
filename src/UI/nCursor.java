@@ -21,6 +21,7 @@ public class nCursor extends nWidget implements Macro_Interf {
 	  public PVector dir() { if (dval != null && dval.get().mag() > ref_size) 
 	                    return new PVector(dval.x(), dval.y()).setMag(1); 
 	                  else return new PVector(1, 0); } //.rotate(gui.app.random(2*RConst.PI))
+	  public boolean dir_set() { return dval.get().mag() > ref_size; }
 	  public boolean hasDir() { 
 		  if (dval != null && dval.get().mag() > ref_size) return true; 
 		  else return false; }

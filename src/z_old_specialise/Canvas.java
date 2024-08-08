@@ -43,7 +43,15 @@ public class Canvas extends Macro_Sheet {
 	      .addDrawer(10.25, 0.75)
 	      .addModel("Label-S4", "-Canvas Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(val_show, val_show_bound, 10, 1)
+	      ;
+	    sheet_front.getTab(1).getShelf()
+	      .addDrawerTripleButton(back_clear, back_fill, back_add, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerDoubleButton(back_save, back_load, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFieldCtrl(back_file, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerTripleButton(val_show, val_show_back, val_show_bound, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerDoubleButton(val_rst_run, val_show_grab, 10, 1)
 	      .addSeparator(0.125)
@@ -72,6 +80,14 @@ public class Canvas extends Macro_Sheet {
 	    
 	    update_com_selector_list();
 	    
+
+	    if (sheet_front.collapsed) {
+	    		sheet_front.popUp();
+	    		sheet_front.collapse();
+	    } else {
+    			sheet_front.collapse();
+    			sheet_front.popUp();
+	    }
 	    sheet_front.toLayerTop();
 	  }
 	  void update_com_selector_list() {
@@ -102,7 +118,7 @@ public class Canvas extends Macro_Sheet {
 	  sVec val_pos;
 	  sInt val_w, val_h, can_div;
 	  sFlt val_scale, color_keep_thresh, val_decay, slow_decay;
-	  sBoo val_show, val_show_bound, val_show_grab;
+	  sBoo val_show, val_show_back, val_show_bound, val_show_grab;
 	  sStr selected_com;
 	  sCol val_col_back;
 	  sRun val_rst_run;
@@ -117,6 +133,10 @@ public class Canvas extends Macro_Sheet {
 	  
 	  Simulation sim;
 	  
+	  PImage back;
+	  sRun back_clear, back_add, back_fill, back_save, back_load;
+	  sStr back_file;
+	  
 	  Canvas(Simulation m, sValueBloc b) { 
 	    super(m.mmain(), "Canvas", b);
 	    sim = m;
@@ -125,11 +145,12 @@ public class Canvas extends Macro_Sheet {
 	    val_w = menuIntIncr(gui.app.width / def_pix_size, 100, "val_w");
 	    val_h = menuIntIncr(gui.app.height / def_pix_size, 100, "val_h");
 	    can_div = menuIntIncr(4, 1, "can_div");
-	    val_scale = menuFltSlide(def_pix_size, 10, 500, "val_scale");
-	    color_keep_thresh = menuFltSlide(200, 10, 260, "clrkeep_thresh");
+	    val_scale = menuFltSlide(def_pix_size, 2, 80, "val_scale");
+	    color_keep_thresh = menuFltSlide(200, 0, 260, "clrkeep_thresh");
 	    val_decay = menuFltSlide(1, 0.99F, 1.01F, "decay");
 	    slow_decay = menuFltSlide(1.0F, 0.9F, 1.1F, "slow_decay");
 	    val_show = newBoo(false, "val_show", "show_canvas");
+	    val_show_back = newBoo(false, "val_show_back", "val_show_back");
 	    val_show_bound = newBoo(false, "val_show_bound", "show_bound");
 	    val_show_grab = newBoo(false, "val_show_grab", "show_grab");
 	    selected_com = newStr("selected_com", "scom", "");
@@ -164,7 +185,22 @@ public class Canvas extends Macro_Sheet {
 	    cam_draw = new Drawable() { public void drawing() { 
 	      drawCanvas(); } };
 	    val_rst_run = newRun("val_rst_run", "rst_run", rst_run);
-	    
+
+	    back_clear = newRun("back_clear", "back_clear", 
+	    		new nRunnable() { public void run() { clearBack(); } });
+	    back_fill = newRun("back_fill", "back_fill", 
+	    		new nRunnable() { public void run() { fillBack(); } });
+	    back_add = newRun("back_add", "back_add", 
+	    		new nRunnable() { public void run() { addToBack(); } });
+
+	    back_save = newRun("back_save", "back_save", 
+	    		new nRunnable() { public void run() { saveBack(); } });
+	    back_load = newRun("back_load", "back_load", 
+	    		new nRunnable() { public void run() { loadBack(); } });
+	    back_file = newStr("back_file", "back_file", "canvas");
+
+	    val_w.addEventChange(back_clear.get());
+	    val_h.addEventChange(back_clear.get());
 	    val_w.addEventChange(rst_run);
 	    val_h.addEventChange(rst_run);
 	    
@@ -183,10 +219,12 @@ public class Canvas extends Macro_Sheet {
 	      }
 	    }});
 	    
+	    clearBack();
 	    reset();
 	    
 	    addEventSetupLoad(new nRunnable() { public void run() { 
 	      mmain().inter.addEventNextFrame(new nRunnable() {public void run() { 
+	  	    clearBack();
 	    	    reset();
 	        for (Community c : sim.list) if (c.name.equals(selected_com.get())) selected_comu(c);
 	        cam_draw.toLayerBottom();
@@ -194,12 +232,54 @@ public class Canvas extends Macro_Sheet {
 	  }
 	  
 	  void reset() {
-	    can1 = gui.app.createImage(val_w.get(), val_h.get(), PConstants.RGB);
+	    can1 = gui.app.createImage(val_w.get(), val_h.get(), PConstants.ARGB);
 	    init_pim(can1);
-	    can2 = gui.app.createImage(val_w.get(), val_h.get(), PConstants.RGB);
+	    can2 = gui.app.createImage(val_w.get(), val_h.get(), PConstants.ARGB);
 	    init_pim(can2);
 	    can_st = can_div.get();
 	    active_can = 0;
+	  }
+	  
+	  private void init_pim(PImage canvas) {
+	    for(int i = 0; i < canvas.pixels.length; i++) {
+	      canvas.pixels[i] = val_col_back.get(); 
+	    }
+	  }
+
+	  void saveBack() {
+	    back.save("image/"+back_file.get()+".tif");
+	  }
+	  void loadBack() {
+		  PImage t = gui.app.loadImage("image/"+back_file.get()+".tif");
+		  if (t != null)
+		  	for(int i = 0; i < back.pixels.length && i < t.pixels.length ; i++) {
+			  back.pixels[i] = t.pixels[i];
+		  }
+	  }
+	  void clearBack() {
+	    back = gui.app.createImage(val_w.get(), val_h.get(), PConstants.ARGB);
+	    for(int i = 0; i < back.pixels.length; i++) {
+	    		back.pixels[i] = gui.app.color(0); 
+	    }
+	  }
+	  void fillBack() {
+	    back = gui.app.createImage(val_w.get(), val_h.get(), PConstants.ARGB);
+	    for(int i = 0; i < back.pixels.length; i++) {
+	    		back.pixels[i] = gui.app.color(0);  
+	    }
+	  }
+	  void addToBack() {
+		  PImage t = null;
+	      if (active_can == 0) t = can1;
+	      else if (active_can == 1) t = can2;
+		  for(int i = 0; i < back.pixels.length; i++) {
+			  float a = gui.app.alpha(t.pixels[i]) / 255.0F;
+			  back.pixels[i] = gui.app.color(
+					  			gui.app.red(back.pixels[i]) + gui.app.red(t.pixels[i]) * a, 
+ 		             			gui.app.green(back.pixels[i]) + gui.app.green(t.pixels[i]) * a, 
+ 		             			gui.app.blue(back.pixels[i]) + gui.app.blue(t.pixels[i]) * a
+ 		             		); 
+		  }
 	  }
 	  
 	  public Canvas clear() {
@@ -211,25 +291,22 @@ public class Canvas extends Macro_Sheet {
 	    return this;
 	  }
 	  
-	  private void init_pim(PImage canvas) {
-	    for(int i = 0; i < canvas.pixels.length; i++) {
-	      canvas.pixels[i] = val_col_back.get(); 
-	    }
-	  }
-	  
 	  float sat(int c) {
-	    return (gui.app.red(c) + gui.app.green(c) + gui.app.blue(c)) / 3; 
+	    return (gui.app.alpha(c) / 255.0F) * 
+	    		(gui.app.red(c) + gui.app.green(c) + gui.app.blue(c)) / 3; 
 	  }
 
 	  int decay(int c) {
 	    return gui.app.color(gui.app.red(c)*val_decay.get(), 
 	    		             gui.app.green(c)*val_decay.get(), 
-	    		             gui.app.blue(c)*val_decay.get()); 
+	    		             gui.app.blue(c)*val_decay.get(), 
+	    		             gui.app.alpha(c)*val_decay.get()); 
 	  }
 	  int slowdecay(int c) {
 	    return gui.app.color(gui.app.red(c)*slow_decay.get(), 
 	    		             gui.app.green(c)*slow_decay.get(), 
-	    		             gui.app.blue(c)*slow_decay.get()); 
+	    		             gui.app.blue(c)*slow_decay.get(), 
+	    		             gui.app.alpha(c)*slow_decay.get()); 
 	  }
 	  int dc_cnt = 0;
 	  private void clear_pim(PImage canvas) {
@@ -247,9 +324,14 @@ public class Canvas extends Macro_Sheet {
 	  }
 	  private void med_pim(PImage canvas1, PImage canvas2) {
 	    for (int i = 0 ; i < canvas1.pixels.length ; i++) {
-	      int c = gui.app.color( (gui.app.red(canvas1.pixels[i]) + gui.app.red(canvas2.pixels[i])) / 2.0F, 
-	                       (gui.app.green(canvas1.pixels[i]) + gui.app.green(canvas2.pixels[i])) / 2.0F, 
-	                       (gui.app.blue(canvas1.pixels[i]) + gui.app.blue(canvas2.pixels[i])) / 2.0F );
+	      int c = gui.app.color( (gui.app.red(canvas1.pixels[i]) + 
+	    		  						gui.app.red(canvas2.pixels[i])) / 2.0F, 
+	                       (gui.app.green(canvas1.pixels[i]) + 
+	                    		   		gui.app.green(canvas2.pixels[i])) / 2.0F, 
+	                       (gui.app.blue(canvas1.pixels[i]) + 
+                   		   		gui.app.blue(canvas2.pixels[i])) / 2.0F , 
+	                       (gui.app.alpha(canvas1.pixels[i]) + 
+                   		   		gui.app.alpha(canvas2.pixels[i])) / 2.0F );
 	      canvas1.pixels[i] = c;
 	      canvas2.pixels[i] = c;
 	    }
@@ -260,6 +342,15 @@ public class Canvas extends Macro_Sheet {
 	      for (int i = can_st ; i < f.list.size() ; i += Math.max(1, can_div.get()) )
 	        if (f.list.get(i).active) {
 	          ((Floc)f.list.get(i)).draw_halo(this);
+	      }
+	    }
+	  }
+	  
+	  void spiral_tick(Spiral f) {
+	    if (f != null) {
+	      for (int i = can_st ; i < f.list.size() ; i += Math.max(1, can_div.get()) )
+	        if (f.list.get(i).active) {
+	          ((Arc)f.list.get(i)).draw_halo(this);
 	      }
 	    }
 	  }
@@ -302,6 +393,8 @@ public class Canvas extends Macro_Sheet {
 	    				 val_pos.get().y - val_h.get() * val_scale.get() / 2, 
 	    				 val_w.get() * val_scale.get(), val_h.get() * val_scale.get());
 	    }
+
+  	    if (val_show_back.get()) draw(back);
 	    if (val_show.get()) {
 	      if (active_can == 0) draw(can1);
 	      else if (active_can == 1) draw(can2);

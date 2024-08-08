@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import RApplet.RConst;
 import processing.core.PApplet;
+import processing.core.PConstants;
 import sData.nRunnable;
 import sData.sBoo;
+import sData.sFlt;
 import sData.sValue;
 
 public class nShelf extends nBuilder {
@@ -205,23 +207,26 @@ public class nShelf extends nBuilder {
 	      ;
 	    return this;
 	  }
-	  //nShelf addDrawerSlideCtrl(sValue val, float w, float h) {
-	  //  nDrawer d = addDrawer(w, h);
-	  //  d.addWidget(new nSlide(gui, w*ref_size, h*ref_size)
-	  //    .setLinkedValue(val)
-	  //    .setSize(w*ref_size/3, h*ref_size)
-	  //    .setPosition(2*w*ref_size/3, 0)
-	  //    )
-	  //    ;
-	  //  d.addModel("Label_Small_Text")
-	  //    .setSize(w*ref_size/10, h*ref_size)
-	  //    .setPosition(0, 0)
-	  //    .setText(val.ref)
-	  //    .setFont(int(ref_size/1.9))
-	  //    .setTextAlignment(LEFT, CENTER)
-	  //    ;
-	  //  return this;
-	  //}
+	  public nShelf addDrawerFltSlide(sFlt val) {
+	    addDrawer(10, 1)
+	      .addModel("Label_Small_Text-S1-P1", ((sFlt)val).ref)
+	        .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+	      .addWatcherModel("Auto_Watch_Label-S1-P3")
+	        .setLinkedValue(((sFlt)val))
+	        .setSX(ref_size*2.0)
+	        .setPX(ref_size*2.875)
+	        .setTextAlignment(PConstants.CENTER, PConstants.CENTER).getDrawer()
+	      .addWidget(new nSlide(gui, ref_size * 5, ref_size * 0.75F)
+	        .setValue( ( ((sFlt)val).get() - ((sFlt)val).getmin() ) / 
+	                   ( ((sFlt)val).getmax() - ((sFlt)val).getmin() ) )
+	        .addEventSlide(new nRunnable(((sFlt)val)) { public void run(float c) { 
+	          ((sFlt)builder).set( ((sFlt)builder).getmin() + 
+	                               c * (((sFlt)builder).getmax() - ((sFlt)builder).getmin()) ); 
+	        } } )
+	        .setPosition(5*ref_size, ref_size * 2 / 16) ).getShelf()
+	      .addSeparator(0.125);
+	    return this;
+	  }
 	  public nShelf addDrawerFieldCtrl(sValue val, float w, float h) {
 	    nDrawer d = addDrawer(w, h);
 	    d.addLinkedModel("Field")

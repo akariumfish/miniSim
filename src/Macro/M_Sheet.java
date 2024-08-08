@@ -575,18 +575,34 @@ class MZone extends MBasic {
   nLinkedWidget corner_widg;
   nWidget zone_widg;
   Drawable zone_draw;
+  nRunnable goto_run;
+  nRunnable move_run, zoom_run;
+  nWidget screen_widget;
   
   MZone(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "zone", _bloc); }
   void init() {
 	  corner_pos = newVec("corner_pos");
 	  if (!loading_from_bloc) corner_pos.set(ref_size*3.0F, ref_size*3.0F);
+	  
+	  goto_run = new nRunnable() { public void run() {
+	      float ns = mmain().inter.cam.cam_scale.get();
+	      if (gui.view.size.x / zone_widg.getLocalSX() < gui.view.size.y / zone_widg.getLocalSY())
+	        ns *= gui.view.size.x / zone_widg.getLocalSX();
+	      else ns *= gui.view.size.y / zone_widg.getLocalSY();
+	      ns = Math.min(1.0F, ns);
+	      ns = Math.max(0.03F, ns);
+	      mmain().inter.cam.cam_scale.set(ns);
+	      mmain().inter.cam.cam_pos
+	        .set(-(zone_widg.getX() + zone_widg.getLocalSX()/2) * mmain().inter.cam.cam_scale.get(), 
+	             -(zone_widg.getY() + zone_widg.getLocalSY()/2) * mmain().inter.cam.cam_scale.get() );
+	  }};
   }
   void build_param() {
 	  build_normal();
   }
   void build_normal() {
 	  Macro_Element e = addEmptyS(0);
-	  
+	  addEmptyS(1);
 	  zone_widg = e.addModel("Field");
 	  zone_widg.setPosition(ref_size * 2 / 16, ref_size * 2 / 16).setPassif();
 	  
@@ -604,6 +620,55 @@ class MZone extends MBasic {
 	  corner_widg = e.addLinkedModel("MC_SpeTrig");
 	  corner_widg.alignUp().alignLeft();
 	  corner_widg.setLinkedValue(corner_pos);
+	  
+
+	  screen_widget = gui.theme.newWidget(sheet.mmain().screen_gui, "Cursor")
+	      .setSize(ref_size/2, ref_size/2);
+	  PVector c = new PVector(zone_widg.getX()+corner_pos.get().x, 
+			  zone_widg.getY()+corner_pos.get().y);
+      PVector p = mmain().inter.cam.cam_to_screen(c);
+      screen_widget.setPosition(p.x, p.y).setGrabbable().center();
+
+	  screen_widget.addEventDrag(new nRunnable() {public void run() {
+	        PVector p = new PVector(screen_widget.getX(), 
+	        		screen_widget.getY());
+	        p = mmain().inter.cam.screen_to_cam(p);
+	        corner_pos.set(p.x - zone_widg.getX(), p.y - zone_widg.getY());
+	  }});
+	
+	  move_run = new nRunnable() {public void run() { 
+	        if (corner_pos != null) {
+	      	  	PVector c = new PVector(zone_widg.getX()+corner_pos.get().x, 
+	      	  			zone_widg.getY()+corner_pos.get().y);
+	            PVector p = mmain().inter.cam.cam_to_screen(c);
+	            screen_widget.setPosition(p.x, p.y); } }};
+      zoom_run = new nRunnable() {public void run() { 
+	      update_view();
+	      if (corner_pos != null) {
+      	  	PVector c = new PVector(zone_widg.getX()+corner_pos.get().x, 
+	      	  			zone_widg.getY()+corner_pos.get().y);
+	        PVector p = mmain().inter.cam.cam_to_screen(c);
+	        screen_widget.setPosition(p.x, p.y); } }};
+	      
+	  mmain().inter.cam.addEventMove(move_run);
+	  mmain().inter.cam.addEventZoom(zoom_run);
+	  
+	  grabber.addEventVisibilityChange(new nRunnable() { public void run() { update_view(); }});
+	    
+	  addInputBang(0, "view", new nRunnable() { public void run() { 
+		  goto_run.run(); } });
+	  addTrigS(1, "go", goto_run);
+  }
+
+  void update_view() {
+    if (mmain().inter.cam.cam_scale.get() < 0.5 && 
+    		!grabber.isHided()) {  
+        screen_widget.show(); 
+        toLayerTop(); 
+    } else { 
+    		screen_widget.hide();
+    		toLayerTop();
+    }
   }
   public MZone clear() {
     super.clear(); 
@@ -1068,7 +1133,7 @@ class MSheetBloc extends MBasic {
 	    addEmptyXL(0);
 	    m.addSwitchXLSelector(1, "view", "show view access in normal view", show1);
 	    if (sheet != mmain()) m.addSwitchXLSelector(2, "open", "show openning control in normal view", show2);
-	    m.addSwitchXLSelector(3, "self", "show selh object access in normal view", show3);
+	    m.addSwitchXLSelector(3, "self", "show self object access in normal view", show3);
 	    if (sheet != mmain()) m.addSwitchXLSelector(4, "prio", "show sheet priority control in normal view", show4);
 	    
 	    addTrigS(1, "view", goto_run).setInfo("view full sheet");
