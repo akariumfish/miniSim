@@ -259,6 +259,8 @@ public static class FlocPrint extends Sheet_Specialize {
 	sim_front.getTab(2).getShelf()
     		.addDrawerFactValue(startzone, 2, 10, 1)
     		.addSeparator(0.125)
+    	    .addDrawerButton(kill_all, 10, 1)
+    	    .addSeparator(0.125)
     		;
 	
     nFrontTab tab = sim_front.addTab("Floc");
@@ -327,6 +329,8 @@ public static class FlocPrint extends Sheet_Specialize {
   sBoo draw_tail, oscillant, point_to_side, do_flocking;
   sFlt side_dir, oscl_force, oscl_length, side_force;
   sInt tail_long;
+  
+  sRun kill_all;
 
   FlocComu(Simulation _c, Canvas c, String n, sValueBloc b) { super(_c, n, "floc", 50, b); 
   	canv = c;
@@ -386,7 +390,10 @@ public static class FlocPrint extends Sheet_Specialize {
 	        if (ms.specialize.get().equals("Grower")) gcom = (GrowerComu)ms;
 	      }
 	    }});
-	  
+	    
+	    kill_all = newRun("kill_all", "kill_all", new nRunnable() { 
+	      public void run() { 
+	    	  	for (Entity e : list) if (e.active) e.destroy(); } } );
   }
   
   void custom_pre_tick() {

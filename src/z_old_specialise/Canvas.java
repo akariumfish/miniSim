@@ -56,7 +56,7 @@ public class Canvas extends Macro_Sheet {
 	      .addDrawerDoubleButton(val_rst_run, val_show_grab, 10, 1)
 	      .addSeparator(0.125)
 	      ;
-	      
+
 	    selector_list = tab.getShelf(0)
 	      .addSeparator(0.25)
 	      .addList(4, 10, 1);
@@ -80,6 +80,24 @@ public class Canvas extends Macro_Sheet {
 	    
 	    update_com_selector_list();
 	    
+	    tab = sheet_front.addTab("Brush");
+	    tab.getShelf()
+	      .addDrawer(10.25, 0.75)
+	      .addModel("Label-S4", "-Brush Control-").setFont((int)(ref_size/1.4)).getShelf()
+	      .addSeparator(0.125)
+	      .addDrawerButton(do_rain, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFactValue(rain_strength, 2, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(rain_dir, 1, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerButton(do_brush, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFactValue(brush_size, 2, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFactValue(brush_dens, 2, 10, 1)
+	      .addSeparator(0.125)
+	      ;
 
 	    if (sheet_front.collapsed) {
 	    		sheet_front.popUp();
@@ -137,6 +155,12 @@ public class Canvas extends Macro_Sheet {
 	  sRun back_clear, back_add, back_fill, back_save, back_load;
 	  sStr back_file;
 	  
+	  sBoo do_rain, do_brush;
+	  sFlt rain_strength, brush_size, brush_dens;
+	  sInt rain_dir;
+	  sCol val_col_brush;
+	  
+	  
 	  Canvas(Simulation m, sValueBloc b) { 
 	    super(m.mmain(), "Canvas", b);
 	    sim = m;
@@ -155,9 +179,14 @@ public class Canvas extends Macro_Sheet {
 	    val_show_grab = newBoo(false, "val_show_grab", "show_grab");
 	    selected_com = newStr("selected_com", "scom", "");
 	    val_col_back = menuColor(gui.app.color(0), "background");
-	    val_col_back.addEventChange(new nRunnable() { public void run() { 
-	      reset();
-	    } });
+	    val_col_back.addEventChange(new nRunnable() { public void run() { reset(); } });
+	    do_rain = newBoo(false, "do_rain", "do_rain");
+	    rain_strength = newFlt(1, "rain_strength", "rain_strength");
+	    rain_dir = newInt(0, "rain_dir", "rain_dir");
+	    do_brush = newBoo(false, "do_brush", "do_brush");
+	    brush_size = newFlt(30, "brush_size", "brush_size");
+	    brush_dens = newFlt(1, "brush_dens", "brush_dens");
+	    val_col_brush = menuColor(gui.app.color(255, 0, 0), "val_col_brush");
 	    
 	    can_st = can_div.get()-1;
 	    can_div.addEventChange(new nRunnable() { public void run() { 
@@ -295,7 +324,7 @@ public class Canvas extends Macro_Sheet {
 	    return (gui.app.alpha(c) / 255.0F) * 
 	    		(gui.app.red(c) + gui.app.green(c) + gui.app.blue(c)) / 3; 
 	  }
-
+	  
 	  int decay(int c) {
 	    return gui.app.color(gui.app.red(c)*val_decay.get(), 
 	    		             gui.app.green(c)*val_decay.get(), 
@@ -355,6 +384,78 @@ public class Canvas extends Macro_Sheet {
 	    }
 	  }
 	  
+	  void rain(PImage can) {
+		  for (int i = 0 ; i < can.pixels.length ; i++) {
+//			  if (i+val_w.get() < can.pixels.length) {
+//				  if (sat(can.pixels[i]) - rain_strength.get() > 
+//			  	  sat(can.pixels[i+val_w.get()])) {
+//				  can.pixels[i] = gui.app.color(
+//						  gui.app.red(can.pixels[i]) - rain_strength.get()/3.0F, 
+//						  gui.app.green(can.pixels[i]) - rain_strength.get()/3.0F, 
+//						  gui.app.blue(can.pixels[i]) - rain_strength.get()/3.0F 
+////						  gui.app.alpha(can.pixels[i]) - rain_strength.get()/4
+//						  );
+//				  int j = i+val_w.get();
+//				  can.pixels[j] = gui.app.color(
+//						  gui.app.red(can.pixels[j]) + rain_strength.get()/3.0F, 
+//						  gui.app.green(can.pixels[j]) + rain_strength.get()/3.0F, 
+//						  gui.app.blue(can.pixels[j]) + rain_strength.get()/3.0F 
+////						  gui.app.alpha(can.pixels[j]) + rain_strength.get()/4
+//						  );
+//			  } 
+			if (i+val_w.get() < can.pixels.length) {
+				if (gui.app.red(can.pixels[i]) - rain_strength.get() >=
+					gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
+					gui.app.red(can.pixels[i]) - rain_strength.get() >= 0 && 
+					gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
+				  can.pixels[i] = gui.app.color(
+						  gui.app.red(can.pixels[i]) - rain_strength.get(), 
+						  gui.app.green(can.pixels[i]), 
+						  gui.app.blue(can.pixels[i]), 
+						  gui.app.alpha(can.pixels[i]) );
+				  int j = i+val_w.get();
+				  can.pixels[j] = gui.app.color(
+						  gui.app.red(can.pixels[j]) + rain_strength.get(), 
+						  gui.app.green(can.pixels[j]), 
+						  gui.app.blue(can.pixels[j]), 
+						  gui.app.alpha(can.pixels[j]) );
+				}  
+				if (gui.app.green(can.pixels[i]) - rain_strength.get() >=
+					gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
+					gui.app.green(can.pixels[i]) - rain_strength.get() >= 0 && 
+					gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
+				  can.pixels[i] = gui.app.color(
+						  gui.app.red(can.pixels[i]), 
+						  gui.app.green(can.pixels[i]) - rain_strength.get(), 
+						  gui.app.blue(can.pixels[i]), 
+						  gui.app.alpha(can.pixels[i]) );
+				  int j = i+val_w.get();
+				  can.pixels[j] = gui.app.color(
+						  gui.app.red(can.pixels[j]), 
+						  gui.app.green(can.pixels[j]) + rain_strength.get(), 
+						  gui.app.blue(can.pixels[j]), 
+						  gui.app.alpha(can.pixels[j]) );
+				}  
+				if (gui.app.blue(can.pixels[i]) - rain_strength.get() >=
+					gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
+					gui.app.blue(can.pixels[i]) - rain_strength.get() >= 0 && 
+					gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
+				  can.pixels[i] = gui.app.color(
+						  gui.app.red(can.pixels[i]), 
+						  gui.app.green(can.pixels[i]), 
+						  gui.app.blue(can.pixels[i]) - rain_strength.get(), 
+						  gui.app.alpha(can.pixels[i]) );
+				  int j = i+val_w.get();
+				  can.pixels[j] = gui.app.color(
+						  gui.app.red(can.pixels[j]), 
+						  gui.app.green(can.pixels[j]), 
+						  gui.app.blue(can.pixels[j]) + rain_strength.get(), 
+						  gui.app.alpha(can.pixels[j]) );
+				}  
+			}
+		  }
+	  }
+	  
 	  void tick() {
 //	    if (fcom != null) {
 //	      for (int i = can_st ; i < fcom.list.size() ; i += Math.max(1, can_div.get()) )
@@ -362,6 +463,15 @@ public class Canvas extends Macro_Sheet {
 //	          ((Floc)fcom.list.get(i)).draw_halo(this);
 //	      }
 //	    }
+		
+		if (do_rain.get()) {
+	      if (active_can == 0) rain(can1);
+	      else if (active_can == 1) rain(can2);
+		}
+		
+		if (do_brush.get() && gui.in.getState("MouseRight")) {
+			draw_halo(gui.mouseVector, brush_size.get(), brush_dens.get(), val_col_brush.get());
+		}
 	    
 	    for (Face f : faces) f.tick();
 	    

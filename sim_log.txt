@@ -1,16 +1,10 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-429:- :setup_load from multi_floc.sdata
-1300:- :setup_load from nodes.sdata
-4443:- :setup_load from old_world.sdata
-5055:- :setup_load from rainbow.sdata
-8290:  :full_data_save to rainbow.sdata
-8580:  :setup_load from spirale.sdata
-9201:  :setup_load from shape.sdata
-10709:- :full_data_save to shape.sdata
-10748:- :setup_load from shape.sdata
-12252:- :exit
+6654:- :full_data_save to start.sdata
+39434:- :full_data_save to start.sdata
+41697:- :full_data_save to start.sdata
+42552:- :exit
 null
 null
 null
