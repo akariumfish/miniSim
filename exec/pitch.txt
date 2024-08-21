@@ -1,0 +1,76 @@
+Root.
+
+Players and conceptor should be equals in what they can do with games
+
+Once you publish a map, everyone can get access to whats behind by winning it and modify it for its taste.
+
+The patch show visualy the role, settings, and relation of each numeric actors behind the map.
+
+You never have to spend time to learn before starting building your idee
+
+Playing teach you slowly how it work.
+
+ranking is not for everyone (no shame)
+
+Winning means better access level.
+access means power to influence the world.
+Full access means full control over the patchs
+patchs execusion cost in function of the actions.
+cost are always here but source too
+full access means more fund
+fund exit maps with you if you win
+fund can enter new map but different quantity means different difficulty level 
+some give full access at start for free to learn or play
+fund can be placed in a bank between maps
+when you win ownership you only win a copy
+you can have special patch for your entity control that go with you between maps if allowed
+play hosted locally, log send for verification (no hack cause no versus and no gain)
+
+
+Develoment.
+At first, it was a catharsis. I needed to do something to escape.
+It was simple and i was liking what i made more and more. 
+New idees and success where flowing, and i was proud of the result. 
+Linking what i do feeled so ancient. I was needing it, so it took all the place.
+Feeling the inside finally getting quieter was a delivering. 
+So i was terrified of others breaking it for me.
+Some people liked it yet.
+
+In the excitment, i wished to see where it can go if im a little more serious. To go further, new more complexe tools was in line and i needed to greet an old fear. There was no question, at this moment the other choice was too far away.
+It was hard, for a long time if there where progress, it was slow. I was getting bored. The fear woke me up, why was it so short this time? I still needed it, deeply.
+Finally i understood, i was missing the feeling of creation. So why would i keep doing this?
+With absolutelly no technical utility, in the middle of the workshop, i added back my first tools.
+
+In the end i couldnt make the new tools like i wanted them. The dragon was down but not fully dompted. The road ahead was not so distent in apperance, but i started thinking i couldnt get what i wanted in this workshop. Nonetheless it has teached me, now i should be able to do it. I only needed to recreate almost everything. And, i was sure, it will be awesome.
+
+I did it slowly, with preparation, building one thing at a time.
+I learned and always kept old tools, to keep seeing the path, and as pets, in a certain way.
+And things seemed to work. Not always, numerous buildings had flaws, hidden and not. But i couldnt deny it now.
+I was still able to go further. 
+
+New tools, builds, pets and blueprint, they where all over the workshop. New idee where partially build in some corner, olds pains where comming back regularly. Its like they want to mock my incapacity to cure them. In this chaos it was long to get anywhere or anything. Maybe it was time to move. But not yet, result where close.
+
+Eventually workshop inhabitants accepted to work together. Without believing in it, i took the tool. And tried again. Under my hand, shaking, what was a troubled vision has become reality. Nothing much, barely alive, but here. Doing what i allways doubted i could see one day.
+I was right, it seemed now possible for me. More closer than ever before. Someday, i will get to see the end of my old vision. And it will go away with who want to go where i cant. 
+
+In my head, long curbed ideas started storming again. Quickly the new workshop was set.
+Not everybody followed. Some tools where better being redone. Some others could come only later and not always fully. I craved a clean space so i migrated them only when needed. The new shop was allowing so much. No more! Time spend searching. No more, rolling long distence for nothing. And last but not the least : less labor, the workshop could work too! The road was steep but the goal as never looked this clear.
+
+Time passed. Between now and the end of this story, not much is left. So i did more than ever before.
+I was feeling it getting closer. After, i knew the storm would slowly go back to sleep. 
+So i had to pluck as much as i could out, franticly, and throwed all of it wherever and however i could. Too bad for the tidying but time was counted. Since my first im always anxious when the end get close. Like a raging tempest, concepts and possibilitys not event fully formed flash before me. Large chunk of this swamp of idee sprouts or dissapear. I try to select the promising ones, quickly, and with care i anchor them as best i can. How many will be lost, i dont know.
+
+I calmed down. There where more, but who has not yet found a meaning, so it was okay.
+I knew it was time to stop playing now. The next steps in front of me leaded me back to a place i visited before. A place much more taxing. A place for the next dive. 
+Carefully, i tidied up the workshop. I knew, the next time, i would only come back here to greet the memorys.
+
+
+
+show screenshots of the corresponding version while speaking
+
+
+tools/idee features
+pets cool objects
+build patch
+workshop IDE/language
+pain bug

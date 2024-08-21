@@ -1,8 +1,7 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-397:- :setup_load from floc_tail.sdata
-633:- :exit
+87:- :exit
 null
 null
 null

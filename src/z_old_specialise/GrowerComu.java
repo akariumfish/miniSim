@@ -145,8 +145,8 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    val_col_leaf = menuColor(gui.app.color(0, 220, 0), "val_col_leaf");
 	    col_back = menuColor(gui.app.color(0, 220, 0), "col_back");
 	    
-	    MAX_LINE_WIDTH = menuFltSlide(1.5F, 0.1F, 50, "max_line_width");
-	    MIN_LINE_WIDTH = menuFltSlide(0.2F, 0.1F, 40, "min_line_width");
+	    MAX_LINE_WIDTH = menuFltSlide(1.5F, 1, 300, "max_line_width");
+	    MIN_LINE_WIDTH = menuFltSlide(0.2F, 1, 50, "min_line_width");
 	    leaf_size_fact = menuFltSlide(1, 1, 8, "leaf_size_fact");
 	    backfact = menuFltSlide(1, 0.1F, 8, "backfact");
 	    
@@ -350,7 +350,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  void addWidth() {
 		  width += (float)(com().MAX_LINE_WIDTH.get() - com().MIN_LINE_WIDTH.get()) / 
 				  (float)com().max_entity.get();
-//		  if (parent != null) parent.addWidth();
+		  if (parent != null) parent.addWidth();
 	  }
 	  Grower frame() { 
 	    return this;
