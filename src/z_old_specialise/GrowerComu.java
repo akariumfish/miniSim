@@ -55,7 +55,6 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  
 	  sInt leaf_nb;
 	  sFlt leaf_rot;
-	  sBoo do_anim;
 
 	  void comPanelBuild(nFrontPanel sim_front) {
 	    nFrontTab tab = sim_front.addTab("Control");
@@ -101,8 +100,6 @@ public static class GrowerPrint extends Sheet_Specialize {
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(leaf_nb, 10, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerButton(do_anim, 10, 1)
-	      .addSeparator(0.125)
 	      ;
 	    sim_front.toLayerTop();
 	  }
@@ -128,7 +125,6 @@ public static class GrowerPrint extends Sheet_Specialize {
 
 	    cible_zone = newFlt(1000F, "cible_zone", "zone");
 	    zone_view = newBoo(false, "zone_view", "zone_view");
-	    do_anim = newBoo(false, "do_anim", "do_anim");
 	    
 	    growP = new RandomTryParam(this, 0.2F, true, "grow");
 	    sproutP = new RandomTryParam(this, 3000, true, "sprout");
@@ -385,7 +381,6 @@ public static class GrowerPrint extends Sheet_Specialize {
 	        n.parent = this;
 	        n.addWidth();
 	        sprouts++;
-	        if (com().do_anim.get()) com().sim.anim(_p.x, _p.y);
 	      }
 	      //sprouts = (int[]) expand(sprouts, sprouts.length + 1);
 	      //sprouts[sprouts.length - 1] = temp_b.id;
@@ -410,7 +405,6 @@ public static class GrowerPrint extends Sheet_Specialize {
 	        n.addWidth();
 	        n.end = true;
 	        sprouts++;
-	        if (com().do_anim.get()) com().sim.anim(_p.x, _p.y);
 	      }
 	    }
 

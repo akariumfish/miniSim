@@ -7,6 +7,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import sData.nRunnable;
 import sData.sBoo;
+import sData.sCol;
 import sData.sFlt;
 import sData.sValue;
 
@@ -25,6 +26,20 @@ public class nShelf extends nBuilder {
 	      .setPosition(ref_size*0, 0)
 	      .setTextAlignment(PApplet.LEFT, PApplet.CENTER)
 	      ;
+	    }
+	    return this;
+	  }
+	public nShelf addDrawerColor(sCol val, float w, float h, nTaskPanel tp) {
+	    if (val != null) {
+			nDrawer d = addDrawer(w, h);
+		    d.addCtrlModel("Auto_Button-S2-P3", "choose").setRunnable(new nRunnable(val) { public void run() { 
+		    		new nColorPanel(gui, tp, ((sCol)builder));
+		    } } ).getDrawer()
+		    .addWatcherModel("Auto_Watch_Label-S6/1", "Color picker: " + val.ref)
+	        		.setLinkedValue(val)
+	        		.setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+	        	.getShelf()
+	        	.addSeparator(0.125);
 	    }
 	    return this;
 	  }

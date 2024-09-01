@@ -181,7 +181,7 @@ public class Camera {
     	input.app.pushMatrix();
     	input.app.translate(-(cam_pos.x() / cam_scale.get()), -(cam_pos.y() / cam_scale.get()));
     	input.app.scale(1/cam_scale.get());
-    	input.app.translate(-input.app.screen_width / 2  - input.app.screen_0_x, 
+    	input.app.translate(-input.app.screen_width / 2 - input.app.screen_0_x, 
     			-input.app.screen_height / 2 - input.app.screen_0_y);
 
       input.app.translate(-(cam_pos.x() / cam_scale.get()), -(cam_pos.y() / cam_scale.get()));

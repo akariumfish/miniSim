@@ -165,9 +165,6 @@ public class Simulation extends Macro_Sheet {
   Simulation addEventTick2(nRunnable r) { eventsTick2.add(r); return this; }
   Simulation removeEventTick2(nRunnable r) { eventsTick2.remove(r); return this; }
   
-
-  ArrayList<Animation> anims = new ArrayList<Animation>();
-
   void resetRng() { 
     SEED.set((int)(gui.app.random(1000000000))); 
     reset();
@@ -230,7 +227,6 @@ public class Simulation extends Macro_Sheet {
 
     //tick communitys
     for (Community c : list) c.tick();
-    for (int i = anims.size() - 1 ; i >= 0 ; i--) anims.get(i).tick();
 
     //tick call
     nRunnable.runEvents(eventsTick);
@@ -263,17 +259,12 @@ public class Simulation extends Macro_Sheet {
           for (Community f : list) if (f.val_draw_layer.get() == i) f.custom_cam_draw_post_entity();
         }
       }
-      for (Animation c : anims) c.draw();
     }
   }
   void draw_to_screen() { 
     for (Community c : list) if (c.show_entity.get()) c.draw_Screen();
   }
   
-  void anim(float x, float y) {
-	  Animation a = new Animation(this);
-	  a.play(x, y, 0);
-  }
   
   nToolPanel toolpanel;
   

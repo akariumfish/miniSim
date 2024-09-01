@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import Macro.Macro_Main;
 import Macro.Macro_Sheet;
 import RApplet.RConst;
+import RApplet.Rapp;
 import UI.Drawable;
 import UI.nCursor;
 import UI.nFrontPanel;
@@ -85,7 +86,7 @@ public class Canvas extends Macro_Sheet {
 	      .addDrawer(10.25, 0.75)
 	      .addModel("Label-S4", "-Brush Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-	      .addDrawerButton(do_rain, 10, 1)
+	      .addDrawerTripleButton(do_rain1, do_rain2, do_rain3, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(rain_strength, 2, 10, 1)
 	      .addSeparator(0.125)
@@ -155,7 +156,7 @@ public class Canvas extends Macro_Sheet {
 	  sRun back_clear, back_add, back_fill, back_save, back_load;
 	  sStr back_file;
 	  
-	  sBoo do_rain, do_brush;
+	  sBoo do_rain1, do_rain2, do_rain3, do_brush;
 	  sFlt rain_strength, brush_size, brush_dens;
 	  sInt rain_dir;
 	  sCol val_col_brush;
@@ -180,7 +181,9 @@ public class Canvas extends Macro_Sheet {
 	    selected_com = newStr("selected_com", "scom", "");
 	    val_col_back = menuColor(gui.app.color(0), "background");
 	    val_col_back.addEventChange(new nRunnable() { public void run() { reset(); } });
-	    do_rain = newBoo(false, "do_rain", "do_rain");
+	    do_rain1 = newBoo(false, "do_rain1", "do_rain1");
+	    do_rain2 = newBoo(false, "do_rain2", "do_rain2");
+	    do_rain3 = newBoo(false, "do_rain3", "do_rain3");
 	    rain_strength = newFlt(1, "rain_strength", "rain_strength");
 	    rain_dir = newInt(0, "rain_dir", "rain_dir");
 	    do_brush = newBoo(false, "do_brush", "do_brush");
@@ -322,7 +325,7 @@ public class Canvas extends Macro_Sheet {
 	  
 	  float sat(int c) {
 	    return (gui.app.alpha(c) / 255.0F) * 
-	    		(gui.app.red(c) + gui.app.green(c) + gui.app.blue(c)) / 3; 
+	    		(gui.app.red(c) + gui.app.green(c) + gui.app.blue(c)) / 3.0F; 
 	  }
 	  
 	  int decay(int c) {
@@ -375,85 +378,122 @@ public class Canvas extends Macro_Sheet {
 	    }
 	  }
 	  
-	  void spiral_tick(Spiral f) {
-	    if (f != null) {
-	      for (int i = can_st ; i < f.list.size() ; i += Math.max(1, can_div.get()) )
-	        if (f.list.get(i).active) {
-	          ((Arc)f.list.get(i)).draw_halo(this);
-	      }
-	    }
-	  }
-	  
 	  void rain(PImage can) {
 		  for (int i = 0 ; i < can.pixels.length ; i++) {
-//			  if (i+val_w.get() < can.pixels.length) {
-//				  if (sat(can.pixels[i]) - rain_strength.get() > 
-//			  	  sat(can.pixels[i+val_w.get()])) {
-//				  can.pixels[i] = gui.app.color(
-//						  gui.app.red(can.pixels[i]) - rain_strength.get()/3.0F, 
-//						  gui.app.green(can.pixels[i]) - rain_strength.get()/3.0F, 
-//						  gui.app.blue(can.pixels[i]) - rain_strength.get()/3.0F 
-////						  gui.app.alpha(can.pixels[i]) - rain_strength.get()/4
-//						  );
-//				  int j = i+val_w.get();
-//				  can.pixels[j] = gui.app.color(
-//						  gui.app.red(can.pixels[j]) + rain_strength.get()/3.0F, 
-//						  gui.app.green(can.pixels[j]) + rain_strength.get()/3.0F, 
-//						  gui.app.blue(can.pixels[j]) + rain_strength.get()/3.0F 
-////						  gui.app.alpha(can.pixels[j]) + rain_strength.get()/4
-//						  );
-//			  } 
-			if (i+val_w.get() < can.pixels.length) {
-				if (gui.app.red(can.pixels[i]) - rain_strength.get() >=
-					gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
-					gui.app.red(can.pixels[i]) - rain_strength.get() >= 0 && 
-					gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
+			  if (do_rain1.get()) {
+			  if (i+val_w.get() < can.pixels.length) {
+				  if (sat(can.pixels[i]) - rain_strength.get() > 
+			  	  sat(can.pixels[i+val_w.get()])) {
 				  can.pixels[i] = gui.app.color(
-						  gui.app.red(can.pixels[i]) - rain_strength.get(), 
-						  gui.app.green(can.pixels[i]), 
-						  gui.app.blue(can.pixels[i]), 
-						  gui.app.alpha(can.pixels[i]) );
+						  gui.app.red(can.pixels[i]) - rain_strength.get()/3.0F, 
+						  gui.app.green(can.pixels[i]) - rain_strength.get()/3.0F, 
+						  gui.app.blue(can.pixels[i]) - rain_strength.get()/3.0F 
+//						  gui.app.alpha(can.pixels[i]) - rain_strength.get()/4
+						  );
 				  int j = i+val_w.get();
 				  can.pixels[j] = gui.app.color(
-						  gui.app.red(can.pixels[j]) + rain_strength.get(), 
-						  gui.app.green(can.pixels[j]), 
-						  gui.app.blue(can.pixels[j]), 
-						  gui.app.alpha(can.pixels[j]) );
-				}  
-				if (gui.app.green(can.pixels[i]) - rain_strength.get() >=
-					gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
-					gui.app.green(can.pixels[i]) - rain_strength.get() >= 0 && 
-					gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
-				  can.pixels[i] = gui.app.color(
-						  gui.app.red(can.pixels[i]), 
-						  gui.app.green(can.pixels[i]) - rain_strength.get(), 
-						  gui.app.blue(can.pixels[i]), 
-						  gui.app.alpha(can.pixels[i]) );
-				  int j = i+val_w.get();
-				  can.pixels[j] = gui.app.color(
-						  gui.app.red(can.pixels[j]), 
-						  gui.app.green(can.pixels[j]) + rain_strength.get(), 
-						  gui.app.blue(can.pixels[j]), 
-						  gui.app.alpha(can.pixels[j]) );
-				}  
-				if (gui.app.blue(can.pixels[i]) - rain_strength.get() >=
-					gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
-					gui.app.blue(can.pixels[i]) - rain_strength.get() >= 0 && 
-					gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
-				  can.pixels[i] = gui.app.color(
-						  gui.app.red(can.pixels[i]), 
-						  gui.app.green(can.pixels[i]), 
-						  gui.app.blue(can.pixels[i]) - rain_strength.get(), 
-						  gui.app.alpha(can.pixels[i]) );
-				  int j = i+val_w.get();
-				  can.pixels[j] = gui.app.color(
-						  gui.app.red(can.pixels[j]), 
-						  gui.app.green(can.pixels[j]), 
-						  gui.app.blue(can.pixels[j]) + rain_strength.get(), 
-						  gui.app.alpha(can.pixels[j]) );
-				}  
+						  gui.app.red(can.pixels[j]) + rain_strength.get()/3.0F, 
+						  gui.app.green(can.pixels[j]) + rain_strength.get()/3.0F, 
+						  gui.app.blue(can.pixels[j]) + rain_strength.get()/3.0F 
+//						  gui.app.alpha(can.pixels[j]) + rain_strength.get()/4
+						  );
+				  }
+			  } 
+			}
+			if (do_rain2.get()) {
+				if (i+val_w.get() < can.pixels.length) {
+					if (gui.app.red(can.pixels[i]) - rain_strength.get() >=
+						gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
+						gui.app.red(can.pixels[i]) - rain_strength.get() >= 0 && 
+						gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
+					  can.pixels[i] = gui.app.color(
+							  gui.app.red(can.pixels[i]) - rain_strength.get(), 
+							  gui.app.green(can.pixels[i]), 
+							  gui.app.blue(can.pixels[i]), 
+							  gui.app.alpha(can.pixels[i]) );
+					  int j = i+val_w.get();
+					  can.pixels[j] = gui.app.color(
+							  gui.app.red(can.pixels[j]) + rain_strength.get(), 
+							  gui.app.green(can.pixels[j]), 
+							  gui.app.blue(can.pixels[j]), 
+							  gui.app.alpha(can.pixels[j]) );
+					}  
+					if (gui.app.green(can.pixels[i]) - rain_strength.get() >=
+						gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
+						gui.app.green(can.pixels[i]) - rain_strength.get() >= 0 && 
+						gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
+					  can.pixels[i] = gui.app.color(
+							  gui.app.red(can.pixels[i]), 
+							  gui.app.green(can.pixels[i]) - rain_strength.get(), 
+							  gui.app.blue(can.pixels[i]), 
+							  gui.app.alpha(can.pixels[i]) );
+					  int j = i+val_w.get();
+					  can.pixels[j] = gui.app.color(
+							  gui.app.red(can.pixels[j]), 
+							  gui.app.green(can.pixels[j]) + rain_strength.get(), 
+							  gui.app.blue(can.pixels[j]), 
+							  gui.app.alpha(can.pixels[j]) );
+					}  
+					if (gui.app.blue(can.pixels[i]) - rain_strength.get() >=
+						gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
+						gui.app.blue(can.pixels[i]) - rain_strength.get() >= 0 && 
+						gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
+					  can.pixels[i] = gui.app.color(
+							  gui.app.red(can.pixels[i]), 
+							  gui.app.green(can.pixels[i]), 
+							  gui.app.blue(can.pixels[i]) - rain_strength.get(), 
+							  gui.app.alpha(can.pixels[i]) );
+					  int j = i+val_w.get();
+					  can.pixels[j] = gui.app.color(
+							  gui.app.red(can.pixels[j]), 
+							  gui.app.green(can.pixels[j]), 
+							  gui.app.blue(can.pixels[j]) + rain_strength.get(), 
+							  gui.app.alpha(can.pixels[j]) );
+					}  
+				}
 			}
 		  }
+		if (do_rain3.get()) {
+			for (int i = 0 ; i < can.pixels.length ; i++) {
+				if (i+val_w.get() < can.pixels.length) {
+					transfer_pixel(can, can, i, i+val_w.get(), (int)rain_strength.get());
+				}
+			}
+		}
+	  }
+	  void transfer_pixel(PImage from_can, PImage to_can, int from, int to, int amount) {
+		  if (from_can.pixels.length != to_can.pixels.length) return;
+		  if (from < 0 || from > from_can.pixels.length) return;
+		  if (to < 0 || to > from_can.pixels.length) return;
+		  Rapp ap = gui.app;
+		  int rf = (int)ap.red(from_can.pixels[from]);
+		  int gf = (int)ap.green(from_can.pixels[from]);
+		  int bf = (int)ap.blue(from_can.pixels[from]);
+		  int af = (int)ap.alpha(from_can.pixels[from]);
+		  int rt = (int)ap.red(from_can.pixels[to]);
+		  int gt = (int)ap.green(from_can.pixels[to]);
+		  int bt = (int)ap.blue(from_can.pixels[to]);
+		  int at = (int)ap.alpha(from_can.pixels[to]);
+		  int[] result = transfer_color(rf, rt, amount);
+		  rf = result[0];
+		  rt = result[1];
+		  result = transfer_color(gf, gt, amount);
+		  gf = result[0];
+		  gt = result[1];
+		  result = transfer_color(bf, bt, amount);
+		  bf = result[0];
+		  bt = result[1];
+		  to_can.pixels[from] = ap.color(rf,gf,bf,af);
+		  to_can.pixels[to] = ap.color(rt,gt,bt,at);
+	  }
+	  int[] transfer_color(int from, int to, int amount) {
+		  if (from - amount < 0) amount = from;
+		  if (to + amount > 255) amount = 255 - to;
+		  int[] result = new int[3];
+		  result[0] = from - amount;
+		  result[1] = to + amount;
+		  result[2] = amount;
+		  return result;
 	  }
 	  
 	  void tick() {
@@ -464,10 +504,8 @@ public class Canvas extends Macro_Sheet {
 //	      }
 //	    }
 		
-		if (do_rain.get()) {
-	      if (active_can == 0) rain(can1);
-	      else if (active_can == 1) rain(can2);
-		}
+		if (active_can == 0) rain(can2);
+		else if (active_can == 1) rain(can1);
 		
 		if (do_brush.get() && gui.in.getState("MouseRight")) {
 			draw_halo(gui.mouseVector, brush_size.get(), brush_dens.get(), val_col_brush.get());
@@ -569,7 +607,7 @@ public class Canvas extends Macro_Sheet {
 	      }
 	    }
 	  }
-	  
+
 	  public void draw_halo(PVector pos, float halo_size, float halo_density, int c) {
 	    //walk a box of pix around entity containing the halo (pos +/- halo radius)
 	    for (float px = (int)(pos.x - halo_size) ; px < (int)(pos.x + halo_size) ; px+=val_scale.get())
@@ -583,6 +621,32 @@ public class Canvas extends Macro_Sheet {
 	          if (active_can == 1) addpix(can1, px, py, gui.app.color(gui.app.red(c)*a, gui.app.green(c)*a, gui.app.blue(c)*a));
 	        }
 	    }
+	  }
+	  public void draw_line_halo(PVector p1, PVector p2, float halo_size, float halo_density, int c, boolean fracture) {
+		  float xmin = PApplet.min(p1.x, p2.x);
+		  float xmax = PApplet.max(p1.x, p2.x);
+		  float ymin = PApplet.min(p1.y, p2.y);
+		  float ymax = PApplet.max(p1.y, p2.y);
+		    for (float px = (int)(xmin - halo_size) ; px < (int)(xmax + halo_size) ; 
+		    		 px += val_scale.get())
+		      for (float py = (int)(ymin - halo_size) ; py < (int)(ymax + halo_size) ; 
+		    		   py += val_scale.get()) {
+		        float d = RConst.distancePointToLine(px, py, p1.x, p1.y, p2.x, p2.y);
+		        float d1 = RConst.distancePointToPoint(px, py, p1.x, p1.y);
+//		        float d2 = RConst.distancePointToPoint(px, py, p2.x, p2.y);
+//		        float l = RConst.distancePointToPoint(p1.x, p1.y, p2.x, p2.y);
+		        if (d < halo_size && (d1 > halo_size || !fracture)
+		        		//&& (l < halo_size || !fracture)
+		        		) { 
+		          float a = (halo_density) * RConst.soothedcurve(1.0F, d / halo_size);
+		          if (active_can == 0) addpix(can2, px, py, gui.app.color(gui.app.red(c)*a, 
+		        		  													gui.app.green(c)*a, 
+		        		  													gui.app.blue(c)*a));
+		          if (active_can == 1) addpix(can1, px, py, gui.app.color(gui.app.red(c)*a, 
+		        		  													gui.app.green(c)*a, 
+		        		  													gui.app.blue(c)*a));
+		        }
+		    }
 	  }
 
 	  void addpix(PImage canvas, float x, float y, int nc) {

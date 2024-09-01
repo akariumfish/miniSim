@@ -1,13 +1,8 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-16056:- :full_data_save to start.sdata
-16067:- :setup_load from start.sdata
-17018:- :full_data_save to start.sdata
-17033:- :setup_load from start.sdata
-17220:- :full_data_save to start.sdata
-17232:- :setup_load from start.sdata
-27221:- :exit
+12448:- :setup_load from solid_draw.sdata
+56046:- :exit
 null
 null
 null
