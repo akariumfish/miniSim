@@ -1,7 +1,9 @@
 0:- :init
 0:  :init end
 2:- :setup_load from start.sdata
-87:- :exit
+2439:- :full_data_save to start.sdata
+3137:- :full_data_save to start.sdata
+3983:- :exit
 null
 null
 null
