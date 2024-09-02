@@ -114,6 +114,11 @@ public class Camera {
       }
     }
   }
+  
+  int recording = 0;
+  public void record(int len) {
+	  recording = len;
+  }
 
   void popCam() {
     input.app.popMatrix();
@@ -122,6 +127,11 @@ public class Camera {
       input.app.saveFrame("image/shot-########.png");
     }
     screenshot = false;
+    
+    if (recording > 0) {
+    		recording--;
+    		input.app.saveFrame("video/shot-########.tif");
+    }
 
     PVector tm = screen_to_cam(input.mouse);
     PVector tpm = screen_to_cam(input.pmouse);

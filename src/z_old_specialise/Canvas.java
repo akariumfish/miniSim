@@ -135,8 +135,8 @@ public class Canvas extends Macro_Sheet {
 	  nCursor ref_cursor;
 	  
 	  sVec val_pos;
-	  sInt val_w, val_h, can_div;
-	  sFlt val_scale, color_keep_thresh, val_decay, slow_decay;
+	  sInt val_w, val_h, can_div, rate_decay;
+	  sFlt val_scale, color_keep_thresh, decay_fact;
 	  sBoo val_show, val_show_back, val_show_bound, val_show_grab;
 	  sStr selected_com;
 	  sCol val_col_back;
@@ -172,8 +172,8 @@ public class Canvas extends Macro_Sheet {
 	    can_div = menuIntIncr(4, 1, "can_div");
 	    val_scale = menuFltSlide(def_pix_size, 2, 80, "val_scale");
 	    color_keep_thresh = menuFltSlide(200, 0, 260, "clrkeep_thresh");
-	    val_decay = menuFltSlide(1, 0.99F, 1.01F, "decay");
-	    slow_decay = menuFltSlide(1.0F, 0.9F, 1.1F, "slow_decay");
+	    decay_fact = menuFltSlide(1, 0.9F, 1.0F, "decay_fact");
+	    rate_decay = menuIntIncr(100, 10, "rate_decay");
 	    val_show = newBoo(false, "val_show", "show_canvas");
 	    val_show_back = newBoo(false, "val_show_back", "val_show_back");
 	    val_show_bound = newBoo(false, "val_show_bound", "show_bound");
@@ -329,27 +329,28 @@ public class Canvas extends Macro_Sheet {
 	  }
 	  
 	  int decay(int c) {
-	    return gui.app.color(gui.app.red(c)*val_decay.get(), 
-	    		             gui.app.green(c)*val_decay.get(), 
-	    		             gui.app.blue(c)*val_decay.get(), 
-	    		             gui.app.alpha(c)*val_decay.get()); 
+	    return gui.app.color(1.0F*gui.app.red(c)*decay_fact.get(), 
+	    					1.0F*gui.app.green(c)*decay_fact.get(), 
+	    					1.0F*gui.app.blue(c)*decay_fact.get(), 
+	    		             gui.app.alpha(c));//*val_decay.get()); 
 	  }
-	  int slowdecay(int c) {
-	    return gui.app.color(gui.app.red(c)*slow_decay.get(), 
-	    		             gui.app.green(c)*slow_decay.get(), 
-	    		             gui.app.blue(c)*slow_decay.get(), 
-	    		             gui.app.alpha(c)*slow_decay.get()); 
-	  }
+//	  int slowdecay(int c) {
+//	    return gui.app.color(gui.app.red(c)*slow_decay.get(), 
+//	    		             gui.app.green(c)*slow_decay.get(), 
+//	    		             gui.app.blue(c)*slow_decay.get(), 
+//	    		             gui.app.alpha(c)*slow_decay.get()); 
+//	  }
 	  int dc_cnt = 0;
 	  private void clear_pim(PImage canvas) {
+  	  	dc_cnt++;
+  	  	if (dc_cnt >= rate_decay.get()) {
+  	  		dc_cnt = 0;
+  	  	}
 	    for (int i = 0 ; i < canvas.pixels.length ; i++) {
 	      if (sat(canvas.pixels[i]) < color_keep_thresh.get()) canvas.pixels[i] = val_col_back.get(); 
 	      else {
-	    	  	canvas.pixels[i] = decay(canvas.pixels[i]);
-	    	  	dc_cnt++;
-	    	  	if (dc_cnt > 100) {
-	    	  		dc_cnt = 0;
-	    	  		canvas.pixels[i] = slowdecay(canvas.pixels[i]);
+	    	  	if (dc_cnt == 0) {
+	    	  		canvas.pixels[i] = decay(canvas.pixels[i]);
 	    	  	}
 	      }
 	    }

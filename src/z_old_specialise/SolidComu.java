@@ -21,6 +21,8 @@ class Solid extends Entity {
   float halo_density = 0;
   int halo_col = 0;
   
+  ArrayList<Solid> close_list = new ArrayList<Solid>();
+  
   Solid(SolidComu c) { 
 	super(c);
   }
@@ -52,9 +54,25 @@ class Solid extends Entity {
     return com().app.color(r, g, b);
   }
 
+  int gradedCol(int c1, int c2, float p) {
+	int r = (int)(p * (com().app.red(c1) -
+    		com().app.red(c2)));
+    int g = (int)(p * (com().app.green(c1) -
+    		com().app.green(c2)));
+    int b = (int)(p * (com().app.blue(c1) -
+    		com().app.blue(c2)));
+    r += com().app.red(c2);
+    g += com().app.green(c2);
+    b += com().app.blue(c2);
+    return com().app.color(r, g, b);
+  }
   void draw_halo(Canvas canvas) {
+
+	halo_col = gradedCol(com().val_col_halo1.get(), com().val_col_halo2.get(), mov.mag()/20);
     canvas.draw_line_halo(prev_pos, pos, halo_size, halo_density, halo_col, 
     		com().fracture_halo.get());
+//    canvas.draw_line_halo(prev_pos, pos, halo_size, halo_density, halo_col, 
+//    		com().fracture_halo.get());
   }
   
   Solid frame() { return this; }
@@ -68,8 +86,32 @@ class Solid extends Entity {
     mov.mult(1 - com().friction_fact.get());
     
     accel.set(0, 0);
+    
+    if (com().use_merge.get()) {
+	    cnt++;
+	    if (cnt > 40 && this != com().ball_obj && radius < com().ball_rad.get() * 0.9F) {
+	    		cnt = 0;
+		    for (Entity e : com().list) if (e.active) {
+		    		Solid s = (Solid)e;
+		    		if (s != com().ball_obj && s.radius < com().ball_rad.get() * 0.9F) {
+			    		float d = PApplet.dist(pos.x, pos.y, s.pos.x, s.pos.y);
+			    		if (s.radius < radius && d < radius + s.radius) {
+			    			if (close_list.contains(s)) {
+			    				close_list.remove(s);
+			    				radius += s.radius / 1.0F;
+	//		    				mov.add(s.mov);
+			    				s.destroy();
+			    			} else close_list.add(s);
+			    		} else {
+			    			if (close_list.contains(s)) close_list.remove(s);
+			    		}
+		    		}
+		    } 
+	    }
+    }
     return this;
   }
+  int cnt = 0;
   
   Solid draw() {
 	  if (com().show_fill.get()) com().app.fill(com().fill_col.get()); 
@@ -111,13 +153,13 @@ public static class SolidPrint extends Sheet_Specialize {
 	    .addSeparator(0.125)
 	    ;
 	
-      nFrontTab tab = sim_front.addTab("Solid");
+      nFrontTab tab = sim_front.addTab("Create");
       tab.getShelf()
       	.addDrawerDoubleButton(build_as, del_all, 10.25F, 1)
       	.addSeparator(0.125)
       	.addDrawerButton(reset_build, 10.25F, 1)
       	.addSeparator(0.125)
-      	.addDrawerDoubleButton(build_as_box, build_as_hexa, 10.25F, 1)
+      	.addDrawerTripleButton(build_as_box, build_as_hexa, build_rng, 10.25F, 1)
       	.addSeparator(0.125)
         .addDrawerIncrValue(strtbox_width, 10, 10, 1)
         .addSeparator(0.125)
@@ -129,17 +171,24 @@ public static class SolidPrint extends Sheet_Specialize {
         .addSeparator(0.125)
         .addDrawerFactValue(solid_rad, 1.18F, 10, 1)
         .addSeparator(0.125)
+        ;
+      tab = sim_front.addTab("Pilote");
+      tab.getShelf()
         .addDrawerFactValue(friction_fact, 2, 10, 1)
         .addSeparator(0.125)
         .addDrawerFactValue(collide_fact, 2, 10, 1)
         .addSeparator(0.125)
+      	.addDrawerDoubleButton(use_grav, use_merge, 10.25F, 1)
+      	.addSeparator(0.125)
+        .addDrawerFactValue(gravity_const, 2, 10, 1)
+        .addSeparator(0.125)
+      	.addDrawerDoubleButton(use_ball, ball_to_center, 10.25F, 1)
+      	.addSeparator(0.125)
+        .addDrawerFactValue(ball_rad, 2, 10, 1)
+        .addSeparator(0.125)
       	.addDrawerDoubleButton(use_wall, show_wall, 10.25F, 1)
       	.addSeparator(0.125)
         .addDrawerFactValue(wall_width, 2, 10, 1)
-        .addSeparator(0.125)
-      	.addDrawerButton(use_ball, 10.25F, 1)
-      	.addSeparator(0.125)
-        .addDrawerFactValue(ball_rad, 2, 10, 1)
         .addSeparator(0.125)
       	;
     	  sim_front.toLayerTop();
@@ -152,10 +201,11 @@ public static class SolidPrint extends Sheet_Specialize {
   
   sInt strtbox_width;
   sFlt strtbox_space, solid_rad, wall_width;
-  sBoo reset_build, build_as_box, build_as_hexa, use_wall, show_wall, use_ball;
+  sBoo reset_build, build_as_box, build_as_hexa, build_rng, use_wall, show_wall, 
+  	use_ball, ball_to_center, use_grav, use_merge;
   sRun build_as, del_all;
 
-  sFlt friction_fact, collide_fact, ball_rad;
+  sFlt friction_fact, collide_fact, gravity_const, ball_rad;
   
   sBoo show_fill, show_stroke, fracture_halo;
   sFlt stroke_width, halo_size, halo_dens;
@@ -179,11 +229,16 @@ public static class SolidPrint extends Sheet_Specialize {
     reset_build = newBoo(true, "reset_build");
     build_as_box = newBoo(true, "build_as_box");
     build_as_hexa = newBoo(false, "build_as_hexa");
+    build_rng = newBoo(false, "build_rng");
 
     friction_fact = newFlt(0.1F, "friction_fact");
     collide_fact = newFlt(0.1F, "collide_fact");
-    
+    gravity_const = newFlt(1F, "gravity_const");
+    use_grav = newBoo(false, "use_grav");
+    use_merge = newBoo(false, "use_merge");
+
     use_ball = newBoo(false, "use_ball");
+    ball_to_center = newBoo(false, "ball_to_center");
     ball_rad = newFlt(40F, "ball_rad");
 
     show_fill = newBoo(true, "show_fill");
@@ -217,7 +272,7 @@ public static class SolidPrint extends Sheet_Specialize {
     		if (build_as_box.get()) {
 	    	  	for (Entity e : list) if (e.active) e.destroy(); 
 	    	  	ball_obj = null; 
-	    	  	float side_length = strtbox_width.get() * strtbox_space.get();
+	    	  	float side_length = (strtbox_width.get() - 1) * strtbox_space.get();
 	    	  	for (int i = 0; i < strtbox_width.get() ; i++)
 	        	for (int j = 0; j < strtbox_width.get() ; j++) {
 	        		Solid s = newEntity();
@@ -225,6 +280,18 @@ public static class SolidPrint extends Sheet_Specialize {
 	        			s.pos.set(adding_cursor.pos().x - side_length / 2 + i * strtbox_space.get(), 
 	        					  adding_cursor.pos().y - side_length / 2 + j * strtbox_space.get());
 	        			s.radius = solid_rad.get();
+	        			if (build_rng.get()) {
+	        				s.pos.add(app.random(- strtbox_space.get() / 2, strtbox_space.get() /2),
+	        						  app.random(- strtbox_space.get() / 2, strtbox_space.get() /2));
+	        				s.radius += app.random(- solid_rad.get() / 2, solid_rad.get() /1);
+	        				s.mov.set(300 * collide_fact.get() * solid_rad.get(), 0);
+	        				s.mov.rotate(app.random(-3.14F, 3.14F));
+	        			}
+//	        			if (ball_obj != null) {
+//		        			float tc = PApplet.dist(s.pos.x, s.pos.y, 
+//		        									ball_obj.pos.x, ball_obj.pos.y);
+//		        			if (tc < ball_obj.radius * 2.0F) s.destroy();
+//	        			}
 	        		}
 	        	}
     		}
@@ -246,6 +313,18 @@ public static class SolidPrint extends Sheet_Specialize {
 		        					  j * strtbox_space.get() +
 		        					  (flip * strtbox_space.get() / 2));
 		        			s.radius = solid_rad.get();
+		        			if (build_rng.get()) {
+		        				s.pos.add(app.random(- strtbox_space.get() / 2, strtbox_space.get() /2),
+		        						  app.random(- strtbox_space.get() / 2, strtbox_space.get() /2));
+		        				s.radius += app.random(- solid_rad.get() / 2, solid_rad.get() / 1);
+		        				s.mov.set(300 * collide_fact.get() * solid_rad.get(), 0);
+		        				s.mov.rotate(app.random(-3.14F, 3.14F));
+		        			}
+//		        			if (ball_obj != null) {
+//			        			float tc = PApplet.dist(s.pos.x, s.pos.y, 
+//			        									ball_obj.pos.x, ball_obj.pos.y);
+//			        			if (tc < ball_obj.radius / 1.0F) s.destroy();
+//		        			}
 		        		}
 		        	}
 	    	  	}
@@ -268,6 +347,10 @@ public static class SolidPrint extends Sheet_Specialize {
 			ball_obj = null; 
 		}
 		if (use_ball.get()) {
+			if (ball_obj != null) {
+				ball_obj.destroy(); 
+				ball_obj = null; 
+			}
 			ball_obj = newEntity();
 	    		if (ball_obj != null) {
 	    			ball_obj.pos.set(adding_cursor.pos().x, adding_cursor.pos().y);
@@ -282,10 +365,16 @@ public static class SolidPrint extends Sheet_Specialize {
 		  float d = PApplet.dist(s1.pos.x, s1.pos.y, s2.pos.x, s2.pos.y);
 		  if (d < s1.radius/2.0F + s2.radius/2.0F) {
 			  PVector push = new PVector(s1.pos.x - s2.pos.x, s1.pos.y - s2.pos.y);
-			  push.mult(collide_fact.get());
+			  push.mult(collide_fact.get() * s2.radius / (s1.radius + s2.radius));
 			  s1.accel.add(push);
-			  push.mult(-1);
+			  push.mult(-(s1.radius / (s1.radius + s2.radius)) / (s2.radius / (s1.radius + s2.radius)));
 			  s2.accel.add(push);
+		  } else if (use_grav.get()) {
+			  PVector push = new PVector(s1.pos.x - s2.pos.x, s1.pos.y - s2.pos.y);
+			  push.setMag(s1.radius * gravity_const.get() / (d*d));
+			  s2.accel.add(push);
+			  push.mult(-s2.radius/s1.radius);
+			  s1.accel.add(push);
 		  }
 	  }
 	  if (use_wall.get()) {
@@ -294,22 +383,24 @@ public static class SolidPrint extends Sheet_Specialize {
 		  float ymin = adding_cursor.pos().y - wall_width.get() / 2.0F;
 		  float ymax = adding_cursor.pos().y + wall_width.get() / 2.0F;
 		  for (Solid s : solid_list) {
-			  if (s.pos.x < xmin + s.radius) { //s.accel.add(-s.mov.x * 2, 0); 
-			  	s.mov.add((xmin + s.radius) - s.pos.x, 0);
+			  if (s.pos.x < xmin + s.radius/2) { //s.accel.add(-s.mov.x * 2, 0); 
+			  	s.mov.add((xmin + s.radius/2) - s.pos.x, 0);
 			  }
-			  if (s.pos.y < ymin + s.radius) { //s.accel.add(0, -s.mov.y * 2);
-			  	s.mov.add(0, (ymin + s.radius) - s.pos.y);
+			  if (s.pos.y < ymin + s.radius/2) { //s.accel.add(0, -s.mov.y * 2);
+			  	s.mov.add(0, (ymin + s.radius/2) - s.pos.y);
 			  }
-			  if (s.pos.x > xmax - s.radius) { //s.accel.add(-s.mov.x * 2, 0);
-			  	s.mov.add((xmax - s.radius) - s.pos.x, 0);
+			  if (s.pos.x > xmax - s.radius/2) { //s.accel.add(-s.mov.x * 2, 0);
+			  	s.mov.add((xmax - s.radius/2) - s.pos.x, 0);
 			  }
-			  if (s.pos.y > ymax - s.radius) { //s.accel.add(0, -s.mov.y * 2);
-			  	s.mov.add(0, (ymax - s.radius) - s.pos.y);
+			  if (s.pos.y > ymax - s.radius/2) { //s.accel.add(0, -s.mov.y * 2);
+			  	s.mov.add(0, (ymax - s.radius/2) - s.pos.y);
 			  }
 		  }
 	  }
   }
   void custom_post_tick() {
+	  if (ball_to_center.get() && ball_obj != null) 
+		  ball_obj.pos.set(adding_cursor.pos());
 	  for (Solid s : solid_list) s.draw_halo(canv);
   }
   void custom_frame() {

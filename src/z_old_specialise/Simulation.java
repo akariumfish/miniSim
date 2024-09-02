@@ -124,6 +124,10 @@ public class Simulation extends Macro_Sheet {
     srun_scrsht = newRun("screen_shot", "impr", new nRunnable() { 
       public void run() { inter.cam.screenshot = true; } } );
     
+    srun_record = newRun("srun_record", "record", new nRunnable() { 
+        public void run() { inter.cam.record(record_len.get()); } } );
+    record_len = newInt(400, "record_len", "record_len");
+    
     mmain().addEventSetupLoad(new nRunnable() { 
       public void run() { mmain().inter.addEventNextFrame(new nRunnable() { 
       public void run() { reset(); } } ); 
@@ -148,6 +152,9 @@ public class Simulation extends Macro_Sheet {
   sInt auto_reset_turn;
   sRun srun_reset, srun_rngr, srun_nxtt, srun_nxtf, srun_tick, srun_scrsht;
   sBoo show_toolpanel;
+  
+  sInt record_len; 
+  sRun srun_record;
 
   float tick_pile = 0; //pile des tick a exec
 
@@ -376,6 +383,12 @@ public class Simulation extends Macro_Sheet {
       .addDrawerTripleButton(srun_reset, srun_rngr, srun_nxtt, 10, 1)
       .addSeparator(0.125)
       .addDrawerTripleButton(pause, show_com, inter.cam.grid, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerIncrValue(record_len, 10, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerIncrValue(record_len, 1000, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerButton(srun_record, 10, 1)
       .addSeparator(0.125)
       ;
     
