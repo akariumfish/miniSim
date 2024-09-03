@@ -613,9 +613,9 @@ vec
 shr
 menu_pos
 x
--698.0
+-690.0
 y
--673.5
+-707.5
 0
 0
 menu_tab
@@ -631,7 +631,7 @@ int
 shr
 menu_tab
 val
-3
+1
 min
 0
 max
@@ -655,7 +655,7 @@ boo
 shr
 menu_reduc
 val
-1
+0
 0
 0
 com_param_view
@@ -839,7 +839,7 @@ int
 shr
 rate_decay
 val
-45
+20
 min
 0
 max
@@ -1201,7 +1201,7 @@ flt
 shr
 decay_fact
 val
-0.99220777
+0.9880519
 min
 0.9
 max
@@ -3759,7 +3759,7 @@ int
 shr
 tick
 val
-8872
+22416
 min
 0
 max
@@ -3783,7 +3783,7 @@ flt
 shr
 tps
 val
-218.08269
+216.60649
 min
 0.0
 max
@@ -4941,7 +4941,7 @@ menu_pos
 x
 -710.0
 y
--669.5
+-670.5
 0
 0
 menu_tab
@@ -4981,7 +4981,7 @@ boo
 shr
 menu_reduc
 val
-0
+1
 0
 0
 com_param_view
@@ -5677,7 +5677,7 @@ boo
 shr
 build_rng
 val
-0
+1
 0
 0
 strtbox_width
@@ -5903,7 +5903,7 @@ col
 shr
 val_col_halo1
 c
--256
+-201
 0
 0
 build_box
@@ -8113,7 +8113,7 @@ flt
 shr
 tls
 val
-36.68333
+36.93334
 min
 0.0
 max
@@ -8223,7 +8223,7 @@ flt
 shr
 tps
 val
-27.260336
+27.075811
 min
 0.0
 max
@@ -8247,7 +8247,7 @@ flt
 shr
 cfr
 val
-0.036
+0.035
 min
 0.0
 max
@@ -8331,7 +8331,7 @@ int
 shr
 SEED
 val
-919050560
+648512128
 min
 0
 max
@@ -8455,9 +8455,9 @@ vec
 shr
 pos
 x
-57.9918
+110.81334
 y
-10.78541
+-6.0973186
 0
 0
 copy_run
@@ -8525,7 +8525,7 @@ int
 shr
 frsr
 val
-245
+16
 min
 0
 max
@@ -8581,7 +8581,7 @@ flt
 shr
 fdur
 val
-36.0
+35.0
 min
 0.0
 max
@@ -8619,7 +8619,7 @@ int
 shr
 tick
 val
-246
+17
 min
 0
 max
@@ -8715,7 +8715,7 @@ int
 shr
 sec
 val
-8
+0
 min
 0
 max
@@ -8755,7 +8755,7 @@ flt
 shr
 mfr
 val
-27.260336
+27.075811
 min
 0.0
 max
@@ -8931,7 +8931,7 @@ str
 shr
 spath
 val
-start.sdata
+orbits.sdata
 0
 0
 log_ext_save

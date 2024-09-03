@@ -11,7 +11,7 @@ French Down   vvv  .
 See previews for samples, more in the image folder.
 
 Quick start :
-Go to https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.4.rar
+Go to https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.7.rar
  ; click on "view raw" to dowload 
  ; extract it somewhere then launch miniSim0.x.x.exe .
 
@@ -19,7 +19,7 @@ If nothing append or a windows flash brieffly, you probably dont have the correc
 
 Once the program is launched :
 Click on the FS button then on the OP button on top right of the screen .
-Click on 'blue.sdata' in the new windows - wait a little for loading - .
+Click on any sdata file in the new windows - wait a little for loading - .
 Press h .
 To quit hit ESC.  
 
@@ -38,7 +38,7 @@ contact growsDev@gmail.com.
 Il y a quelques previews dans le dossier image.
 
 Démarrage :
-Ouvre https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.4.rar
+Ouvre https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.7.rar
  ; clique sur "view raw" pour télécharger le fichier 
  ; décompresse le quelque-part et lance miniSim0.x.x.exe .
 

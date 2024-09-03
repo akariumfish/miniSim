@@ -631,7 +631,7 @@ int
 shr
 menu_tab
 val
-3
+1
 min
 0
 max
@@ -839,7 +839,7 @@ int
 shr
 rate_decay
 val
-45
+10
 min
 0
 max
@@ -1019,7 +1019,7 @@ int
 shr
 can_div
 val
-1
+2
 min
 0
 max
@@ -1201,7 +1201,7 @@ flt
 shr
 decay_fact
 val
-0.99220777
+0.9096104
 min
 0.9
 max
@@ -3587,9 +3587,9 @@ vec
 shr
 menu_pos
 x
-434.0
+382.0
 y
--597.5
+-604.5
 0
 0
 menu_tab
@@ -3759,7 +3759,7 @@ int
 shr
 tick
 val
-8872
+61432
 min
 0
 max
@@ -3783,7 +3783,7 @@ flt
 shr
 tps
 val
-218.08269
+252.10085
 min
 0.0
 max
@@ -3885,7 +3885,7 @@ int
 shr
 SEED
 val
-904778496
+612235840
 min
 0
 max
@@ -5045,7 +5045,7 @@ flt
 shr
 collide_fact
 val
-0.0044194176
+0.0015625
 min
 0.0
 max
@@ -5117,7 +5117,7 @@ flt
 shr
 ball_rad
 val
-1810.1934
+3620.3867
 min
 0.0
 max
@@ -5157,7 +5157,7 @@ boo
 shr
 use_merge
 val
-1
+0
 0
 0
 pulse_add 
@@ -5229,7 +5229,7 @@ boo
 shr
 show_stroke
 val
-0
+1
 0
 0
 stroke_col
@@ -5397,7 +5397,7 @@ boo
 shr
 use_ball
 val
-1
+0
 0
 0
 gravity_const
@@ -5413,7 +5413,7 @@ flt
 shr
 gravity_const
 val
-63.999992
+1023.9999
 min
 0.0
 max
@@ -5437,7 +5437,7 @@ flt
 shr
 halo_dens
 val
-0.84852815
+1.2
 min
 0.0
 max
@@ -5461,7 +5461,7 @@ flt
 shr
 halo_size
 val
-80.0
+226.27417
 min
 0.0
 max
@@ -5501,7 +5501,7 @@ flt
 shr
 friction_fact
 val
-9.765624E-5
+0.0015624998
 min
 0.0
 max
@@ -5567,7 +5567,7 @@ int
 shr
 max_entity
 val
-100
+30
 min
 0
 max
@@ -5677,7 +5677,7 @@ boo
 shr
 build_rng
 val
-0
+1
 0
 0
 strtbox_width
@@ -5693,7 +5693,7 @@ int
 shr
 strtbox_width
 val
-8
+5
 min
 0
 max
@@ -5717,7 +5717,7 @@ boo
 shr
 ball_to_center
 val
-1
+0
 0
 0
 0_Solid_0_cursor_show
@@ -5749,7 +5749,7 @@ flt
 shr
 solid_rad
 val
-11.800002
+23.600004
 min
 0.0
 max
@@ -5829,7 +5829,7 @@ int
 shr
 active_pop
 val
-65
+25
 min
 0
 max
@@ -8113,7 +8113,7 @@ flt
 shr
 tls
 val
-36.68333
+31.733334
 min
 0.0
 max
@@ -8223,7 +8223,7 @@ flt
 shr
 tps
 val
-27.260336
+31.512606
 min
 0.0
 max
@@ -8247,7 +8247,7 @@ flt
 shr
 cfr
 val
-0.036
+0.026
 min
 0.0
 max
@@ -8331,7 +8331,7 @@ int
 shr
 SEED
 val
-919050560
+797572480
 min
 0
 max
@@ -8455,9 +8455,9 @@ vec
 shr
 pos
 x
-57.9918
+86.03415
 y
-10.78541
+-16.076351
 0
 0
 copy_run
@@ -8525,7 +8525,7 @@ int
 shr
 frsr
 val
-245
+425
 min
 0
 max
@@ -8581,7 +8581,7 @@ flt
 shr
 fdur
 val
-36.0
+26.0
 min
 0.0
 max
@@ -8619,7 +8619,7 @@ int
 shr
 tick
 val
-246
+426
 min
 0
 max
@@ -8715,7 +8715,7 @@ int
 shr
 sec
 val
-8
+13
 min
 0
 max
@@ -8755,7 +8755,7 @@ flt
 shr
 mfr
 val
-27.260336
+31.512606
 min
 0.0
 max
@@ -8931,7 +8931,7 @@ str
 shr
 spath
 val
-start.sdata
+chain_reaction.sdata
 0
 0
 log_ext_save
