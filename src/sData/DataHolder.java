@@ -3,6 +3,7 @@ package sData;
 import java.util.Map;
 
 import RApplet.Rapp;
+import RApplet.sInput;
 
 
 /*
@@ -18,11 +19,13 @@ DataHolding
 
 public class DataHolder extends sValueBloc {
 	
+	sInput input;
+	
 	boolean doevent = true;
   
-  public DataHolder(Rapp a) {
+  public DataHolder(Rapp a, sInput in) {
     super(); 
-	  app = a; ref = "data"; parent = this; data = this;
+	  app = a; ref = "data"; parent = this; data = this; input = in;
   }
   Rapp app;
   String[] types = {"flt", "int", "boo", "str", "vec", "col", "run", "obj"};

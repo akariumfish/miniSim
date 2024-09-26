@@ -88,7 +88,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 
 	  nWidget back = null, spot = null;
 	  Macro_Connexion connect = null, sheet_connect = null;
-	  Macro_Bloc bloc;
+	  public Macro_Bloc bloc;
 	  boolean sheet_viewable = false, was_viewable = false;
 	  boolean no_mirror = false;
 	  String descr;

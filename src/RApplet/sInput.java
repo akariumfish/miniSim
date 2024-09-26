@@ -6,6 +6,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
 import processing.event.MouseEvent;
+import sData.sValue;
 
 public class sInput {
 
@@ -61,6 +62,8 @@ public class sInput {
   char last_key = ' ';
 
   ArrayList<sInput_Button> buttons = new ArrayList<sInput_Button>();
+  
+  public ArrayList<sValue> shorted_values = new ArrayList<sValue>();
   public sInput_Button mouseLeft;
 
 sInput_Button mouseRight;
@@ -89,7 +92,7 @@ public sInput_Button keyAll;
     buttons.add(n);
     return n;
   }
-  sInput_Button getKeyboardButton(char k) {
+  public sInput_Button getKeyboardButton(char k) {
     for (sInput_Button b : buttons) if (b.ref.equals("k") && k == b.key_char) return b;
     sInput_Button n = new sInput_Button("k", k); 
     buttons.add(n);
@@ -107,7 +110,12 @@ public sInput_Button keyAll;
   void frame_end() {
     mouseWheelUp = false; 
     mouseWheelDown = false;
-    for (sInput_Button b : buttons) b.frame();
+    for (sInput_Button b : buttons) {
+    		if (b.trigClick) for (sValue v : shorted_values) 
+    			if (v.direct_shortcut != 0 && v.direct_shortcut == b.key_char) 
+    				v.directshortcut_action();
+    		b.frame();
+    }
   }
 
   void mouseWheelEvent(MouseEvent event) {

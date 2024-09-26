@@ -30,7 +30,7 @@ public class nSelectZone {
 	    gui.addEventFrame(new nRunnable() { public void run() { frame(); } } );
 	    pile = _g.hoverable_pile;
 	    pile.addEventNotFound(new nRunnable() { public void run() { 
-	      if (ON && gui.in.getClick("MouseRight")) clickDelay = 1; 
+	      if (ON && gui.in.getClick("MouseLeft")) clickDelay = 1; 
 	    } } );
 	    drawer = new Drawable(_g.drawing_pile, 25) { public void drawing() {
 	      gui.app.noFill();
@@ -66,12 +66,12 @@ public class nSelectZone {
 	    	  nRunnable.runEvents(eventSelecting);
 	        select_zone.size.x = gui.mouseVector.x - select_zone.pos.x;
 	        select_zone.size.y = gui.mouseVector.y - select_zone.pos.y;
-	        if (gui.in.getUnClick("MouseRight")) { 
+	        if (gui.in.getUnClick("MouseLeft")) { 
 	        	nRunnable.runEvents(eventEndSelect);
 	          emptyClick = false; 
 	        }
 	      }
 	    }
-	    if (!gui.in.getState("MouseRight")) emptyClick = false;
+	    if (!gui.in.getState("MouseLeft")) emptyClick = false;
 	  }
 	}

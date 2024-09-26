@@ -23,7 +23,7 @@ public class Camera {
   public boolean screenshot = false; //enregistre une image de la frame sans les menu si true puis se desactive
   boolean matrixPushed = false; //track if in or out of the cam matrix
   
-  float min_scale = 0.02F, max_scale = 5.0F;
+  float min_scale = 0.005F, max_scale = 5.0F;
   
   nRunnable up_view_run;
   Camera(sInput i, sValueBloc d) { 
@@ -115,10 +115,8 @@ public class Camera {
     }
   }
   
-  int recording = 0;
-  public void record(int len) {
-	  recording = len;
-  }
+  nRunnable popCam_run = null;
+  public void setPopCamRun(nRunnable r) { popCam_run = r; }
 
   void popCam() {
     input.app.popMatrix();
@@ -128,11 +126,8 @@ public class Camera {
     }
     screenshot = false;
     
-    if (recording > 0) {
-    		recording--;
-    		input.app.saveFrame("video/shot-########.tif");
-    }
-
+    if (popCam_run != null) popCam_run.run();
+    
     PVector tm = screen_to_cam(input.mouse);
     PVector tpm = screen_to_cam(input.pmouse);
     PVector tmm = screen_to_cam(input.mmouse);
@@ -144,9 +139,9 @@ public class Camera {
     mmouse.y = tmm.y;
 
     //permet le cliquer glisser le l'ecran
-    if (input.getClick("MouseLeft") && can_grab.get() && GRAB) grabbed = true; 
-    if (!input.getState("MouseLeft") && grabbed) grabbed = false; 
-    if (input.getState("MouseLeft") && grabbed) { 
+    if (input.getClick("MouseCenter") && can_grab.get() && GRAB) grabbed = true; 
+    if (!input.getState("MouseCenter") && grabbed) grabbed = false; 
+    if (input.getState("MouseCenter") && grabbed) { 
       cam_pos.add((mouse.x - pmouse.x)*cam_scale.get(), 
     		  		  (mouse.y - pmouse.y)*cam_scale.get());
       up_view_run.run();

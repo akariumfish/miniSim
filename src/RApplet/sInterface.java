@@ -42,7 +42,7 @@ import z_old_specialise.Sheet_Specialize;
 public class sInterface {
   
   public void quick_open() {
-    new nFilePicker(screen_gui, taskpanel, savepath_value, true, "0pen", true)
+    new nFilePicker(screen_gui, taskpanel, savepath_value, savefolder, true, "0pen", true)
       .addFilter("sdata")
       .addEventChoose(new nRunnable() { public void run() { 
         setup_load();
@@ -50,7 +50,7 @@ public class sInterface {
   }
   
   public void save_to() {
-    new nFilePicker(screen_gui, taskpanel, savepath_value, false, "Save to", true)
+    new nFilePicker(screen_gui, taskpanel, savepath_value, savefolder, false, "Save to", true)
       .addFilter("sdata")
       .addEventChoose(new nRunnable() { public void run() { 
         full_data_save();
@@ -75,7 +75,7 @@ public class sInterface {
         .addDrawer(1)
           .addCtrlModel("Button-S4", "Select file")
           .setRunnable(new nRunnable() { public void run() { 
-            new nFilePicker(screen_gui, taskpanel, filempath_value, true, "Select file to explore", false)
+            new nFilePicker(screen_gui, taskpanel, filempath_value, savefolder, true, "Select file to explore", false)
               .addFilter("sdata");
           } } )
           .setInfo("choose a .sdata to explore in the manager")
@@ -299,15 +299,15 @@ public class sInterface {
   
   void file_explorer_save() {
     if (file_explorer != null && file_explorer.starting_bloc != null && 
-    		!filempath_value.get().equals("default.sdata")) {
+    		!filempath_value.get().equals("sdata\\default.sdata")) {
       file_savebloc.clear();
       file_explorer.starting_bloc.preset_to_save_bloc(file_savebloc);
-      file_savebloc.save_to(filempath_value.get());
+      file_savebloc.save_to(savefolder+filempath_value.get());
     }
   }
   void file_explorer_load() {
     file_savebloc.clear();
-    file_savebloc.load_from(filempath_value.get());
+    file_savebloc.load_from(savefolder+filempath_value.get());
     if (explored_bloc != null) explored_bloc.clear();
     explored_bloc = data.newBloc(file_savebloc, "file");
     file_explorer.setStrtBloc(explored_bloc);
@@ -403,8 +403,8 @@ public class sInterface {
   	  app.logln("full_data_save to "+savepath_value.get());
       file_savebloc.clear(); 
       interface_bloc.preset_to_save_bloc(file_savebloc); 
-      file_savebloc.save_to(savepath_value.get());
-      prev_savepth.set(savepath_value.get());
+      file_savebloc.save_to(savefolder+savepath_value.get());
+//      prev_savepth.set(savepath_value.get());
     } else {
       new nTextPop(screen_gui, taskpanel, "cant save on default file");
     } }
@@ -420,7 +420,7 @@ public class sInterface {
     if (!show_taskpanel.get()) taskpanel.reduc();
     taskpanel.addEventReduc(new nRunnable() { public void run() { 
       show_taskpanel.set(!taskpanel.hide); }});
-      
+    
     savepath_value = new sStr(interface_bloc, savepath, "savepath", "spath");
     savepath_value.addEventChange(new nRunnable() { public void run() { 
       app.app_grab.setText(version_title + "  -  "+savepath_value.get());
@@ -433,8 +433,9 @@ public class sInterface {
   }
   public nWidget match_flag;
   public  nWindowPanel files_panel;
-  public String version_title = "MiniSim 0.3.7";
+  public String version_title = "MiniSim 0.4.0";
   public String savepath = "start.sdata";
+  public String savefolder = "sdata\\";
   public sStr savepath_value, filempath_value;
   public sBoo auto_load, log_ext_save;
   public Save_Bloc file_savebloc;
@@ -476,7 +477,7 @@ public class sInterface {
     ref_size = s;
     user = new User("user");
     input = new sInput(app);
-    data = new DataHolder(app);
+    data = new DataHolder(app, input);
     interface_bloc = new sValueBloc(data, "Interface");
     
     conf_init();
@@ -544,27 +545,28 @@ public class sInterface {
       public void run() { setup_load(); } } ); } } );
     filesm_run = macro_main.newRun("files_management", "filesm", 
       new nRunnable() { public void run() { filesManagement(); } } );
-    full_screen_run = macro_main.newRun("full_screen_run", "fulls", new nRunnable() { public void run() { 
+    full_screen_run = macro_main.newRun("full_screen_run", "fulls", 
+    		new nRunnable() { public void run() { 
       app.fs_switch(); 
       screen_view.pos.set(app.screen_0_x, app.screen_0_y);
       screen_view.size.set(app.screen_width, app.screen_height);
       screen_gui.updateView();
       cam.up_view_run.run();
       cam_gui.updateView();
+      if (!app.fullscreen) macro_main.close_bp.hide(); else macro_main.close_bp.show();
       runEvents(screen_gui.eventsFullScreen); 
       runEvents(screen_gui.eventsFullScreen); 
       runEvents(eventsFullS); } } );
-    
     
   }
 
   public sRun breakpoint,log_widg_hierarch;
   boolean  breakp = false;
   public sRun quicksave_run;
-public sRun quickload_run;
-public sRun filesm_run;
-public sRun full_screen_run;
-
+  public sRun quickload_run;
+  public sRun filesm_run;
+  public sRun full_screen_run;
+  
   public sInterface addToCamDrawerPile(Drawable d) { d.setPile(cam_gui.drawing_pile); return this; }
   public sInterface addToScreenDrawerPile(Drawable d) { d.setPile(screen_gui.drawing_pile); return this; }
   
@@ -598,7 +600,7 @@ public sRun full_screen_run;
 		app.app_grab.setText(version_title + "  -  "+savepath_value.get());
 	    file_savebloc.clear();
 	    if (setup_bloc != null) setup_bloc.clear();
-	    if (file_savebloc.load_from(savepath_value.get())) {
+	    if (file_savebloc.load_from(savefolder+savepath_value.get())) {
 	      
 	      setup_bloc = data.newBloc(file_savebloc, "setup");
 	      
@@ -625,33 +627,34 @@ public sRun full_screen_run;
   }
   
   
-  String confpth = "conf.txt";
-  sValueBloc conf_bloc;
-  sStr prev_savepth;
+  
+//  String confpth = "conf.txt";
+//  sValueBloc conf_bloc;
+//  sStr prev_savepth;
   void conf_init() {
-	  if (file_savebloc != null) file_savebloc.clear();
-	  file_savebloc = new Save_Bloc("fsb");
-      if (conf_bloc != null) conf_bloc.clear();
-      if (file_savebloc.load_from(confpth)) {
-	    	  	conf_bloc = data.newBloc(file_savebloc, "conf");
-	    	  	if (conf_bloc.getValue("prev_savepth") != null) {
-	    		  prev_savepth = ((sStr)conf_bloc.getValue("prev_savepth"));
-	    		  file_savebloc.clear();
-	//    		  if (file_savebloc.load_from(prev_savepth.get())) 
-	//    			  ;
-	    	  	} 
-      } else { 
-	    	  conf_bloc = data.newBloc("conf");
-	    	  prev_savepth = new sStr(conf_bloc, "", "prev_savepth", "prev_savepth");
-	    	  //fullscreen
-	    	  //last file
-	    	  //menu colors
-      }
+//	  if (file_savebloc != null) file_savebloc.clear();
+//	  file_savebloc = new Save_Bloc("fsb");
+//      if (conf_bloc != null) conf_bloc.clear();
+//      if (file_savebloc.load_from(confpth)) {
+//	    	  	conf_bloc = data.newBloc(file_savebloc, "conf");
+//	    	  	if (conf_bloc.getValue("prev_savepth") != null) {
+//	    		  prev_savepth = ((sStr)conf_bloc.getValue("prev_savepth"));
+//	    		  file_savebloc.clear();
+//	//    		  if (file_savebloc.load_from(prev_savepth.get())) 
+//	//    			  ;
+//	    	  	} 
+//      } else { 
+//	    	  conf_bloc = data.newBloc("conf");
+//	    	  prev_savepth = new sStr(conf_bloc, "", "prev_savepth", "prev_savepth");
+//	    	  //fullscreen
+//	    	  //last file
+//	    	  //menu colors
+//      }
   }
   void conf_save() {
-	  file_savebloc.clear();
-	  conf_bloc.preset_to_save_bloc(file_savebloc); 
-      file_savebloc.save_to(confpth);
+//	  file_savebloc.clear();
+//	  conf_bloc.preset_to_save_bloc(file_savebloc); 
+//      file_savebloc.save_to(confpth);
   }
   
   
@@ -677,7 +680,7 @@ public sRun full_screen_run;
   ArrayList<nRunnable> eventsHoverNotFound = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventsSetup = new ArrayList<nRunnable>();
   boolean is_starting = true;
-  public boolean show_info = true;
+  public boolean show_info = false, show_frmrt = true;
   void frame() {
 	  if (breakp) { app.breakpnt(); breakp = false; }
 	  
@@ -709,11 +712,11 @@ public sRun full_screen_run;
     screen_gui.draw();
 
     //info:
+    app.fill(255); 
+    app.textAlign(PConstants.LEFT);
+    
+    if (show_frmrt) app.text(framerate.get(), 15, app.window_head + 24 );
     if (show_info) {
-      app.fill(255); 
-//      app.textSize(18); 
-      app.textAlign(PConstants.LEFT);
-      app.text(framerate.get(), 10, app.window_head + 24 );
       app.text(" C " + RConst.trimFlt(cam.mouse.x) + 
         "," + RConst.trimFlt(cam.mouse.y), 40, app.window_head + 24 );
       app.text("S " + RConst.trimFlt(input.mouse.x) + 

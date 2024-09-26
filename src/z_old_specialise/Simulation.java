@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import Macro.Macro_Sheet;
 import RApplet.sInterface;
 import UI.*;
+import processing.core.PApplet;
+import processing.core.PGraphics;
+import processing.core.PImage;
+import processing.opengl.PShader;
 import sData.*;
 import z_old_specialise.Community;
 
@@ -124,14 +128,6 @@ public class Simulation extends Macro_Sheet {
     srun_scrsht = newRun("screen_shot", "impr", new nRunnable() { 
       public void run() { inter.cam.screenshot = true; } } );
     
-    srun_record = newRun("srun_record", "record", new nRunnable() { 
-        public void run() { inter.cam.record(record_len.get()); } } );
-    record_len = newInt(400, "record_len", "record_len");
-    
-    mmain().addEventSetupLoad(new nRunnable() { 
-      public void run() { mmain().inter.addEventNextFrame(new nRunnable() { 
-      public void run() { reset(); } } ); 
-    } } );
       
     show_toolpanel = newBoo("show_toolpanel", "toolpanel", true);
     show_toolpanel.addEventChange(new nRunnable(this) { public void run() { 
@@ -152,9 +148,6 @@ public class Simulation extends Macro_Sheet {
   sInt auto_reset_turn;
   sRun srun_reset, srun_rngr, srun_nxtt, srun_nxtf, srun_tick, srun_scrsht;
   sBoo show_toolpanel;
-  
-  sInt record_len; 
-  sRun srun_record;
 
   float tick_pile = 0; //pile des tick a exec
 
@@ -243,6 +236,7 @@ public class Simulation extends Macro_Sheet {
   }
 
   void draw_to_cam() { 
+	  
     if (show_com.get()) {
       
       if (faces.size() > 0 || list.size() > 0 || organs.size() > 0) {
@@ -267,6 +261,8 @@ public class Simulation extends Macro_Sheet {
         }
       }
     }
+    
+    
   }
   void draw_to_screen() { 
     for (Community c : list) if (c.show_entity.get()) c.draw_Screen();
@@ -384,13 +380,9 @@ public class Simulation extends Macro_Sheet {
       .addSeparator(0.125)
       .addDrawerTripleButton(pause, show_com, inter.cam.grid, 10, 1)
       .addSeparator(0.125)
-      .addDrawerIncrValue(record_len, 10, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerIncrValue(record_len, 1000, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerButton(srun_record, 10, 1)
-      .addSeparator(0.125)
       ;
+    
+
     
 //    tab.getShelf(0).addSeparator(0.25)
 //      .addDrawer(10.25, 0.75)
@@ -416,6 +408,7 @@ public class Simulation extends Macro_Sheet {
 //    update_com_selector_list();
     sheet_front.toLayerTop();
   }
+  
 //  void update_com_selector_list() {
 //    selector_entry.clear();
 //    selector_value.clear();

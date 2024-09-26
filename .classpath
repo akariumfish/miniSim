@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/gluegen-rt-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/jogl-all-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/jogl-all.jar"/>
 	<classpathentry kind="lib" path="src/core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/VideoExport/library/jna.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/VideoExport/library/jna-platform.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/VideoExport/library/VideoExport.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

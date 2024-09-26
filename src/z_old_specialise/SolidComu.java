@@ -41,6 +41,12 @@ class Solid extends Entity {
     return this;
   }
   
+  boolean collision(Solid s) {
+	  if (s == this) return true;
+	  if (s.radius + radius > PApplet.dist(pos.x, pos.y, s.pos.x, s.pos.y)) return true;
+	  return false;
+  }
+  
   int rngCol(int c1, int c2) {
 	int r = (int)com().app.random(com().app.red(c1) -
     		com().app.red(c2));
@@ -182,7 +188,7 @@ public static class SolidPrint extends Sheet_Specialize {
       	.addSeparator(0.125)
         .addDrawerFactValue(gravity_const, 2, 10, 1)
         .addSeparator(0.125)
-      	.addDrawerDoubleButton(use_ball, ball_to_center, 10.25F, 1)
+      	.addDrawerTripleButton(use_ball, ball_to_center, protect_ball, 10.25F, 1)
       	.addSeparator(0.125)
         .addDrawerFactValue(ball_rad, 2, 10, 1)
         .addSeparator(0.125)
@@ -202,7 +208,7 @@ public static class SolidPrint extends Sheet_Specialize {
   sInt strtbox_width;
   sFlt strtbox_space, solid_rad, wall_width;
   sBoo reset_build, build_as_box, build_as_hexa, build_rng, use_wall, show_wall, 
-  	use_ball, ball_to_center, use_grav, use_merge;
+  	use_ball, ball_to_center, protect_ball, use_grav, use_merge;
   sRun build_as, del_all;
 
   sFlt friction_fact, collide_fact, gravity_const, ball_rad;
@@ -238,6 +244,7 @@ public static class SolidPrint extends Sheet_Specialize {
     use_merge = newBoo(false, "use_merge");
 
     use_ball = newBoo(false, "use_ball");
+    protect_ball = newBoo(true, "protect_ball");
     ball_to_center = newBoo(false, "ball_to_center");
     ball_rad = newFlt(40F, "ball_rad");
 
@@ -329,7 +336,14 @@ public static class SolidPrint extends Sheet_Specialize {
 		        	}
 	    	  	}
     		}
+    		
     		ball_change.run();
+    		
+    		if (protect_ball.get() && use_ball.get() && ball_obj != null) {
+    			for (Entity s : list) 
+    				if (s.active && ((Solid)s).collision(ball_obj)) s.destroy();
+    		}
+    		
     	} } );
 	
     del_all = newRun("del_all", "del_all", new nRunnable() { 

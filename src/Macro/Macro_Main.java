@@ -6,7 +6,9 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PVector;
 import sData.*;
+import z_old_specialise.Canvas;
 import z_old_specialise.Sheet_Specialize;
+import z_old_specialise.Simulation;
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -165,74 +167,98 @@ nExplorer sheet_explorer;
   
   public ArrayList<nExplorer> presets_explorers = new ArrayList<nExplorer>();
   
-
+  public nWidget close_bp;
   
   void build_macro_menus() {
+	  
+	  
+	  
     if (macro_tool != null) macro_tool.clear();
-    macro_tool = new nToolPanel(screen_gui, ref_size, 0.125F, true, true);
-    macro_tool.addShelf().addDrawer(5.5, 1)
-	    .addLinkedModel("Menu_Button_Small_Outline-S1-P1", "I")
-	      .setLinkedValue(show_info)
-	      .setInfo("show/hide infos").setFont((int)(ref_size/1.9)).getDrawer()
-    		.addLinkedModel("Menu_Button_Small_Outline-S1-P2", "S")
-		  .setLinkedValue(show_macro)
-		  .setInfo("show/hide macros").setFont((int)(ref_size/1.9)).getDrawer()
-        .addLinkedModel("Menu_Button_Small_Outline-S1-P3", "P")
+    macro_tool = new nToolPanel(screen_gui, ref_size, 0.0F, true, true);
+    
+    float ht = 0.875F;
+    nDrawer last_drawer = macro_tool.addShelf().addDrawer(4.5F, ht)
+    		.addLinkedModel("Menu_Bar_Small_Outline-Mm-P1", "M")
+  		  .setLinkedValue(show_macro)
+  		  .setInfo("show/hide macros").setFont((int)(ref_size/1.9)).getDrawer()
+        .addLinkedModel("Menu_Bar_Small_Outline-Mm-P2", "P")
           .setLinkedValue(do_packet)
           .setInfo("do packet processing").setFont((int)(ref_size/1.9)).getDrawer()
-        .addLinkedModel("Menu_Button_Small_Outline-S1-P4", "L")
+        .addLinkedModel("Menu_Bar_Small_Outline-Mm-P3", "f")
+          .setLinkedValue(show_frmrt)
+          .setInfo("show/hide framerate").setFont((int)(ref_size/1.9)).getDrawer()
+        .addLinkedModel("Menu_Bar_Small_Outline-Mm-P4", "i")
+          .setLinkedValue(show_info)
+          .setInfo("show/hide infos").setFont((int)(ref_size/1.9)).getDrawer()
+        .addLinkedModel("Menu_Bar_Small_Outline-Mm-P5", "l")
           .setLinkedValue(show_link)
           .setInfo("show/hide links").setFont((int)(ref_size/1.9)).getDrawer()
-        .addLinkedModel("Menu_Button_Small_Outline-S1-P5", "LV")
+        .addLinkedModel("Menu_Bar_Small_Outline-Mm-P6", "lv")
           .setLinkedValue(link_volatil)
-          .setInfo("show hided links when hovering connexions").setFont((int)(ref_size/1.9)).getDrawer()
+          .setInfo("show hided links when hovering connexions")
+          .setFont((int)(ref_size/1.9)).getDrawer()
           .getShelfPanel()
-      .addShelf().addDrawer(7.75F, 1)
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P1", "Del")
+      .addShelf().addDrawer(0.01F, ht).getShelfPanel()
+      .addShelf().addDrawer(9.9F, ht)
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P1", "Del")
           .setRunnable(new nRunnable() { public void run() { del_selected(); }})
-          .setInfo("Delete selected bloc").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P2", "X")
+          .setInfo("Delete selected bloc  -  d").setFont((int)(ref_size/1.9)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P2", "X")
           .setRunnable(new nRunnable() { public void run() { cut_run.run(); }})
-          .setInfo("Cut selected blocs").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P3", "C")
+          .setInfo("Cut selected blocs  -  x").setFont((int)(ref_size/1.9)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P3", "C")
           .setRunnable(new nRunnable() { public void run() { copy_to_tmpl(); }})
-          .setInfo("Copy selected blocs").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P4", "V")
+          .setInfo("Copy selected blocs  -  c").setFont((int)(ref_size/1.9)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P4", "V")
           .setRunnable(new nRunnable() { public void run() { pastebin_tmpl(); }})
-          .setInfo("Paste").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P5", "W")
+          .setInfo("Paste  -  v").setFont((int)(ref_size/1.9)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P5", "Dup")
           .setRunnable(new nRunnable() { public void run() { duplic_run.run(); }})
-          .setInfo("Duplicate selected blocs").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P6", "S")
+          .setInfo("Duplicate selected blocs  -  w").setFont((int)(ref_size/2.5)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P6", "All")
           .setRunnable(new nRunnable() { public void run() { selall_run.run(); }})
-          .setInfo("Selecte / Unselect all sheet blocs").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P7", "R")
+          .setInfo("Selecte / Unselect all sheet blocs  -  a").setFont((int)(ref_size/2.5)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P7", "<>")
           .setRunnable(new nRunnable() { public void run() { reduc_run.run(); }})
-          .setInfo("Switch selected blocs openning").setFont((int)(ref_size/1.9)).getShelfPanel()
-      .addShelf().addDrawer(7.75F, 1)
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P1", "MM")
-          .setRunnable(new nRunnable() { public void run() { 
-        	    if (main_sheetbloc != null) main_sheetbloc.menu();
-        	    else build_sheet_menu(); }})	
-          .setInfo("Open main sheet menu").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P2", "FM")
-          .setRunnable(new nRunnable() { public void run() { inter.filesManagement(); }})
-          .setInfo("File management").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P3", "QS")
+          .setInfo("Switch selected blocs openning  -  s").setFont((int)(ref_size/2.5)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P8", "QS")
           .setRunnable(new nRunnable() { public void run() { inter.full_data_save(); }})
-          .setInfo("Quick Save").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P4", "QL")
+          .setInfo("Quick Save").setFont((int)(ref_size/2.5)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P9", "QL")
           .setRunnable(new nRunnable() { public void run() { inter.setup_load(); }})
-          .setInfo("Quick Load").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P5", "ST")
+          .setInfo("Quick Load").setFont((int)(ref_size/2.5)).getDrawer() 
+          .getShelfPanel()
+      .addShelf().addDrawer(0.0F, ht).getShelfPanel() 
+      .addShelf().addDrawer(2.0F, ht)
+	    .addCtrlModel("Menu_Bar", "MAIN")
+	    	  .setRunnable(new nRunnable() { public void run() { 
+	    	    if (main_sheetbloc != null) main_sheetbloc.menu();
+	    	    else build_sheet_menu(); }})
+	    	  .setSX(ref_size*2.0F).setSY(ref_size*0.75F)
+	    	  .setPX(ref_size*0).setPY(ref_size*0.0625F)
+	      .getShelfPanel()
+      .addShelf().addDrawer(0.0F, ht).getShelfPanel()
+      .addShelf().addDrawer(5.5F, ht)
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P1", "MG")
+          .setRunnable(new nRunnable() { public void run() { inter.filesManagement(); }})
+          .setInfo("Management").setFont((int)(ref_size/1.9)).getDrawer()
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P2", "ST")
           .setRunnable(new nRunnable() { public void run() { inter.save_to(); }})
           .setInfo("Save to").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P6", "OP")
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P3", "OP")
           .setRunnable(new nRunnable() { public void run() { inter.quick_open(); }})
           .setInfo("Open").setFont((int)(ref_size/1.9)).getDrawer()
-        .addCtrlModel("Menu_Button_Small_Outline-S1-P7", "FS")
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P4", "FS")
           .setRunnable(new nRunnable() { public void run() { inter.full_screen_run.run(); }})
-          .setInfo("Switch Fullscreen").setFont((int)(ref_size/1.9));
+          .setInfo("Switch Fullscreen").setFont((int)(ref_size/1.9)).getDrawer();
+//    
+    close_bp = last_drawer.addCtrlModel("Menu_Bar_Downlight_Outline-M-P5", "X")
+          .setRunnable(new nRunnable() { public void run() { gui.app.exit(); }})
+          .setInfo("Exit")
+          .setStandbyColor(app.color(175, 20, 20))
+          .setHoveredColor(app.color(200, 100, 100))
+          .setOutlineColor(app.color(125, 10, 10));
+    
     if (!show_macro_tool.get()) macro_tool.reduc();
 //    macro_tool.setPos(app.window_head);
     macro_tool.addEventReduc(new nRunnable() { public void run() { 
@@ -242,7 +268,7 @@ nExplorer sheet_explorer;
     
   }
   void build_buildtool() {
-	  int build_row = 22;
+	  int build_row = 24;
 	  nShelf sh = null;
 	  int row_count = 0;
 //	  int shelf_cible = 0;
@@ -264,7 +290,7 @@ nExplorer sheet_explorer;
 		    		row_count = 0;
 		    		sh = build_tool.addShelf();
 		    	}
-		      sh.addDrawer(3F, 0.7F).addCtrlModel("Menu_Button_Small_Outline-S3/0.75", bloc_builders.get(i).title)
+		      sh.addDrawer(3F, 0.55F).addCtrlModel("Menu_Button_Small_Outline-S3/0.6", bloc_builders.get(i).title)
 		        .setRunnable(new nRunnable(bloc_builders.get(i).type) { public void run() { 
 		          selected_sheet.addByType(((String)builder)); }})
 		        .setFont((int)(ref_size/2)).setTextAlignment(PConstants.LEFT, PConstants.CENTER)
@@ -280,8 +306,8 @@ nExplorer sheet_explorer;
 				row_count = 0;
 				sh = build_tool.addShelf();
 			}
-		    sh.addDrawer(3F, 0.7F)
-		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.name)
+		    sh.addDrawer(3F, 0.55F)
+		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.6", t.name)
 		    .setRunnable(new nRunnable(t) { public void run() { 
 		      ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
 		    .setFont((int)(ref_size/2));
@@ -294,8 +320,8 @@ nExplorer sheet_explorer;
 				row_count = 0;
 				sh = build_tool.addShelf();
 			}
-		    sh.addDrawer(3F, 0.7F)
-		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.75", t.ref)
+		    sh.addDrawer(3F, 0.55F)
+		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.6", t.ref)
 		    .setRunnable(new nRunnable(t) { public void run() { 
 		    		paste_tmpl(((sValueBloc)builder));
 		    	}})
@@ -305,11 +331,11 @@ nExplorer sheet_explorer;
 	    if (!show_build_tool.get()) build_tool.reduc();
 	    build_tool.addEventReduc(new nRunnable() { public void run() { 
 	      show_build_tool.set(!build_tool.hide); }});
-	    build_tool.setPos(ref_size*1.25);
+	    build_tool.setPos(ref_size*0.75);
 	}
   }
   public void build_custom_menu(nFrontPanel sheet_front) {
-    nFrontTab tab = sheet_front.addTab("Explorer");
+    nFrontTab tab = sheet_front.addTab("Explo");
     tab.getShelf()
       .addSeparator(0.125)
       .addDrawer(10.25, 1).addModel("Label-S3", "sheets explorer :")
@@ -339,7 +365,7 @@ nExplorer sheet_explorer;
         } } )
         ;
         
-    tab = sheet_front.addTab("Template");
+    tab = sheet_front.addTab("Templ");
     tab.getShelf()
       .addSeparator(0.125)
       .addDrawer(10.25, 1).addModel("Label-S3", "Templates :")
@@ -939,15 +965,6 @@ nExplorer sheet_explorer;
 	  }
 	  
 	  frame_tick();
-	  
-	  if (gui.in.getClick(' ')) {
-//		  gui.app.logln("space");
-		  if (buildingLine) {
-			  new MNode(selected_sheet, line_building_co, gui.mouseVector);
-		  } else {
-			  new MBasic(selected_sheet, gui.mouseVector);
-		  }
-	  }
   }
   void ask_packet_process(Macro_Sheet sh) {
 //      gui.app.plogln("Main ask_packet_process from " + sh.value_bloc.ref);
@@ -1004,7 +1021,7 @@ nExplorer sheet_explorer;
   nRunnable packet_frame_run;
   
   //, show_sheet_tool
-  sBoo show_info, show_gui, show_macro, show_link, link_volatil, show_build_tool, show_macro_tool, do_packet;
+  sBoo show_info, show_frmrt, show_gui, show_macro, show_link, link_volatil, show_build_tool, show_macro_tool, do_packet;
   sStr new_temp_name, database_path, shown_builder, shown_spe, shown_templ; 
   sRun del_select_run, copy_run, paste_run, duplic_run, cut_run, selall_run, reduc_run, construct_run;
   public sInterface inter;
@@ -1110,41 +1127,44 @@ public Macro_Main(sInterface _int) {
     show_macro_tool.addEventChange(new nRunnable(this) { public void run() { 
       if (macro_tool != null && macro_tool.hide == show_macro_tool.get()) macro_tool.reduc();
     }});
-    show_gui = newBoo("show_gui", "show gui", true);
+    show_gui = newBoo("show_gui", "show gui", true, 'h');
     show_gui.addEventChange(new nRunnable(this) { public void run() { 
       screen_gui.isShown = show_gui.get();
       inter.show_info = show_gui.get();
     }});
     show_info = newBoo("show_info", "show_info", true);
     show_info.addEventChange(new nRunnable(this) { public void run() { 
-    		inter.show_info = show_info.get(); }});
-    
+		inter.show_info = show_info.get(); }});
+    show_frmrt = newBoo("show_framerate", "show_framerate", true);
+    show_frmrt.addEventChange(new nRunnable(this) { public void run() { 
+		inter.show_frmrt = show_frmrt.get(); }});
     do_packet = newBoo(true, "do_packet", "do_packet");
     
-    del_select_run = newRun("del_select_run", "del", 
+    del_select_run = newRun("del_select_run", "del", 'd',
     		new nRunnable() { public void run() { del_selected(); }});
 
-    copy_run = newRun("copy_run", "copy", 
+    copy_run = newRun("copy_run", "copy", 'c',
     		new nRunnable() { public void run() { copy_to_tmpl(); }});
     
-    paste_run = newRun("paste_run", "paste", 
+    paste_run = newRun("paste_run", "paste", 'v',
     		new nRunnable() { public void run() { pastebin_tmpl(); }});
 
-    duplic_run = newRun("duplic_run", "duplic", 
+    duplic_run = newRun("duplic_run", "duplic", 'w',
     		new nRunnable() { public void run() { copy_to_tmpl(); pastebin_tmpl(); }});
 
-    cut_run = newRun("cut_run", "cut", 
+    cut_run = newRun("cut_run", "cut", 'x',
     		new nRunnable() { public void run() { copy_to_tmpl(); del_selected(); }});
     
-    selall_run = newRun("selall_run", "selall", 
+    selall_run = newRun("selall_run", "selall", 'a',
     		new nRunnable() { public void run() { select_all(); }});
     
-    reduc_run = newRun("switch_reduc_run", "switch_reduc", 
+    reduc_run = newRun("switch_reduc_run", "switch_reduc", 's',
     		new nRunnable() { public void run() { reduc_selected(); }});
     
-    construct_run = newRun("construct_run", "construct", 
+    construct_run = newRun("construct_run", "construct", ' ', 
     		new nRunnable() { public void run() { 
-    			new MBasic(selected_sheet, gui.mouseVector); }});
+		  if (buildingLine) { new MNode(selected_sheet, line_building_co, gui.mouseVector);
+		  } else { new MBasic(selected_sheet, gui.mouseVector); }  }});
     
 
     	  add_bloc_builders(new MZone.Builder(this));
@@ -1153,6 +1173,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MBasic.Builder(this));
       add_bloc_builders(new MNode.Builder(this));
       add_bloc_builders(new MSheetBloc.Builder(this));
+      add_bloc_builders(new MCustom.Builder(this));
       add_bloc_builders(new MCursor.MCursor_Builder(this));
       add_bloc_builders(new MMButton.Builder(this));
       add_bloc_builders(new MText.Builder(this));
@@ -1400,11 +1421,15 @@ public Macro_Main(sInterface _int) {
 	  sBoo show_toolpanel;
 
 	  float tick_pile = 0; //pile des tick a exec
-
 	  int run_tck_cnt = 0, met_tck_cnt = 0;
 	  int run_rst_cnt = 0, met_rst_cnt = 0;
 
 	void init_tick() {
+		
+		addEventSetupLoad(new nRunnable() { 
+	      public void run() { mmain().inter.addEventNextFrame(new nRunnable() { 
+	    	  	public void run() { reset(); } } );   } } );
+		
 	    tick_counter = newInt(0, "tick_counter", "tick");
 	    tick_by_frame = newFlt(2, "tick by frame", "tck/frm");
 	    tick_sec = newFlt(0, "tick seconde", "tps");
@@ -1429,12 +1454,176 @@ public Macro_Main(sInterface _int) {
 	      public void run() { force_next_tick.set((int)(tick_by_frame.get())); } } );
 	    srun_scrsht = newRun("screen_shot", "impr", new nRunnable() { 
 	      public void run() { mmain().inter.cam.screenshot = true; } } );
+	    
+
+	    inter.addEventTwoFrame(new nRunnable() { public void run() { 
+	    		videoRecodingSetup(); }});
 	}
 	
+	  ArrayList<nRunnable> eventsReset = new ArrayList<nRunnable>();
+	  ArrayList<nRunnable> eventsFrame = new ArrayList<nRunnable>();
+	  ArrayList<nRunnable> eventsUnpausedFrame = new ArrayList<nRunnable>();
+	  ArrayList<nRunnable> eventsTick = new ArrayList<nRunnable>();
+	  ArrayList<nRunnable> eventsTick2 = new ArrayList<nRunnable>();
+	  Macro_Main addEventReset(nRunnable r) { eventsReset.add(r); return this; }
+	  Macro_Main removeEventReset(nRunnable r) { eventsReset.remove(r); return this; }
+	  Macro_Main addEventFrame(nRunnable r) { eventsFrame.add(r); return this; }
+	  Macro_Main addEventUnpausedFrame(nRunnable r) { eventsUnpausedFrame.add(r); return this; }
+	  Macro_Main addEventTick(nRunnable r) { eventsTick.add(r); return this; }
+	  Macro_Main removeEventTick(nRunnable r) { eventsTick.remove(r); return this; }
+	  Macro_Main addEventTick2(nRunnable r) { eventsTick2.add(r); return this; }
+	  Macro_Main removeEventTick2(nRunnable r) { eventsTick2.remove(r); return this; }
+	
 
+	sRun vid_start, vid_stop;
+	sInt vid_len, vid_final_frmrate, vid_max_len, vid_capturerate;
+	sBoo vid_run, vid_paused, vid_limit_len, vid_rst_start, vid_canvas_record;
+	sStr vid_name;
+	sFlt vid_dur;
+	int vid_cnt = 0;
+	boolean vid_started = false;
+	
+	Canvas recorded_canvas = null;
+  
+	void videoRecodingSetup() {
+	  // Set video and audio quality.
+	  // Video quality: 100 is best, lossless video (but big file size)
+	  //   Set it to 0 (worst) if you enjoy poor quality videos :)
+	  //   70 is the default.
+	  // Audio quality: 128 is the default, 192 very good,
+	  //   256 is near lossless but big file size.
+//	  gui.app.videoExport.setQuality(50, 32);
+	  
+	  // This sets the frame rate of the resulting video file. I has nothing to do
+	  // with the current Processing frame rate. For instance you could have a 
+	  // Processing sketch that does heavy computation and renders only one frame 
+	  // every 5 seconds, but here you could still set that the resulting video should 
+	  // play at 10 frames per second. Default: 30 fps.
+	  //videoExport.setFrameRate(10);  
+	  
+	  // If your sketch already calls loadPixels(), you can tell videoExport to 
+	  // not do that again. It's not necessary, but your sketch may perform a 
+	  // bit better if you avoid calling it twice.
+//	  gui.app.videoExport.setLoadPixels(false);
+	  
+	  // If video is being exported correctly, you can call this function to avoid
+	  // creating .txt files containing debug information.
+	  gui.app.videoExport.setDebugging(false);
+
+	  // Use the next line once if you changed the location of the ffmpeg tool.
+	  // This will make the library ask for it's location again.
+	  //videoExport.forgetFfmpegPath();
+	  
+	  // This advanced example shows how to customize the ffmpeg command that gets
+	  // executed by this library.
+	  // This allows you to access the full power of ffmpeg and select custom
+	  // codecs, apply audio or video filters and even do video streaming!
+	  
+	  // Everything as by default except -vf (video filter)
+//	  gui.app.videoExport.setFfmpegVideoSettings(
+//	    new String[]{
+//	    "[ffmpeg]",                       // ffmpeg executable
+//	    "-y",                             // overwrite old file
+//	    "-f",        "rawvideo",          // format rgb raw
+//	    "-vcodec",   "rawvideo",          // in codec rgb raw
+//	    "-s",        "[width]x[height]",  // size
+//	    "-pix_fmt",  "rgb24",             // pix format rgb24
+//	    "-r",        "[fps]",             // frame rate
+//	    "-i",        "-",                 // pipe input
+//
+//	                                      // video filter with vignette, blur,
+//	                                      // noise and text. font commented out
+//	    "-vf", "vignette,gblur=sigma=1,noise=alls=10:allf=t+u," +
+//	    "drawtext=text='Made with Processing':x=50:y=(h-text_h-50):fontsize=24:fontcolor=white@0.8",
+//	    // drawtext=fontfile=/path/to/a/font/myfont.ttf:text='Made...
+//
+//	    "-an",                            // no audio
+//	    "-vcodec",   "h264",              // out codec h264
+//	    "-pix_fmt",  "yuv420p",           // color space yuv420p
+//	    "-crf",      "[crf]",             // quality
+//	    "-metadata", "comment=[comment]", // comment
+//	    "[output]"                        // output file
+//	    });
+
+	  // Everything as by default. Unused: no audio in this example.
+//	  gui.app.videoExport.setFfmpegAudioSettings(new String[]{
+//	    "[ffmpeg]",                       // ffmpeg executable
+//	    "-y",                             // overwrite old file
+//	    "-i",        "[inputvideo]",      // video file path
+//	    "-i",        "[inputaudio]",      // audio file path
+//	    "-filter_complex", "[1:0]apad",   // pad with silence
+//	    "-shortest",                      // match shortest file
+//	    "-vcodec",   "copy",              // don't reencode vid
+//	    "-acodec",   "aac",               // aac audio encoding
+//	    "-b:a",      "[bitrate]k",        // bit rate (quality)
+//	    "-metadata", "comment=[comment]", // comment
+//	    // https://stackoverflow.com/questions/28586397/ffmpeg-error-while-re-encoding-video#28587897
+//	    "-strict",   "-2",                // enable aac
+//	    "[output]"                        // output file
+//	    });
+	  
+	  vid_start = newRun("vid_start", "vid_start", new nRunnable() { public void run() { 
+		  if (!vid_run.get()) { 
+			  gui.app.videoExport.setMovieFileName("video\\" + vid_name.get() + 
+					  gui.app.global_frame_count + ".mp4");
+			  gui.app.videoExport.setFrameRate(vid_final_frmrate.get());
+			  gui.app.videoExport.startMovie(); 
+			  vid_len.set(0);
+			  vid_run.set(true); } } } );
+	  vid_stop = newRun("vid_stop", "vid_stop", new nRunnable() { public void run() { 
+		  if (vid_run.get()) { 
+		    	  gui.app.videoExport.endMovie(); 
+		    	  vid_run.set(false); } } } );
+	  
+	  vid_len = newInt(0, "vid_len", "frame");
+	  vid_max_len = newInt(300, "vid_max_len");
+	  vid_capturerate = newInt(0, "vid_capturerate");
+	  vid_final_frmrate = newInt(60, "vid_final_frmrate");
+	  vid_dur = newFlt(0, "vid_dur", "duration (s)");
+	  
+	  vid_len.addEventChange(new nRunnable() { public void run() { 
+	  	  vid_dur.set((float)vid_len.get() / (float)vid_final_frmrate.get()); } } );
+	  
+	  vid_run = newBoo(false, "vid_run"); 
+	  vid_paused = newBoo(false, "vid_paused"); 
+	  vid_limit_len = newBoo(false, "vid_limit_len");
+	  vid_rst_start = newBoo(false, "vid_rst_start");
+	  vid_canvas_record = newBoo(false, "vid_canvas_record");
+	  
+	  vid_name = newStr("miniVid", "vid_name");
+	  
+	  inter.addEventTwoFrame(new nRunnable() { public void run() { 
+		  addEventReset(new nRunnable() { public void run() { 
+			  if (vid_rst_start.get()) vid_start.run(); } } );
+	  
+		  inter.cam.setPopCamRun(new nRunnable() { public void run() { 
+			  if (!vid_paused.get() && vid_run.get()) {
+				  vid_cnt++;
+				  if (vid_cnt > vid_capturerate.get()) {
+					  if (vid_limit_len.get() && vid_len.get() >= vid_max_len.get()) {
+						  vid_stop.run();
+					  } else {
+						  vid_len.add(1);
+						  gui.app.videoExport.saveFrame(); 
+					  } } }
+		  } } );
+
+		  vid_run.set(false);
+		  vid_paused.set(false);
+		  vid_started = false;
+		  vid_cnt = 0;
+		  vid_len.set(0);
+		  gui.app.videoExport.setFrameRate(vid_final_frmrate.get());
+	  } } );
+
+  }
+  
+
+  nWidget recording_flag;
+	  
 	
   public void build_tick_menu(nFrontPanel sheet_front) {
-    nFrontTab tab = sheet_front.addTab("Tick");
+    nFrontTab tab = sheet_front.addTab("Time");
 
 	tab.getShelf()
 	  .addDrawer(10.25, 0.6)
@@ -1461,6 +1650,51 @@ public Macro_Main(sInterface _int) {
       .addDrawerDoubleButton(pause, mmain().inter.cam.grid, 10, 1)
       .addSeparator(0.125)
       ;
+
+    tab = sheet_front.addTab("Video");
+    tab.getShelf()
+      .addDrawer(10.25, 0.5)
+      .addModel("Label-S4", "-Video Recording Control-").setFont((int)(ref_size/1.4)).getShelf()
+      .addSeparator(0.35)
+      .addDrawerDoubleButton(vid_start, vid_stop, 10, 1);
+    nDrawer flag_drw = tab.getShelf().addDrawer(10.25, 0.0);
+    tab.getShelf()
+      .addSeparator(0.125)
+      .addDrawerCentralButton(vid_paused, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerDoubleWatch(vid_len, vid_dur, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerDoubleButton(vid_rst_start, vid_limit_len, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerIncrValue(vid_max_len, 10, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerIncrValue(vid_max_len, 1000, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerIncrValue(vid_capturerate, 10, 10, 1)
+      .addSeparator(0.125)
+      .addDrawer(10.25, 0.5)
+      .addModel("Label-S4", "-File-").setFont((int)(ref_size/1.4)).getShelf()
+      .addSeparator(0.35)
+      .addDrawerIncrValue(vid_final_frmrate, 10, 10, 1)
+      .addSeparator(0.125)
+      .addDrawerLargeFieldCtrl(vid_name, 10, 1)
+      .addSeparator(0.125)
+      ;
+    
+    recording_flag = flag_drw.addModel("Label_DownLight_Back_Downlight_Outline-S3", "--")
+    		.setPX(ref_size*4).setPY(-ref_size*18.0/16.0)
+    		.setSX(ref_size*2).setSY(ref_size*18.0/16.0);
+    
+    vid_run.addEventChange(new nRunnable() { public void run() { 
+	  if (!vid_run.get()) recording_flag.setLook(inter.screen_gui.theme, 
+			    "Label_DownLight_Back_Downlight_Outline-S3")
+  	  			.setText("--"); 
+	  else recording_flag.setLook(inter.screen_gui.theme, 
+			    "Label_HightLight_Back_Highlight_Outline-S3")
+				.setText("REC"); 
+	} } );
+
+	vid_run.set(false);
   }
 
 	void resetRng() { 

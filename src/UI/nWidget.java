@@ -148,6 +148,12 @@ public class nWidget {
     return this;
   }
   
+  boolean totalhide = false;
+  public nWidget totalhide() { 
+	  totalhide = true;
+    return this; 
+  }
+  
   public nWidget hide() { 
     if (!hide) {
       hide = true; 
@@ -443,9 +449,11 @@ public class nWidget {
   public float getLocalSY() { return localrect.size.y; }
   
   public boolean isViewable() {
-	  return always_view || (Rect.rectCollide(getRect(), gui.view) && 
-    		  !(fine_view && getSX()*gui.scale < 1 && getSY()*gui.scale < 1 ) && 
-    		  !(!fine_view && getSX()*gui.scale < 5 && getSY()*gui.scale < 5));
+	  return !totalhide &&( always_view || (Rect.rectCollide(getRect(), gui.view) && 
+    		  !(fine_view && getSX()*gui.scale < gui.min_fineview_size && 
+    				  getSY()*gui.scale < gui.min_fineview_size ) && 
+    		  !(!fine_view && getSX()*gui.scale < gui.min_view_size && 
+    				  getSY()*gui.scale < gui.min_view_size)) );
   }
   
   public nWidget(Rapp a) {   //only for theme model saving !!
@@ -579,6 +587,7 @@ boolean constantOutlineWeight = false;
                                      getX()            , getY() + getSY()/2  );}
         else if (!app.DEBUG_NOFILL) app.rect(getX(), getY(), getSX(), getSY());
         
+        // OUTLINE    OUTLINE
         app.noFill();
         if (isField && isSelected) app.stroke(look.outlineSelectedColor);
         else if (showOutline || (hoverOutline && isHovered)) app.stroke(look.outlineColor);
@@ -597,6 +606,7 @@ boolean constantOutlineWeight = false;
         else app.rect(getX() + wf*look.outlineWeight/2, getY() + wf*look.outlineWeight/2, 
              getSX() - wf*look.outlineWeight, getSY() - wf*look.outlineWeight);
         
+        // TEXT    TEXT
         if (show_text && gui.scale >= 0.3) {
           String l = label;
           if (showCursor) {
@@ -621,7 +631,7 @@ boolean constantOutlineWeight = false;
 	                    //- (line * look.textFont / 3)
 	                  ;
 	          else if (textAlignY == PConstants.BOTTOM) 
-	            ty += getLocalSY() - (look.textFont / 10);
+		            ty += getLocalSY() - (look.textFont / 10);
 	          if (textAlignX == PConstants.LEFT)        tx += look.textFont / 4.0;
 	          else if (textAlignX == PConstants.CENTER) tx += getSX() / 2;
 	          else if (textAlignX == PConstants.BOTTOM) //ref to opposite side

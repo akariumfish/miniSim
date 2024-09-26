@@ -654,7 +654,7 @@ class MZone extends MBasic {
 	  mmain().inter.cam.addEventZoom(zoom_run);
 	  
 	  grabber.addEventVisibilityChange(new nRunnable() { public void run() { update_view(); }});
-	    
+	  
 	  addInputBang(0, "view", new nRunnable() { public void run() { 
 		  goto_run.run(); } });
 	  addTrigS(1, "go", goto_run);
@@ -1121,12 +1121,15 @@ class MSheetBloc extends MBasic {
 //	    out_obj = addOutput(2, "object");
 
 	    addEmptyS(2); 
-	    addTrigS(0, "show", "show all sheet cursor", new nRunnable() { public void run() {
-	    		for (nCursor c : sheet.sheet_cursors_list) c.show.set(true);
-	    } });
-	    addTrigS(1, "hide", "hide all sheet cursor", new nRunnable() { public void run() {
-    			for (nCursor c : sheet.sheet_cursors_list) c.show.set(false);
-	    } });
+	    nRunnable show_curs_run = new nRunnable() { public void run() {
+			for (nCursor c : sheet.sheet_cursors_list) c.show.set(true); } };
+		nRunnable hide_curs_run = new nRunnable() { public void run() {
+			for (nCursor c : sheet.sheet_cursors_list) c.show.set(false); } };
+	    		
+	    addTrigS(0, "show", "show all sheet cursor", show_curs_run);
+	    addTrigS(1, "hide", "hide all sheet cursor", hide_curs_run);
+	    addInputBang(0, "show", show_curs_run);
+	    addInputBang(1, "hide", hide_curs_run);
     		
 	    addEmptyS(1); addEmptyS(2); 
 	    Macro_Element m = 
@@ -1168,12 +1171,13 @@ class MSheetBloc extends MBasic {
 //	    out_obj = addOutput(2, "object");
 
 	    if (show2.get() || show3.get() || show4.get()) addEmptyS(2); 
-	    addTrigS(0, "show", "show all sheet cursor", new nRunnable() { public void run() {
-	    		for (nCursor c : sheet.sheet_cursors_list) c.show.set(true);
-	    } });
-	    addTrigS(1, "hide", "hide all sheet cursor", new nRunnable() { public void run() {
-    			for (nCursor c : sheet.sheet_cursors_list) c.show.set(false);
-	    } });
+	    nRunnable show_curs_run = new nRunnable() { public void run() {
+    			for (nCursor c : sheet.sheet_cursors_list) c.show.set(true); } };
+		nRunnable hide_curs_run = new nRunnable() { public void run() {
+			for (nCursor c : sheet.sheet_cursors_list) c.show.set(false); } };
+
+	    addTrigS(0, "show", "show all sheet cursor", show_curs_run);
+	    addTrigS(1, "hide", "hide all sheet cursor", hide_curs_run);
 	    
 	    if (show1.get()) {
 		    addTrigS(1, "view", goto_run).setInfo("view full sheet");
@@ -1226,6 +1230,12 @@ class MSheetBloc extends MBasic {
 		super.toLayerTop(); 
 		return this; }
 }
+
+
+
+
+
+
 
 
 //class MPack extends MBasic { 

@@ -29,6 +29,19 @@ public class nShelf extends nBuilder {
 	    }
 	    return this;
 	  }
+	public nShelf addDrawerCentralButton(sValue val1, float w, float h) {
+		    nDrawer d = addDrawer(w, h);
+		    if (val1 != null) {
+		    d.addLinkedModel("Auto_Button-S3")
+		      .setLinkedValue(val1)
+		      .setPX(ref_size*3.0F)
+		      .setSY(h*ref_size*0.75F)
+		      .setPY(h*ref_size*0.125F)
+		      .setText(val1.shrt)
+		      ;
+		    }
+		    return this;
+		  }
 	public nShelf addDrawerColor(sCol val, float w, float h, nTaskPanel tp) {
 	    if (val != null) {
 			nDrawer d = addDrawer(w, h);
@@ -283,8 +296,42 @@ public class nShelf extends nBuilder {
 	      ;
 	    d.addModel("Label_Small_Text")
 	      .setSize(w*ref_size/10, h*ref_size)
-	      .setPosition(0, 0)
+	      .setPX(ref_size*1.0)
 	      .setText(val.ref)
+	      .setFont((int)(ref_size/1.9F))
+	      .setTextAlignment(PApplet.LEFT, PApplet.CENTER)
+	      ;
+	    return this;
+	  }
+	  public nShelf addDrawerDoubleWatch(sValue val1, sValue val2, float w, float h) {
+	    nDrawer d = addDrawer(w, h);
+	    d.addWatcherModel("Label_Back-S1-P3")
+	    	  .setFloatPrecision(4)
+	      .setLinkedValue(val1)
+	      .setPX(ref_size*3.0F)
+	      .setSX(ref_size*2.0F)
+//	      .setSize(w*ref_size/3, h*ref_size)
+//	      .setPosition(2*w*ref_size/3, 0)
+	      ;
+	    d.addModel("Label_Small_Text-S2-P1")
+//	      .setSize(w*ref_size/10, h*ref_size)
+//	      .setPX(ref_size*1.0)
+	      .setText(val1.shrt)
+	      .setFont((int)(ref_size/1.9F))
+	      .setTextAlignment(PApplet.LEFT, PApplet.CENTER)
+	      ;
+
+	    d.addWatcherModel("Label_Back-S1-P8")
+	    	  .setFloatPrecision(4)
+	      .setLinkedValue(val2)
+	      .setSX(ref_size*2.0F)
+//	      .setSize(w*ref_size/3, h*ref_size)
+//	      .setPosition(2*w*ref_size/3, 0)
+	      ;
+	    d.addModel("Label_Small_Text-S2-P3")
+//	      .setSize(w*ref_size/10, h*ref_size)
+	      .setPX(ref_size*5.0)
+	      .setText(val2.shrt)
 	      .setFont((int)(ref_size/1.9F))
 	      .setTextAlignment(PApplet.LEFT, PApplet.CENTER)
 	      ;

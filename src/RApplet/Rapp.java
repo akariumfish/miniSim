@@ -2,6 +2,8 @@ package RApplet;
 
 import java.util.ArrayList;
 
+import com.hamoid.VideoExport;
+
 //import themidibus.*;
 
 import UI.nWidget;
@@ -42,24 +44,29 @@ public class Rapp extends PApplet implements RConst {
 //	public static void main(String[] args) {
 //		PApplet.main("RApplet.Rapp");
 //	}
-	
+
 	boolean START_AS_WINDOW = true;
+	public boolean USE_SHADERS = true;
 	
 	sInterface interf;
 	
 	public void settings() {
-//		  size(1600, 900);//taille de l'ecran
-		fullScreen();
-		noSmooth();
-//		  smooth();//anti aliasing
+//		  if (USE_SHADERS) size(1600, 900, P2D);
+//		  else size(1600, 900);
+		  if (USE_SHADERS) fullScreen(P2D);
+		  else fullScreen();
+//		fullScreen(P2D);
+//		noSmooth();
+		  smooth(2);//anti aliasing
 	}
 	
 	public void setup() {
+		
 		  surface.setResizable(true);
 		
-		frameRate(60);
+//		frameRate(60); // done later
 		textSize(18);
-		
+//		
 		background(0);//fond noir
 		
 //		rectMode(PApplet.CENTER);
@@ -95,8 +102,7 @@ public class Rapp extends PApplet implements RConst {
 		
 		  
 	    
-	    interf.addEventTwoFrame(new nRunnable() { 
-	      public void run() { interf.setup_load(); } } );
+	    
 
 	    
 	    
@@ -112,6 +118,9 @@ public class Rapp extends PApplet implements RConst {
 		    } } );
 		  app_close = new nWidget(interf.screen_gui, "X", 28, base_width - 40, 0.1F, 40, 40)
 		    .setTrigger()
+	        .setStandbyColor(color(175, 20, 20))
+	        .setHoveredColor(color(200, 100, 100))
+	        .setOutlineColor(color(125, 10, 10))
 		    .addEventTrigger(new nRunnable() { public void run() { 
 		      logln("exit");
 		      if (save_log_exit) savelog(); 
@@ -120,16 +129,45 @@ public class Rapp extends PApplet implements RConst {
 		  
 
 		  interf.full_screen_run.run();
-		  interf.full_screen_run.run();
 		  
-		  if (START_AS_WINDOW) {
+		  interf.addEventTwoFrame(new nRunnable() { public void run() { 
 			  interf.full_screen_run.run();
-			  interf.addEventNextFrame(new nRunnable() { public void run() { 
-				  surface.setLocation(100, 50); } } );
-		  }
+
+			  if (START_AS_WINDOW) {
+				  interf.full_screen_run.run();
+				  interf.addEventNextFrame(new nRunnable() { public void run() { 
+					  surface.setLocation(100, 50); } } );
+			  }
+			  interf.addEventTwoFrame(new nRunnable() { public void run() { 
+			    	  	frameRate(60); 
+			    	  	interf.setup_load(); } } );
+	 	  } } );
+		  
+		  video_setup();
+		  
 		  logln("init end");
 	}
 	
+	public boolean BLACKOUT = false;
+	boolean starting = true;;
+	public void draw() {
+		
+	    interf.frame();
+	  
+	  global_frame_count++;
+	  if (starting && global_frame_count < 5) { fill(0); noStroke(); rect(0, 0, width, height); }
+	  else starting = false;
+	  if (BLACKOUT) { 
+		  fill(0); noStroke(); rect(0, window_head, width, height-window_head); 
+	      fill(255); 
+		  text("Please Wait ...", width/2, height/2);
+	  }
+	  if (do_one_save) { do_one_save = false; savelog(); }
+		logln_this_frame = false;
+	}
+	
+	
+
 	nWidget app_grab, app_close;
 	public float window_head = 40;
 	float mx, my;
@@ -162,21 +200,6 @@ public class Rapp extends PApplet implements RConst {
 	  }
 	}
 	
-	public boolean BLACKOUT = false;
-	boolean starting = true;;
-	public void draw() {
-	  interf.frame();
-	  global_frame_count++;
-	  if (starting && global_frame_count < 5) { fill(0); noStroke(); rect(0, 0, width, height); }
-	  else starting = false;
-	  if (BLACKOUT) { 
-		  fill(0); noStroke(); rect(0, window_head, width, height-window_head); 
-	      fill(255); 
-		  text("Please Wait ...", width/2, height/2);
-	  }
-	  if (do_one_save) { do_one_save = false; savelog(); }
-		logln_this_frame = false;
-	}
 	
 
 	public void breakpnt() { 
@@ -188,7 +211,10 @@ public class Rapp extends PApplet implements RConst {
 	  interf.input.mouseWheelEvent(event);
 	}  
 	public void keyPressed() { 
-	  interf.input.keyPressedEvent();
+		if (!fullscreen) { //only stop esc in window mode
+			switch(key) {
+				case ESC: key = 0; break; } }
+		interf.input.keyPressedEvent();
 	}  
 	public void keyReleased() { 
 	  interf.input.keyReleasedEvent();
@@ -204,6 +230,15 @@ public class Rapp extends PApplet implements RConst {
 	}
 	public void mouseMoved() { 
 	  //interf.input.mouseMovedEvent();
+	}
+	
+	
+	
+
+	public VideoExport videoExport;
+	
+	void video_setup() {
+		videoExport = new VideoExport(this);
 	}
 	
 	    //#######################################################################

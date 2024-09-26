@@ -188,10 +188,12 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
 public boolean unclearable = false, hide_ctrl = false;
 boolean loading_from_bloc = false;
   public float ref_size = 40;
-  sVec grab_pos; sStr val_type;
+  sVec grab_pos; public sStr val_type;
   public  sStr val_descr;
 sStr val_title;
-  sInt priority, openning, openning_pre_hide; sObj val_self;
+  public sInt priority;
+sInt openning;
+sInt openning_pre_hide; sObj val_self;
   float prev_x, prev_y; //for group dragging
   public nLinkedWidget grabber;
 nLinkedWidget title; nCtrlWidget prio_sub, prio_add; nWatcherWidget prio_view;
@@ -341,6 +343,8 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
   void build_ui() {
     grabber = addLinkedModel("MC_Grabber")
       .setLinkedValue(grab_pos);
+
+	grabber.totalhide(); 
       
     grabber.clearParent().addEventDrag(new nRunnable(this) { public void run() { 
       grabber.setPY(grabber.getLocalY() - grabber.getLocalY()%(ref_size * GRID_SNAP_FACT));
@@ -586,11 +590,15 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
   public sRun newRun(String r, nRunnable d) { return newRun(r, r, d); }
   public sRun newRun(String r) { return newRun(r, r, null); }
   public sObj newObj(String r) { return newObj(r, r); }
-  
-  public sBoo newBoo(String r, String s, boolean d) {
+
+  public sBoo newBoo(String r, String s, boolean d, char ct) {
     sBoo v = ((sBoo)(value_bloc.getValue(r))); 
-    if (v == null) v = value_bloc.newBoo(r, s, d);
+    if (v == null) v = value_bloc.newBoo(r, s, d, ct);
     return v; }
+  public sBoo newBoo(String r, String s, boolean d) {
+	    sBoo v = ((sBoo)(value_bloc.getValue(r))); 
+	    if (v == null) v = value_bloc.newBoo(r, s, d);
+	    return v; }
   public sInt newInt(String r, String s, int d) {
     sInt v = ((sInt)(value_bloc.getValue(r))); 
     if (v == null) v = value_bloc.newInt(r, s, d);
@@ -614,10 +622,15 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     if (v == null) v = value_bloc.newCol(r, s, d);
     return v; }
   public sRun newRun(String r, String s, nRunnable d) {
-    sRun v = ((sRun)(value_bloc.getValue(r))); 
-    if (v == null) v = value_bloc.newRun(r, s, d);
-    else v.set(d);
-    return v; }
+	    sRun v = ((sRun)(value_bloc.getValue(r))); 
+	    if (v == null) v = value_bloc.newRun(r, s, d);
+	    else v.set(d);
+	    return v; }
+  public sRun newRun(String r, String s, char ct, nRunnable d) {
+	    sRun v = ((sRun)(value_bloc.getValue(r))); 
+	    if (v == null) v = value_bloc.newRun(r, s, ct, d);
+	    else v.set(d);
+	    return v; }
   public sObj newObj(String r, String s) {
     sObj v = ((sObj)(value_bloc.getValue(r))); 
     if (v == null) v = value_bloc.newObj(r, s);

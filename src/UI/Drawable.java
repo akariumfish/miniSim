@@ -7,6 +7,7 @@ public class Drawable {
 	  int layer = 0;
 	  private boolean active = true;
 	  boolean drawn_this_frame = false;
+	  boolean alwaysBottom = false;
 	  Drawable set_view(boolean b) { if (b) show(); else hide(); return this; }
 	  Drawable show() { 
 		  //removing from array break drawing order...
@@ -30,6 +31,7 @@ public class Drawable {
 	  public void clear() { if (pile != null) pile.drawables.remove(this); }
 	  public void toLayerTop() { pile.drawables.remove(this); pile.drawables.add(0, this); }
 	  public void toLayerBottom() { pile.drawables.remove(this); pile.drawables.add(this); }
+	  public void setAlwaysBottom(boolean b) { alwaysBottom = b; }
 	  public Drawable setLayer(int l) {
 	    layer = l;
 	    return this;

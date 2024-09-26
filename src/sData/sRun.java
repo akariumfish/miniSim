@@ -1,11 +1,14 @@
 package sData;
 
 public class sRun extends sValue {
+	  public void directshortcut_action() { if (val != null) { val.run(); doChange(); } }
 	  public nRunnable asRun() { return val; }
 	  public String getString() { return ref; }
 	  public void clear() { super.clear(); }
 	  private nRunnable val;
 	  public sRun(sValueBloc b, String n, String s, nRunnable r) { super(b, "run", n, s);  val = r; }
+	  public sRun(sValueBloc b, String n, String s, nRunnable r, char ct) { super(b, "run", n, s);  
+	  	val = r; set_directshortcut(ct); }
 	  public nRunnable get() { return val; } // !!!! carefull, no event if run outside !!!!
 	  public sRun run() { if (val != null) { val.run(); doChange(); } return this; }
 	  public sRun set(nRunnable v) { run_events_allset(); val = v; return this; }

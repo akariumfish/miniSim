@@ -8,6 +8,7 @@ import UI.*;
 import processing.core.PVector;
 
 public abstract class sValue implements RConst {
+	
 	public boolean log = false;
 	  sValueBloc getBloc() { return bloc; }
 	  public abstract String getString();
@@ -79,12 +80,19 @@ public abstract class sValue implements RConst {
 	    sb.newData("ref", ref);
 	    sb.newData("typ", type);
 	    sb.newData("shr", shrt);
+	    sb.newData("cut", (int)direct_shortcut);
 	  }
 	  void load_from_bloc(Save_Bloc svb) {
 //	    vlogln("sv load " + ref);
 	    ref = svb.getData("ref");
 	    type = svb.getData("typ");
 	    shrt = svb.getData("shr");
+	    direct_shortcut = (char)svb.getInt("cut");
+	    if (direct_shortcut != 0) { 
+	    		data.input.getKeyboardButton(direct_shortcut);
+	    		data.input.shorted_values.add(this);
+	    }
+	    else data.input.shorted_values.remove(this);
 	    has_changed = true;
 	  }
 	  public boolean limited_min = false;
@@ -156,4 +164,17 @@ public abstract class sValue implements RConst {
 	    	  return new nObjectPanel(gui, tpan, (sObj)this);
 	    } else return null;
 	  }
+
+		public char direct_shortcut = 0;
+		public void set_directshortcut(char s) {
+			if (s != 0) {
+				direct_shortcut = s;
+				if (!data.input.shorted_values.contains(this)) {
+					data.input.getKeyboardButton(s);
+					data.input.shorted_values.add(this); } 
+			else clear_directshortcut(); } }
+		public void clear_directshortcut() { 
+			direct_shortcut = 0; 
+			data.input.shorted_values.remove(this); }
+		public void directshortcut_action() {}
 	}

@@ -8,7 +8,7 @@ public class nTaskPanel extends nToolPanel {
 	  ArrayList<nWindowPanel> windowPanels = new ArrayList<nWindowPanel>();
 	  ArrayList<nWidget> window_buttons = new ArrayList<nWidget>();
 	  int used_spot = 0, max_spot = 8;
-	  int row = 2, col = 4;
+	  int row = 1, col = 6;
 	  float adding_pos;
 	  public nWidget getWindowPanelButton(nWindowPanel w) {
 	    if (used_spot < max_spot) {

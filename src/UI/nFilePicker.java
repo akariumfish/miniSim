@@ -25,15 +25,16 @@ public class nFilePicker extends nWindowPanel {
 	  
 	  sStr val_cible;
 	  boolean autoclose = false, mitig_ac = false, filter_db = false;
-	  
+	  String folder;
 	  ArrayList<nRunnable> eventsChoose = new ArrayList<nRunnable>();
 	  public nFilePicker addEventChoose(nRunnable r) { eventsChoose.add(r);  return this; } 
 	  
-	  public nFilePicker(nGUI _g, nTaskPanel _task, sStr _sv, boolean _autoclose, String t, boolean _fdb) { 
+	  public nFilePicker(nGUI _g, nTaskPanel _task, sStr _sv, String _folder, boolean _autoclose, String t, boolean _fdb) { 
 	    super(_g, _task, t); 
 	    val_cible = _sv;
 	    autoclose = _autoclose;
 	    filter_db = _fdb;
+	    folder = _folder;
 	    explorer_entry = new ArrayList<String>();
 	    ext_filter = new ArrayList<String>();
 	    
@@ -78,7 +79,7 @@ public class nFilePicker extends nWindowPanel {
 	  }
 	  void update_list() {
 	    String[] names = null;
-	    File file = new File(gui.app.sketchPath());
+	    File file = new File(gui.app.sketchPath() + "\\" + folder);
 	    if (file.isDirectory()) { names = file.list(); } // all files in sketch directory
 	    if (names != null) {
 	      explorer_entry.clear();

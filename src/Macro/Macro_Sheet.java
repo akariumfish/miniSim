@@ -689,6 +689,9 @@ public class Macro_Sheet extends Macro_Abstract {
   
   public sObj val_sheet;
   
+
+  protected ArrayList<MCustom> custom_blocs = new ArrayList<MCustom>(0);
+  
   
  
   

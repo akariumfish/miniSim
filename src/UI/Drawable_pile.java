@@ -10,6 +10,9 @@ class Drawing_pile {
 	    int layer = 0;
 	    int run_count = 0;
 	    for (Drawable d : drawables) d.drawn_this_frame = false;
+	    for (Drawable d : drawables) if (d.alwaysBottom) { 
+	    		if (d.get_view()) d.do_drawing();
+	        run_count++; }
 	    while (run_count < drawables.size()) {
 	      for (int i = drawables.size() - 1; i >= 0 ; i--) {
 	        Drawable r = drawables.get(i);

@@ -3,15 +3,21 @@
 
 Unperfect Simulation sandbox with visual scripting. To waste time making ephemeral worlds.
 
-Using : Java 1.8  -  https://www.java.com/en/ ; 
-Processing 3.5.4  -  https://www.processing.org/ ; .
+Using :
+Java 1.8           -  Language           -  https://www.java.com/en/ ; 
+Processing 3.5.4   -  Systeme interface  -  https://www.processing.org/ ;
+Eclipse IDE        -  Developement       -  https://eclipseide.org/ ;
+Launch4j           -  Executable         -  https://launch4j.sourceforge.net/ ;
+Ffmpeg 			   -  Video              -  https://ffmpeg.org// ;
+VideoExport        -  Video              -  https://funprogramming.org/VideoExport-for-Processing/ ;
+
 
 French Down   vvv  .
 
 See previews for samples, more in the image folder.
 
 Quick start :
-Go to https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.4.rar
+Go to https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.7.rar
  ; click on "view raw" to dowload 
  ; extract it somewhere then launch miniSim0.x.x.exe .
 
@@ -19,34 +25,27 @@ If nothing append or a windows flash brieffly, you probably dont have the correc
 
 Once the program is launched :
 Click on the FS button then on the OP button on top right of the screen .
-Click on 'blue.sdata' in the new windows - wait a little for loading - .
-Press h .
-To quit hit ESC.  
+Click on any sdata file in the new windows - wait a little for loading - .
 
-Java RE 8 is needed to launch the .exe. To get it go to : https://www.java.com/fr/download/manual.jsp then click Windows Online. After downloading, install this anywhere.
+Java RE 8 is needed to launch the software. To get it go to : https://www.java.com/fr/download/manual.jsp then click Windows Online. After downloading, install this anywhere.
 
 Please be aware that im not a pro, (i never had any programming lessons) and its certainly not done correctly. 
 
-thanks for trying, no doc yet, good luck ... 	( sorry )
-
-contact growsDev@gmail.com.
+This is not the developement of a programmation projet !! Its a montain of unfinished idee, temporary setups on top of more temporary fixs, quick and lazy solution driven by lack of sleep and depression, and be aware that IT IS PERFECT LIKE THAT. I dont intent on fully fixing it. As long as i can make it more absurdly complex and obscur I will continue. If you are here for the "art", thank you deeply! but please go to grows.cloud, there is nothing for you here. Otherwise, if you want to try making something, thank you dearly, and good luck. Know that EVERYTHING can work, but not always as intended. 
 
 .
 ..
+...
 
 ---FRANCAIS---MINISIM---
-Il y a quelque preview dans le dossier image.
+Démarrage :
+Ouvre https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.7.rar
+ ; clique sur "view raw" pour télécharger le fichier 
+ ; décompresse le quelque-part et lance miniSim0.x.x.exe .
 
-Demarrage :
-Ouvre https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.4.rar
- ; clique sur "view raw" pour telecharger le fichier 
- ; decompresse le quelque par et lance miniSim0.x.x.exe .
-
-Si le programme ne ce lance pas il faut probablement installé Java RE 8
+Si le programme ne se lance pas il faut probablement installer Java RE 8
 https://www.java.com/fr/download/manual.jsp .
 
-Sache que je ne suis pas un pro, et que ce programme n'est certainement pas construit comme il faudrais.
+Sache que je ne suis pas un pro, et que ce programme n'est certainement pas construit comme il faudrait.
 
-Merci de ton intérêt, pas encore de doc, bonne chance ... (désolé)
-
-contact growsDev@gmail.com.
+Merci de ton intérêt, il n'y as pas de doc, bonne chance ...

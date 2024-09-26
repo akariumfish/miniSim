@@ -1,6 +1,7 @@
 package UI;
 
 import RApplet.Rapp;
+import processing.core.PConstants;
 
 public class nConstructor {
   nTheme theme; 
@@ -28,6 +29,7 @@ public class nConstructor {
       );
     theme.addModel("Label", theme.newWidget("ref")
       .setStandbyColor(app.color(255, 0))
+      .setTextAlignment(PConstants.CENTER, PConstants.TOP)
       );
     theme.addModel("Label_Small_Text", theme.newWidget("Label")
       .setFont((int)(ref_size/2.1))
@@ -56,6 +58,12 @@ public class nConstructor {
       .setStandbyColor(app.color(80, 90, 80))
       .setHoveredColor(app.color(110, 120, 110))
       .setClickedColor(app.color(140, 150, 140))
+      );
+    theme.addModel("Menu_Bar", theme.newWidget("Button")
+      .setStandbyColor(app.color(80, 90, 80))
+      .setHoveredColor(app.color(110, 120, 110))
+      .setClickedColor(app.color(120, 135, 120))
+      .setOutlineColor(app.color(40, 05, 10))
       );
     theme.addModel("Head_Button", theme.newWidget("Button")
       .setStandbyColor(app.color(80, 90, 80))
@@ -124,6 +132,7 @@ public class nConstructor {
       
     make_outline("Button");
     make_outline("Menu_Button");
+    make_outline("Menu_Bar");
     make_outline("Head_Button");
     make_outline("Auto_Ctrl_Button");
     make_outline("Label");
@@ -142,6 +151,7 @@ public class nConstructor {
     make("Label_Small_Text");
     make("Button");
     make("Menu_Button");
+    make("Menu_Bar");
     make("Head_Button");
     make("Auto_Ctrl_Button");
     make("Label_Back");
@@ -187,6 +197,7 @@ public class nConstructor {
     do_sizes(base, "-S2/1", ref_size*2, ref_size);
     do_sizes(base, "-S2/0.75", ref_size*2, ref_size*0.75F);
     do_sizes(base, "-S2.5/0.75", ref_size*2.5F, ref_size*0.75F);
+    do_sizes(base, "-S3/0.6", ref_size*3, ref_size*0.6F);
     do_sizes(base, "-S3/0.75", ref_size*3, ref_size*0.75F);
     do_sizes(base, "-S4/0.75", ref_size*4, ref_size*0.75F);
     do_sizes(base, "-S6/1", ref_size*6, ref_size*1);
@@ -229,6 +240,28 @@ public class nConstructor {
     do_places(base, "-S1-P7", ref_size*6.75F,  0, ref_size, ref_size);
     do_places(base, "-S1-P8", ref_size*7.875F, 0, ref_size, ref_size);
     do_places(base, "-S1-P9", ref_size*9,     0, ref_size, ref_size);
+
+    float lrg = 1.1F;
+    float ht = 0.75F;
+    float py = ref_size*0.0625F;
+    do_places(base, "-M-P1", ref_size*0    , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P2", ref_size*1.1F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P3", ref_size*2.2F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P4", ref_size*3.3F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P5", ref_size*4.4F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P6", ref_size*5.5F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P7", ref_size*6.6F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P8", ref_size*7.7F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-M-P9", ref_size*8.8F , py, ref_size*lrg, ref_size*ht);
+    
+    lrg = 0.75F;
+    do_places(base, "-Mm-P1", ref_size*0     , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-Mm-P2", ref_size*0.75F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-Mm-P3", ref_size*1.5F  , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-Mm-P4", ref_size*2.25F , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-Mm-P5", ref_size*3.0F  , py, ref_size*lrg, ref_size*ht);
+    do_places(base, "-Mm-P6", ref_size*3.75F , py, ref_size*lrg, ref_size*ht);
+    
     
     do_places(base, "-SS1-P1", ref_size*0.125F, ref_size*0.125F, ref_size*0.75F, ref_size*0.75F);
     do_places(base, "-SS1-P2", ref_size*1.25F,  ref_size*0.125F, ref_size*0.75F, ref_size*0.75F);

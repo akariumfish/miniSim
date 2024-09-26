@@ -2,19 +2,11 @@ package z_old_specialise;
 
 import java.util.ArrayList;
 
-import Macro.Macro_Main;
-import Macro.Macro_Sheet;
-import RApplet.RConst;
-import RApplet.Rapp;
-import UI.Drawable;
-import UI.nCursor;
-import UI.nFrontPanel;
-import UI.nFrontTab;
-import UI.nList;
-import processing.core.PApplet;
-import processing.core.PConstants;
-import processing.core.PImage;
-import processing.core.PVector;
+import Macro.*;
+import RApplet.*;
+import UI.*;
+import processing.core.*;
+import processing.opengl.PShader;
 import sData.*;
 
 
@@ -46,15 +38,9 @@ public class Canvas extends Macro_Sheet {
 	      .addSeparator(0.125)
 	      ;
 	    sheet_front.getTab(1).getShelf()
-	      .addDrawerTripleButton(back_clear, back_fill, back_add, 10, 1)
-	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(back_save, back_load, 10, 1)
-	      .addSeparator(0.125)
-	      .addDrawerFieldCtrl(back_file, 10, 1)
-	      .addSeparator(0.125)
 	      .addDrawerTripleButton(val_show, val_show_back, val_show_bound, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(val_rst_run, val_show_grab, 10, 1)
+	      .addDrawerTripleButton(val_rst_run, val_show_grab, val_centered, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 
@@ -83,20 +69,34 @@ public class Canvas extends Macro_Sheet {
 	    
 	    tab = sheet_front.addTab("Brush");
 	    tab.getShelf()
-	      .addDrawer(10.25, 0.75)
-	      .addModel("Label-S4", "-Brush Control-").setFont((int)(ref_size/1.4)).getShelf()
+	      .addDrawer(10.25, 0.5)
+	      .addModel("Label-S4", "-Back Control-").setFont((int)(ref_size/1.4)).getShelf()
+	      .addSeparator(0.125)
+	      .addDrawerTripleButton(back_clear, back_fill, back_add, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerDoubleButton(back_save, back_load, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFieldCtrl(back_file, 10, 1)
+	      .addDrawer(10.25, 0.5)
+	      .addModel("Label-S4", "-Rain Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
 	      .addDrawerTripleButton(do_rain1, do_rain2, do_rain3, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(rain_strength, 2, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(rain_dir, 1, 10, 1)
+	      .addDrawer(10.25, 0.5)
+	      .addModel("Label-S4", "-Brush Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
 	      .addDrawerButton(do_brush, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(brush_size, 2, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(brush_dens, 2, 10, 1)
+	      .addDrawer(10.25, 0.5)
+	      .addModel("Label-S4", "-Effect Control-").setFont((int)(ref_size/1.4)).getShelf()
+	      .addSeparator(0.125)
+	      .addDrawerDoubleButton(use_mask, use_blur, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 
@@ -136,8 +136,8 @@ public class Canvas extends Macro_Sheet {
 	  
 	  sVec val_pos;
 	  sInt val_w, val_h, can_div, rate_decay;
-	  sFlt val_scale, color_keep_thresh, decay_fact;
-	  sBoo val_show, val_show_back, val_show_bound, val_show_grab;
+	  sFlt val_scale, val_scale_fine, color_keep_thresh, decay_fact;
+	  sBoo val_show, val_show_back, val_show_bound, val_show_grab, val_centered;
 	  sStr selected_com;
 	  sCol val_col_back;
 	  sRun val_rst_run;
@@ -151,6 +151,11 @@ public class Canvas extends Macro_Sheet {
 	  int can_st;
 	  
 	  Simulation sim;
+	  
+	  PShader shader_blur;
+	  PShader shader_mask;
+	  PGraphics mask_image;
+	  sBoo use_blur, use_mask;
 	  
 	  PImage back;
 	  sRun back_clear, back_add, back_fill, back_save, back_load;
@@ -170,7 +175,8 @@ public class Canvas extends Macro_Sheet {
 	    val_w = menuIntIncr(gui.app.width / def_pix_size, 100, "val_w");
 	    val_h = menuIntIncr(gui.app.height / def_pix_size, 100, "val_h");
 	    can_div = menuIntIncr(4, 1, "can_div");
-	    val_scale = menuFltSlide(def_pix_size, 2, 80, "val_scale");
+	    val_scale = menuFltSlide(def_pix_size, 1, 150, "val_scale");
+	    val_scale_fine = menuFltSlide(def_pix_size / 10, 1, 15, "fine_scale");
 	    color_keep_thresh = menuFltSlide(200, 0, 260, "clrkeep_thresh");
 	    decay_fact = menuFltSlide(1, 0.9F, 1.0F, "decay_fact");
 	    rate_decay = menuIntIncr(100, 10, "rate_decay");
@@ -178,6 +184,7 @@ public class Canvas extends Macro_Sheet {
 	    val_show_back = newBoo(false, "val_show_back", "val_show_back");
 	    val_show_bound = newBoo(false, "val_show_bound", "show_bound");
 	    val_show_grab = newBoo(false, "val_show_grab", "show_grab");
+	    val_centered = newBoo(false, "val_centered", "val_centered");
 	    selected_com = newStr("selected_com", "scom", "");
 	    val_col_back = menuColor(gui.app.color(0), "background");
 	    val_col_back.addEventChange(new nRunnable() { public void run() { reset(); } });
@@ -214,8 +221,7 @@ public class Canvas extends Macro_Sheet {
 	    
 	    tick_run = new nRunnable() { public void run() { tick(); } };
 	    rst_run = new nRunnable() { public void run() { reset(); } };
-	    cam_draw = new Drawable() { public void drawing() { 
-	      drawCanvas(); } };
+	    cam_draw = new Drawable() { public void drawing() { drawCanvas(); } };
 	    val_rst_run = newRun("val_rst_run", "rst_run", rst_run);
 
 	    back_clear = newRun("back_clear", "back_clear", 
@@ -238,8 +244,18 @@ public class Canvas extends Macro_Sheet {
 	    
 	    if (sim != null) sim.addEventTick2(tick_run);
 	    if (sim != null) sim.inter.addToCamDrawerPile(cam_draw);
+//	    cam_draw.setAlwaysBottom(true);
 	    if (sim != null) sim.addEventReset(rst_run);
 //	    if (sim != null) sim.reset();
+
+	    use_blur = newBoo(false, "use_blur");
+	    use_mask = newBoo(false, "use_mask");
+	    use_blur.addEventChange(rst_run);
+	    use_mask.addEventChange(rst_run);
+	    if (gui.app.USE_SHADERS) {
+		    shader_blur = gui.app.loadShader("shaders\\shader_blur.glsl");
+		    shader_mask = gui.app.loadShader("shaders\\shader_mask.glsl");
+	    }
 	    
 	    mmain().inter.addToCamDrawerPile(cam_draw);
 
@@ -268,6 +284,12 @@ public class Canvas extends Macro_Sheet {
 	    init_pim(can1);
 	    can2 = gui.app.createImage(val_w.get(), val_h.get(), PConstants.ARGB);
 	    init_pim(can2);
+
+	    if (gui.app.USE_SHADERS) {
+		    mask_image = gui.app.createGraphics(val_w.get(), val_h.get(), PApplet.P2D);
+		    mask_image.noSmooth();
+	    }
+	    
 	    can_st = can_div.get();
 	    active_can = 0;
 	  }
@@ -322,6 +344,8 @@ public class Canvas extends Macro_Sheet {
 	    super.clear();
 	    return this;
 	  }
+	  
+	  float getscale() { return val_scale.get() + val_scale_fine.get(); }
 	  
 	  float sat(int c) {
 	    return (gui.app.alpha(c) / 255.0F) * 
@@ -532,48 +556,97 @@ public class Canvas extends Macro_Sheet {
 	    }
 	  }
 	  
+
+	  
+	  void cam_to_mask(MCam s) {
+		PVector p1 = new PVector(); PVector p2 = new PVector(); PVector p3 = new PVector();
+
+		mask_image.pushMatrix();
+		mask_image.scale( 1.0F / getscale() );
+		if (val_centered.get()) 
+			mask_image.translate(
+				-val_pos.get().x + val_w.get() * getscale() / 2, 
+    				-val_pos.get().y + val_h.get() * getscale() / 2); 
+		else mask_image.translate(-val_pos.get().x, -val_pos.get().y);
+		
+		for (int j = 0 ; j+2 < s.mask_vert_stack.size() ; j += 3) {
+			p1.set(s.mask_vert_stack.get(j));
+			p2.set(s.mask_vert_stack.get(j+1));
+			p3.set(s.mask_vert_stack.get(j+2));
+			
+			mask_image.triangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+		}
+		mask_image.popMatrix();
+	  }
+	  
 	  void drawCanvas() {
 	    if (val_show_bound.get()) {
 
-	    	gui.app.stroke(180);
-	    	gui.app.strokeWeight(ref_size / (10 * mmain().gui.scale) );
-	    	gui.app.noFill();
-	    	gui.app.rect(val_pos.get().x - val_w.get() * val_scale.get() / 2, 
-	    				 val_pos.get().y - val_h.get() * val_scale.get() / 2, 
-	    				 val_w.get() * val_scale.get(), val_h.get() * val_scale.get());
+		    	gui.app.stroke(180);
+		    	gui.app.strokeWeight(ref_size / (10 * mmain().gui.scale) );
+		    	gui.app.noFill();
+		    	if (val_centered.get())
+		    		gui.app.rect(val_pos.get().x - val_w.get() * getscale() / 2, 
+		    				 val_pos.get().y - val_h.get() * getscale() / 2, 
+		    				 val_w.get() * getscale(), val_h.get() * getscale());
+		    	else gui.app.rect(val_pos.get().x, val_pos.get().y, 
+	    				 val_w.get() * getscale(), val_h.get() * getscale());
 	    }
 
-  	    if (val_show_back.get()) draw(back);
+  	    if (val_show_back.get()) draw(back, false);
 	    if (val_show.get()) {
-	      if (active_can == 0) draw(can1);
-	      else if (active_can == 1) draw(can2);
+	      if (active_can == 0) draw(can1, true);
+	      else if (active_can == 1) draw(can2, true);
 	    }
 	    
-	    //done in sim
-	    //if (faces.size() > 0) {
-	    //  int min = faces.get(0).val_draw_layer.get(), max = min;
-	    //  for (Face f : faces) {
-	    //    min = min(min, f.val_draw_layer.get()); max = max(max, f.val_draw_layer.get()); }
-	    //  for (int i = min ; i <= max ; i++)
-	    //  for (Face f : faces) if (f.val_draw_layer.get() == i) f.draw();
-	    //}
+    		if (gui.app.USE_SHADERS && use_mask.get()) {
+    		    mask_image.beginDraw();
+    	  	  	mask_image.background(0);
+    	  	  	mask_image.noStroke();
+    	  	  	mask_image.fill(255, 0, 0);
+    	  	  	
+    			for (MCustom c : custom_blocs) { 
+    				for (Macro_Connexion i : c.out.connected_inputs) 
+    					if (i.elem.bloc.val_type.get().equals("cam")) 
+    						cam_to_mask((MCam)i.elem.bloc);
+    				for (Macro_Connexion dc : c.out.direct_cos) 
+    				for (Macro_Connexion i : dc.connected_inputs)
+    					if (i.elem.bloc.val_type.get().equals("cam")) 
+    						cam_to_mask((MCam)i.elem.bloc);
+    			}
+	  	  	mask_image.endDraw();
+	    }
 	  }
-	  
-	  void draw(PImage canvas) {
+
+	  void draw(PImage canvas, boolean shadering) {
 	    canvas.updatePixels();
 	    gui.app.pushMatrix();
-	    gui.app.translate(val_pos.get().x - val_w.get() * val_scale.get() / 2, 
-	    				  val_pos.get().y - val_h.get() * val_scale.get() / 2);
-	    gui.app.scale(val_scale.get());
+	    if (val_centered.get()) 
+	    		gui.app.translate(val_pos.get().x - val_w.get() * getscale() / 2, 
+	    				  val_pos.get().y - val_h.get() * getscale() / 2);
+	    else gui.app.translate(val_pos.get().x, val_pos.get().y);
+	    gui.app.scale(getscale());
+
+	    if (gui.app.USE_SHADERS) {
+		    if (use_mask.get() && shadering) {
+			    shader_mask.set("mask", mask_image);
+		    	    gui.app.shader(shader_mask);
+		    }
+		    else if (use_blur.get() && shadering) gui.app.shader(shader_blur);
+		    else gui.app.resetShader();
+	    }
 	    gui.app.image(canvas, 0, 0);
+	    
+	    if (gui.app.USE_SHADERS && (use_blur.get() || use_mask.get())) gui.app.resetShader();
+	    
 	    gui.app.popMatrix();
 	  }
 	  
 	  void draw_shape_fill(nBase sh, float halo_size, float halo_density, int c) {
 	    for (float px = (int)(sh.pos.x - sh.rad() - halo_size) ; 
-	         px < (int)(sh.pos.x + sh.rad() + halo_size) ; px+=val_scale.get())
+	         px < (int)(sh.pos.x + sh.rad() + halo_size) ; px+=getscale())
 	      for (float py = (int)(sh.pos.y - sh.rad() - halo_size) ; 
-	           py < (int)(sh.pos.y + sh.rad() + halo_size) ; py+=val_scale.get()) {
+	           py < (int)(sh.pos.y + sh.rad() + halo_size) ; py+=getscale()) {
 	      PVector p = new PVector(px, py);
 	      float l1 = RConst.distancePointToLine(px, py, sh.p1().x, sh.p1().y, sh.p2().x, sh.p2().y);
 	      float l2 = RConst.distancePointToLine(px, py, sh.p3().x, sh.p3().y, sh.p2().x, sh.p2().y);
@@ -591,9 +664,9 @@ public class Canvas extends Macro_Sheet {
 	  }
 	  void draw_shape_line(nBase sh, float halo_size, float halo_density, int c) {
 	    for (float px = (int)(sh.pos.x - sh.rad() - halo_size) ; 
-	         px < (int)(sh.pos.x + sh.rad() + halo_size) ; px+=val_scale.get())
+	         px < (int)(sh.pos.x + sh.rad() + halo_size) ; px+=getscale())
 	      for (float py = (int)(sh.pos.y - sh.rad() - halo_size) ; 
-	           py < (int)(sh.pos.y + sh.rad() + halo_size) ; py+=val_scale.get()) {
+	           py < (int)(sh.pos.y + sh.rad() + halo_size) ; py+=getscale()) {
 	      
 	      float l1 = RConst.distancePointToLine(px, py, sh.p1().x, sh.p1().y, sh.p2().x, sh.p2().y);
 	      float l2 = RConst.distancePointToLine(px, py, sh.p3().x, sh.p3().y, sh.p2().x, sh.p2().y);
@@ -611,8 +684,8 @@ public class Canvas extends Macro_Sheet {
 
 	  public void draw_halo(PVector pos, float halo_size, float halo_density, int c) {
 	    //walk a box of pix around entity containing the halo (pos +/- halo radius)
-	    for (float px = (int)(pos.x - halo_size) ; px < (int)(pos.x + halo_size) ; px+=val_scale.get())
-	      for (float py = (int)(pos.y - halo_size) ; py < (int)(pos.y + halo_size) ; py+=val_scale.get()) {
+	    for (float px = (int)(pos.x - halo_size) ; px < (int)(pos.x + halo_size) ; px+=getscale())
+	      for (float py = (int)(pos.y - halo_size) ; py < (int)(pos.y + halo_size) ; py+=getscale()) {
 	        PVector m = new PVector(pos.x - px, pos.y - py);
 	        if (m.mag() < halo_size) { //get and try distence of current pix
 	          //the color to add to the current pix is function of his distence to the center
@@ -629,9 +702,9 @@ public class Canvas extends Macro_Sheet {
 		  float ymin = PApplet.min(p1.y, p2.y);
 		  float ymax = PApplet.max(p1.y, p2.y);
 		    for (float px = (int)(xmin - halo_size) ; px < (int)(xmax + halo_size) ; 
-		    		 px += val_scale.get())
+		    		 px += getscale())
 		      for (float py = (int)(ymin - halo_size) ; py < (int)(ymax + halo_size) ; 
-		    		   py += val_scale.get()) {
+		    		   py += getscale()) {
 		        float d = RConst.distancePointToLine(px, py, p1.x, p1.y, p2.x, p2.y);
 		        float d1 = RConst.distancePointToPoint(px, py, p1.x, p1.y);
 //		        float d2 = RConst.distancePointToPoint(px, py, p2.x, p2.y);
@@ -651,14 +724,19 @@ public class Canvas extends Macro_Sheet {
 	  }
 
 	  void addpix(PImage canvas, float x, float y, int nc) {
-	    //x -= int(val_scale.get() / 2);
-	    //y -= int(val_scale.get() / 2);
-	    x -= val_pos.get().x - val_w.get() * val_scale.get() / 2;
-	    y -= val_pos.get().y - val_h.get() * val_scale.get() / 2;
-	    x /= val_scale.get();
-	    y /= val_scale.get();
-	    //x += 1 / val_scale.get();
-	    //y += 1 / val_scale.get();
+	    //x -= int(getscale() / 2);
+	    //y -= int(getscale() / 2);
+		  if (val_centered.get()) {
+	    x -= val_pos.get().x - val_w.get() * getscale() / 2;
+	    y -= val_pos.get().y - val_h.get() * getscale() / 2;
+		  } else {
+	    x -= val_pos.get().x;
+	    y -= val_pos.get().y;
+		  }
+	    x /= getscale();
+	    y /= getscale();
+	    //x += 1 / getscale();
+	    //y += 1 / getscale();
 	    if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) return;
 	    int pi = canvas.width * (int)(y) + (int)(x);
 	    if (pi >= 0 && pi < canvas.pixels.length) {
@@ -671,9 +749,9 @@ public class Canvas extends Macro_Sheet {
 
 	  void shape_transform(nBase sh, PixelTransform rn) {
 		  for (float px = (int)(sh.pos.x - sh.rad()) ; 
-				  px < (int)(sh.pos.x + sh.rad()) ; px+=val_scale.get())
+				  px < (int)(sh.pos.x + sh.rad()) ; px+=getscale())
 			  for (float py = (int)(sh.pos.y - sh.rad()) ; 
-					  py < (int)(sh.pos.y + sh.rad()) ; py+=val_scale.get()) {
+					  py < (int)(sh.pos.y + sh.rad()) ; py+=getscale()) {
 			  PVector p = new PVector(px, py);
 			  if (RConst.point_in_trig(sh.p1(), sh.p2(), sh.p3(), p))
 				  if (active_can == 0) transformpix(can2, px, py, rn);
@@ -682,14 +760,14 @@ public class Canvas extends Macro_Sheet {
       }
 	  
 	  void transformpix(PImage canvas, float x, float y, PixelTransform rn) {
-		    //x -= int(val_scale.get() / 2);
-		    //y -= int(val_scale.get() / 2);
-		    x -= val_pos.get().x - val_w.get() * val_scale.get() / 2;
-		    y -= val_pos.get().y - val_h.get() * val_scale.get() / 2;
-		    x /= val_scale.get();
-		    y /= val_scale.get();
-		    //x += 1 / val_scale.get();
-		    //y += 1 / val_scale.get();
+		    //x -= int(getscale() / 2);
+		    //y -= int(getscale() / 2);
+		    x -= val_pos.get().x - val_w.get() * getscale() / 2;
+		    y -= val_pos.get().y - val_h.get() * getscale() / 2;
+		    x /= getscale();
+		    y /= getscale();
+		    //x += 1 / getscale();
+		    //y += 1 / getscale();
 		    if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) return;
 		    int pi = canvas.width * (int)(y) + (int)(x);
 		    if (pi >= 0 && pi < canvas.pixels.length) {

@@ -76,6 +76,8 @@ public class nGUI {
   public nInfo info;
   public Rect view;
   public float scale = 1;
+  public float min_view_size = 2;
+  public float min_fineview_size = 0.5F;
   public float ref_size = 30;
   public boolean isShown = true;
   public boolean field_used = false;

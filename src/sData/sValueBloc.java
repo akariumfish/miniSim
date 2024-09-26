@@ -117,15 +117,18 @@ public class sValueBloc {
 	  public  sInt newInt(String n, String s, int v)       { return new sInt(this, v, n, s); }
 	  public  sFlt newFlt(String n, String s, float v)     { return new sFlt(this, v, n, s); }
 	  public  sBoo newBoo(String n, String s, boolean v)   { return new sBoo(this, v, n, s); }
+	  public  sBoo newBoo(String n, String s, boolean v, char ct)   { return new sBoo(this, v, n, s, ct); }
 	  public sInt newInt(int v, String n, String s)       { return new sInt(this, v, n, s); }
 	  public sFlt newFlt(float v, String n, String s)     { return new sFlt(this, v, n, s); }
 	  public sBoo newBoo(boolean v, String n, String s)   { return new sBoo(this, v, n, s); }
+	  public sBoo newBoo(boolean v, String n, String s, char ct)   { return new sBoo(this, v, n, s, ct); }
 	  public sStr newStr(String n, String s, String v)    { return new sStr(this, v, n, s); }
 	  public sVec newVec(String n, String s, PVector v)   { return new sVec(this, n, s).set(v); }
 	  public sVec newVec(String n, String s)              { return new sVec(this, n, s); }
 	  public sCol newCol(String n, String s, int v)     { return new sCol(this, n, s).set(v); }
 	  public sCol newCol(String n, String s)              { return new sCol(this, n, s); }
 	  public sRun newRun(String n, String s, nRunnable v)  { return new sRun(this, n, s, v); }
+	  public sRun newRun(String n, String s, char ct, nRunnable v)  { return new sRun(this, n, s, v, ct); }
 	  //sBlc newBlc(String n, String s) { return new sBlc(this, n, s); }
 	  public sObj newObj(String n, Object v) { return new sObj(this, n, v); }
 	  

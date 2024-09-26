@@ -200,7 +200,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   
   nWidget ref, lens, msg_view;
   Drawable ref_draw;
-  Macro_Element elem; Macro_Sheet sheet; //sObj val_self;
+  public Macro_Element elem; Macro_Sheet sheet; //sObj val_self;
   int type = INPUT;
   String descr,base_info; boolean is_sheet_co = false;
   Rapp app;
@@ -618,7 +618,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
       		o.link_undefine) o.set_nolink();
 	  direct_cos.remove(o); 
   }
-  ArrayList<Macro_Connexion> direct_cos = new ArrayList<Macro_Connexion>();
+  public ArrayList<Macro_Connexion> direct_cos = new ArrayList<Macro_Connexion>();
   
   protected boolean linkable = false;
   public boolean link_undefine = false;
@@ -639,7 +639,7 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   boolean buildingLine = false;
   PVector newLine = new PVector();
   
-  ArrayList<Macro_Connexion> connected_inputs = new ArrayList<Macro_Connexion>();
+  public ArrayList<Macro_Connexion> connected_inputs = new ArrayList<Macro_Connexion>();
   ArrayList<Macro_Connexion> connected_outputs = new ArrayList<Macro_Connexion>();
   
   void end_packet_process() {

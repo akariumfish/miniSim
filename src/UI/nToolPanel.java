@@ -27,7 +27,7 @@ public class nToolPanel extends nShelfPanel {
 	    top = tp; right = rgh;
 	    reduc = addCtrlModel("Menu_Button_Small_Outline", "<")
 	      .setRunnable(new nRunnable(this) { public void run() { reduc(); } } );
-	    reduc.setSize(ref_size/1.7F, panel.getSY()).stackRight().show().setLabelColor(gui.app.color(180));
+	    reduc.setSize(ref_size/2.3F, panel.getSY()).stackRight().show().setLabelColor(gui.app.color(180));
 	    up_pos();
 	    gui.addEventsFullScreen(new nRunnable(this) { public void run() { 
 	      up_pos();

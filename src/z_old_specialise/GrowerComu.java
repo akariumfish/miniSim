@@ -346,7 +346,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  void addWidth() {
 		  width += (float)(com().MAX_LINE_WIDTH.get() - com().MIN_LINE_WIDTH.get()) / 
 				  (float)com().max_entity.get();
-		  if (parent != null) parent.addWidth();
+		  if (parent != null && parent != this) parent.addWidth();
 	  }
 	  Grower frame() { 
 	    return this;
