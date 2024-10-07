@@ -32,68 +32,14 @@ class Floc extends Entity {
   ArrayList<Floc> blob_list;
   boolean in_blob = false;
   
+  int crazy_cnt = 0;
+  boolean crazy_state = false;
+  
   Floc(FlocComu c) { 
 	super(c);
   	tail_list = new ArrayList<PVector>();
   	neight_list = new ArrayList<Floc>();
   	blob_list = new ArrayList<Floc>();
-  }
-  
-  void build_blob() {
-	  blob_list.clear();
-	  blob_list.add(this);
-	  for (Floc f : neight_list) add_to_blob(this, f);
-  }
-  void add_to_blob(Floc cible, Floc test) {
-	  if (!cible.blob_list.contains(test)) {
-		  cible.blob_list.add(test);
-		  for (Floc n : test.neight_list) add_to_blob(this, n);
-	  }
-  }
-  
-  void draw_halo(Canvas canvas) {
-    canvas.draw_halo(pos, halo_size, halo_density, halo_col);
-  }
-
-  void headTo(PVector c, float s) {
-    PVector l = new PVector(c.x, c.y);
-    l.add(-pos.x, -pos.y);
-    float r1 = RConst.mapToCircularValues(mov.heading(), l.heading(), s, -PConstants.PI, PConstants.PI);
-    mov.x = speed; mov.y = 0;
-    mov.rotate(r1);
-  }
-  void headAway(PVector c, float s) {
-    PVector l = new PVector(c.x, c.y);
-    l.add(-pos.x, -pos.y);
-    l.mult(-1);
-    float r1 = RConst.mapToCircularValues(mov.heading(), l.heading(), s, -PConstants.PI, PConstants.PI);
-    mov.x = speed; mov.y = 0;
-    mov.rotate(r1);
-  }
-  void headTo(float l, float s) {
-    float r1 = RConst.mapToCircularValues(mov.heading(), l, s, -PConstants.PI, PConstants.PI);
-    mov.x = speed; mov.y = 0;
-    mov.rotate(r1);
-  }
-  
-  void pair(Floc b2) {
-    float d = PApplet.dist(pos.x, pos.y, b2.pos.x, b2.pos.y);
-    if (d > com().SPACING_MIN.get() && d < com().SPACING_MAX.get()) {
-      headTo(b2.mov.heading(), 
-    		  com().FOLLOW.get() / ((com().SPACING_MAX.get() - d) / com().SPACING_MAX.get()) );
-      b2.headTo(mov.heading(), 
-    		  com().FOLLOW.get() / ((com().SPACING_MAX.get() - d) / com().SPACING_MAX.get()) );
-      neight_list.add(b2);
-      b2.neight_list.add(this);
-    } else if (d >= com().SPACING_MAX.get()) {
-        headTo(b2.pos, com().POURSUITE.get() / d);
-        b2.headTo(pos, com().POURSUITE.get() / d);
-    } else if (d <= com().SPACING_MIN.get()) {
-        headAway(b2.pos, com().POURSUITE.get() / d);
-        b2.headAway(pos, com().POURSUITE.get() / d);
-        neight_list.add(b2);
-        b2.neight_list.add(this);
-    }
   }
   
   Floc init() {
@@ -126,31 +72,69 @@ class Floc extends Entity {
     
     return this;
   }
+
+  void headTo(PVector c, float s) {
+    PVector l = new PVector(c.x, c.y);
+    l.add(-pos.x, -pos.y);
+    float r1 = RConst.mapToCircularValues(mov.heading(), l.heading(), s, -RConst.PI, RConst.PI);
+    mov.x = speed; mov.y = 0;
+    mov.rotate(r1);
+  }
+  void headAway(PVector c, float s) {
+    PVector l = new PVector(c.x, c.y);
+    l.add(-pos.x, -pos.y);
+    l.mult(-1);
+    float r1 = RConst.mapToCircularValues(mov.heading(), l.heading(), s, -RConst.PI, RConst.PI);
+    mov.x = speed; mov.y = 0;
+    mov.rotate(r1);
+  }
+  void headTo(float l, float s) {
+    float r1 = RConst.mapToCircularValues(mov.heading(), l, s, -RConst.PI, RConst.PI);
+    mov.x = speed; mov.y = 0;
+    mov.rotate(r1);
+  }
+  void headAway(float l, float s) {
+    l = (l + RConst.PI) % (2 * RConst.PI);
+    float r1 = RConst.mapToCircularValues(mov.heading(), l, s, -RConst.PI, RConst.PI);
+    mov.x = speed; mov.y = 0;
+    mov.rotate(r1);
+  }
   
-  int rngCol(int c1, int c2) {
-	int r = (int)com().app.random(com().app.red(c1) -
-    		com().app.red(c2));
-    int g = (int)com().app.random(com().app.green(c1) -
-    		com().app.green(c2));
-    int b = (int)com().app.random(com().app.blue(c1) -
-    		com().app.blue(c2));
-    r += com().app.red(c2);
-    g += com().app.green(c2);
-    b += com().app.blue(c2);
-    return com().app.color(r, g, b);
+  void follow(Floc f, float to, float frm, float a) {
+	  if (!crazy_state) { headTo(frm, a ); f.headTo(to, a );
+	  } else { headAway(frm, a ); f.headAway(to, a ); } }
+  void headTo(Floc f, float a) {
+	  if (!crazy_state) { headTo(f.pos, a ); f.headTo(pos, a );
+	  } else { headAway(f.pos, a ); f.headAway(pos, a ); } }
+  void headAway(Floc f, float a) {
+	  if (!crazy_state) { headAway(f.pos, a ); f.headTo(pos, a );
+	  } else { headTo(f.pos, a ); f.headAway(pos, a ); } }
+  
+  void pair(Floc b2) {
+    float d = PApplet.dist(pos.x, pos.y, b2.pos.x, b2.pos.y);
+	if (d < com().VIEWING_DIST.get()) {
+	  float purss_eff = com().POURSUITE.get() * (d/com().VIEWING_DIST.get());
+	  if (d > com().SPACING_MIN.get() && d < com().SPACING_MAX.get()) {
+		float dist_fact = (d - com().SPACING_MIN.get()) / 
+				(com().SPACING_MAX.get() - com().SPACING_MIN.get());
+//				((com().SPACING_MAX.get() - d) / com().SPACING_MAX.get());
+		
+	    //follow as much as close
+	    	follow(b2, mov.heading(), b2.mov.heading(), com().FOLLOW.get() * (1.0F - dist_fact) );
+		//pursue less and less as close
+	    	headTo(b2, com().POURSUITE.get() * dist_fact);
+	    neight_list.add(b2);
+	    b2.neight_list.add(this);
+	  } else if (d >= com().SPACING_MAX.get()) {
+	    	headTo(b2, purss_eff);
+	  } else if (d <= com().SPACING_MIN.get()) {
+	    headAway(b2, purss_eff);
+	    neight_list.add(b2);
+	    b2.neight_list.add(this);
+	  }
+    }
   }
 
-  int derivCol(int c, float dev) {
-	float r = com().app.red(c);
-	float g = com().app.green(c);
-	float b = com().app.blue(c);
-    
-	r = r * com().app.random(1 - dev, 1 + dev);
-    g = g * com().app.random(1 - dev, 1 + dev);
-    b = b * com().app.random(1 - dev, 1 + dev);
-    return com().app.color(r, g, b);
-  }
-  
   Floc frame() { return this; }
   int dev_cnt = 0;
   Floc tick() {
@@ -159,6 +143,17 @@ class Floc extends Entity {
 		  dev_cnt = 0;
 		  halo_col = derivCol(halo_col, (int)com().halo_dev.get());
 	  }
+	  
+	if (com().crazy_run.get()) {
+		crazy_cnt++;
+		if (!crazy_state && crazy_cnt >= com().crazy_tryrate.get()) {
+			crazy_cnt = 0;
+			if (com().app.random(1.0F) < com().crazy_prob.get()) crazy_state = true;
+		} else if (crazy_state && crazy_cnt >= com().crazy_tryrate.get()) {
+			crazy_cnt = 0;
+			if (com().app.random(1.0F) > (1.0F - com().crazy_prob.get()) / 2.0F) crazy_state = false;
+		}
+	}
 	  
     age++;
     if (age > max_age && com().aging.get()) {
@@ -208,6 +203,35 @@ class Floc extends Entity {
     
     return this;
   }
+
+  void draw_halo(Canvas canvas) {
+    canvas.draw_halo(pos, halo_size, halo_density, halo_col);
+  }
+  
+  int rngCol(int c1, int c2) {
+	int r = (int)com().app.random(com().app.red(c1) -
+    		com().app.red(c2));
+    int g = (int)com().app.random(com().app.green(c1) -
+    		com().app.green(c2));
+    int b = (int)com().app.random(com().app.blue(c1) -
+    		com().app.blue(c2));
+    r += com().app.red(c2);
+    g += com().app.green(c2);
+    b += com().app.blue(c2);
+    return com().app.color(r, g, b);
+  }
+
+  int derivCol(int c, float dev) {
+	float r = com().app.red(c);
+	float g = com().app.green(c);
+	float b = com().app.blue(c);
+    
+	r = r * com().app.random(1 - dev, 1 + dev);
+    g = g * com().app.random(1 - dev, 1 + dev);
+    b = b * com().app.random(1 - dev, 1 + dev);
+    return com().app.color(r, g, b);
+  }
+  
   Floc draw() {
 
 //      com().app.fill(com().val_col_deb.get());
@@ -270,6 +294,19 @@ class Floc extends Entity {
     }
     return this;
   }
+
+  void build_blob() {
+	  blob_list.clear();
+	  blob_list.add(this);
+	  for (Floc f : neight_list) add_to_blob(this, f);
+  }
+  void add_to_blob(Floc cible, Floc test) {
+	  if (!cible.blob_list.contains(test)) {
+		  cible.blob_list.add(test);
+		  for (Floc n : test.neight_list) add_to_blob(this, n);
+	  }
+  }
+  
   Floc clear() { return this; }
   FlocComu com() { return ((FlocComu)com); }
   
@@ -365,7 +402,7 @@ public static class FlocPrint extends Sheet_Specialize {
     if (c != null && c.type_value.get().equals("grow")) gcom = (GrowerComu)c;
   }
   
-  sFlt POURSUITE, FOLLOW, SPACING_MAX, SPACING_MIN, SPEED, 
+  sFlt POURSUITE, FOLLOW, SPACING_MAX, SPACING_MIN, VIEWING_DIST, SPEED, 
   	HALO_SIZE, HALO_DENS, POINT_FORCE, grow_prob,
   	speed_rng;
   sInt AGE, deriv_speed;
@@ -385,6 +422,10 @@ public static class FlocPrint extends Sheet_Specialize {
   sInt tail_long;
   
   sRun kill_all;
+  
+  sBoo crazy_run;//, crazy_invert, crazy_random;
+  sInt crazy_tryrate;
+  sFlt crazy_prob, crazy_medlength;//, crazy_lenrngfact;
 
   FlocComu(Simulation _c, Canvas c, String n, sValueBloc b) { super(_c, n, "floc", 50, b); 
   	canv = c;
@@ -392,9 +433,15 @@ public static class FlocPrint extends Sheet_Specialize {
   }
   void can_init() {
 
+	  crazy_run = newBoo(true, "crazy_run");
+	  crazy_tryrate = newInt(200, "crazy_tryrate");
+	  crazy_prob = newFlt(0.01F, "crazy_prob");
+	  crazy_medlength = newFlt(200, "crazy_medlength");
+	    
 	    do_flocking = newBoo(true, "do_flocking", "do_flocking");
 	    POURSUITE = newFlt(0.3F, "POURSUITE", "poursuite");
-	    FOLLOW = newFlt(0.0036F, "FOLLOW", "follox");
+	    FOLLOW = newFlt(0.0036F, "FOLLOW", "follow");
+	    VIEWING_DIST = newFlt(95, "VIEWING_DIST", "viewing distence");
 	    SPACING_MIN = newFlt(95, "SPACING_MIN", "space min");
 	    SPACING_MAX = newFlt(95, "SPACING_MAX", "space max");
 	    SPEED = newFlt(2, "SPEED", "speed");

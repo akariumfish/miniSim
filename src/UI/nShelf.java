@@ -12,6 +12,19 @@ import sData.sFlt;
 import sData.sValue;
 
 public class nShelf extends nBuilder {
+
+//	  public nShelf addTitle(String tt, float w, float h) {
+//	    nDrawer d = addDrawer(w, h);
+//	    d.addWatcherModel("Label_Back")
+//	    	  .setFloatPrecision(6)
+//	      .setLinkedValue(val)
+//	      .setSize(w*ref_size/3, h*ref_size)
+//	      .setPosition(2*w*ref_size/3, 0)
+//	      .setTextAlignment(PConstants.LEFT, PConstants.CENTER)
+//	      ;
+//	    return this;
+//	  }
+	  
 	public nShelf addDrawerButton(sValue val1, float w, float h) {
 	    nDrawer d = addDrawer(w, h);
 	    if (val1 != null) {
@@ -293,6 +306,7 @@ public class nShelf extends nBuilder {
 	      .setLinkedValue(val)
 	      .setSize(w*ref_size/3, h*ref_size)
 	      .setPosition(2*w*ref_size/3, 0)
+	      .setTextAlignment(PConstants.LEFT, PConstants.CENTER)
 	      ;
 	    d.addModel("Label_Small_Text")
 	      .setSize(w*ref_size/10, h*ref_size)
@@ -310,6 +324,7 @@ public class nShelf extends nBuilder {
 	      .setLinkedValue(val1)
 	      .setPX(ref_size*3.0F)
 	      .setSX(ref_size*2.0F)
+	      .setTextAlignment(PConstants.LEFT, PConstants.CENTER)
 //	      .setSize(w*ref_size/3, h*ref_size)
 //	      .setPosition(2*w*ref_size/3, 0)
 	      ;
@@ -325,6 +340,7 @@ public class nShelf extends nBuilder {
 	    	  .setFloatPrecision(4)
 	      .setLinkedValue(val2)
 	      .setSX(ref_size*2.0F)
+	      .setTextAlignment(PConstants.LEFT, PConstants.CENTER)
 //	      .setSize(w*ref_size/3, h*ref_size)
 //	      .setPosition(2*w*ref_size/3, 0)
 	      ;

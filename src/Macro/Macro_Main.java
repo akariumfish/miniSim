@@ -454,8 +454,7 @@ nExplorer sheet_explorer;
     template_explorer.getShelf()
       .addSeparator(0.25)
         ;
-        
-        
+    
     tab = sheet_front.addTab("Blocs");
     tab.getShelf()
       .addSeparator(0.125)
@@ -484,6 +483,7 @@ nExplorer sheet_explorer;
       }});
 	  
 	  build_tick_menu(sheet_front);
+	  build_video_menu(sheet_front);
   }
 	ArrayList<String> catego;
   void update_bloc_selector_list() {
@@ -1300,6 +1300,8 @@ public Macro_Main(sInterface _int) {
       inter.cam.cam_grid_spacing.set(ref_size*5*Macro_Main.GRID_SNAP_FACT*3);
     } } );
 
+    inter.addEventTwoFrame(new nRunnable() { public void run() { 
+		videoRecodingSetup(); }});
     
     inter.addEventTwoFrame(new nRunnable() { public void run() { 
 	    inter.cam.cam_pos.set(-600, 0);
@@ -1410,7 +1412,7 @@ public Macro_Main(sInterface _int) {
   
 
 	  sInt tick_counter; //conteur de tour depuis le dernier reset ou le debut
-	  sBoo pause; //permet d'interompre le defilement des tour
+	  public sBoo pause; //permet d'interompre le defilement des tour
 	  sInt force_next_tick; 
 	  sFlt tick_by_frame; //nombre de tour a executé par frame
 	  sFlt tick_sec,tick_time;
@@ -1454,26 +1456,114 @@ public Macro_Main(sInterface _int) {
 	      public void run() { force_next_tick.set((int)(tick_by_frame.get())); } } );
 	    srun_scrsht = newRun("screen_shot", "impr", new nRunnable() { 
 	      public void run() { mmain().inter.cam.screenshot = true; } } );
-	    
-
-	    inter.addEventTwoFrame(new nRunnable() { public void run() { 
-	    		videoRecodingSetup(); }});
 	}
+	    
 	
 	  ArrayList<nRunnable> eventsReset = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsFrame = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsUnpausedFrame = new ArrayList<nRunnable>();
 	  ArrayList<nRunnable> eventsTick = new ArrayList<nRunnable>();
-	  ArrayList<nRunnable> eventsTick2 = new ArrayList<nRunnable>();
-	  Macro_Main addEventReset(nRunnable r) { eventsReset.add(r); return this; }
-	  Macro_Main removeEventReset(nRunnable r) { eventsReset.remove(r); return this; }
-	  Macro_Main addEventFrame(nRunnable r) { eventsFrame.add(r); return this; }
-	  Macro_Main addEventUnpausedFrame(nRunnable r) { eventsUnpausedFrame.add(r); return this; }
-	  Macro_Main addEventTick(nRunnable r) { eventsTick.add(r); return this; }
-	  Macro_Main removeEventTick(nRunnable r) { eventsTick.remove(r); return this; }
-	  Macro_Main addEventTick2(nRunnable r) { eventsTick2.add(r); return this; }
-	  Macro_Main removeEventTick2(nRunnable r) { eventsTick2.remove(r); return this; }
+//	  ArrayList<nRunnable> eventsTick2 = new ArrayList<nRunnable>();
+	  public Macro_Main addEventReset(nRunnable r) { eventsReset.add(r); return this; }
+	  public Macro_Main removeEventReset(nRunnable r) { eventsReset.remove(r); return this; }
+//	  public Macro_Main addEventFrame(nRunnable r) { eventsFrame.add(r); return this; }
+//	  public Macro_Main addEventUnpausedFrame(nRunnable r) { eventsUnpausedFrame.add(r); return this; }
+	  public Macro_Main addEventTick(nRunnable r) { eventsTick.add(r); return this; }
+	  public Macro_Main removeEventTick(nRunnable r) { eventsTick.remove(r); return this; }
+//	  public Macro_Main addEventTick2(nRunnable r) { eventsTick2.add(r); return this; }
+//	  public Macro_Main removeEventTick2(nRunnable r) { eventsTick2.remove(r); return this; }
 	
+
+	  public void build_tick_menu(nFrontPanel sheet_front) {
+	    nFrontTab tab = sheet_front.addTab("Time");
+
+		tab.getShelf()
+		  .addDrawer(10.25, 0.6)
+		  .addModel("Label-S4", "- Tick Control -").setFont((int)(ref_size/1.4)).getShelf()
+	      .addSeparator(0.125)
+	      .addDrawerWatch(tick_counter, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerLargeFieldCtrl(SEED, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFactValue(tick_by_frame, 2, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerWatch(tick_sec, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerWatch(tick_time, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(auto_reset_turn, 1000, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerDoubleButton(auto_reset, auto_reset_rng_seed, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerDoubleButton(srun_scrsht, auto_reset_screenshot, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerTripleButton(srun_reset, srun_rngr, srun_tick, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerDoubleButton(pause, mmain().inter.cam.grid, 10, 1)
+	      .addSeparator(0.125)
+	      ;
+	}
+	  
+	void resetRng() { 
+	  SEED.set((int)(gui.app.random(1000000000))); 
+	  reset();
+	}
+	void reset() {
+	  gui.app.randomSeed(SEED.get());
+	  tick_counter.set(0);
+	  mmain().inter.framerate.reset();
+	  nRunnable.runEvents(eventsReset);
+	  run_tck_cnt = 0; met_tck_cnt = 0;
+	  met_rst_cnt++; 
+	  while (run_rst_cnt < met_rst_cnt) srun_reset.run();
+	}
+
+	void tick() {
+	  //auto reset
+	  if (auto_reset.get() && auto_reset_turn.get() <= tick_counter.get()) {
+	    if (auto_reset_rng_seed.get()) {
+	      SEED.set((int)(gui.app.random(1000000000)));
+	    }
+	    reset();
+	  }
+	  tick_counter.set(tick_counter.get()+1);
+	  for (MBaseTick b : baseticked_list) b.receive_tick();
+	  for (MGrow b : grow_list) b.receive_tick();
+	  nRunnable.runEvents(eventsTick);
+	  met_tck_cnt++; 
+	  while (run_tck_cnt < met_tck_cnt) srun_tick.run();
+	}
+	void frame_tick() {
+	  if (!pause.get()) {
+	  	tick_sec.set(mmain().inter.framerate.median_framerate.get() * tick_by_frame.get());
+	  	tick_time.set(1 / tick_sec.get()*1000);
+	
+	//      tick_pile += tick_by_frame.get();
+	    if (all_packet_processed) tick_pile += tick_by_frame.get();
+	
+	    //auto screenshot before reset
+	    if (auto_reset.get() && auto_reset_screenshot.get() &&
+	      auto_reset_turn.get() == tick_counter.get() + tick_by_frame.get() + tick_by_frame.get()) {
+	      mmain().inter.cam.screenshot = true;
+	    }
+	
+	    while (tick_pile >= 1) {
+	      tick();
+	      tick_pile--;
+	    }
+	
+	  } else tick_sec.set(0);
+	
+	  // tick by tick control
+	  if (pause.get() && force_next_tick.get() > 0) { 
+	    for (int i = 0; i < force_next_tick.get(); i++) tick(); 
+	    force_next_tick.set(0);
+	  }
+	  if (!pause.get() && force_next_tick.get() > 0) { 
+	    force_next_tick.set(0);
+	  }
+	
+	}
 
 	sRun vid_start, vid_stop;
 	sInt vid_len, vid_final_frmrate, vid_max_len, vid_capturerate;
@@ -1508,7 +1598,7 @@ public Macro_Main(sInterface _int) {
 	  
 	  // If video is being exported correctly, you can call this function to avoid
 	  // creating .txt files containing debug information.
-	  gui.app.videoExport.setDebugging(false);
+//	  gui.app.videoExport.setDebugging(false);
 
 	  // Use the next line once if you changed the location of the ffmpeg tool.
 	  // This will make the library ask for it's location again.
@@ -1569,7 +1659,8 @@ public Macro_Main(sInterface _int) {
 			  gui.app.videoExport.setFrameRate(vid_final_frmrate.get());
 			  gui.app.videoExport.startMovie(); 
 			  vid_len.set(0);
-			  vid_run.set(true); } } } );
+			  vid_run.set(true); 
+			  vid_paused.set(false); } } } );
 	  vid_stop = newRun("vid_stop", "vid_stop", new nRunnable() { public void run() { 
 		  if (vid_run.get()) { 
 		    	  gui.app.videoExport.endMovie(); 
@@ -1594,7 +1685,10 @@ public Macro_Main(sInterface _int) {
 	  
 	  inter.addEventTwoFrame(new nRunnable() { public void run() { 
 		  addEventReset(new nRunnable() { public void run() { 
-			  if (vid_rst_start.get()) vid_start.run(); } } );
+			  if (vid_rst_start.get()) {
+//				  vid_stop.run();
+				  vid_start.run();
+			  }  } } );
 	  
 		  inter.cam.setPopCamRun(new nRunnable() { public void run() { 
 			  if (!vid_paused.get() && vid_run.get()) {
@@ -1607,7 +1701,7 @@ public Macro_Main(sInterface _int) {
 						  gui.app.videoExport.saveFrame(); 
 					  } } }
 		  } } );
-
+		  
 		  vid_run.set(false);
 		  vid_paused.set(false);
 		  vid_started = false;
@@ -1615,146 +1709,55 @@ public Macro_Main(sInterface _int) {
 		  vid_len.set(0);
 		  gui.app.videoExport.setFrameRate(vid_final_frmrate.get());
 	  } } );
-
   }
   
-
   nWidget recording_flag;
-	  
-	
-  public void build_tick_menu(nFrontPanel sheet_front) {
-    nFrontTab tab = sheet_front.addTab("Time");
+  
+  public void build_video_menu(nFrontPanel sheet_front) {
+	  nFrontTab tab = sheet_front.addTab("Video");
+	    tab.getShelf()
+	      .addDrawer(10.25, 0.5)
+	      .addModel("Label-S4", "-Video Recording Control-").setFont((int)(ref_size/1.4)).getShelf()
+	      .addSeparator(0.35)
+	      .addDrawerDoubleButton(vid_start, vid_stop, 10, 1);
+	    nDrawer flag_drw = tab.getShelf().addDrawer(10.25, 0.0);
+	    tab.getShelf()
+	      .addSeparator(0.125)
+	      .addDrawerCentralButton(vid_paused, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerDoubleWatch(vid_len, vid_dur, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerDoubleButton(vid_rst_start, vid_limit_len, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(vid_max_len, 10, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(vid_max_len, 1000, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(vid_capturerate, 10, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawer(10.25, 0.5)
+	      .addModel("Label-S4", "-File-").setFont((int)(ref_size/1.4)).getShelf()
+	      .addSeparator(0.35)
+	      .addDrawerIncrValue(vid_final_frmrate, 10, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerLargeFieldCtrl(vid_name, 10, 1)
+	      .addSeparator(0.125)
+	      ;
+	    
+	    recording_flag = flag_drw.addModel("Label_DownLight_Back_Downlight_Outline-S3", "--")
+	    		.setPX(ref_size*4).setPY(-ref_size*18.0/16.0)
+	    		.setSX(ref_size*2).setSY(ref_size*18.0/16.0);
+	    
+	    vid_run.addEventChange(new nRunnable() { public void run() { 
+		  if (!vid_run.get()) recording_flag.setLook(inter.screen_gui.theme, 
+				    "Label_DownLight_Back_Downlight_Outline-S3")
+	  	  			.setText("--"); 
+		  else recording_flag.setLook(inter.screen_gui.theme, 
+				    "Label_HightLight_Back_Highlight_Outline-S3")
+					.setText("REC"); 
+		} } );
+   }
 
-	tab.getShelf()
-	  .addDrawer(10.25, 0.6)
-	  .addModel("Label-S4", "- Tick Control -").setFont((int)(ref_size/1.4)).getShelf()
-      .addSeparator(0.125)
-      .addDrawerWatch(tick_counter, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerLargeFieldCtrl(SEED, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerFactValue(tick_by_frame, 2, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerWatch(tick_sec, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerWatch(tick_time, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerIncrValue(auto_reset_turn, 1000, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerDoubleButton(auto_reset, auto_reset_rng_seed, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerDoubleButton(srun_scrsht, auto_reset_screenshot, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerTripleButton(srun_reset, srun_rngr, srun_tick, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerDoubleButton(pause, mmain().inter.cam.grid, 10, 1)
-      .addSeparator(0.125)
-      ;
-
-    tab = sheet_front.addTab("Video");
-    tab.getShelf()
-      .addDrawer(10.25, 0.5)
-      .addModel("Label-S4", "-Video Recording Control-").setFont((int)(ref_size/1.4)).getShelf()
-      .addSeparator(0.35)
-      .addDrawerDoubleButton(vid_start, vid_stop, 10, 1);
-    nDrawer flag_drw = tab.getShelf().addDrawer(10.25, 0.0);
-    tab.getShelf()
-      .addSeparator(0.125)
-      .addDrawerCentralButton(vid_paused, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerDoubleWatch(vid_len, vid_dur, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerDoubleButton(vid_rst_start, vid_limit_len, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerIncrValue(vid_max_len, 10, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerIncrValue(vid_max_len, 1000, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerIncrValue(vid_capturerate, 10, 10, 1)
-      .addSeparator(0.125)
-      .addDrawer(10.25, 0.5)
-      .addModel("Label-S4", "-File-").setFont((int)(ref_size/1.4)).getShelf()
-      .addSeparator(0.35)
-      .addDrawerIncrValue(vid_final_frmrate, 10, 10, 1)
-      .addSeparator(0.125)
-      .addDrawerLargeFieldCtrl(vid_name, 10, 1)
-      .addSeparator(0.125)
-      ;
-    
-    recording_flag = flag_drw.addModel("Label_DownLight_Back_Downlight_Outline-S3", "--")
-    		.setPX(ref_size*4).setPY(-ref_size*18.0/16.0)
-    		.setSX(ref_size*2).setSY(ref_size*18.0/16.0);
-    
-    vid_run.addEventChange(new nRunnable() { public void run() { 
-	  if (!vid_run.get()) recording_flag.setLook(inter.screen_gui.theme, 
-			    "Label_DownLight_Back_Downlight_Outline-S3")
-  	  			.setText("--"); 
-	  else recording_flag.setLook(inter.screen_gui.theme, 
-			    "Label_HightLight_Back_Highlight_Outline-S3")
-				.setText("REC"); 
-	} } );
-
-	vid_run.set(false);
-  }
-
-	void resetRng() { 
-	  SEED.set((int)(gui.app.random(1000000000))); 
-	  reset();
-	}
-	void reset() {
-	  gui.app.randomSeed(SEED.get());
-	  tick_counter.set(0);
-	  mmain().inter.framerate.reset();
-	  run_tck_cnt = 0; met_tck_cnt = 0;
-	  met_rst_cnt++; 
-	  while (run_rst_cnt < met_rst_cnt) srun_reset.run();
-	}
-
-	void tick() {
-	  //auto reset
-	  if (auto_reset.get() && auto_reset_turn.get() <= tick_counter.get()) {
-	    if (auto_reset_rng_seed.get()) {
-	      SEED.set((int)(gui.app.random(1000000000)));
-	    }
-	    reset();
-	  }
-	  tick_counter.set(tick_counter.get()+1);
-	  for (MBaseTick b : baseticked_list) b.receive_tick();
-	  for (MGrow b : grow_list) b.receive_tick();
-	  met_tck_cnt++; 
-	  while (run_tck_cnt < met_tck_cnt) srun_tick.run();
-	}
-	void frame_tick() {
-	  if (!pause.get()) {
-	  	tick_sec.set(mmain().inter.framerate.median_framerate.get() * tick_by_frame.get());
-	  	tick_time.set(1 / tick_sec.get()*1000);
-	
-	//      tick_pile += tick_by_frame.get();
-	    if (all_packet_processed) tick_pile += tick_by_frame.get();
-	
-	    //auto screenshot before reset
-	    if (auto_reset.get() && auto_reset_screenshot.get() &&
-	      auto_reset_turn.get() == tick_counter.get() + tick_by_frame.get() + tick_by_frame.get()) {
-	      mmain().inter.cam.screenshot = true;
-	    }
-	
-	    while (tick_pile >= 1) {
-	      tick();
-	      tick_pile--;
-	    }
-	
-	  } else tick_sec.set(0);
-	
-	  // tick by tick control
-	  if (pause.get() && force_next_tick.get() > 0) { 
-	    for (int i = 0; i < force_next_tick.get(); i++) tick(); 
-	    force_next_tick.set(0);
-	  }
-	  if (!pause.get() && force_next_tick.get() > 0) { 
-	    force_next_tick.set(0);
-	  }
-	
-	}
 	
   
   

@@ -1,9 +1,11 @@
 0:- :init
 0:  :init end
-2:- :setup_load from start.sdata
-8604:- :setup_load from connected_halo.sdata
-8888:- :setup_load from chain_reaction.sdata
-10136:- :exit
+4:- :setup_load from start.sdata
+277:- :setup_load from gravity_well.sdata
+1313:- :setup_load from flocs.sdata
+2051:- :setup_load from triangular_mask.sdata
+3178:- :setup_load from default.sdata
+3532:- :exit
 null
 null
 null

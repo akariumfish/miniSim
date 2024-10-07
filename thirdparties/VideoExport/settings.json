@@ -47,5 +47,5 @@
     "-2",
     "[output]"
   ],
-  "ffmpeg_path": "C:\\Users\\user\\Desktop\\code\\java\\miniSim\\ffmpeg\\bin\\ffmpeg.exe"
+  "ffmpeg_path": "C:\\Users\\user\\Desktop\\code\\java\\miniSim\\thirdparties\\ffmpeg\\bin\\ffmpeg.exe"
 }

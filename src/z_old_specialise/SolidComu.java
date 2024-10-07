@@ -12,10 +12,12 @@ import sData.*;
 
 class Solid extends Entity {
   PVector pos = new PVector(0, 0);
-  PVector prev_pos = new PVector(0, 0);
   PVector mov = new PVector(0, 0);
   PVector accel = new PVector(0, 0);
   float radius;
+
+  PVector prev_pos = new PVector(0, 0);
+  float squared_speed = 0;
 
   float halo_size = 0;
   float halo_density = 0;
@@ -73,10 +75,12 @@ class Solid extends Entity {
     return com().app.color(r, g, b);
   }
   void draw_halo(Canvas canvas) {
-
-	halo_col = gradedCol(com().val_col_halo1.get(), com().val_col_halo2.get(), mov.mag()/20);
-    canvas.draw_line_halo(prev_pos, pos, halo_size, halo_density, halo_col, 
-    		com().fracture_halo.get());
+	  float speed_factor = (squared_speed - com().sq_speed_min) / 
+	  (com().sq_speed_max - com().sq_speed_min);
+	  halo_col = gradedCol(com().val_col_halo1.get(), com().val_col_halo2.get(), speed_factor);
+      canvas.draw_line_halo(prev_pos, pos, halo_size, halo_density, halo_col, 
+    		  com().fracture_halo.get());
+      
 //    canvas.draw_line_halo(prev_pos, pos, halo_size, halo_density, halo_col, 
 //    		com().fracture_halo.get());
   }
@@ -87,6 +91,11 @@ class Solid extends Entity {
 	mov.add(accel);
 	prev_pos.set(pos);
 	pos.add(mov);
+	
+	squared_speed = com().app.squared_mag(mov);
+	if (com().sq_speed_min == 0) com().sq_speed_min = squared_speed;
+	if (com().sq_speed_min > squared_speed) com().sq_speed_min = squared_speed;
+	if (com().sq_speed_max < squared_speed) com().sq_speed_max = squared_speed;
 	
 	// friction
     mov.mult(1 - com().friction_fact.get());
@@ -218,6 +227,8 @@ public static class SolidPrint extends Sheet_Specialize {
   sCol fill_col, stroke_col, val_col_halo1, val_col_halo2;
 
   nRunnable ball_change;
+  
+  float sq_speed_min = 0, sq_speed_max = 0; //squared values for efficiencies
   
   SolidComu(Simulation _c, Canvas c, String n, sValueBloc b) { super(_c, n, "floc", 50, b); 
   	canv = c;
@@ -411,6 +422,7 @@ public static class SolidPrint extends Sheet_Specialize {
 			  }
 		  }
 	  }
+	  sq_speed_min = 0; sq_speed_max = 0;
   }
   void custom_post_tick() {
 	  if (ball_to_center.get() && ball_obj != null) 

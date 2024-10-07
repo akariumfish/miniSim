@@ -31,7 +31,7 @@ Java RE 8 is needed to launch the software. To get it go to : https://www.java.c
 
 Please be aware that im not a pro, (i never had any programming lessons) and its certainly not done correctly. 
 
-This is not the developement of a programmation projet !! Its a montain of unfinished idee, temporary setups on top of more temporary fixs, quick and lazy solution driven by lack of sleep and depression, and be aware that IT IS PERFECT LIKE THAT. I dont intent on fully fixing it. As long as i can make it more absurdly complex and obscur I will continue. If you are here for the "art", thank you deeply! but please go to grows.cloud, there is nothing for you here. Otherwise, if you want to try making something, thank you dearly, and good luck. Know that EVERYTHING can work, but not always as intended. 
+This is not the developement of a programmation projet !! Its a montain of unfinished idee, temporary setups on top of more temporary fixs, quick and lazy solution driven by lack of sleep and depression, and be aware that IT IS PERFECT LIKE THAT. I dont intent on fully fixing it. As long as i can make it more absurdly complex and obscur I will continue. If you are here for the "art", thank you deeply! but please go to grows.cloud, there is nothing for you here. Otherwise, if you want to try making something, thank you dearly, and good luck. 
 
 .
 ..

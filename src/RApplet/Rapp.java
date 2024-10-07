@@ -254,7 +254,8 @@ public class Rapp extends PApplet implements RConst {
 			}
 		return PApplet.parseFloat(s);
 	}
-		
+	
+	public float squared_mag(PVector p) { return p.x * p.x + p.y * p.y; }
 
 	public float crandom(float d) { return pow(random((float) 1.0), d); }
 		
