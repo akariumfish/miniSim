@@ -1,4 +1,5 @@
 
 /thirdparties/ffmpeg/bin
 ffmpeg.exe
+/exec/ffmpeg.exe
 /bin
