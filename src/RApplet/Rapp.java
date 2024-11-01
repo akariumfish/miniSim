@@ -155,12 +155,16 @@ public class Rapp extends PApplet implements RConst {
 	    interf.frame();
 	  
 	  global_frame_count++;
-	  if (starting && global_frame_count < 5) { fill(0); noStroke(); rect(0, 0, width, height); }
+	  if (starting && global_frame_count < 5) { 
+		  fill(0); noStroke(); rect(0, 0, width, height); 
+		  fill(255); 
+		  text("Starting ...", width/2, height/2);
+	  }
 	  else starting = false;
 	  if (BLACKOUT) { 
 		  fill(0); noStroke(); rect(0, window_head, width, height-window_head); 
 	      fill(255); 
-		  text("Please Wait ...", width/2, height/2);
+		  text("Loading ...", width/2, height/2);
 	  }
 	  if (do_one_save) { do_one_save = false; savelog(); }
 		logln_this_frame = false;
