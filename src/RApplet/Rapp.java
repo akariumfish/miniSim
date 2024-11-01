@@ -239,6 +239,7 @@ public class Rapp extends PApplet implements RConst {
 	
 	void video_setup() {
 		videoExport = new VideoExport(this);
+		videoExport.setFfmpegPath(sketchPath() + "\\" + "ffmpeg.exe");
 	}
 	
 	    //#######################################################################

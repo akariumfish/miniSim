@@ -1,4 +1,4 @@
-/bin/
+
 /thirdparties/ffmpeg/bin
-exec/ffmpeg.exe
-/video
+ffmpeg.exe
+/bin

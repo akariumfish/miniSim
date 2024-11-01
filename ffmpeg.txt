@@ -1,0 +1,47 @@
+ffmpeg version 2024-09-22-git-a577d313b2-full_build-www.gyan.dev Copyright (c) 2000-2024 the FFmpeg developers
+  built with gcc 13.2.0 (Rev5, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libshaderc --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint
+  libavutil      59. 37.100 / 59. 37.100
+  libavcodec     61. 17.100 / 61. 17.100
+  libavformat    61.  6.100 / 61.  6.100
+  libavdevice    61.  2.101 / 61.  2.101
+  libavfilter    10.  3.100 / 10.  3.100
+  libswscale      8.  2.100 /  8.  2.100
+  libswresample   5.  2.100 /  5.  2.100
+  libpostproc    58.  2.100 / 58.  2.100
+Input #0, rawvideo, from 'fd:':
+  Duration: N/A, start: 0.000000, bitrate: 1411200 kb/s
+  Stream #0:0: Video: rawvideo (RGB[24] / 0x18424752), rgb24, 1400x840, 1411200 kb/s, 50 tbr, 50 tbn
+Stream mapping:
+  Stream #0:0 -> #0:0 (rawvideo (native) -> h264 (libx264))
+[libx264 @ 000002c63829df80] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+[libx264 @ 000002c63829df80] profile High, level 4.0, 4:2:0, 8-bit
+[libx264 @ 000002c63829df80] 264 - core 164 r3192 c24e06c - H.264/MPEG-4 AVC codec - Copyleft 2003-2024 - http://www.videolan.org/x264.html - options: cabac=1 ref=3 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=7 psy=1 psy_rd=1.00:0.00 mixed_ref=1 me_range=16 chroma_me=1 trellis=1 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=-2 threads=12 lookahead_threads=2 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=2 keyint=250 keyint_min=25 scenecut=40 intra_refresh=0 rc_lookahead=40 rc=crf mbtree=1 crf=15.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
+Output #0, mp4, to 'C:\Users\user\Desktop\code\java\miniSim\video\vid_name117.mp4':
+  Metadata:
+    comment         : Made with Video Export for Processing - https://git.io/vAXLk
+    encoder         : Lavf61.6.100
+  Stream #0:0: Video: h264 (avc1 / 0x31637661), yuv420p(tv, progressive), 1400x840, q=2-31, 50 fps, 12800 tbn
+      Metadata:
+        encoder         : Lavc61.17.100 libx264
+      Side data:
+        cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: N/A
+frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A    frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A    frame=    0 fps=0.0 q=0.0 size=       0KiB time=N/A bitrate=N/A speed=N/A    [out#0/mp4 @ 000002c63828a880] video:101KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 1.126553%
+frame=   30 fps= 16 q=-1.0 Lsize=     102KiB time=00:00:00.56 bitrate=1487.6kbits/s speed=0.293x    
+[libx264 @ 000002c63829df80] frame I:1     Avg QP: 9.55  size: 47977
+[libx264 @ 000002c63829df80] frame P:24    Avg QP:15.48  size:  2135
+[libx264 @ 000002c63829df80] frame B:5     Avg QP:20.30  size:   612
+[libx264 @ 000002c63829df80] consecutive B-frames: 70.0% 20.0% 10.0%  0.0%
+[libx264 @ 000002c63829df80] mb I  I16..4: 62.1% 24.5% 13.4%
+[libx264 @ 000002c63829df80] mb P  I16..4:  0.0%  0.0%  0.0%  P16..4:  2.9%  0.2%  0.2%  0.0%  0.0%    skip:96.7%
+[libx264 @ 000002c63829df80] mb B  I16..4:  0.0%  0.0%  0.0%  B16..8:  1.8%  0.4%  0.2%  direct: 0.3%  skip:97.2%  L0:56.3% L1:37.7% BI: 6.0%
+[libx264 @ 000002c63829df80] 8x8 transform intra:24.6% inter:24.5%
+[libx264 @ 000002c63829df80] coded y,uvDC,uvAC intra: 9.9% 13.0% 12.4% inter: 1.2% 0.6% 0.2%
+[libx264 @ 000002c63829df80] i16 v,h,dc,p: 94%  3%  3%  0%
+[libx264 @ 000002c63829df80] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 43% 34% 21%  0%  0%  0%  0%  0%  0%
+[libx264 @ 000002c63829df80] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 37% 22% 11%  4%  4%  5%  5%  6%  5%
+[libx264 @ 000002c63829df80] i8c dc,h,v,p: 92%  4%  4%  0%
+[libx264 @ 000002c63829df80] Weighted P-Frames: Y:12.5% UV:12.5%
+[libx264 @ 000002c63829df80] ref P L0: 78.8%  9.0% 11.9%  0.4%  0.0%
+[libx264 @ 000002c63829df80] ref B L0: 97.2%  2.8%
+[libx264 @ 000002c63829df80] kb/s:1363.72
