@@ -1,13 +1,9 @@
 0:- :setup
 0:  :setup end
 3:- :setup_load from start.sdata
-384:- :setup_load from moving_vector.sdata
-14239:- :full_data_save to moving_vector.sdata
-21186:- :full_data_save to moving_vector.sdata
-21574:- :full_data_save to moving_vector.sdata
-22216:  :full_data_save to moving_vector.sdata
-24079:- :full_data_save to moving_vector.sdata
-24375:- :exit
+7250:- :full_data_save to start.sdata
+11058:- :full_data_save to start.sdata
+11070:- :exit
 null
 null
 null

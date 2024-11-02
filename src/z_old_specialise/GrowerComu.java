@@ -40,7 +40,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  sFlt leaf_size_fact; 
 	  sFlt floc_prob;
 	  
-	  sFlt cible_force, cible_zone, backfact;
+	  sFlt cible_force, cible_zone, backfact, cible_linew;
 	  
 	  sBoo create_floc, AGE_ON, zone_view; //use_organ, 
 	  sInt activeGrower;
@@ -94,6 +94,8 @@ public static class GrowerPrint extends Sheet_Specialize {
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(cible_zone, 2, 10, 1)
 	      .addSeparator(0.125)
+	      .addDrawerFactValue(cible_linew, 2, 10, 1)
+	      .addSeparator(0.125)
 	      .addDrawerButton(zone_view, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(leaf_rot, 2, 10, 1)
@@ -119,6 +121,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    OLD_AGE = newFlt(100, "age", "age");
 	    floc_prob = newFlt(1, "floc_prob", "floc_prob");
 	    cible_force = newFlt(0.01F, "cible_force", "cible");
+	    cible_linew = newFlt(3.0F, "cible_linew", "cible_linew");
 	    backfact = newFlt(1.2F, "backfact", "backfact");
 	    leaf_nb = newInt(6, "leaf_nb", "leaf_nb");
 	    leaf_rot = newFlt(1, "leaf_rot", "leaf_rot");
@@ -178,7 +181,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  void custom_cam_draw_pre_entity() {
 		  if (zone_view.get() && show_entity.get()) {
 			  gui.app.stroke(200);
-			  gui.app.strokeWeight(3);
+			  gui.app.strokeWeight(cible_linew.get());
 			  gui.app.noFill();
 			  gui.app.ellipse(obj_cur.x() - cible_zone.get(), obj_cur.y() - cible_zone.get(), 
 					  cible_zone.get()*2, cible_zone.get()*2);
