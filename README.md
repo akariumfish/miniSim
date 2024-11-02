@@ -4,12 +4,12 @@
 Unperfect Simulation sandbox with visual scripting. To waste time making ephemeral worlds.
 
 Using :
-Java 1.8           -  Language           -  https://www.java.com/en/ ; 
-Processing 3.5.4   -  Systeme interface  -  https://www.processing.org/ ;
-Eclipse IDE        -  Developement       -  https://eclipseide.org/ ;
-Launch4j           -  Executable         -  https://launch4j.sourceforge.net/ ;
-Ffmpeg 			   -  Video              -  https://ffmpeg.org// ;
-VideoExport        -  Video              -  https://funprogramming.org/VideoExport-for-Processing/ ;
+Java 1.8           -  https://www.java.com/en/ ; 
+Processing 3.5.4   -  https://www.processing.org/ ;
+Eclipse IDE        -  https://eclipseide.org/ ;
+Launch4j           -  https://launch4j.sourceforge.net/ ;
+Ffmpeg 			   -  https://ffmpeg.org// ;
+VideoExport        -  https://funprogramming.org/VideoExport-for-Processing/ ;
 
 French Down   vvv  .
 
