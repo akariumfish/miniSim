@@ -677,6 +677,10 @@ public class sInterface {
   boolean active_nxtfrm_pile = false;
   ArrayList<nRunnable> eventsHoverNotFound = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventsSetup = new ArrayList<nRunnable>();
+  
+  nRunnable screenDraw_run = null;
+  public void setScreenDrawRun(nRunnable r) { screenDraw_run = r; }
+  
   boolean is_starting = true;
   public boolean show_info = false, show_frmrt = true;
   void frame() {
@@ -721,6 +725,8 @@ public class sInterface {
     		  	"," + RConst.trimFlt(cam.mouse.y), 200, app.window_head + 24 );
       app.text("Zoom " + RConst.trimFlt(cam.cam_scale.get()), 375, app.window_head + 24 );
     }
+    
+    if (screenDraw_run != null) screenDraw_run.run();
     
     data.frame(); // reset flags
     input.frame_end(); // reset flags

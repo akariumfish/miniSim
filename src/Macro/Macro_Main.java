@@ -1576,6 +1576,7 @@ public Macro_Main(sInterface _int) {
 	sRun vid_start, vid_stop;
 	sInt vid_len, vid_final_frmrate, vid_max_len, vid_capturerate;
 	sBoo vid_run, vid_paused, vid_limit_len, vid_rst_start, vid_canvas_record;
+	sBoo rec_screen; //vid_frst_rst_strt, 
 	sStr vid_name;
 	sFlt vid_dur;
 	int vid_cnt = 0;
@@ -1590,7 +1591,7 @@ public Macro_Main(sInterface _int) {
 	  //   70 is the default.
 	  // Audio quality: 128 is the default, 192 very good,
 	  //   256 is near lossless but big file size.
-//	  gui.app.videoExport.setQuality(50, 32);
+	  gui.app.videoExport.setQuality(100, 32);
 	  
 	  // This sets the frame rate of the resulting video file. I has nothing to do
 	  // with the current Processing frame rate. For instance you could have a 
@@ -1662,7 +1663,7 @@ public Macro_Main(sInterface _int) {
 	  
 	  vid_start = newRun("vid_start", "vid_start", new nRunnable() { public void run() { 
 		  if (!vid_run.get()) { 
-			  gui.app.videoExport.setMovieFileName("video\\" + vid_name.get() + 
+			  gui.app.videoExport.setMovieFileName("video\\" + vid_name.get() + "_" +
 					  gui.app.global_frame_count + ".mp4");
 			  gui.app.videoExport.setFrameRate(vid_final_frmrate.get());
 			  gui.app.videoExport.startMovie(); 
@@ -1687,28 +1688,29 @@ public Macro_Main(sInterface _int) {
 	  vid_paused = newBoo(false, "vid_paused"); 
 	  vid_limit_len = newBoo(false, "vid_limit_len");
 	  vid_rst_start = newBoo(false, "vid_rst_start");
+//	  vid_frst_rst_strt = newBoo(false, "vid_frst_rst_strt");
 	  vid_canvas_record = newBoo(false, "vid_canvas_record");
+	  rec_screen = newBoo(false, "vid_gui_rec");
 	  
-	  vid_name = newStr("miniVid", "vid_name");
+	  vid_name = newStr("vid_name", "rec");
 	  
 	  inter.addEventTwoFrame(new nRunnable() { public void run() { 
 		  addEventReset(new nRunnable() { public void run() { 
-			  if (vid_rst_start.get()) {
-//				  vid_stop.run();
-				  vid_start.run();
-			  }  } } );
+//			  if (vid_frst_rst_strt.get() && !vid_run.get()) vid_start.run();
+			  if (vid_rst_start.get() && !vid_run.get()) {
+//				  if (vid_run.get()) { // && !vid_frst_rst_strt.get()
+//					  vid_stop.run();
+//					  inter.addEventFrame(new nRunnable() { public void run() { 
+//						  vid_start.run(); } } );
+//				  } else 
+				vid_start.run();
+				  
+			  } } } );
 	  
 		  inter.cam.setPopCamRun(new nRunnable() { public void run() { 
-			  if (!vid_paused.get() && vid_run.get()) {
-				  vid_cnt++;
-				  if (vid_cnt > vid_capturerate.get()) {
-					  if (vid_limit_len.get() && vid_len.get() >= vid_max_len.get()) {
-						  vid_stop.run();
-					  } else {
-						  vid_len.add(1);
-						  gui.app.videoExport.saveFrame(); 
-					  } } }
-		  } } );
+			  if (!rec_screen.get()) { rec_frame(); } } } );
+		  inter.setScreenDrawRun(new nRunnable() { public void run() { 
+			  if (rec_screen.get()) { rec_frame(); } } } );
 		  
 		  vid_run.set(false);
 		  vid_paused.set(false);
@@ -1718,6 +1720,17 @@ public Macro_Main(sInterface _int) {
 		  gui.app.videoExport.setFrameRate(vid_final_frmrate.get());
 	  } } );
   }
+	
+	void rec_frame() {
+		if (!vid_paused.get() && vid_run.get()) {
+		  vid_cnt++;
+		  if (vid_cnt > vid_capturerate.get()) {
+			  if (vid_limit_len.get() && vid_len.get() >= vid_max_len.get()) {
+				  vid_stop.run();
+			  } else {
+				  vid_len.add(1);
+				  gui.app.videoExport.saveFrame(); 
+	} } } }
   
   nWidget recording_flag;
   
@@ -1735,7 +1748,9 @@ public Macro_Main(sInterface _int) {
 	      .addSeparator(0.125)
 	      .addDrawerDoubleWatch(vid_len, vid_dur, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerButton(vid_rst_start, vid_limit_len, 10, 1)
+	      .addDrawerButton(vid_rst_start, vid_limit_len, rec_screen, 10, 1) //, vid_frst_rst_strt
+//	      .addSeparator(0.125)
+//	      .addDrawerButton(vid_limit_len, rec_screen, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(vid_max_len, 10, 10, 1)
 	      .addSeparator(0.125)
