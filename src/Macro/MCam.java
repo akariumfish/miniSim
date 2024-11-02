@@ -17,7 +17,7 @@ public class MCam extends MBaseMenu {
 		MCam build(Macro_Sheet s, sValueBloc b) { MCam m = new MCam(s, b); return m; }
 	}
 	Drawable drawable;
-	Macro_Connexion struct_link, sheet_in;
+	Macro_Connexion struct_link, sheet_in, link_out;
 	ArrayList<MCursor> cursors;
 	ArrayList<Macro_Sheet> csheets;
 	ArrayList<MShape> shapes;
@@ -118,7 +118,7 @@ public class MCam extends MBaseMenu {
 		if (sheet_in.elem.sheet_connect != null) {
 			sheet_in.elem.sheet_connect.addEventLink(up_sheet_run).addEventUnLink(up_sheet_run);
 		}
-		struct_link = addInput(0, "link");
+		struct_link = addInput(0, "structure link");
 		up_draw_run = new nRunnable() { public void run() {
 			for (MShape mf : shapes) mf.priority.removeEventChange(up_draw_run);
 			for (MStructure mf : structs) mf.priority.removeEventChange(up_draw_run);
@@ -166,7 +166,7 @@ public class MCam extends MBaseMenu {
 		}};
 		struct_link.set_link().addEventLink(up_draw_run).addEventUnLink(up_draw_run);
 		
-		addInput(0, "custom");
+		link_out = addOutput(0, "link out").set_link();
 	}
 	public void build_custom_menu(nFrontPanel sheet_front) {
 		if (sheet_front != null) {

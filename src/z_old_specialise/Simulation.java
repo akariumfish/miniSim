@@ -88,6 +88,8 @@ public class Simulation extends Macro_Sheet {
   sValueBloc sbloc;
   nGUI cam_gui;
   float ref_size;
+  
+  Drawable cam_draw;
 
   ArrayList<Community> list = new ArrayList<Community>();
   ArrayList<Face> faces = new ArrayList<Face>();
@@ -116,10 +118,14 @@ public class Simulation extends Macro_Sheet {
     cam_gui = inter.cam_gui;
     
     val_descr.set("Control time, reset, random...");
-    show_com = newBoo(false, "show_com", "show");
+    show_com = newBoo(true, "show_com", "show");
 
-    inter.addToCamDrawerPile(new Drawable() { 
-      public void drawing() { draw_to_cam(); } } );
+    cam_draw = new Drawable() { public void drawing() { draw_to_cam(); } };
+    inter.addToCamDrawerPile(cam_draw);
+    cam_draw.setLayer(priority.get());
+	priority.addEventChange(new nRunnable() { public void run() { 
+		cam_draw.setLayer(priority.get()); }});
+    
     inter.addToScreenDrawerPile(new Drawable() { 
       public void drawing() { draw_to_screen(); } } );
 
@@ -207,7 +213,7 @@ public class Simulation extends Macro_Sheet {
       .addDrawer(10.25, 0.6)
       .addModel("Label-S4", "- Simulation Control -").setFont((int)(ref_size/1.4)).getShelf()
       .addSeparator(0.125)
-      .addDrawerDoubleButton(show_com, inter.cam.grid, 10, 1)
+      .addDrawerButton(show_com, inter.cam.grid, 10, 1)
       .addSeparator(0.125)
       ;
     

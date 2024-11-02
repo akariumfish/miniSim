@@ -700,7 +700,7 @@ public class Macro_Sheet extends Macro_Abstract {
 //}
     
 public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) { 
-    super(p, "sheet", n, _bloc); init(); 
+    super(p.mmain, p, "sheet", n, _bloc); init(); 
     
     gui.app.mlogln("build sheet "+n+" from "+ _bloc);
     
@@ -1513,93 +1513,7 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
     	    return nm;
       }
     return null;
-//    if (t.equals("numCtrl")) nm = addNumCtrl(b);
-//    else if (t.equals("vecCtrl")) nm = addVecCtrl(b);
-//    else if (t.equals("preset")) nm = addPrst(b);
-//    else if (t.equals("midi")) nm = addMidi(b);
-//    else if (t.equals("toolNC")) nm = addToolNCtrl(b);
-//    else if (t.equals("crossVec")) nm = addCrossVec(b);
-//    if (nm != null) nm.init_end();
-//    return nm;
   }
-  
-//  MData addData(sValueBloc b) { MData m = null;
-////    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
-////      m = new MData(this, b, sheet_viewer.selected_value);
-////      sheet_viewer.update(); }
-////    else 
-//    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
-//             mmain().sheet_explorer.selected_value != null) {
-//      m = new MData(this, b, mmain().sheet_explorer.selected_value);
-//      mmain().sheet_explorer.update(); }
-//    else m = new MData(this, b, null); return m; }
-//  MSheetIn addSheetIn(sValueBloc b) { MSheetIn m = new MSheetIn(this, b); return m; }
-//  MSheetOut addSheetOut(sValueBloc b) { MSheetOut m = new MSheetOut(this, b); return m; }
-//  MKeyboard addKey(sValueBloc b) { MKeyboard m = new MKeyboard(this, b); return m; }
-//  MSwitch addSwitch(sValueBloc b) { MSwitch m = new MSwitch(this, b); return m; }
-//  MTrig addTrig(sValueBloc b) { MTrig m = new MTrig(this, b); return m; }
-//  MBigSwitch addBigSwitch(sValueBloc b) { MBigSwitch m = new MBigSwitch(this, b); return m; }
-//  MBigTrig addBigTrig(sValueBloc b) { MBigTrig m = new MBigTrig(this, b); return m; }
-//  MGate addGate(sValueBloc b) { MGate m = new MGate(this, b); return m; }
-//  MNot addNot(sValueBloc b) { MNot m = new MNot(this, b); return m; }
-//  MBin addBin(sValueBloc b) { MBin m = new MBin(this, b); return m; }
-//  MBool addBool(sValueBloc b) { MBool m = new MBool(this, b); return m; }
-//  MVar addVar(sValueBloc b) { MVar m = new MVar(this, b); return m; }
-//  MPulse addPulse(sValueBloc b) { MPulse m = new MPulse(this, b); return m; }
-//  MCalc addCalc(sValueBloc b) { MCalc m = new MCalc(this, b); return m; }
-//  MComp addComp(sValueBloc b) { MComp m = new MComp(this, b); return m; }
-//  MChan addChan(sValueBloc b) { MChan m = new MChan(this, b); return m; }
-//  MVecXY addVecXY(sValueBloc b) { MVecXY m = new MVecXY(this, b); return m; }
-//  MVecMD addVecMD(sValueBloc b) { MVecMD m = new MVecMD(this, b); return m; }
-//  MFrame addFrame(sValueBloc b) { MFrame m = new MFrame(this, b); return m; }
-//  MNumCtrl addNumCtrl(sValueBloc b) { MNumCtrl m = null;
-//    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
-//      m = new MNumCtrl(this, b, sheet_viewer.selected_value);
-//      sheet_viewer.update(); }
-//    else 
-//    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
-//             mmain().sheet_explorer.selected_value != null) {
-//      m = new MNumCtrl(this, b, mmain().sheet_explorer.selected_value);
-//      mmain().sheet_explorer.update(); }
-//    else m = new MNumCtrl(this, b, null); return m; }
-//  MVecCtrl addVecCtrl(sValueBloc b) { MVecCtrl m = null;
-//    if (sheet_viewer != null && sheet_viewer.selected_value != null) {
-//      m = new MVecCtrl(this, b, sheet_viewer.selected_value);
-//      sheet_viewer.update(); }
-//    else 
-//    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
-//             mmain().sheet_explorer.selected_value != null) {
-//      m = new MVecCtrl(this, b, mmain().sheet_explorer.selected_value);
-//      mmain().sheet_explorer.update(); }
-//    else m = new MVecCtrl(this, b, null); return m; }
-//  MRandom addRng(sValueBloc b) { MRandom m = new MRandom(this, b); return m; }
-//  MMouse addMouse(sValueBloc b) { MMouse m = new MMouse(this, b); return m; }
-//  MComment addComment(sValueBloc b) { MComment m = new MComment(this, b); return m; }
-//  MPreset addPrst(sValueBloc b) { MPreset m = new MPreset(this, b); return m; }
-//  MMIDI addMidi(sValueBloc b) { MMIDI m = new MMIDI(this, b); return m; }
-//  MMenu addMenu(sValueBloc b) { MMenu m = new MMenu(this, b); return m; }
-//  MTool addTool(sValueBloc b) { MTool m = new MTool(this, b); return m; }
-//  MToolBin addToolBin(sValueBloc b) { MToolBin m = new MToolBin(this, b); return m; }
-//  MToolTri addToolTri(sValueBloc b) { MToolTri m = new MToolTri(this, b); return m; }
-//  MToolNCtrl addToolNCtrl(sValueBloc b) { MToolNCtrl m = null;
-//    if (sheet_viewer != null && sheet_viewer.selected_value != null) { 
-//      m = new MToolNCtrl(this, b, sheet_viewer.selected_value);
-//      sheet_viewer.update(); }
-//    else 
-//    	if (mmain().sheet_explorer != null && mmain().sheet_explorer.explored_bloc == value_bloc &&
-//             mmain().sheet_explorer.selected_value != null) { 
-//      m = new MToolNCtrl(this, b, mmain().sheet_explorer.selected_value);
-//      mmain().sheet_explorer.update(); }
-//    else m = new MToolNCtrl(this, b, null); return m; }
-//  MPanel addPanel(sValueBloc b) { MPanel m = new MPanel(this, b); return m; }
-//  MPanBin addPanBin(sValueBloc b) { MPanBin m = new MPanBin(this, b); return m; }
-//  MPanSld addPanSld(sValueBloc b) { MPanSld m = new MPanSld(this, b); return m; }
-//  MPanGrph addPanGrph(sValueBloc b) { MPanGrph m = new MPanGrph(this, b); return m; }
-  //MPanCstm addPanCstm(sValueBloc b) { MPanCstm m = new MPanCstm(this, b); return m; }
-//  MRamp addRamp(sValueBloc b) { MRamp m = new MRamp(this, b); return m; }
-//  MCrossVec addCrossVec(sValueBloc b) { MCrossVec m = new MCrossVec(this, b); return m; }
-//  MColRGB addColRGB(sValueBloc b) { MColRGB m = new MColRGB(this, b); return m; }
-  
 }
 
 

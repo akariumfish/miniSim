@@ -433,7 +433,7 @@ public class sInterface {
   }
   public nWidget match_flag;
   public  nWindowPanel files_panel;
-  public String version_title = "MiniSim 0.4.1";
+  public String version_title = "MiniSim 0.4.2";
   public String savepath = "start.sdata";
   public String savefolder = "sdata\\";
   public sStr savepath_value, filempath_value;
@@ -443,9 +443,7 @@ public class sInterface {
   public nExplorer file_explorer, data_explorer;
   public nTaskPanel taskpanel;
   public float ref_size;
-
   public sBoo show_taskpanel;
-  
   
   public Rapp app;
   public sInput input;
@@ -717,10 +715,11 @@ public class sInterface {
     
     if (show_frmrt) app.text(framerate.get(), 15, app.window_head + 24 );
     if (show_info) {
-      app.text(" C " + RConst.trimFlt(cam.mouse.x) + 
-        "," + RConst.trimFlt(cam.mouse.y), 40, app.window_head + 24 );
-      app.text("S " + RConst.trimFlt(input.mouse.x) + 
-        "," + RConst.trimFlt(input.mouse.y), 250, app.window_head + 24 );
+      app.text("Scr " + RConst.trimFlt(input.mouse.x) + 
+    	        "," + RConst.trimFlt(input.mouse.y - app.window_head), 50, app.window_head + 24 );
+      app.text("Cam " + RConst.trimFlt(cam.mouse.x) + 
+    		  	"," + RConst.trimFlt(cam.mouse.y), 200, app.window_head + 24 );
+      app.text("Zoom " + RConst.trimFlt(cam.cam_scale.get()), 375, app.window_head + 24 );
     }
     
     data.frame(); // reset flags

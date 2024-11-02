@@ -24,9 +24,9 @@ public class BoxComu extends Community {
     nFrontTab tab = sim_front.addTab(name);
     tab.getShelf()
       .addSeparator(0.125)
-      .addDrawerDoubleButton(draw_dot, val_const_line, 10.25F, 1.0F)
+      .addDrawerButton(draw_dot, val_const_line, 10.25F, 1.0F)
       .addSeparator(0.25)
-      .addDrawerDoubleButton(kill_grow, floc_kill, 10, 1)
+      .addDrawerButton(kill_grow, floc_kill, 10, 1)
       .addSeparator(0.25)
       .addDrawerFactValue(spacing_min, 2, 10, 1)
       .addSeparator(0.125)

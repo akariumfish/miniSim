@@ -69,7 +69,7 @@ public class nShelf extends nBuilder {
 	    }
 	    return this;
 	  }
-	  public nShelf addDrawerDoubleButton(sValue val1, sValue val2, float w, float h) {
+	  public nShelf addDrawerButton(sValue val1, sValue val2, float w, float h) {
 	    nDrawer d = addDrawer(w, h);
 	    if (val1 != null) {
 	    d.addLinkedModel("Auto_Button-S3-P1")
@@ -89,7 +89,7 @@ public class nShelf extends nBuilder {
 	    }
 	    return this;
 	  }
-	  public nShelf addDrawerTripleButton(sValue val1, sValue val2, sValue val3, float w, float h) {
+	  public nShelf addDrawerButton(sValue val1, sValue val2, sValue val3, float w, float h) {
 	    nDrawer d = addDrawer(w, h);
 	    if (val1 != null) {
 	    d.addLinkedModel("Auto_Button-S2-P1")

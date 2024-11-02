@@ -11,13 +11,12 @@ Launch4j           -  Executable         -  https://launch4j.sourceforge.net/ ;
 Ffmpeg 			   -  Video              -  https://ffmpeg.org// ;
 VideoExport        -  Video              -  https://funprogramming.org/VideoExport-for-Processing/ ;
 
-
 French Down   vvv  .
 
 See previews for samples, more in the image folder.
 
 Quick start :
-Go to https://github.com/akariumfish/miniSim/blob/main/miniSim0.4.0.rar
+Go to https://github.com/akariumfish/miniSim/blob/main/miniSim0.4.1.rar
  ; click on "view raw" to dowload 
  ; extract it somewhere then launch miniSim0.x.x.exe .
 
@@ -29,17 +28,16 @@ Click on any sdata file in the new windows - wait a little for loading - .
 
 Java RE 8 is needed to launch the software. To get it go to : https://www.java.com/fr/download/manual.jsp then click Windows Online. After downloading, install this anywhere.
 
-Please be aware that im not a pro, (i never had any programming lessons) and its certainly not done correctly. 
-
-This is not a serious projet !! Its a montain of unfinished idee, temporary setups on top of more temporary fixs, quick and lazy solution driven by lack of sleep and depression, and be aware that IT IS PERFECT LIKE THAT. I dont intent on fully fixing it. As long as i can make it more absurdly complex and obscur I will continue. If you are here for the "art", thank you deeply! but please go to see a gallery at grows.cloud, there is nothing for you here. Otherwise, if you want to try making something, thank you dearly, and good luck. 
+Please be aware that im not a pro, and its certainly not done correctly. This is not a serious projet !! Its a montain of unfinished idee, temporary setups on top of temporary fixs, quick and lazy solution driven by lack of sleep and depression, and be aware that IT IS PERFECT LIKE THAT. I dont intent on fully fixing it. As long as i can make it more absurdly complex and obscur I will continue. If you are here for the "art", thank you deeply! but please go see the galleries at https://grows.cloud, there is not much for you here. Otherwise, if you want to try making something, thank you dearly, and good luck. 
 
 .
 ..
 ...
 
 ---FRANCAIS---MINISIM---
+
 Démarrage :
-Ouvre https://github.com/akariumfish/miniSim/blob/main/miniSim0.3.7.rar
+Ouvre https://github.com/akariumfish/miniSim/blob/main/miniSim0.4.1.rar
  ; clique sur "view raw" pour télécharger le fichier 
  ; décompresse le quelque-part et lance miniSim0.x.x.exe .
 
@@ -48,4 +46,4 @@ https://www.java.com/fr/download/manual.jsp .
 
 Sache que je ne suis pas un pro, et que ce programme n'est certainement pas construit comme il faudrait.
 
-Merci de ton intérêt, il n'y as pas de doc, bonne chance ...
+Merci de ton intérêt, il n'y as pas de doc, mais quelques exemples, bonne chance ...

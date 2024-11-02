@@ -30,9 +30,9 @@ public class nTaskPanel extends nToolPanel {
 	  public nTaskPanel(nGUI _g, float ref_size, float space_factor) { 
 	    super(_g, ref_size, space_factor, true, false); 
 	    
-	    addGrid(col, row, 4, 0.75F);
+	    addGrid(col, row, 3.75F, 0.75F);
 	    for (int i = 0 ; i < col ; i++) for (int j = 0 ; j < row ; j++) {
-	      nWidget nw = getDrawer(i, j).addModel("Button-S4/0.75").setStandbyColor(gui.app.color(60));
+	      nWidget nw = getDrawer(i, j).addModel("Button-S3.75/0.75").setStandbyColor(gui.app.color(60));
 	      window_buttons.add(nw);
 	    }
 	    //gui.addEventSetup(new Runnable() { public void run() { reduc(); } } );

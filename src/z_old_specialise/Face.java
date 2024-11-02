@@ -39,7 +39,7 @@ public static class FacePrint extends Sheet_Specialize {
         .addSeparator(0.125)
         .addDrawerFactValue(val_disp, 2, 10, 1)
         .addSeparator(0.125)
-        .addDrawerDoubleButton(val_halo_type, val_halo_type2, 10, 1)
+        .addDrawerButton(val_halo_type, val_halo_type2, 10, 1)
         .addSeparator(0.125)
         .addDrawerButton(val_mirage, 10, 1)
         .addSeparator(0.125)

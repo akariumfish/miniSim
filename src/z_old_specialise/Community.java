@@ -40,9 +40,9 @@ public abstract class Community extends Macro_Sheet {
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(adding_step, 10, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerTripleButton(pulse_add, auto_add, srun_add, 10, 1)
+	      .addDrawerButton(pulse_add, auto_add, srun_add, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(show_entity, adding_cursor.show, 10, 1)
+	      .addDrawerButton(show_entity, adding_cursor.show, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(pulse_add_delay, 10, 10, 1)
 	      .addSeparator(0.125)
@@ -123,7 +123,7 @@ public abstract class Community extends Macro_Sheet {
 	  String name = "";
 	  String type;
 
-	  ArrayList<Entity> list = new ArrayList<Entity>(); //contien les objet
+	  public ArrayList<Entity> list = new ArrayList<Entity>(); //contien les objet
 
 	  sInt max_entity; //longueur max de l'array d'objet
 	  sInt active_entity, adding_entity_nb, adding_step; // add one new object each adding_step turn
@@ -261,34 +261,5 @@ public abstract class Community extends Macro_Sheet {
 
 
 
-abstract class Entity { 
-  Community com;
-  int age = 0, id;
-  boolean active = false;
-  Entity(Community c) { 
-    com = c; 
-    id = com.list.size();
-  }
-  Entity activate() {
-    if (!active) { 
-      active = true; 
-      age = 0; 
-      init();
-    }
-    return this;
-  }
-  Entity destroy() {
-    if (active) { 
-      active = false; 
-      clear();
-    }
-    return this;
-  }
-  abstract Entity tick();     //exec by community 
-  abstract Entity frame();    //exec by community 
-  abstract Entity draw();    //exec by community 
-  abstract Entity init();     //exec by activate and community.reset
-  abstract Entity clear();    //exec by destroy
-}
 
 

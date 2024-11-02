@@ -8,8 +8,10 @@ public class Rect {
 	public PVector pos = new PVector(0, 0);
 	public PVector size = new PVector(0, 0);
 	public Rect() {}
-	public Rect(float x, float y, float w, float h) {pos.x = x; pos.y = y; size.x = w; size.y = h;}
-	public Rect(Rect r) {pos.x = r.pos.x; pos.y = r.pos.y; size.x = r.size.x; size.y = r.size.y;}
+	public Rect(float x, float y, float w, float h) {
+		pos.x = x; pos.y = y; size.x = w; size.y = h;}
+	public Rect(Rect r) {
+		pos.x = r.pos.x; pos.y = r.pos.y; size.x = r.size.x; size.y = r.size.y;}
 	public void draw(Rapp a) { 
 		  a.rect(pos.x, pos.y, size.x, size.y); 
 	}
@@ -17,6 +19,27 @@ public class Rect {
 	  pos.x = r.pos.x; pos.y = r.pos.y; size.x = r.size.x; size.y = r.size.y; 
 	  return this; }
 
+	public boolean rectCollide(Rect rect1) {
+	  Rect rect2 = this;
+	  return (rect1.pos.x < rect2.pos.x + rect2.size.x &&
+	          rect1.pos.x + rect1.size.x > rect2.pos.x &&
+	          rect1.pos.y < rect2.pos.y + rect2.size.y &&
+	          rect1.pos.y + rect1.size.y > rect2.pos.y   );
+	}
+	
+	public boolean rectCollide(PVector p) {
+	  Rect rect = this;
+	  return (p.x >= rect.pos.x && p.x <= rect.pos.x + rect.size.x &&
+	          p.y >= rect.pos.y && p.y <= rect.pos.y + rect.size.y );
+	}
+	
+	boolean rectCollide(PVector p, float s) {
+	  Rect rect = this;
+	  Rect rects = new Rect(rect); rects.pos.x -= s; rects.pos.y -= s; rects.size.x += 2*s; rects.size.y += 2*s;
+	  return (p.x >= rects.pos.x && p.x <= rects.pos.x + rects.size.x &&
+	          p.y >= rects.pos.y && p.y <= rects.pos.y + rects.size.y );
+	}
+	
 	static boolean rectCollide(Rect rect1, Rect rect2) {
 	  return (rect1.pos.x < rect2.pos.x + rect2.size.x &&
 	          rect1.pos.x + rect1.size.x > rect2.pos.x &&

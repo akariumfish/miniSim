@@ -75,7 +75,9 @@ public class nCursor extends nWidget implements Macro_Interf {
 	    thiswidget = this;
 	    gui = sheet.gui; ref_size = sheet.gui.theme.ref_size; 
 	    
-	    if (blc.getValue("pos") != null && blc.getValue("show") != null && blc.getValue("dir") != null) {
+	    if (blc.getValue("pos") != null && 
+	    		blc.getValue("show") != null && 
+	    		blc.getValue("dir") != null) {
 	      s_bloc = blc;
 	      
 	      pval = (sVec)blc.getValue("pos");
@@ -244,17 +246,20 @@ public class nCursor extends nWidget implements Macro_Interf {
 	      update_view();
 	      if (pval != null) {
 	        PVector p = cam.cam_to_screen(pval.get());
-	        screen_widget.setPosition(p.x, 
-	        						  p.y); } }};
+	        screen_widget.setPosition(p.x, p.y); } }};
+	    
 	    cam.addEventMove(move_run);
 	    cam.addEventZoom(zoom_run);
 	    
 	    sheet.mmain().inter.addEventNextFrame(new nRunnable() {public void run() {
 	      update_view();
+	      if (pval != null) {
+		        PVector p = cam.cam_to_screen(pval.get());
+		        screen_widget.setPosition(p.x, p.y); }
 	    }});
 	  }
 	  
-	  void update_view() {
+	  public void update_view() {
 	    if (cam.cam_scale.get() < 0.5) { 
 	      if (show != null && show.get()) { 
 	        screen_widget.show(); 

@@ -842,7 +842,7 @@ public class Macro_Bloc extends Macro_Abstract {
 //	}
   
   Macro_Bloc(Macro_Sheet _sheet, String t, String n, sValueBloc _bloc) {
-	    super(_sheet, t, n, _bloc);
+	    super(_sheet.mmain, _sheet, t, n, _bloc);
 //		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
 	    addShelf(); 
 	    addShelf();
@@ -852,7 +852,7 @@ public class Macro_Bloc extends Macro_Abstract {
 		col_rows_nb[0] = 0; col_rows_nb[1] = 0; col_rows_nb[2] = 0;
 	  }
   Macro_Bloc(Macro_Sheet _sheet, String t, sValueBloc _bloc) {
-	    super(_sheet, t, t, _bloc);
+	    super(_sheet.mmain, _sheet, t, t, _bloc);
 //		    mlogln("build bloc "+t+" "+n+" "+ _bloc);
 	    addShelf(); 
 	    addShelf();

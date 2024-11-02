@@ -22,7 +22,7 @@ public class Grid extends Macro_Sheet {
 	      .addDrawer(10.25, 0.75)
 	      .addModel("Label-S4", "-Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(decay, median, 10, 1)
+	      .addDrawerButton(decay, median, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 	      

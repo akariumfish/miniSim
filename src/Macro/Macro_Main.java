@@ -236,6 +236,7 @@ nExplorer sheet_explorer;
 	    	    else build_sheet_menu(); }})
 	    	  .setSX(ref_size*2.0F).setSY(ref_size*0.75F)
 	    	  .setPX(ref_size*0).setPY(ref_size*0.0625F)
+	    	  .setInfo("Main Menu")
 	      .getShelfPanel()
       .addShelf().addDrawer(0.0F, ht).getShelfPanel()
       .addShelf().addDrawer(5.5F, ht)
@@ -1049,7 +1050,8 @@ Macro_Sheet search_sheet = this;
   ArrayList<MTool> tool_macros = new ArrayList<MTool>();
   ArrayList<nCursor> cursors_list = new ArrayList<nCursor>();
   ArrayList<MBaseTick> baseticked_list = new ArrayList<MBaseTick>();
-  ArrayList<MGrow> grow_list = new ArrayList<MGrow>();
+  ArrayList<MBaseMT> baseMticked_list = new ArrayList<MBaseMT>();
+//  ArrayList<MGrow> grow_list = new ArrayList<MGrow>();
   MSheetBloc main_sheetbloc;
   MPanel last_added_panel;
   MTool last_added_tool;
@@ -1201,7 +1203,8 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MTransform.Builder());
       add_bloc_builders(new MFilter.Builder());
       add_bloc_builders(new MVecLerp.Builder());
-      add_bloc_builders(new MGrow.Builder(this));
+      add_bloc_builders(new MSolidGroup.Builder(this));
+      add_bloc_builders(new MCanvas.Builder(this));
 
       add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());
@@ -1438,8 +1441,8 @@ public Macro_Main(sInterface _int) {
 	    tick_time = newFlt(0, "tick duration (ms)", "tls");
 	    pause = newBoo(false, "pause", "pause");
 	    force_next_tick = newInt(0, "force_next_tick", "nxt tick");
-	    auto_reset = newBoo(true, "auto_reset", "auto reset");
-	    auto_reset_rng_seed = newBoo(true, "auto_reset_rng_seed", "auto rng");
+	    auto_reset = newBoo(false, "auto_reset", "auto reset");
+	    auto_reset_rng_seed = newBoo(false, "auto_reset_rng_seed", "auto rng");
 	    auto_reset_screenshot = newBoo(false, "auto_rest_screenshot", "auto shot");
 	    auto_reset_turn = newInt(4000, "auto_reset_turn", "auto turn");
 	    SEED = newInt(548651008, "SEED", "SEED");
@@ -1493,13 +1496,13 @@ public Macro_Main(sInterface _int) {
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(auto_reset_turn, 1000, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(auto_reset, auto_reset_rng_seed, 10, 1)
+	      .addDrawerButton(auto_reset, auto_reset_rng_seed, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(srun_scrsht, auto_reset_screenshot, 10, 1)
+	      .addDrawerButton(srun_scrsht, auto_reset_screenshot, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerTripleButton(srun_reset, srun_rngr, srun_tick, 10, 1)
+	      .addDrawerButton(srun_reset, srun_rngr, srun_tick, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(pause, mmain().inter.cam.grid, 10, 1)
+	      .addDrawerButton(pause, mmain().inter.cam.grid, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 	}
@@ -1512,6 +1515,7 @@ public Macro_Main(sInterface _int) {
 	  gui.app.randomSeed(SEED.get());
 	  tick_counter.set(0);
 	  mmain().inter.framerate.reset();
+	  for (MBaseMT b : baseMticked_list) b.receive_reset();
 	  nRunnable.runEvents(eventsReset);
 	  run_tck_cnt = 0; met_tck_cnt = 0;
 	  met_rst_cnt++; 
@@ -1527,8 +1531,12 @@ public Macro_Main(sInterface _int) {
 	    reset();
 	  }
 	  tick_counter.set(tick_counter.get()+1);
+	  
+	  for (MBaseMT b : baseMticked_list) b.receive_tick_strt();
 	  for (MBaseTick b : baseticked_list) b.receive_tick();
-	  for (MGrow b : grow_list) b.receive_tick();
+	  for (MBaseMT b : baseMticked_list) b.receive_tick();
+	  for (MBaseMT b : baseMticked_list) b.receive_tick_end();
+	  
 	  nRunnable.runEvents(eventsTick);
 	  met_tck_cnt++; 
 	  while (run_tck_cnt < met_tck_cnt) srun_tick.run();
@@ -1719,7 +1727,7 @@ public Macro_Main(sInterface _int) {
 	      .addDrawer(10.25, 0.5)
 	      .addModel("Label-S4", "-Video Recording Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.35)
-	      .addDrawerDoubleButton(vid_start, vid_stop, 10, 1);
+	      .addDrawerButton(vid_start, vid_stop, 10, 1);
 	    nDrawer flag_drw = tab.getShelf().addDrawer(10.25, 0.0);
 	    tab.getShelf()
 	      .addSeparator(0.125)
@@ -1727,7 +1735,7 @@ public Macro_Main(sInterface _int) {
 	      .addSeparator(0.125)
 	      .addDrawerDoubleWatch(vid_len, vid_dur, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(vid_rst_start, vid_limit_len, 10, 1)
+	      .addDrawerButton(vid_rst_start, vid_limit_len, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerIncrValue(vid_max_len, 10, 10, 1)
 	      .addSeparator(0.125)

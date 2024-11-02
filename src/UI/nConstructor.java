@@ -199,6 +199,7 @@ public class nConstructor {
     do_sizes(base, "-S2.5/0.75", ref_size*2.5F, ref_size*0.75F);
     do_sizes(base, "-S3/0.6", ref_size*3, ref_size*0.6F);
     do_sizes(base, "-S3/0.75", ref_size*3, ref_size*0.75F);
+    do_sizes(base, "-S3.75/0.75", ref_size*3.75F, ref_size*0.75F);
     do_sizes(base, "-S4/0.75", ref_size*4, ref_size*0.75F);
     do_sizes(base, "-S6/1", ref_size*6, ref_size*1);
     do_sizes(base, "-S10/0.75", ref_size*10, ref_size*0.75F);

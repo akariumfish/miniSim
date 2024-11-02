@@ -38,9 +38,9 @@ public class Canvas extends Macro_Sheet {
 	      .addSeparator(0.125)
 	      ;
 	    sheet_front.getTab(1).getShelf()
-	      .addDrawerTripleButton(val_show, val_show_back, val_show_bound, 10, 1)
+	      .addDrawerButton(val_show, val_show_back, val_show_bound, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerTripleButton(val_rst_run, val_show_grab, val_centered, 10, 1)
+	      .addDrawerButton(val_rst_run, val_show_grab, val_centered, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 
@@ -72,15 +72,15 @@ public class Canvas extends Macro_Sheet {
 	      .addDrawer(10.25, 0.5)
 	      .addModel("Label-S4", "-Back Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-	      .addDrawerTripleButton(back_clear, back_fill, back_add, 10, 1)
+	      .addDrawerButton(back_clear, back_fill, back_add, 10, 1)
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(back_save, back_load, 10, 1)
+	      .addDrawerButton(back_save, back_load, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFieldCtrl(back_file, 10, 1)
 	      .addDrawer(10.25, 0.5)
 	      .addModel("Label-S4", "-Rain Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-	      .addDrawerTripleButton(do_rain1, do_rain2, do_rain3, 10, 1)
+	      .addDrawerButton(do_rain1, do_rain2, do_rain3, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(rain_strength, 2, 10, 1)
 	      .addSeparator(0.125)
@@ -96,7 +96,7 @@ public class Canvas extends Macro_Sheet {
 	      .addDrawer(10.25, 0.5)
 	      .addModel("Label-S4", "-Effect Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-	      .addDrawerDoubleButton(use_mask, use_blur, 10, 1)
+	      .addDrawerButton(use_mask, use_blur, 10, 1)
 	      .addSeparator(0.125)
 	      ;
 
@@ -138,13 +138,12 @@ public class Canvas extends Macro_Sheet {
 	  sInt val_w, val_h, can_div, rate_decay;
 	  sFlt val_scale, val_scale_fine, color_keep_thresh, decay_fact;
 	  sBoo val_show, val_show_back, val_show_bound, val_show_grab, val_centered;
+	  
 	  sStr selected_com;
 	  sCol val_col_back;
 	  sRun val_rst_run;
 
 	  sObj floc_obj;
-	  
-	  //nLinkedWidget canvas_grabber;
 	  
 	  PImage can1,can2;
 	  int active_can = 0;

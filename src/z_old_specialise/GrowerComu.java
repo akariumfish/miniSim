@@ -113,9 +113,9 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    super(_c, n, "grow", 1000, t);
 	    DEVIATION = newFlt(6, "dev", "dev");
 	    L_MIN = newFlt(2.5F, "lmin", "lmin");
-	    L_MAX = newFlt(40, "lmax", "lmax");
+	    L_MAX = newFlt(10, "lmax", "lmax");
 	    L_DIFFICULTY = newFlt(1, "ldif", "ldif");
-	    TEEN_AGE = newFlt(50, "young", "young");
+	    TEEN_AGE = newFlt(6.25F, "young", "young");
 	    OLD_AGE = newFlt(100, "age", "age");
 	    floc_prob = newFlt(1, "floc_prob", "floc_prob");
 	    cible_force = newFlt(0.01F, "cible_force", "cible");
@@ -172,21 +172,20 @@ public static class GrowerPrint extends Sheet_Specialize {
 	      }
 	    }});
 	    
-
 	    obj_cur = menuCursor(""+n+"_objectif", false);
 	    
 	  }
 	  void custom_cam_draw_pre_entity() {
-//		  for (Entity g : list) if (g.active) ((Grower)g).backdraw();
-	  }
-	  void custom_cam_draw_post_entity() {
-		  if (zone_view.get()) {
-			  gui.app.stroke(220);
-			  gui.app.strokeWeight(1);
+		  if (zone_view.get() && show_entity.get()) {
+			  gui.app.stroke(200);
+			  gui.app.strokeWeight(3);
 			  gui.app.noFill();
 			  gui.app.ellipse(obj_cur.x() - cible_zone.get(), obj_cur.y() - cible_zone.get(), 
 					  cible_zone.get()*2, cible_zone.get()*2);
 		  }
+//		  for (Entity g : list) if (g.active && !((Grower)g).end) ((Grower)g).backdraw();
+	  }
+	  void custom_cam_draw_post_entity() {
 	  }
 	  void custom_pre_tick() {
 	    activeGrower.set(grower_Nb());
@@ -286,8 +285,9 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  float age = 0.0F;
 	  float start = 0.0F;
 	  
-	  Grower parent = null;
+	  Grower parent = this;
 	  float width = 0;
+	  int leaf_nb = 1;
 
 	  Grower(GrowerComu c) { 
 	    super(c);
@@ -300,6 +300,8 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    start = 0.0F;
 	    flt_cnt = 0;
 	    width = 0;
+	    parent = this;
+	    leaf_nb = (int) com().app.random(1, com().leaf_nb.get());
 	    if (com().app.random(1) > 0.5) side = true; else side = false;
 	    return this;
 	  }
@@ -320,6 +322,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  }
 	  Grower define(PVector _p, PVector _d, int r) {
 		rang = r+1;
+		
 	    pos = _p;
 	    grows = new PVector(com().L_MIN.get() + 
 	    		com().app.crandom(com().L_DIFFICULTY.get())*(com().L_MAX.get() - com().L_MIN.get()), 0);
@@ -343,10 +346,12 @@ public static class GrowerPrint extends Sheet_Specialize {
 	    grows = PVector.add(pos, grows);
 	    return this;
 	  }
-	  void addWidth() {
+	  void addWidth() { addWidth(0); }
+	  void addWidth(int r) {
 		  width += (float)(com().MAX_LINE_WIDTH.get() - com().MIN_LINE_WIDTH.get()) / 
 				  (float)com().max_entity.get();
-		  if (parent != null && parent != this) parent.addWidth();
+		  if ( parent != null && parent != this && parent.active && 
+			  r < com().max_entity.get() / 4.0 ) parent.addWidth(r+1);
 	  }
 	  Grower frame() { 
 	    return this;
@@ -378,8 +383,8 @@ public static class GrowerPrint extends Sheet_Specialize {
 	        _d.setMag(com().app.random(1.0F) * _d.mag());
 	        _p.add(pos).add(_d);
 	        n.define(_p, _d, rang);
-	        n.parent = this;
-	        n.addWidth();
+//	        n.parent = n;
+//	        n.addWidth();
 	        sprouts++;
 	      }
 	      //sprouts = (int[]) expand(sprouts, sprouts.length + 1);
@@ -433,6 +438,7 @@ public static class GrowerPrint extends Sheet_Specialize {
 	  }
 	  Grower draw() {
 		  	if (!end) backdraw();
+		  	
 		    // aging color
 		    int ca = 255;
 		    if (age > com().OLD_AGE.get() / 2) ca = PApplet.constrain(255 + (int)(com().OLD_AGE.get()/2) - (int)(age/1.2), 90, 255);
@@ -469,21 +475,21 @@ public static class GrowerPrint extends Sheet_Specialize {
 		    	  com().app.strokeWeight( (com().MAX_LINE_WIDTH.get()+1) / com().leaf_size_fact.get() );// / 
 		                    //(com.sim.inter.cam.cam_scale.get());
 		      PVector e2 = new PVector(e.x, e.y);
-		      if (flt_cnt < com().leaf_nb.get() * 50) flt_cnt++;
+		      if (flt_cnt < leaf_nb * 50) flt_cnt++;
 		      else r_cnt += com().leaf_rot.get();
 		      for (int i = 1 ; i < 1 + flt_cnt / 50 ; i++) {
 		    	    com().app.pushMatrix();
 		    	    com().app.rotate(-2*PConstants.PI * r_cnt / 500);
 		    	    com().app.rotate(2*PConstants.PI * 50 * i / flt_cnt);
 		    	    e.set(dir);
-		    	    e2 = new PVector(e.x * rang / 100.0F, e.y * rang / 100.0F);
+		    	    e2 = new PVector(e.x * (40+rang) / 200.0F, e.y * (40+rang) / 200.0F);
 		    	    e.div(2);
-		    	    e.rotate(-PConstants.PI/16);
+		    	    e.rotate(-PConstants.PI/8.0F);
 		    	    e.mult(rang / 100.0F);
 		    	    if (side) {
 		    	    		com().app.triangle(0F, 0F, e2.x, e2.y, e.x, e.y);
 		    	    } else {
-			    	    e.rotate(PConstants.PI/8);
+			    	    e.rotate(PConstants.PI/8.0F);
 			    	    com().app.triangle(0F, 0F, e2.x, e2.y, e.x, e.y);
 		    	    }
 				com().app.popMatrix();

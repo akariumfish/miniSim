@@ -211,7 +211,7 @@ class MMButton extends MBasic {
 	  
 	MMButton(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "mbutton", _bloc); }
 	public void init() {
-		row_nb = newInt(2, "row_nb");
+		row_nb = newInt(1, "row_nb");
 		mode = newBoo(false, "mode");
 		size = newInt(2, "size");
 		if (!loading_from_bloc) size.set_limit(1, 3);
@@ -1012,8 +1012,8 @@ class MTool extends Macro_Bloc {
     super(_sheet, "tool", "tool", _bloc); 
     setup_send = newBoo("stp_send", "stp_send", false);
     menu_reduc = newBoo("menu_reduc", "menu_reduc", false);
-    menu_top = newBoo("menu_top", "menu_top", true);
-    menu_pos = newInt("y_pos", "y_pos", 1);
+    menu_top = newBoo("menu_top", "menu_top", false);
+    menu_pos = newInt("y_pos", "y_pos", 0);
     
     reduc_run = new nRunnable() { public void run() {
       if (front_panel != null) { menu_reduc.set(front_panel.hide); 

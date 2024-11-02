@@ -1,7 +1,7 @@
-0:- :init
-0:  :init end
-4:- :setup_load from start.sdata
-144:- :exit
+0:- :setup
+0:  :setup end
+3:- :setup_load from start.sdata
+177:- :exit
 null
 null
 null

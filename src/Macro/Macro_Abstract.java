@@ -12,6 +12,7 @@ import processing.core.PVector;
 import java.util.ArrayList;
 
 import RApplet.RConst;
+import RApplet.Rapp;
 import RApplet.sInterface;
 import sData.*;
 
@@ -81,8 +82,7 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
 //		    d.add_coDrawer(front.getDrawable()); 
 //		    d.add_coDrawer(grab_front.getDrawable()); 
 //	  return this; }
-	  public Macro_Main mmain() { if (sheet == this) return (Macro_Main)this; return sheet.mmain(); }
-
+	  
 	  void switch_select() {
 		  if (szone_selected ) {
 			  szone_unselect();
@@ -181,8 +181,21 @@ public class Macro_Abstract extends nShelfPanel implements Macro_Interf {
     return this; }
   
 
+  void up_short_title() {
+	  short_title = val_title.get();
+	  for (int i = 0 ; i < short_title.length() ; i ++) {
+		  if (short_title.charAt(i) == '_') {
+			  String n = short_title.substring(0, i);
+			  if (RConst.testParseInt(n))
+				  short_title = short_title.substring(i+1, short_title.length());
+			  break;
+		  }
+	  }
+  }
   
+  public Macro_Main mmain;
   public nGUI gui;
+  public Rapp app;
   Macro_Sheet sheet;    int sheet_depth = 0;
   boolean szone_selected = false, title_fixe = false;
 public boolean unclearable = false, hide_ctrl = false;
@@ -203,21 +216,18 @@ nLinkedWidget title; nCtrlWidget prio_sub, prio_add; nWatcherWidget prio_view;
   nRunnable szone_st, szone_en;
   String short_title = "";
   
-  void up_short_title() {
-	  short_title = val_title.get();
-	  for (int i = 0 ; i < short_title.length() ; i ++) {
-		  if (short_title.charAt(i) == '_') {
-			  String n = short_title.substring(0, i);
-			  if (RConst.testParseInt(n))
-				  short_title = short_title.substring(i+1, short_title.length());
-			  break;
-		  }
-	  }
-  }
   
-Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
+
+  public Macro_Main mmain() { 
+	  return mmain;
+//	  if (sheet == this) return (Macro_Main)this; return sheet.mmain(); 
+  }
+
+  
+Macro_Abstract(Macro_Main _m, Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     super(_sheet.gui, _sheet.ref_size, 0.0F);
-    gui = _sheet.gui; ref_size = _sheet.ref_size; sheet = _sheet; 
+    mmain = _m;
+    gui = _sheet.gui; ref_size = _sheet.ref_size; sheet = _sheet; app = gui.app;
     sheet_depth = sheet.sheet_depth + 1;
     
     if (_bloc == null) {
@@ -303,7 +313,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     super(_int.cam_gui, _int.ref_size, 0.0F);
     
 //    mlogln("build main abstract ");
-    
+    mmain = (Macro_Main) this;
     gui = _int.cam_gui; 
     ref_size = _int.ref_size; 
     sheet = (Macro_Main)this;
@@ -638,6 +648,7 @@ Macro_Abstract(Macro_Sheet _sheet, String ty, String n, sValueBloc _bloc) {
     
   
   public Macro_Abstract addEventSetupLoad(nRunnable r) { eventsSetupLoad.add(r); return this; }
+  public Macro_Abstract removeEventSetupLoad(nRunnable r) { eventsSetupLoad.remove(r); return this; }
   ArrayList<nRunnable> eventsSetupLoad = new ArrayList<nRunnable>();
   
   boolean canSetupFrom(sValueBloc bloc) {

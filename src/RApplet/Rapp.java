@@ -74,7 +74,7 @@ public class Rapp extends PApplet implements RConst {
 //		blendMode(REPLACE);
 		
 
-		  logln("init");
+		  logln("setup");
 		
 		  interf = new sInterface(this, 40);
 
@@ -84,27 +84,20 @@ public class Rapp extends PApplet implements RConst {
 		  
 
 		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
-		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
-		  interf.addSpecializedSheet(new Face.FacePrint(canv));
-		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
+//		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
+//		  interf.addSpecializedSheet(new Face.FacePrint(canv));
+//		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
 		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
-		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul, canv));
-		  interf.addSpecializedSheet(new SolidComu.SolidPrint(simul, canv));
-		  interf.addSpecializedSheet(new BoxComu.BoxPrint(simul));
-		  interf.addSpecializedSheet(new Grid.GridPrint(simul));
+		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
+//		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul, canv));
+//		  interf.addSpecializedSheet(new SolidComu.SolidPrint(simul, canv));
+//		  interf.addSpecializedSheet(new BoxComu.BoxPrint(simul));
+//		  interf.addSpecializedSheet(new Grid.GridPrint(simul));
 		  
 		  
 		  //logln("end models: "+interf.gui_theme.models.size());
 		  
 		  
-		
-		
-		
-		  
-	    
-	    
-
-	    
 	    
 	    
 	    
@@ -127,40 +120,36 @@ public class Rapp extends PApplet implements RConst {
 		      interf.addEventTwoFrame(new nRunnable() { 
 		        public void run() { exit(); } } ); } } );
 		  
-
-		  interf.full_screen_run.run();
-		  
-		  interf.addEventTwoFrame(new nRunnable() { public void run() { 
-			  interf.full_screen_run.run();
-
-			  if (START_AS_WINDOW) {
-				  interf.full_screen_run.run();
-				  interf.addEventNextFrame(new nRunnable() { public void run() { 
-					  surface.setLocation(100, 50); } } );
-			  }
-			  interf.addEventTwoFrame(new nRunnable() { public void run() { 
-			    	  	frameRate(60); 
-			    	  	interf.setup_load(); } } );
-	 	  } } );
-		  
 		  video_setup();
 		  
-		  logln("init end");
+		  logln("setup end");
 	}
 	
 	public boolean BLACKOUT = false;
-	boolean starting = true;;
+	
+	int setup_tmp = 1;
 	public void draw() {
-		
-	    interf.frame();
-	  
+
 	  global_frame_count++;
-	  if (starting && global_frame_count < 5) { 
+
+	  if (global_frame_count > setup_tmp+1) {
+		  interf.frame();
+	  }
+	  if (global_frame_count == setup_tmp) {
+		  if (!START_AS_WINDOW) fullscreen = false;
+		  interf.full_screen_run.run();
+	  }
+	  else if (global_frame_count == setup_tmp+2) {
+		  if (START_AS_WINDOW) surface.setLocation(100, 50); 
+		  frameRate(60); 
+	  	  interf.setup_load();
+	  }
+	  
+	  if (global_frame_count < setup_tmp+2) { 
 		  fill(0); noStroke(); rect(0, 0, width, height); 
 		  fill(255); 
 		  text("Starting ...", width/2, height/2);
 	  }
-	  else starting = false;
 	  if (BLACKOUT) { 
 		  fill(0); noStroke(); rect(0, window_head, width, height-window_head); 
 	      fill(255); 
