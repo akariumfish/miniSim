@@ -272,6 +272,22 @@ public class MBaseMenu extends MBasic {
     } });
     return f;
   	}
+	public sCol menuColor(int v, String r, String s) {
+	    sCol f = newCol(r, s, v);
+	    addEventsBuildMenu(new nRunnable(f) { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addCtrlModel("Auto_Button-S2-P3", "choose").setRunnable(new nRunnable(builder) { public void run() { 
+	          new nColorPanel(custom_tab.gui, mmain().inter.taskpanel, ((sCol)builder));
+	        } } ).getDrawer()
+	        .addWatcherModel("Auto_Watch_Label-S6/1", "Color picker: " + ((sCol)builder).ref)
+	          .setLinkedValue(((sCol)builder))
+	          .setTextAlignment(PConstants.LEFT, PConstants.CENTER).getDrawer()
+	        .getShelf()
+	        .addSeparator(0.125);
+	    } });
+	    return f;
+	  	}
 	public sBoo menuBoo(sBoo f) {
 	    addEventsBuildMenu(new nRunnable(f) { public void run() { 
 	      if (custom_tab != null) custom_tab.getShelf()

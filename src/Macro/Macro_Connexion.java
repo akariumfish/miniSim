@@ -418,13 +418,23 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
 	    .setSize(ref_size*0.5, ref_size*0.75);
     return this;
   }
+  
+  boolean is_access = false;
+  public Macro_Connexion set_access(boolean b) { is_access = b; return this; }
+  
   Macro_Connexion upview() { 
     if (isDraw()) {
       ref.show(); 
-      if ((!is_sheet_co && elem.bloc.sheet.openning.get() == DEPLOY && elem.bloc.openning.get() == OPEN ) 
-          || (is_sheet_co && elem.spot != null && elem.bloc.sheet.openning.get() == OPEN) ) {
+      if ( //is_access || 
+    		   (!is_sheet_co && 
+    		    elem.bloc.sheet.openning.get() == DEPLOY && 
+    		    elem.bloc.openning.get() == OPEN ) || 
+    		   (is_sheet_co && 
+    			elem.spot != null && 
+    			elem.bloc.sheet.openning.get() == OPEN) ) {
         lens.show(); 
-        msg_view.show(); 
+        if (!is_access) msg_view.show(); 
+        else msg_view.hide(); 
       } else {
         lens.hide(); 
         msg_view.hide(); 
@@ -438,10 +448,11 @@ public class Macro_Connexion extends nBuilder implements Macro_Interf {
   }
   
   boolean isDraw() {
-    return sheet.mmain().show_macro.get() && ( 
+    return //is_access || 
+    			(sheet.mmain().show_macro.get() && ( 
     			(!is_sheet_co && sheet.openning.get() == DEPLOY) || 
             (is_sheet_co && elem.spot != null && sheet.openning.get() == DEPLOY)
-            );
+            ));
   }
   
   PVector getCenter(nWidget w) { 

@@ -36,6 +36,7 @@ public class MShape extends MBaseMenu {
 	}
 	void init() {
 		super.init();
+		init_access();
 		structs = new ArrayList<MStructure>();
 		val_type = newInt(0, "type");
 		val_scale = menuFltSlide(10, 1, 50, "val_scale");

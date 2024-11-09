@@ -1,7 +1,8 @@
 package sData;
 
 public class sRun extends sValue {
-	  public void directshortcut_action() { if (val != null) { val.run(); doChange(); } }
+	  public void directshortcut_action() { 
+		  if (val != null) { val.run(); doChange(); } }
 	  public nRunnable asRun() { return val; }
 	  public String getString() { return ref; }
 	  public void clear() { super.clear(); }

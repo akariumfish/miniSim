@@ -41,7 +41,7 @@ public class nCursor extends nWidget implements Macro_Interf {
 	  Macro_Sheet sheet;
 	  Camera cam;
 	  nRunnable move_run, zoom_run;
-	  boolean show_dir = true;
+	  public boolean show_dir = true;
 	  boolean grid_snapping = true;
 	  
 	  ArrayList<Runnable> eventClearRuns = new ArrayList<Runnable>();

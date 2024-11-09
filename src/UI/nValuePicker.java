@@ -3,6 +3,7 @@ package UI;
 import java.util.ArrayList;
 import java.util.Map;
 
+import RApplet.RConst;
 import processing.core.PApplet;
 import sData.nRunnable;
 import sData.sStr;
@@ -68,10 +69,18 @@ public class nValuePicker extends nWindowPanel {
 	    update_list();
 	  }
 	  void update_list() {
-	    for (Map.Entry<String,sValue> b : search_bloc.values.entrySet()) { 
-	      sValue s = (sValue)b.getValue(); 
-	      explorer_entry.add(s.ref);
-	    }
+		  ArrayList<String> names = new ArrayList<String>();
+		  for (Map.Entry<String,sValue> b : search_bloc.values.entrySet()) { 
+			  sValue sv = (sValue)b.getValue(); 
+			  String n = new String();
+			  n += sv.ref;
+			  names.add(n);
+		  }
+
+	      for (String a : RConst.alphabet) 
+	    	  	for (String s : names) 
+	    	  	  if (s.charAt(0) == a.charAt(0)) explorer_entry.add(s);
+	      
 	    explorer_list.setEntrys(explorer_entry);
 	  }
 	  public nWindowPanel clear() { 

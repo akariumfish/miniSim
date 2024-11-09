@@ -211,6 +211,7 @@ class MMButton extends MBasic {
 	  
 	MMButton(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "mbutton", _bloc); }
 	public void init() {
+		init_access();
 		row_nb = newInt(1, "row_nb");
 		mode = newBoo(false, "mode");
 		size = newInt(2, "size");
@@ -220,7 +221,7 @@ class MMButton extends MBasic {
 //	  	show_screen = newBoo(false, "show_screen");
 	  	butt_col = newCol("butt_col");
 		if (!loading_from_bloc) butt_col.set(gui.app.color(10, 40, 80));
-
+		
 		show_rownb = newBoo(true, "show_rownb");
 		
 		vals = new ArrayList<sBoo>();
@@ -241,6 +242,7 @@ class MMButton extends MBasic {
 			size.addEventChange(mode_run);
 	  		mirror_view.addEventChange(mode_run);
 	  		show_rownb.addEventChange(mode_run);
+			butt_col.addEventChange(mode_run);
 	  	}});
 		if (setup_send.get()) 
 			mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
@@ -250,6 +252,7 @@ class MMButton extends MBasic {
 						cos.get(count).send(v.asPacket()); count++; 
 				} else for (Macro_Connexion v : cos) v.sendBang();
 		}});
+
   	}
 	public void build_param() {
 		addEmptyS(1).no_mirror(); 

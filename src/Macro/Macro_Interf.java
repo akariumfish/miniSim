@@ -9,5 +9,5 @@ public interface Macro_Interf {
 	  static final int[] shapes_vertices = {3, 2, 2, 3, 2};
 	  static final String[] shapes_names = {"TRIG", "LINE", "CIRCLE", "ARROW", "RECT"};
 	  static final String 	OBJ_TOKEN = "@", GROUP_TOKEN = "¤", 
-			  				INFO_TOKEN = "#", BLOC_TOKEN = "~";
+			  				INFO_TOKEN = "#", BLOC_TOKEN = "~", LINK_TOKEN = "%";
 	}

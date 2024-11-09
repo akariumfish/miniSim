@@ -31,6 +31,7 @@ public class MCam extends MBaseMenu {
 	MCam(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "cam", _bloc); }
 	void init() {
 		super.init();   
+		init_access();
 
 		cursors = new ArrayList<MCursor>();
 		csheets = new ArrayList<Macro_Sheet>();

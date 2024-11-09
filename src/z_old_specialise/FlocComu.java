@@ -332,7 +332,7 @@ public static class FlocPrint extends Sheet_Specialize {
   
   Floc build() { return new Floc(this); }
   Floc addEntity() { return newEntity(); }
-  Floc newEntity() {
+  public Floc newEntity() {
     for (Entity e : list) if (!e.active) { e.activate(); return (Floc)e; } return null; }
 }
 

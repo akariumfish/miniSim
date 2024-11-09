@@ -604,15 +604,15 @@ public class Canvas extends Macro_Sheet {
     	  	  	mask_image.noStroke();
     	  	  	mask_image.fill(255, 0, 0);
     	  	  	
-    			for (MCustom c : custom_blocs) { 
-    				for (Macro_Connexion i : c.out.connected_inputs) 
-    					if (i.elem.bloc.val_type.get().equals("cam")) 
-    						cam_to_mask((MCam)i.elem.bloc);
-    				for (Macro_Connexion dc : c.out.direct_cos) 
-    				for (Macro_Connexion i : dc.connected_inputs)
-    					if (i.elem.bloc.val_type.get().equals("cam")) 
-    						cam_to_mask((MCam)i.elem.bloc);
-    			}
+//    			for (MCustom c : custom_blocs) { 
+//    				for (Macro_Connexion i : c.out.connected_inputs) 
+//    					if (i.elem.bloc.val_type.get().equals("cam")) 
+//    						cam_to_mask((MCam)i.elem.bloc);
+//    				for (Macro_Connexion dc : c.out.direct_cos) 
+//    				for (Macro_Connexion i : dc.connected_inputs)
+//    					if (i.elem.bloc.val_type.get().equals("cam")) 
+//    						cam_to_mask((MCam)i.elem.bloc);
+//    			}
 	  	  	mask_image.endDraw();
 	    }
 	  }

@@ -1,5 +1,5 @@
-/thirdparties/
+/thirdparties
 ffmpeg.exe
 /exec/ffmpeg.exe
-/bin/
 /video/too_big/
+/bin

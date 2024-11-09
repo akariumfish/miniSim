@@ -1389,10 +1389,13 @@ class MValue extends MBasic {
       	first_start_show(m); }
       MValue build(Macro_Sheet s, sValueBloc b) { MValue m = new MValue(s, b); return m; }
     }
+  boolean bloc_from_link;
   sValue cible; sValueBloc bloc_cible;
-  sStr val_cible, val_bloc, val_depth, var_type; sBoo setup_send, panel_open;
+  sStr val_cible, val_bloc, val_depth, var_type; 
+  sBoo setup_send, panel_open;
   Macro_Connexion in, out;
-  nWidget val_widget;
+  Macro_Connexion link_access;
+  nWidget val_widget, blockpick_widget, blockdepth_widget;
   Macro_Element val_elem;
   
   sBoo bval; sInt ival; sFlt fval; sStr sval; sVec vval; sRun rval; sCol cval; sObj oval;
@@ -1413,18 +1416,24 @@ class MValue extends MBasic {
 	  var_type = newStr("type", "type", "");
 	  setup_send = newBoo("stp_snd", "stp_snd", false);
 	  panel_open = newBoo("pan_opn", "pan_opn", false);
+	  
+	  link_access = null;
+	  bloc_from_link = false;
+	  bloc_cible = null;
   }
   void build_param() { 
 	nDrawer d = addEmptyS(0);
-  	d.addCtrlModel("MC_Element_SButton", "pick")
+	blockpick_widget = d.addCtrlModel("MC_Element_SButton", "pick")
 	.setRunnable(new nRunnable() { public void run() {
-		if (val_depth.get().equals("/")) bloc_cible = sheet.value_bloc;
+		if (bloc_from_link) ;
+		else if (val_depth.get().equals("/")) bloc_cible = sheet.value_bloc;
 	    else if (val_depth.get().equals("..") && sheet != mmain()) 
 			bloc_cible = sheet.sheet.value_bloc;
      	new nBlockPicker(mmain().screen_gui, mmain().inter.taskpanel, val_bloc, bloc_cible, true)
         .addEventChoose(new nRunnable() { public void run() { 
         mmain().inter.addEventNextFrame( new nRunnable() { public void run() {
-		  if (val_bloc.get().equals(sheet.value_bloc.ref)) 
+        	  if (bloc_from_link) ;
+    		  else if (val_bloc.get().equals(sheet.value_bloc.ref)) 
 			  bloc_cible = sheet.value_bloc;
 		  else if (sheet != mmain() && val_bloc.get().equals(sheet.sheet.value_bloc.ref)) 
 			  bloc_cible = sheet.sheet.value_bloc;
@@ -1439,7 +1448,7 @@ class MValue extends MBasic {
 	      clearValue();
 		} } ); } } );
 	} });
-  	d.addCtrlModel("MC_Element_MiniButton", "/")
+	blockdepth_widget = d.addCtrlModel("MC_Element_MiniButton", "/")
   	.setRunnable(new nRunnable() { public void run() {
 		if (!val_depth.get().equals("/") || sheet == mmain()) {
 			val_depth.set("/"); bloc_cible = sheet.value_bloc; }
@@ -1448,7 +1457,10 @@ class MValue extends MBasic {
 		val_bloc.set(bloc_cible.ref);
 		clearValue();
 	} });
-    addEmpty(2);
+  	
+//    addEmpty(2);
+  	build_link_access();
+  	
     addEmptyL(1).addWatcherModel("MC_Element_Field")
     	.setLinkedValue(val_bloc).setInfo("selected value searching bloc ref")
     .getDrawer().addWatcherModel("MC_Element_SText")
@@ -1456,8 +1468,58 @@ class MValue extends MBasic {
     
     build_normal();
   }
+  
+  void build_link_access() {
+    Macro_Element m = new Macro_Element(this, "block_access", "MC_Element_Single", 
+    		"link to block to access values", OUTPUT, OUTPUT, true);
+    addElement(2, m); 
+    link_access = m.connect;
+    link_access.set_link();
+    link_access.addEventLink(new nRunnable() { public void run() { 
+		link_change(); }});
+    link_access.addEventUnLink(new nRunnable() { public void run() { 
+		link_change(); }});
+    mmain().inter.addEventTwoFrame(new nRunnable() { public void run() { 
+    		link_change(); }});
+  }
+  
+  void link_change() {
+	  if (link_access != null) {
+		  if (link_access.connected_inputs.size() > 0) {
+//			  app.logln("test link from ins");
+			  if (!val_bloc.get().equals(
+					  link_access.connected_inputs.get(0)
+					  .elem.bloc.value_bloc.ref)) clearValue();
+			  bloc_cible = 
+					link_access.connected_inputs.get(0).elem.bloc.value_bloc;
+			  bloc_from_link = true;
+			  if (blockpick_widget != null) blockpick_widget.setPassif()
+			  	.setStandbyColor(gui.app.color(40, 40, 40));
+			  if (blockdepth_widget != null) blockdepth_widget.setPassif()
+			  	.setStandbyColor(gui.app.color(40, 40, 40));
+			  val_bloc.set(bloc_cible.ref);
+			  setValue();
+		  } else {
+			  bloc_from_link = false;
+			  if (blockpick_widget != null) blockpick_widget.setTrigger()
+			  	.setStandbyColor(gui.app.color(10, 40, 80));
+			  if (blockdepth_widget != null) blockdepth_widget.setTrigger()
+			  	.setStandbyColor(gui.app.color(10, 40, 80)); 
+			  if (bloc_cible != null ) {
+				  if (val_depth.get().equals("..") && sheet != mmain()) 
+						  bloc_cible = sheet.sheet.value_bloc;
+				  else bloc_cible = sheet.value_bloc; }
+			  if (!val_bloc.get().equals(bloc_cible.ref)) clearValue();
+			  val_bloc.set(bloc_cible.ref);
+			  setValue();
+		  }
+	  }
+  }
 
   void build_normal() { 
+    if (link_access == null) build_link_access();
+    else addEmpty(2);
+    
     addEmptyS(0).addCtrlModel("MC_Element_SButton", "pick")
 	.setRunnable(new nRunnable() { public void run() {
 		if (bloc_cible != null ) {
@@ -1465,7 +1527,7 @@ class MValue extends MBasic {
 		    .addEventChoose(new nRunnable() { public void run() { setValue(); } } );
 		}
     } });
-    addEmpty(2);
+    
     addEmptyL(1).addWatcherModel("MC_Element_Field")
     	.setLinkedValue(val_cible).setInfo("selected value ref");
     
@@ -1487,7 +1549,7 @@ class MValue extends MBasic {
       if (cible != null) cible.pop_panel(mmain().screen_gui, mmain().inter.taskpanel)
 		.addEventClose(new nRunnable() { public void run() { panel_open.set(false); } } );
     } }); 
-    val_elem = addEmptyL(0);
+    val_elem = addEmptyS(0);
 
     
     mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
@@ -1495,7 +1557,8 @@ class MValue extends MBasic {
   }
   
   void setValue() {
-	  if (val_bloc.get().equals(sheet.value_bloc.ref)) 
+	  if (bloc_from_link) ;
+	  else if (val_bloc.get().equals(sheet.value_bloc.ref)) 
 		  bloc_cible = sheet.value_bloc;
 	  else if (sheet != mmain() && val_bloc.get().equals(sheet.sheet.value_bloc.ref)) 
 		  bloc_cible = sheet.sheet.value_bloc;
@@ -1508,7 +1571,13 @@ class MValue extends MBasic {
 			  bloc_cible = bloc_cible.getBloc(val_bloc.get());
 	  }
 	  if (bloc_cible != null) {
-	      cible = bloc_cible.getValue(val_cible.get());
+		  if (cible != null && val_run != null) cible.removeEventChange(val_run);
+		  if (cible != null && val_run != null) cible.removeEventAllChange(val_run);
+		  if (in_run != null) in.removeEventReceive(in_run);
+		  in_run = null;
+		  val_run = null;
+		  if (val_widget != null) val_widget.clear();
+		  cible = bloc_cible.getValue(val_cible.get());
 	      setValue(cible);
 	  }
   }
@@ -1579,9 +1648,16 @@ class MValue extends MBasic {
     ftmp = v.get();
     val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketFloat(fval.get())); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isFloat() && ftmp != in.lastPack().asFloat()) { 
-        ftmp = in.lastPack().asFloat();
+      if (in.lastPack() != null && in.lastPack().isFloat() 
+//    		  && ftmp != in.lastPack().asFloat()
+    		  ) { 
+//        ftmp = in.lastPack().asFloat();
         fval.set(in.lastPack().asFloat()); }
+      if (in.lastPack() != null && in.lastPack().isInt() 
+//    		  && ftmp != in.lastPack().asInt()
+    		  ) { 
+//        ftmp = in.lastPack().asInt();
+        fval.set(in.lastPack().asInt()); }
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);
@@ -1591,9 +1667,16 @@ class MValue extends MBasic {
     itmp = v.get();
     val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketInt(ival.get())); }};
     in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isInt() && itmp != in.lastPack().asInt()) { 
-        itmp = in.lastPack().asInt();
+      if (in.lastPack() != null && in.lastPack().isInt()
+//    		  && itmp != in.lastPack().asInt()
+    		  ) { 
+//        itmp = in.lastPack().asInt();
         ival.set(in.lastPack().asInt()); }
+      if (in.lastPack() != null && in.lastPack().isFloat()
+//    		  && itmp != in.lastPack().asInt()
+    		  ) { 
+//        itmp = in.lastPack().asInt();
+        ival.set(in.lastPack().asFloat()); }
     } };
     v.addEventChange(val_run);
     in.addEventReceive(in_run);

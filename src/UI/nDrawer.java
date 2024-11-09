@@ -6,7 +6,7 @@ public class nDrawer extends nBuilder {
 	  nShelf shelf;
 	  public nWidget ref;
 	  public float drawer_width = 0;
-	float drawer_height = 0;
+	  public float drawer_height = 0;
 	  public nDrawer(nShelf s, float w, float h) {
 	    super(s.gui, s.ref_size);
 	    ref = addModel("ref"); shelf = s;

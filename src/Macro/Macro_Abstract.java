@@ -482,6 +482,8 @@ Macro_Abstract(Macro_Main _m, Macro_Sheet _sheet, String ty, String n, sValueBlo
       if (mmain().sheet_explorer != null) mmain().sheet_explorer.update(); 
       nRunnable.runEvents(eventsSetupLoad); 
       toLayerTop(); 
+      
+      grabber.setSize(0,0);
   }
   void find_place(nWidget collide_cible) {
 	  

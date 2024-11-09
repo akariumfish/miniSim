@@ -47,7 +47,7 @@ public class MCanvas extends MBaseMT {
 	      .addDrawer(10.25, 0.5)
 	      .addModel("Label-S4", "-Rain Control-").setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-	      .addDrawerButton(do_rain1, do_rain2, do_rain3, 10, 1)
+	      .addDrawerButton(do_rain1, do_rain2, 10, 1)
 	      .addSeparator(0.125)
 	      .addDrawerFactValue(rain_strength, 2, 10, 1)
 	      .addSeparator(0.125)
@@ -105,6 +105,7 @@ public class MCanvas extends MBaseMT {
 	void init_end() { super.init_end(); }
 	public void init() {
 		super.init();
+		init_access();
 		inter = mmain().inter;
 		cam_gui = inter.cam_gui;
 		ref_size = inter.ref_size;
@@ -129,7 +130,7 @@ public class MCanvas extends MBaseMT {
 	  sRun back_clear, back_add, back_fill, back_save, back_load;
 	  sStr back_file;
 	  
-	  sBoo do_rain1, do_rain2, do_rain3, do_brush;
+	  sBoo do_rain1, do_rain2, do_brush; //, do_rain3
 	  sFlt rain_strength, brush_size, brush_dens;
 	  sInt rain_dir;
 	  sCol val_col_brush;
@@ -140,31 +141,33 @@ public class MCanvas extends MBaseMT {
 	  sBoo use_blur, use_mask;
 	
 	void init_canvas() {
-	    int def_pix_size = 10;
-	    int def_size = PApplet.min(app.width, app.height) / def_pix_size;
-	    def_size -= def_size % 10;
+	    int def_pix_size = 5;
+	    int def_size_w = app.width / def_pix_size;
+	    int def_size_h = app.height / def_pix_size;
+	    def_size_w -= def_size_w % 10;
+	    def_size_h -= def_size_h % 10;
 	    val_pos = newVec("val_pos", "val_pos");
-	    val_w = menuIntIncr(def_size, 100, "val_w");
-	    val_h = menuIntIncr(def_size, 100, "val_h");
+	    val_w = menuIntIncr(def_size_w, 100, "val_w");
+	    val_h = menuIntIncr(def_size_h, 100, "val_h");
 	    can_div = menuIntIncr(1, 1, "can_div");
 	    can_div.set_min(0);
-	    val_scale = menuFltSlide(def_pix_size, 1, 150, "val_scale");
-	    val_scale_fine = menuFltSlide(0, 0, 15, "fine_scale");
-	    color_keep_thresh = menuFltSlide(200, 0, 260, "clrkeep_thresh");
-	    decay_fact = menuFltSlide(1, 0.9F, 1.0F, "decay_fact");
-	    rate_decay = menuIntIncr(100, 10, "rate_decay");
+	    val_scale = menuFltSlide(1, 1, 150, "val_scale");
+	    val_scale_fine = menuFltSlide(def_pix_size - 1, 0, 15, "fine_scale");
+	    color_keep_thresh = menuFltSlide(0, 0, 260, "clrkeep_thresh");
+	    decay_fact = menuFltSlide(0.95F, 0.9F, 1.0F, "decay_fact");
+	    rate_decay = menuIntIncr(20, 10, "rate_decay");
 	    val_show = newBoo(true, "val_show", "show_canvas");
 	    val_show_back = newBoo(false, "val_show_back", "val_show_back");
 	    val_show_bound = newBoo(true, "val_show_bound", "show_bound");
 	    val_show_grab = newBoo(true, "val_show_grab", "show_grab");
-	    val_centered = newBoo(false, "val_centered", "val_centered");
+	    val_centered = newBoo(true, "val_centered", "val_centered");
 	    val_col_back = menuColor(gui.app.color(0), "background");
 	    val_col_back.addEventChange(new nRunnable() { public void run() { reset(); } });
 	    val_col_bound = menuColor(gui.app.color(255), "col_bound");
-	    val_bound_thick = menuFltSlide(0.5F, 0, 6.0F, "val_bound_thick");
+	    val_bound_thick = menuFltSlide(2.0F, 0, 8.0F, "val_bound_thick");
 	    do_rain1 = newBoo(false, "do_rain1", "do_rain1");
 	    do_rain2 = newBoo(false, "do_rain2", "do_rain2");
-	    do_rain3 = newBoo(false, "do_rain3", "do_rain3");
+//	    do_rain3 = newBoo(false, "do_rain3", "do_rain3");
 	    rain_strength = newFlt(1, "rain_strength", "rain_strength");
 	    rain_dir = newInt(0, "rain_dir", "rain_dir");
 	    do_brush = newBoo(false, "do_brush", "do_brush");
@@ -309,27 +312,19 @@ public class MCanvas extends MBaseMT {
 	void tick_end() {
 		
 		for (Macro_Connexion c : link_group.connected_outputs) {
-			FlocComu fcom = null;
+			MFlocGroup fcom = null;
 			MSolidGroup solidg = null;
-			if (c.elem.bloc.val_type.get().equals("sheetbloc")) {
-				MSheetBloc sb = (MSheetBloc)c.elem.bloc;
-				sValueBloc b = sb.sheet.value_bloc;
-				if (b.getBloc("settings").getValue("specialize") != null) {
-			        String spe = ((sStr)b.getBloc("settings").getValue("specialize")).get();
-			        
-			        if (spe.equals("Floc")) {
-			        		fcom = (FlocComu)sb.sheet;
-			        }
-				}
+			if (c.elem.bloc.val_type.get().equals("flocs")) {
+				fcom = (MFlocGroup)c.elem.bloc;
 			} 
 			if (c.elem.bloc.val_type.get().equals("solids")) {
 				solidg = (MSolidGroup)c.elem.bloc;
 			}
 			
 		    if (fcom != null) {
-		      for (int i = can_st ; i < fcom.list.size() ; i += Math.max(1, can_div.get()) )
-		        if (fcom.list.get(i).active) {
-		          ((Floc)fcom.list.get(i)).draw_halo(this);
+		      for (int i = can_st ; i < fcom.entity_list.size() ; i += Math.max(1, can_div.get()) )
+		        if (fcom.entity_list.get(i).active) {
+		          ((EFloc)fcom.entity_list.get(i)).draw_halo(this);
 		      }
 		    }
 		    if (solidg != null) { 
@@ -556,7 +551,7 @@ public class MCanvas extends MBaseMT {
 
 	  void rain(PImage can) {
 		  for (int i = 0 ; i < can.pixels.length ; i++) {
-			  if (do_rain1.get()) {
+			if (do_rain1.get()) {
 			  if (i+val_w.get() < can.pixels.length) {
 				  if (sat(can.pixels[i]) - rain_strength.get() > 
 			  	  sat(can.pixels[i+val_w.get()])) {
@@ -576,66 +571,69 @@ public class MCanvas extends MBaseMT {
 				  }
 			  } 
 			}
-//			if (do_rain2.get()) {
-//				if (i+val_w.get() < can.pixels.length) {
-//					if (gui.app.red(can.pixels[i]) - rain_strength.get() >=
-//						gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
-//						gui.app.red(can.pixels[i]) - rain_strength.get() >= 0 && 
-//						gui.app.red(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
-//					  can.pixels[i] = gui.app.color(
-//							  gui.app.red(can.pixels[i]) - rain_strength.get(), 
-//							  gui.app.green(can.pixels[i]), 
-//							  gui.app.blue(can.pixels[i]), 
-//							  gui.app.alpha(can.pixels[i]) );
-//					  int j = i+val_w.get();
-//					  can.pixels[j] = gui.app.color(
-//							  gui.app.red(can.pixels[j]) + rain_strength.get(), 
-//							  gui.app.green(can.pixels[j]), 
-//							  gui.app.blue(can.pixels[j]), 
-//							  gui.app.alpha(can.pixels[j]) );
-//					}  
-//					if (gui.app.green(can.pixels[i]) - rain_strength.get() >=
-//						gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
-//						gui.app.green(can.pixels[i]) - rain_strength.get() >= 0 && 
-//						gui.app.green(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
-//					  can.pixels[i] = gui.app.color(
-//							  gui.app.red(can.pixels[i]), 
-//							  gui.app.green(can.pixels[i]) - rain_strength.get(), 
-//							  gui.app.blue(can.pixels[i]), 
-//							  gui.app.alpha(can.pixels[i]) );
-//					  int j = i+val_w.get();
-//					  can.pixels[j] = gui.app.color(
-//							  gui.app.red(can.pixels[j]), 
-//							  gui.app.green(can.pixels[j]) + rain_strength.get(), 
-//							  gui.app.blue(can.pixels[j]), 
-//							  gui.app.alpha(can.pixels[j]) );
-//					}  
-//					if (gui.app.blue(can.pixels[i]) - rain_strength.get() >=
-//						gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() && 
-//						gui.app.blue(can.pixels[i]) - rain_strength.get() >= 0 && 
-//						gui.app.blue(can.pixels[i+val_w.get()-rain_dir.get()]) + rain_strength.get() <= 255) {
-//					  can.pixels[i] = gui.app.color(
-//							  gui.app.red(can.pixels[i]), 
-//							  gui.app.green(can.pixels[i]), 
-//							  gui.app.blue(can.pixels[i]) - rain_strength.get(), 
-//							  gui.app.alpha(can.pixels[i]) );
-//					  int j = i+val_w.get();
-//					  can.pixels[j] = gui.app.color(
-//							  gui.app.red(can.pixels[j]), 
-//							  gui.app.green(can.pixels[j]), 
-//							  gui.app.blue(can.pixels[j]) + rain_strength.get(), 
-//							  gui.app.alpha(can.pixels[j]) );
-//					}  
-//				}
-//			}
-		  }
-		if (do_rain3.get()) {
-			for (int i = 0 ; i < can.pixels.length ; i++) {
+			if (do_rain2.get()) {
 				if (i+val_w.get() < can.pixels.length) {
-					transfer_pixel(can, can, i, i+val_w.get(), (int)rain_strength.get());
+					int id_to = i+val_w.get()-rain_dir.get();
+					if (id_to >= 0 && id_to < can.pixels.length) {
+						if (gui.app.red(can.pixels[i]) - rain_strength.get() >=
+							gui.app.red(can.pixels[id_to]) + rain_strength.get() && 
+							gui.app.red(can.pixels[i]) - rain_strength.get() >= 0 && 
+							gui.app.red(can.pixels[id_to]) + rain_strength.get() <= 255) {
+						  can.pixels[i] = gui.app.color(
+								  gui.app.red(can.pixels[i]) - rain_strength.get(), 
+								  gui.app.green(can.pixels[i]), 
+								  gui.app.blue(can.pixels[i]), 
+								  gui.app.alpha(can.pixels[i]) );
+						  int j = i+val_w.get();
+						  can.pixels[j] = gui.app.color(
+								  gui.app.red(can.pixels[j]) + rain_strength.get(), 
+								  gui.app.green(can.pixels[j]), 
+								  gui.app.blue(can.pixels[j]), 
+								  gui.app.alpha(can.pixels[j]) );
+						}  
+						if (gui.app.green(can.pixels[i]) - rain_strength.get() >=
+							gui.app.green(can.pixels[id_to]) + rain_strength.get() && 
+							gui.app.green(can.pixels[i]) - rain_strength.get() >= 0 && 
+							gui.app.green(can.pixels[id_to]) + rain_strength.get() <= 255) {
+						  can.pixels[i] = gui.app.color(
+								  gui.app.red(can.pixels[i]), 
+								  gui.app.green(can.pixels[i]) - rain_strength.get(), 
+								  gui.app.blue(can.pixels[i]), 
+								  gui.app.alpha(can.pixels[i]) );
+						  int j = i+val_w.get();
+						  can.pixels[j] = gui.app.color(
+								  gui.app.red(can.pixels[j]), 
+								  gui.app.green(can.pixels[j]) + rain_strength.get(), 
+								  gui.app.blue(can.pixels[j]), 
+								  gui.app.alpha(can.pixels[j]) );
+						}  
+						if (gui.app.blue(can.pixels[i]) - rain_strength.get() >=
+							gui.app.blue(can.pixels[id_to]) + rain_strength.get() && 
+							gui.app.blue(can.pixels[i]) - rain_strength.get() >= 0 && 
+							gui.app.blue(can.pixels[id_to]) + rain_strength.get() <= 255) {
+						  can.pixels[i] = gui.app.color(
+								  gui.app.red(can.pixels[i]), 
+								  gui.app.green(can.pixels[i]), 
+								  gui.app.blue(can.pixels[i]) - rain_strength.get(), 
+								  gui.app.alpha(can.pixels[i]) );
+						  int j = i+val_w.get();
+						  can.pixels[j] = gui.app.color(
+								  gui.app.red(can.pixels[j]), 
+								  gui.app.green(can.pixels[j]), 
+								  gui.app.blue(can.pixels[j]) + rain_strength.get(), 
+								  gui.app.alpha(can.pixels[j]) );
+						}  
+					}
 				}
 			}
 		}
+//		if (do_rain3.get()) {
+//			for (int i = 0 ; i < can.pixels.length ; i++) {
+//				if (i+val_w.get() < can.pixels.length) {
+//					transfer_pixel(can, can, i, i+val_w.get(), (int)rain_strength.get());
+//				}
+//			}
+//		}
 	  }
 	  void transfer_pixel(PImage from_can, PImage to_can, int from, int to, int amount) {
 		  if (from_can.pixels.length != to_can.pixels.length) return;

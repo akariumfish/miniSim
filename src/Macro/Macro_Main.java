@@ -200,9 +200,9 @@ nExplorer sheet_explorer;
           .getShelfPanel()
       .addShelf().addDrawer(0.01F, ht).getShelfPanel()
       .addShelf().addDrawer(9.9F, ht)
-        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P1", "Del")
+        .addCtrlModel("Menu_Bar_Downlight_Outline-M-P1", "Era")
           .setRunnable(new nRunnable() { public void run() { del_selected(); }})
-          .setInfo("Delete selected bloc  -  d").setFont((int)(ref_size/1.9)).getDrawer()
+          .setInfo("Erase selected bloc  -  e").setFont((int)(ref_size/1.9)).getDrawer()
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P2", "X")
           .setRunnable(new nRunnable() { public void run() { cut_run.run(); }})
           .setInfo("Cut selected blocs  -  x").setFont((int)(ref_size/1.9)).getDrawer()
@@ -220,7 +220,7 @@ nExplorer sheet_explorer;
           .setInfo("Selecte / Unselect all sheet blocs  -  a").setFont((int)(ref_size/2.5)).getDrawer()
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P7", "<>")
           .setRunnable(new nRunnable() { public void run() { reduc_run.run(); }})
-          .setInfo("Switch selected blocs openning  -  s").setFont((int)(ref_size/2.5)).getDrawer()
+          .setInfo("Switch selected blocs openning  -  n").setFont((int)(ref_size/2.5)).getDrawer()
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P8", "QS")
           .setRunnable(new nRunnable() { public void run() { inter.full_data_save(); }})
           .setInfo("Quick Save").setFont((int)(ref_size/2.5)).getDrawer()
@@ -299,21 +299,21 @@ nExplorer sheet_explorer;
 		        ;
 	    }
 //	    sh.addSeparator(0.25);
-	    for (Sheet_Specialize t : Sheet_Specialize.prints) 
-	    if (!t.unique && t.visible && t.show_in_buildtool) {
-	    		row_count++;
-			if (row_count > build_row) {
-//				shelf_cible++; 
-				row_count = 0;
-				sh = build_tool.addShelf();
-			}
-		    sh.addDrawer(3F, 0.55F)
-		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.6", t.name)
-		    .setRunnable(new nRunnable(t) { public void run() { 
-		      ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
-		    .setFont((int)(ref_size/2));
-		    ;
-	    }
+//	    for (Sheet_Specialize t : Sheet_Specialize.prints) 
+//	    if (!t.unique && t.visible && t.show_in_buildtool) {
+//	    		row_count++;
+//			if (row_count > build_row) {
+////				shelf_cible++; 
+//				row_count = 0;
+//				sh = build_tool.addShelf();
+//			}
+//		    sh.addDrawer(3F, 0.55F)
+//		    .addCtrlModel("Menu_Button_Small_Outline-S3/0.6", t.name)
+//		    .setRunnable(new nRunnable(t) { public void run() { 
+//		      ((Sheet_Specialize)builder).add_new(selected_sheet, null, null); }})
+//		    .setFont((int)(ref_size/2));
+//		    ;
+//	    }
 	    for (sValueBloc t : shown_templ_list) {
 	    		row_count++;
 			if (row_count > build_row) {
@@ -493,7 +493,7 @@ nExplorer sheet_explorer;
 		selector_list.new_comp_entry("            --- Blocs ---");
 	  }
 		String[] saved_shown = PApplet.splitTokens(shown_builder.get(), OBJ_TOKEN);
-		String[] saved_shown_spe = PApplet.splitTokens(shown_spe.get(), OBJ_TOKEN);
+//		String[] saved_shown_spe = PApplet.splitTokens(shown_spe.get(), OBJ_TOKEN);
 		shown_type_list.clear();
 		shown_builder.set("");
 		shown_spe_list.clear();
@@ -509,16 +509,16 @@ nExplorer sheet_explorer;
 	    for (MAbstract_Builder m2 : shown_type_list) 
 	    		shown_builder.set(shown_builder.get() + OBJ_TOKEN + m2.type);
 
-		for (Sheet_Specialize m : sheetspe_builders) {
-			boolean found = false;
-			for (String t : saved_shown_spe) if (t.equals(m.name)) {
-				found = true;
-				shown_spe_list.add(m);
-				m.show_in_buildtool = true; }
-			if (!found) m.show_in_buildtool = false;
-		} 
-	    for (Sheet_Specialize m2 : shown_spe_list) 
-	    		shown_spe.set(shown_spe.get() + OBJ_TOKEN + m2.name);
+//		for (Sheet_Specialize m : sheetspe_builders) {
+//			boolean found = false;
+//			for (String t : saved_shown_spe) if (t.equals(m.name)) {
+//				found = true;
+//				shown_spe_list.add(m);
+//				m.show_in_buildtool = true; }
+//			if (!found) m.show_in_buildtool = false;
+//		} 
+//	    for (Sheet_Specialize m2 : shown_spe_list) 
+//	    		shown_spe.set(shown_spe.get() + OBJ_TOKEN + m2.name);
 		
 		build_buildtool();
 
@@ -553,23 +553,23 @@ nExplorer sheet_explorer;
 			}
 		}
 		
-		selector_list.new_comp_entry("            --- Specialized Sheet ---");
-	    for (Sheet_Specialize m : Sheet_Specialize.prints) if (!m.unique && m.visible) 
-			selector_list.new_comp_entry(" - "+m.name).setBuilder(m)
-			.setSelectable(new nRunnable(m) { public void run() {
-				((Sheet_Specialize)builder).add_new(selected_sheet, null, null); 
-			}})
-			.setOption(m.show_in_buildtool, "", new nRunnable(m) { public void run() {
-				Sheet_Specialize m = ((Sheet_Specialize)builder);
-				m.show_in_buildtool = !m.show_in_buildtool;
-				if (m.show_in_buildtool) shown_spe_list.add(m);
-				else shown_spe_list.remove(m);
-
-			    shown_spe.set("");
-			    for (Sheet_Specialize m2 : shown_spe_list) 
-			    	shown_spe.set(shown_spe.get() + OBJ_TOKEN + m2.name);
-				build_buildtool();
-			}});
+//		selector_list.new_comp_entry("            --- Specialized Sheet ---");
+//	    for (Sheet_Specialize m : Sheet_Specialize.prints) if (!m.unique && m.visible) 
+//			selector_list.new_comp_entry(" - "+m.name).setBuilder(m)
+//			.setSelectable(new nRunnable(m) { public void run() {
+//				((Sheet_Specialize)builder).add_new(selected_sheet, null, null); 
+//			}})
+//			.setOption(m.show_in_buildtool, "", new nRunnable(m) { public void run() {
+//				Sheet_Specialize m = ((Sheet_Specialize)builder);
+//				m.show_in_buildtool = !m.show_in_buildtool;
+//				if (m.show_in_buildtool) shown_spe_list.add(m);
+//				else shown_spe_list.remove(m);
+//
+//			    shown_spe.set("");
+//			    for (Sheet_Specialize m2 : shown_spe_list) 
+//			    	shown_spe.set(shown_spe.get() + OBJ_TOKEN + m2.name);
+//				build_buildtool();
+//			}});
 
 	     selector_list.end_complexe_entry();
 	  }
@@ -1142,7 +1142,7 @@ public Macro_Main(sInterface _int) {
 		inter.show_frmrt = show_frmrt.get(); }});
     do_packet = newBoo(true, "do_packet", "do_packet");
     
-    del_select_run = newRun("del_select_run", "del", 'd',
+    del_select_run = newRun("del_select_run", "del", 'e',
     		new nRunnable() { public void run() { del_selected(); }});
 
     copy_run = newRun("copy_run", "copy", 'c',
@@ -1160,12 +1160,21 @@ public Macro_Main(sInterface _int) {
     selall_run = newRun("selall_run", "selall", 'a',
     		new nRunnable() { public void run() { select_all(); }});
     
-    reduc_run = newRun("switch_reduc_run", "switch_reduc", 's',
+    reduc_run = newRun("switch_reduc_run", "switch_reduc", 'n',
     		new nRunnable() { public void run() { reduc_selected(); }});
     
     construct_run = newRun("construct_run", "construct", ' ', 
     		new nRunnable() { public void run() { 
-		  if (buildingLine) { new MNode(selected_sheet, line_building_co, gui.mouseVector);
+		  if (buildingLine) { 
+			  // crash when packet go through point on sheet 
+			  // works if point on main
+			  if (selected_sheet == mmain()) { //delete after debug
+				  PVector p = new PVector(gui.mouseVector.x, gui.mouseVector.y);
+				  p.add( - selected_sheet.grabber.getX(), 
+					     - selected_sheet.grabber.getY());
+				  new MNode(selected_sheet, line_building_co, p);
+				  selected_sheet.updateBack();
+			  }
 		  } else { new MBasic(selected_sheet, gui.mouseVector); }  }});
     
 
@@ -1175,7 +1184,6 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MBasic.Builder(this));
       add_bloc_builders(new MNode.Builder(this));
       add_bloc_builders(new MSheetBloc.Builder(this));
-      add_bloc_builders(new MCustom.Builder(this));
       add_bloc_builders(new MCursor.MCursor_Builder(this));
       add_bloc_builders(new MMButton.Builder(this));
       add_bloc_builders(new MText.Builder(this));
@@ -1204,7 +1212,10 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MFilter.Builder());
       add_bloc_builders(new MVecLerp.Builder());
       add_bloc_builders(new MSolidGroup.Builder(this));
+      add_bloc_builders(new MFlocGroup.Builder(this));
+      add_bloc_builders(new MGrowerGroup.Builder(this));
       add_bloc_builders(new MCanvas.Builder(this));
+      add_bloc_builders(new MCurve.Builder(this));
 
       add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());
@@ -1270,15 +1281,26 @@ public Macro_Main(sInterface _int) {
         sgrab_py = select_grab_widg.getY();
       } } )
       .addEventDrag(new nRunnable() { public void run() {
+    	  
+//    	  select_grab_widg.setPY(
+//    			  select_grab_widg.getLocalY() - 
+//    			  select_grab_widg.getLocalY() %
+//    			  (ref_size * GRID_SNAP_FACT / inter.cam.cam_scale.get()));
+//    	  select_grab_widg.setPX(
+//    			  select_grab_widg.getLocalX() - 
+//    			  select_grab_widg.getLocalX() %
+//    			  (ref_size * GRID_SNAP_FACT / inter.cam.cam_scale.get()));
         
         PVector gr_p = new PVector(select_grab_widg.getX(), select_grab_widg.getY());
         
         PVector prev_gr_p = new PVector(sgrab_px, sgrab_py);
         gr_p = inter.cam.screen_to_cam(gr_p);
+        
         prev_gr_p = inter.cam.screen_to_cam(prev_gr_p);
         
-        for (Macro_Abstract m : selected_macro) 
+        for (Macro_Abstract m : selected_macro) {
           m.group_move(gr_p.x - prev_gr_p.x, gr_p.y - prev_gr_p.y);
+        }
         
         sgrab_px = select_grab_widg.getX();
         sgrab_py = select_grab_widg.getY();
@@ -1323,6 +1345,8 @@ public Macro_Main(sInterface _int) {
 	        inter.addEventFrame(new nRunnable() { public void run() { frame(); } } );
 	    	} } );
     } } );
+    
+    build_macro_menus();
     
   }
   float sgrab_px = 0, sgrab_py = 0;
@@ -1381,6 +1405,7 @@ public Macro_Main(sInterface _int) {
       select_bound_widg.show();
       select_bound_widg.setPosition(minx, miny);
       select_bound_widg.setSize(maxx - minx, maxy - miny);
+//      PVector p = new PVector(minx, miny);
       PVector p = new PVector(minx + (maxx - minx) / 2, miny + (maxy - miny) / 2);
 //      p.add(-p.x%ref_size/2, -p.y%ref_size/2);
       p = inter.cam.cam_to_screen(p);
@@ -1394,19 +1419,19 @@ public Macro_Main(sInterface _int) {
     }
   }
   
-  public void addSpecializedSheet(Sheet_Specialize s) {
-    s.mmain = this;
-    sheetspe_builders.add(s);
-    build_macro_menus();
-  }
-  public Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
-    s.mmain = this;
-    s.unique = true;
-    sheetspe_builders.add(s);
-    build_macro_menus();
-    Macro_Sheet ms = s.add_new(this, null, null);
-    return ms;
-  }
+//  public void addSpecializedSheet(Sheet_Specialize s) {
+//    s.mmain = this;
+//    sheetspe_builders.add(s);
+//    build_macro_menus();
+//  }
+//  public Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
+//    s.mmain = this;
+//    s.unique = true;
+//    sheetspe_builders.add(s);
+//    build_macro_menus();
+//    Macro_Sheet ms = s.add_new(this, null, null);
+//    return ms;
+//  }
   
   
   

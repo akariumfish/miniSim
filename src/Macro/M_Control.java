@@ -260,8 +260,7 @@ class MChan extends MBasic {
 	  nLinkedWidget ref_field; 
 	
 	MChan(Macro_Sheet _sheet, sValueBloc _bloc) { 
-		  super(_sheet, "chan", _bloc); 
-	}
+		  super(_sheet, "chan", _bloc); }
 	void init() { 
 		super.init(); 
 
@@ -310,20 +309,24 @@ class MBin extends MBasic {
 	  
   Macro_Connexion in, out;
   nLinkedWidget swtch; 
-  sBoo state;
+  sBoo state, val_not;
   MBin(Macro_Sheet _sheet, sValueBloc _bloc) { 
 	  super(_sheet, "bin", _bloc); 
 	  state = newBoo("state", "state", false); 
+	  val_not = newBoo("val_not", "val_not", false); 
       out = addOutput(1, "out").setDefBool();
-      swtch = out.elem.addLinkedModel("MC_Element_SButton").setLinkedValue(state);
+      swtch = out.elem.addLinkedModel("MC_Element_SButton", "all").setLinkedValue(state);
       swtch.setInfo("all to bang");
 	  in = addInput(0, "in", new nRunnable() { public void run() { 
         if (in.lastPack() != null && in.lastPack().isBool() && 
             in.lastPack().asBool()) out.send(Macro_Packet.newPacketBang()); 
         else if (in.lastPack() != null && in.lastPack().isBang()) 
-        		out.send(Macro_Packet.newPacketBool(true));
+	    		if (!val_not.get()) out.send(Macro_Packet.newPacketBool(true));
+	    		else out.send(Macro_Packet.newPacketBool(false));
         else if (state.get() && in.lastPack() != null) 
         		out.send(Macro_Packet.newPacketBang());  } });
+	  in.elem.addLinkedModel("MC_Element_SButton", "!")
+			  .setLinkedValue(val_not).setInfo("bool not");
   }
   void init() { 
 	  super.init(); }

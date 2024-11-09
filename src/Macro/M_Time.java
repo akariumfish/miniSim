@@ -23,9 +23,10 @@ class MSequance extends MBaseTick {
 	  sInt current_delay;	int counter = 0;
 	  Macro_Connexion current_out;
 	  int current_index;
-	  sInt row_nb; 
+	  sInt row_nb, delay_mult; 
 	  sBoo actif_val, show_actif, show_delay, show_row;
 	  sBoo show_tkrs, show_sequ, show_loop, val_loop, send_delayed;
+	  sBoo mult_1, mult_10, mult_100, mult_1k; 
 	  MSequance(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "sequ", _bloc); }
 	  void init() {
 		  super.init();
@@ -41,12 +42,31 @@ class MSequance extends MBaseTick {
 		  send_delayed = newBoo(false, "send_delayed");
 		  ivals = new ArrayList<sInt>();
 		  connects = new ArrayList<Macro_Connexion>();
+
+		  delay_mult = newInt(1, "delay_mult");
+		  mult_1 = newBoo(true, "mult_1");
+		  mult_10 = newBoo(false, "mult_10");
+		  mult_100 = newBoo(false, "mult_100");
+		  mult_1k = newBoo(false, "mult_1k");
+
+		  mult_1.addEventChange(new nRunnable() { public void run() {
+			  if (mult_1.get()) delay_mult.set(1); }});
+		  mult_10.addEventChange(new nRunnable() { public void run() {
+			  if (mult_10.get()) delay_mult.set(10); }});
+		  mult_100.addEventChange(new nRunnable() { public void run() {
+			  if (mult_100.get()) delay_mult.set(100); }});
+		  mult_1k.addEventChange(new nRunnable() { public void run() {
+			  if (mult_1k.get()) delay_mult.set(1000); }});
 	  }
 	  void init_end() {
 		  super.init_end();
 		  get_reset();
 	  }
 	  void build_param() {
+		  addEmptyS(1); addEmptyS(2);
+		  addSelectL_Excl(0, mult_1, mult_10, mult_100, mult_1k, 
+				  "x1", "x10", "x100", "x1k");
+		  
 		  addEmptyS(1); addEmptyS(2);
 		  Macro_Element e = addEmptyXL(0);
 		  e.addLinkedModel("MC_Element_Button")
@@ -178,17 +198,18 @@ class MSequance extends MBaseTick {
 	  }
 	  void get_sequance() {
 		  tick_pile++;
-		  for (sInt i : ivals) tick_pile += i.get();
+		  for (sInt i : ivals) tick_pile += i.get() * delay_mult.get();
 	  }
 	  void get_reset() {
 		  if (ivals.size() > 0) current_delay = ivals.get(0);
 		  current_index = 0;
 		  if (connects.size() > 0) current_out = connects.get(0);
 		  counter = 0;
+		  tick_pile = 0;
 	  }
 	  boolean tick_row() {
-		  if (counter > current_delay.get()) {
-			  counter -= current_delay.get();
+		  if (counter > current_delay.get() * delay_mult.get()) {
+			  counter -= current_delay.get() * delay_mult.get();
 			  current_out.sendBang();
 			  current_index++;
 			  if (current_index >= row_nb.get()) {
@@ -201,7 +222,6 @@ class MSequance extends MBaseTick {
 			  } else if (current_index < row_nb.get()) { 
 				  current_delay = ivals.get(current_index);
 				  current_out = connects.get(current_index);
-				  
 				  return true; }
 		  } else if (send_delayed.get()) {
 			  current_out.sendBang();

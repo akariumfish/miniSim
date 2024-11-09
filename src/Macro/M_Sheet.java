@@ -69,8 +69,8 @@ class MBasic extends Macro_Bloc {
   sStr links_save;
   
   nCtrlWidget param_ctrl;
-  nRunnable pview_run;
-  nRunnable link_change_run;
+  nRunnable pview_run, link_change_run;
+  
   boolean rebuilding = false;
   MBasic(Macro_Sheet _sheet, String t, sValueBloc _bloc) { 
     super(_sheet, t, t, _bloc);
@@ -80,24 +80,24 @@ class MBasic extends Macro_Bloc {
 		  save_co_links(); } };
     param_view = newBoo("com_param_view", "com_param_view", false);
 	mirror_view = newBoo("mirror_view", "mirror_view", false);
-	param_view.addEventChange(new nRunnable() { public void run() { 
-        if (param_view.get()) param_ctrl.setText("N").setInfo("hide param");
-        else param_ctrl.setText("P").setInfo("show param");
-	}});
-	mirror_view.addEventChange(new nRunnable() { public void run() { 
-		save_co_links();
-		for (Macro_Element m : elements)
-			  m.mirror(mirror_view.get());
-	}});
+//	param_view.addEventChange(new nRunnable() { public void run() { 
+//	}});
+//	mirror_view.addEventChange(new nRunnable() { public void run() { 
+//		save_co_links();
+//		for (Macro_Element m : elements)
+//			  m.mirror(mirror_view.get());
+//	}});
     if (!param_view.get()) get_mirror().setRunnable(new nRunnable() { public void run() { 
     		mirror_view.set(!mirror_view.get());
-    		save_co_links();
+//    		save_co_links();
     		for (Macro_Element m : elements)
     			  m.mirror(mirror_view.get());
 //          rebuild();
     } });
 	param_ctrl = get_param_openner().setRunnable(new nRunnable() { public void run() { 
         param_view.set(!param_view.get());
+//        if (param_view.get()) param_ctrl.setText("N").setInfo("hide param");
+//        else param_ctrl.setText("P").setInfo("show param");
         rebuild();
     } });
     if (param_view.get()) param_ctrl.setText("N").setInfo("hide param");
@@ -148,7 +148,7 @@ class MBasic extends Macro_Bloc {
 		  if (co_links.length > 1 && co.base_info.equals(co_links[0])) {
 			  co_links = PApplet.splitTokens(co_links[1], INFO_TOKEN);
 			  for (String d : co_links) {
-				  String[] e = PApplet.splitTokens(d, BLOC_TOKEN);
+				  String[] e = PApplet.splitTokens(d, LINK_TOKEN);
 				  for (Macro_Connexion c : co.sheet.child_connect) 
 					  if (e.length > 1 && c.elem.descr.equals(e[1]) &&
 						  c.elem.bloc.value_bloc.ref.equals(e[0])) {
@@ -174,7 +174,7 @@ class MBasic extends Macro_Bloc {
 	if (co_list != null && co_list.size() > 0) {
 		links_save.add(co.base_info + GROUP_TOKEN);
 		for (Macro_Connexion c : co_list) {
-			links_save.add(c.elem.bloc.value_bloc.ref + BLOC_TOKEN + c.elem.descr + INFO_TOKEN);
+			links_save.add(c.elem.bloc.value_bloc.ref + LINK_TOKEN + c.elem.descr + INFO_TOKEN);
 		}
 		links_save.add(OBJ_TOKEN);
 	}
@@ -267,14 +267,22 @@ class MZone extends MBasic {
   nLinkedWidget corner_widg;
   nWidget zone_widg;
   Drawable zone_draw;
-  nRunnable goto_run;
+  nRunnable goto_run, select_run;
   nRunnable move_run, zoom_run;
   nWidget screen_widget;
+  nRunnable rebuild_run;
+  Macro_Element zone_ref_elem = null;
+  sVec zone_size;
+  sBoo do_select;
+  sBoo view_select, view_goto, view_zonesize;
+  
   
   MZone(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "zone", _bloc); }
   void init() {
-	  corner_pos = newVec("corner_pos");
-	  if (!loading_from_bloc) corner_pos.set(ref_size*3.0F, ref_size*3.0F);
+	  view_select = newBoo(false, "view_select");
+	  view_goto = newBoo(true, "view_goto");
+	  view_zonesize = newBoo(false, "view_zonesize");
+	  do_select = newBoo(false, "do_select");
 	  
 	  goto_run = new nRunnable() { public void run() {
 	      float ns = mmain().inter.cam.cam_scale.get();
@@ -288,73 +296,160 @@ class MZone extends MBasic {
 	        .set(-(zone_widg.getX() + zone_widg.getLocalSX()/2) * mmain().inter.cam.cam_scale.get(), 
 	             -(zone_widg.getY() + zone_widg.getLocalSY()/2) * mmain().inter.cam.cam_scale.get() );
 	  }};
+	  select_run = new nRunnable() { public void run() {
+	  	  Rect zone = new Rect(zone_widg.getX(), zone_widg.getY(), 
+	  			zone_widg.getSX(), zone_widg.getSY());
+	  	  Rect front_rect = new Rect();
+	      for (Macro_Abstract m : sheet.child_macro) {
+	    	  	  front_rect.set(m.front.getX(), m.front.getY(), 
+	    	  			m.front.getSX(), m.front.getSY());
+	    	  	  if (Rect.rectCollide(zone, front_rect)) {
+	    	  		  m.switch_select();
+	    	  	  }
+	      }
+	  }};
+	  rebuild_run = new nRunnable() { public void run() {
+		  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+			  rebuild();
+		  }}); }};
+	  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+		  view_select.addEventChange(rebuild_run);
+		  view_goto.addEventChange(rebuild_run);
+		  view_zonesize.addEventChange(rebuild_run);
+		  
+		  zoom_run.run();
+	  }});
   }
   void build_param() {
+	  addEmptyS(1);
+	  addSelectL(0, do_select, view_select, view_goto, view_zonesize, 
+			  "autosel", "v sel", "v goto", "v zone").no_mirror();
 	  build_normal();
   }
   void build_normal() {
-	  Macro_Element e = addEmptyS(0);
-	  addEmptyS(1);
-	  zone_widg = e.addModel("Field");
-	  zone_widg.setPosition(ref_size * 2 / 16, ref_size * 2 / 16).setPassif();
+	  if (view_goto.get()) {
+		  zone_ref_elem = addInputBang(0, "goto", 
+				new nRunnable() { public void run() { goto_run.run(); }}).elem;
+		  addTrigS(1, "goto", goto_run); }
 	  
-	  corner_pos.addEventChange(new nRunnable() { public void run() {
-		  zone_widg.setSize(corner_pos.get().x, 	corner_pos.get().y); }});
+	  if (view_select.get()) {
+		  zone_ref_elem = addInputBang(0, "select", 
+				new nRunnable() { public void run() { select_run.run(); }}).elem;
+		  addTrigS(1, "select", select_run); }
+
+	  if (view_zonesize.get() ) {
+		  zone_size = newSRowVec("zone_size");
+		  zone_ref_elem = addEmptyS(0);
+	  }
+	  else zone_size = newVec("zone_size");
 	  
+	  if (zone_ref_elem == null) zone_ref_elem = addEmptyS(0);
+	  
+	  build_zone();
+  }
+  void build_zone() {
+	  zone_widg = zone_ref_elem.addModel("Field");
+	  zone_widg.setPosition(ref_size * 2 / 16, ref_size * 2 / 16)
+	  	.setPassif().stackDown().alignLeft();
 	  zone_draw = new Drawable(gui.drawing_pile, 0) { public void drawing() {
 		  gui.app.noFill(); gui.app.stroke(220);
-		  gui.app.rect(	zone_widg.getX(), 	zone_widg.getY(), 
-				  		corner_pos.get().x+corner_widg.getSX(), 	
-				  		corner_pos.get().y+corner_widg.getSY());
+		  gui.app.rect(	zone_widg.getX(), zone_widg.getY(), 
+				  		zone_widg.getSX(), zone_widg.getSY() );
 	  } };
 	  zone_widg.setDrawable(zone_draw);
-	  
-	  corner_widg = e.addLinkedModel("MC_SpeTrig");
-	  corner_widg.alignUp().alignLeft();
+
+	  corner_pos = newVec("corner_pos");
+	  if (!loading_from_bloc) corner_pos.set(ref_size*3.0F, ref_size*3.0F);
+	  corner_pos.addEventChange(new nRunnable() { public void run() {
+		  zone_widg.setSize(corner_pos.get().x + corner_widg.getSX(), 
+				  		   corner_pos.get().y); 
+		  zone_size.set(corner_pos.get().x + corner_widg.getSX(), 
+		  		   corner_pos.get().y + corner_widg.getSY());
+          PVector p = new PVector(corner_pos.get().x + corner_widg.getX()
+        		  - corner_widg.getLocalX() - corner_widg.getSX() / 2
+        		  + screen_widget.getSX(), 
+        		  corner_pos.get().y + corner_widg.getY() - corner_widg.getLocalY()
+        		  - corner_widg.getSY() / 2 + screen_widget.getSY());
+          p = mmain().inter.cam.cam_to_screen(p);
+          screen_widget.setPosition(p.x, p.y);
+          
+          update_selected();
+	  }});
+	  corner_widg = zone_ref_elem.addLinkedModel("MC_SpeTrig");
+	  corner_widg.alignDown().alignLeft();
 	  corner_widg.setLinkedValue(corner_pos);
 	  
-
+	  zone_size.addEventChange(new nRunnable() { public void run() {
+		  mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
+			  corner_pos.set(zone_size.get().x - corner_widg.getSX(), 
+					  zone_size.get().y - corner_widg.getSY());
+		  }});
+	  }});
+	  
 	  screen_widget = gui.theme.newWidget(sheet.mmain().screen_gui, "Cursor")
 	      .setSize(ref_size/2, ref_size/2);
-	  PVector c = new PVector(zone_widg.getX()+corner_pos.get().x, 
-			  zone_widg.getY()+corner_pos.get().y);
-      PVector p = mmain().inter.cam.cam_to_screen(c);
+	  PVector p = new PVector(corner_widg.getX(), 
+			  corner_widg.getY());
+      p = mmain().inter.cam.cam_to_screen(p);
       screen_widget.setPosition(p.x, p.y).setGrabbable().center();
-
 	  screen_widget.addEventDrag(new nRunnable() {public void run() {
 	        PVector p = new PVector(screen_widget.getX(), 
 	        		screen_widget.getY());
 	        p = mmain().inter.cam.screen_to_cam(p);
-	        corner_pos.set(p.x - zone_widg.getX(), p.y - zone_widg.getY());
+	        corner_pos.set(p.x - corner_widg.getX() + corner_widg.getLocalX()
+	        				+ corner_widg.getSX() / 2, 
+	        		p.y - corner_widg.getY() + corner_widg.getLocalY()
+	        				+ corner_widg.getSY() / 2);
 	  }});
 	
 	  move_run = new nRunnable() {public void run() { 
 	        if (corner_pos != null) {
-	      	  	PVector c = new PVector(zone_widg.getX()+corner_pos.get().x, 
-	      	  			zone_widg.getY()+corner_pos.get().y);
-	            PVector p = mmain().inter.cam.cam_to_screen(c);
-	            screen_widget.setPosition(p.x, p.y); } }};
+	        	  PVector p = new PVector(corner_pos.get().x + corner_widg.getX()
+	        	  	- corner_widg.getLocalX() - corner_widg.getSX() / 2
+	        	  	+ screen_widget.getSX(), 
+	        	  	corner_pos.get().y + corner_widg.getY() - corner_widg.getLocalY()
+	        	  	- corner_widg.getSY() / 2 + screen_widget.getSY());
+	        	  p = mmain().inter.cam.cam_to_screen(p);
+	        	  screen_widget.setPosition(p.x, p.y);
+	        }
+	        }};
       zoom_run = new nRunnable() {public void run() { 
 	      update_view();
 	      if (corner_pos != null) {
-      	  	PVector c = new PVector(zone_widg.getX()+corner_pos.get().x, 
-	      	  			zone_widg.getY()+corner_pos.get().y);
-	        PVector p = mmain().inter.cam.cam_to_screen(c);
-	        screen_widget.setPosition(p.x, p.y); } }};
+	        	PVector p = new PVector(corner_pos.get().x + corner_widg.getX()
+	        		- corner_widg.getLocalX() - corner_widg.getSX() / 2
+	        	  	+ screen_widget.getSX(), 
+	        		corner_pos.get().y + corner_widg.getY() - corner_widg.getLocalY()
+	        		- corner_widg.getSY() / 2 + screen_widget.getSX());
+	        	p = mmain().inter.cam.cam_to_screen(p);
+	        	screen_widget.setPosition(p.x, p.y);
+	      }
+	      }};
 	      
 	  mmain().inter.cam.addEventMove(move_run);
 	  mmain().inter.cam.addEventZoom(zoom_run);
 	  
-	  grabber.addEventVisibilityChange(new nRunnable() { public void run() { update_view(); }});
+//	  grabber.addEventVisibilityChange(new nRunnable() { public void run() { update_view(); }});
 	  
-	  addInputBang(0, "view", new nRunnable() { public void run() { 
-		  goto_run.run(); } });
-	  addTrigS(1, "go", goto_run);
+  }
+  void update_selected() {
+	  if (do_select.get()) {
+		  mmain.szone_clear_select();
+		  Rect zone = new Rect(zone_widg.getX(), zone_widg.getY(), 
+	  			zone_widg.getSX(), zone_widg.getSY());
+	  	  Rect front_rect = new Rect();
+	      for (Macro_Abstract m : sheet.child_macro) {
+	    	  	  front_rect.set(m.front.getX(), m.front.getY(), 
+	    	  			m.front.getSX(), m.front.getSY());
+	    	  	  if (Rect.rectCollide(zone, front_rect)) {
+	    	  		  m.szone_select();
+	    	  	  }
+	      }
+	  }
   }
 
   void update_view() {
-    if (mmain().inter.cam.cam_scale.get() < 0.5 && 
-    		!grabber.isHided()) {  
+    if (mmain().inter.cam.cam_scale.get() < 0.5) {// && !grabber.isHided()) {  
         screen_widget.show(); 
         toLayerTop(); 
     } else { 
@@ -365,6 +460,7 @@ class MZone extends MBasic {
   public MZone clear() {
     super.clear(); 
     zone_draw.clear();
+    screen_widget.clear();
     return this; }
   public MZone toLayerTop() {
     super.toLayerTop(); 
@@ -380,12 +476,23 @@ class MCursor extends MBasic {
   public nCursor cursor;
     public sVec pval = null;
     public sVec dval = null;
-    public sBoo show = null;
+    public sBoo show = null, draw_dir,show_pos,show_dir,show_mov,show_show,show_link;
     public sVec mval;
   nRunnable sheet_grab_run, pval_run, movingchild_run;
   Macro_Connexion in, out;
   Macro_Connexion out_link;
   MCursor(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "cursor", _bloc); }
+  void init() {
+	  super.init();
+
+	  show_pos = newBoo(true, "show_pos_ctrl");
+	  show_dir = newBoo(false, "show_dir_ctrl");
+	  show_mov = newBoo(false, "show_mov_ctrl");
+	  show_show = newBoo(true, "show_show_ctrl");
+	  draw_dir = newBoo(true, "draw_dir");
+	  show_link = newBoo(false, "show_link_ctrl");
+  }
+  
   void init_cursor() {
 	  cursor = new nCursor(mmain(), value_bloc, true);
 	  mmain().cursors_list.add(cursor);
@@ -432,11 +539,6 @@ class MCursor extends MBasic {
 		} };
 		sheet.grab_pos.addEventAllChange(sheet_grab_run);
 	}
-    addEmptyS(1);
-    in = addInput(0, "move", new nRunnable() { public void run() {
-        if (in.lastPack() != null && in.lastPack().isBang()) // && pval != null && mval != null
-      	  	cursor.pval.add(mval.get());
-    } });
   }
 
   protected void group_move_custom(float x, float y) {
@@ -444,26 +546,66 @@ class MCursor extends MBasic {
 //			  cursor.pval.get().y + y);
   }
   void build_param() {
-	    addEmptyS(0);
-	    addEmptyS(1);
-	    out_link = addOutput(2, "cursor_link");
-	    out_link.set_link();
+	  addEmptyS(0);
+	  addEmptyS(1);
+	  out_link = addOutput(2, "cursor_link");
+	  out_link.set_link();
 	  show = newRowBoo(false, "show"); //!!!!! is hided by default
 	  pval = newRowVec("pos");
 	  dval = newRowVec("dir");
 	  mval = newRowVec("mov");
+	  addEmptyS(1);
+	  in = addInput(0, "move", new nRunnable() { public void run() {
+		  if (in.lastPack() != null && in.lastPack().isBang()) // && pval != null && mval != null
+			  cursor.pval.add(mval.get());
+	  } });
+	  addSelectS(0, show_link, show_show,
+			  "link", "show").no_mirror();
+	  addSelectL(1, draw_dir, show_pos, show_dir, show_mov, 
+			  "point", "pos", "dir_val", "move").no_mirror();
 	  init_cursor();
+	  draw_dir.addEventChange(new nRunnable() { public void run() {
+		  if (draw_dir.get()) {
+			  cursor.show_dir = true;
+			  cursor.update_view();
+		  } else {
+			  cursor.show_dir = false;
+			  cursor.update_view();
+		  }
+	  }});
   }
   void build_normal() {
-	  show = newBoo(false, "show"); //!!!!! is hided by default
-	  pval = newVec("pos");
-	  dval = newVec("dir");
-	  mval = newRowVec("mov");
+	  if (show_link.get()) {
+	    addEmptyS(0); addEmptyS(1);
+	    out_link = addOutput(2, "cursor_link"); out_link.set_link();
+	  }
+	  if (show_show.get()) show = newRowBoo(false, "show");
+	  else show = newBoo(false, "show"); 
+	  
+	  if (show_pos.get()) pval = newRowVec("pos");
+	  else pval = newVec("pos");
+	  if (show_dir.get()) dval = newRowVec("dir");
+	  else dval = newVec("dir");
+	  if (show_mov.get()) {
+		  mval = newRowVec("mov");
+		  addEmptyS(1);
+		  in = addInput(0, "move", new nRunnable() { public void run() {
+			  if (in.lastPack() != null && in.lastPack().isBang()) // && pval != null && mval != null
+				  cursor.pval.add(mval.get());
+		  } });
+	  }
+	  else mval = newVec("mov");
+	  
 	  init_cursor();
-	    out_link = addOutput(2, "cursor_link");
-	    out_link.set_link();
-	    addEmptyS(0);
-	    addSwitchS(1, "show", show);
+	  draw_dir.addEventChange(new nRunnable() { public void run() {
+		  if (draw_dir.get()) {
+			  cursor.show_dir = true;
+			  cursor.update_view();
+		  } else {
+			  cursor.show_dir = false;
+			  cursor.update_view();
+		  }
+	  }});
   }
   boolean flag_del = false;
   public MCursor clear() {
@@ -486,7 +628,7 @@ class MNode extends MBasic {
 	  MNode build(Macro_Sheet s, sValueBloc b) { MNode m = new MNode(s, b); return m; }
     }
   sInt co_nb; sBoo as_in, as_out, as_label, as_link, is_point;
-  Macro_Connexion in_link,out_link; 
+  Macro_Connexion in_link, out_link; 
   ArrayList<MNode> nodes;
   ArrayList<Macro_Connexion> out_list;
   ArrayList<Macro_Connexion> in_list;
@@ -718,7 +860,7 @@ class MNode extends MBasic {
 //				if (	out_list.get(0).connected_inputs.size() > 0 && 
 //						in_list.get(0).connected_outputs.size() > 0 ) reduc();
 //				else {
-//					//auto close after co
+//					//auto close after co 
 //				}
 			}
 		}});

@@ -149,7 +149,6 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	  }
 	  
 	  Macro_Element show() {
-	    
 	    if (bloc.mmain().show_macro.get()) {
 		    if (bloc.sheet.openning.get() == DEPLOY && 
 			    		bloc.openning.get() == OPEN) {

@@ -80,19 +80,19 @@ public abstract class sValue implements RConst {
 	    sb.newData("ref", ref);
 	    sb.newData("typ", type);
 	    sb.newData("shr", shrt);
-	    sb.newData("cut", (int)direct_shortcut);
+//	    sb.newData("cut", (int)direct_shortcut);
 	  }
 	  void load_from_bloc(Save_Bloc svb) {
 //	    vlogln("sv load " + ref);
 	    ref = svb.getData("ref");
 	    type = svb.getData("typ");
 	    shrt = svb.getData("shr");
-	    direct_shortcut = (char)svb.getInt("cut");
-	    if (direct_shortcut != 0) { 
-	    		data.input.getKeyboardButton(direct_shortcut);
-	    		data.input.shorted_values.add(this);
-	    }
-	    else data.input.shorted_values.remove(this);
+//	    direct_shortcut = (char)svb.getInt("cut");
+//	    if (direct_shortcut != 0) { 
+//	    		data.input.getKeyboardButton(direct_shortcut);
+//	    		data.input.shorted_values.add(this);
+//	    }
+//	    else data.input.shorted_values.remove(this);
 	    has_changed = true;
 	  }
 	  public boolean limited_min = false;
@@ -175,6 +175,7 @@ public abstract class sValue implements RConst {
 			else clear_directshortcut(); } }
 		public void clear_directshortcut() { 
 			direct_shortcut = 0; 
-			data.input.shorted_values.remove(this); }
+			while (data.input.shorted_values.contains(this))
+				data.input.shorted_values.remove(this); }
 		public void directshortcut_action() {}
 	}

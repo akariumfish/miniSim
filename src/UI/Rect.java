@@ -19,6 +19,9 @@ public class Rect {
 	  pos.x = r.pos.x; pos.y = r.pos.y; size.x = r.size.x; size.y = r.size.y; 
 	  return this; }
 
+	public Rect set(float x, float y, float sx, float sy) { 
+	  pos.x = x; pos.y = y; size.x = sx; size.y = sy; 
+	  return this; }
 	public boolean rectCollide(Rect rect1) {
 	  Rect rect2 = this;
 	  return (rect1.pos.x < rect2.pos.x + rect2.size.x &&
@@ -40,7 +43,7 @@ public class Rect {
 	          p.y >= rects.pos.y && p.y <= rects.pos.y + rects.size.y );
 	}
 	
-	static boolean rectCollide(Rect rect1, Rect rect2) {
+	public static boolean rectCollide(Rect rect1, Rect rect2) {
 	  return (rect1.pos.x < rect2.pos.x + rect2.size.x &&
 	          rect1.pos.x + rect1.size.x > rect2.pos.x &&
 	          rect1.pos.y < rect2.pos.y + rect2.size.y &&

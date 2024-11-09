@@ -351,7 +351,7 @@ public class Macro_Sheet extends Macro_Abstract {
 	for (nWidget w : spot_empty_widget) w.setBackground();
     for (Macro_Element m : child_elements) {
 		for (nWidget w : m.elem_widgets) w.tempPassif(false);
-		m.back.setBackground(); 
+		m.back.setPassif(); 
 		if (m.sheet_viewable) m.back.setLook("MC_Element"); 
 		if (m.spot != null) m.spot.setBackground(); 
     }
@@ -690,8 +690,6 @@ public class Macro_Sheet extends Macro_Abstract {
   public sObj val_sheet;
   
 
-  protected ArrayList<MCustom> custom_blocs = new ArrayList<MCustom>(0);
-  
   
  
   

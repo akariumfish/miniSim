@@ -741,10 +741,12 @@ boolean constantOutlineWeight = false;
           prev_select_outline = showOutline;
           showOutline = true;
           if (isField) showCursor = true;
+          gui.in.do_shortcut = false;
           gui.field_used = true;
         } else {
           showOutline = prev_select_outline;
           if (isField) showCursor = false;
+          gui.in.do_shortcut = true;
           gui.field_used = false;
         }
       } else if (!isHovered && gui.in.getClick("MouseLeft") && isSelected) {
@@ -755,6 +757,7 @@ boolean constantOutlineWeight = false;
         }
         isSelected = false;
         gui.field_used = false;
+        gui.in.do_shortcut = true;
       }
     }
     if (isField && isSelected) {

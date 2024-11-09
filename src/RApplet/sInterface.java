@@ -657,11 +657,11 @@ public class sInterface {
   
   
   
-  
-  void addSpecializedSheet(Sheet_Specialize s) {
-    macro_main.addSpecializedSheet(s); }
-  Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
-    return macro_main.addUniqueSheet(s); }
+//  
+//  void addSpecializedSheet(Sheet_Specialize s) {
+//    macro_main.addSpecializedSheet(s); }
+//  Macro_Sheet addUniqueSheet(Sheet_Specialize s) {
+//    return macro_main.addUniqueSheet(s); }
 
 
   public sValueBloc getTempBloc() {

@@ -83,12 +83,12 @@ public class Rapp extends PApplet implements RConst {
 		  
 		  
 
-		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
+//		  Simulation simul = (Simulation)interf.addUniqueSheet(new Simulation.SimPrint());
 //		  Canvas canv = (Canvas) interf.addUniqueSheet(new Canvas.CanvasPrint(simul));
 //		  interf.addSpecializedSheet(new Face.FacePrint(canv));
 //		  interf.addSpecializedSheet(new Organism.OrganismPrint(simul));
-		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
-		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
+//		  interf.addSpecializedSheet(new GrowerComu.GrowerPrint(simul));
+//		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul));
 //		  interf.addSpecializedSheet(new FlocComu.FlocPrint(simul, canv));
 //		  interf.addSpecializedSheet(new SolidComu.SolidPrint(simul, canv));
 //		  interf.addSpecializedSheet(new BoxComu.BoxPrint(simul));
@@ -127,7 +127,7 @@ public class Rapp extends PApplet implements RConst {
 	
 	public boolean BLACKOUT = false;
 	
-	int setup_tmp = 1;
+	int setup_tmp = 2;
 	public void draw() {
 
 	  global_frame_count++;

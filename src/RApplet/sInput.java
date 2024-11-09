@@ -58,6 +58,7 @@ public class sInput {
   public PVector pmouse = new PVector(); //prev pos
   public PVector mmouse = new PVector(); //mouvement
   public boolean mouseWheelUp, mouseWheelDown;
+  public boolean do_shortcut = true;
   ArrayList<sInput_Button> pressed_keys = new ArrayList<sInput_Button>();
   char last_key = ' ';
 
@@ -111,9 +112,10 @@ public sInput_Button keyAll;
     mouseWheelUp = false; 
     mouseWheelDown = false;
     for (sInput_Button b : buttons) {
-    		if (b.trigClick) for (sValue v : shorted_values) 
-    			if (v.direct_shortcut != 0 && v.direct_shortcut == b.key_char) 
-    				v.directshortcut_action();
+    		if (do_shortcut && b.trigClick) for (sValue v : shorted_values) 
+    			if (v.direct_shortcut != 0 && v.direct_shortcut == b.key_char) {
+    				app.logln("dsc_action:"+v.ref+":"+b.key_char); 
+    				v.directshortcut_action(); }
     		b.frame();
     }
   }

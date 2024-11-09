@@ -426,7 +426,8 @@ class MStructure extends MBaseMenu {
 	
 	MStructure(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "struct", _bloc); }
 	void init() {
-		super.init();  
+		super.init(); 
+		init_access(); 
 		replics_save = newStr("replics_save", "replics_save", "");
 		max_replic = menuIntIncr(40, 100, "max_replic");
 		if (!loading_from_bloc) max_replic.set_limit(1, 500);

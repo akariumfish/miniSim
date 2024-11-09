@@ -22,22 +22,22 @@ public abstract class MGroup extends MBaseMT {
 	      .addModel("Label-S4", "-"+value_bloc.ref+" Control-")
 	      	.setFont((int)(ref_size/1.4)).getShelf()
 	      .addSeparator(0.125)
-//	      .addDrawerWatch(active_entity, 10, 1)
-//	      .addSeparator(0.125)
+	      .addDrawerWatch(active_entity, 10, 1)
+	      .addSeparator(0.125)
 	      .addDrawerIncrValue(max_entity, 100, 10, 1)
 	      .addSeparator(0.125)
-//	      .addDrawerIncrValue(adding_entity_nb, 10, 10, 1)
-//	      .addSeparator(0.125)
-//	      .addDrawerIncrValue(adding_step, 10, 10, 1)
-//	      .addSeparator(0.125)
-//	      .addDrawerButton(pulse_add, auto_add, srun_add, 10, 1)
-//	      .addSeparator(0.125)
+	      .addDrawerIncrValue(adding_entity_nb, 10, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(adding_step, 10, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerButton(pulse_add, auto_add, srun_add, 10, 1)
+	      .addSeparator(0.125)
 	      .addDrawerButton(show_entity, val_show_grab, 10, 1)
 	      .addSeparator(0.125)
-//	      .addDrawerIncrValue(pulse_add_delay, 10, 10, 1)
-//	      .addSeparator(0.125)
-//	      .addDrawerIncrValue(pulse_add_delay, 1000, 10, 1)
-//	      .addSeparator(0.125)
+	      .addDrawerIncrValue(pulse_add_delay, 10, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(pulse_add_delay, 1000, 10, 1)
+	      .addSeparator(0.125)
 	      ;
 	      
 	    comPanelBuild(sheet_front);
@@ -60,7 +60,7 @@ public abstract class MGroup extends MBaseMT {
 	  sVec val_pos;
 	  sBoo val_show_grab;
 	  
-	  Macro_Connexion link_group;
+	  Macro_Connexion link_in,link_out;
 	
 	MGroup(Macro_Sheet _sheet, String typ, sValueBloc _bloc) { 
 		super(_sheet, typ, _bloc); 
@@ -71,7 +71,6 @@ public abstract class MGroup extends MBaseMT {
 		cam_gui = inter.cam_gui;
 		ref_size = inter.ref_size;
 		
-
 	    val_pos = newVec("val_pos", "val_pos");
 	    val_show_grab = newBoo(true, "val_show_grab", "show_grab");
 	    ref_cursor = sheet.menuCursor(value_bloc.ref, false);
@@ -94,7 +93,6 @@ public abstract class MGroup extends MBaseMT {
 			drawable.setLayer(priority.get()); }});
 		
 		
-		
 	    inter.addEventFrame(new nRunnable() { public void run() { frame(); } } );
 
 	    init_group();
@@ -105,7 +103,8 @@ public abstract class MGroup extends MBaseMT {
 	}
 	void build_normal() { 
 	  super.build_normal(); 
-	  link_group = addOutput(0, "Link").set_link();
+	  link_out = addOutput(1, "Link_out").set_link();
+	  link_in = addInput(0, "Link_in").set_link();
 	}
 	void init_end() { 
 		super.init_end(); 
@@ -117,55 +116,49 @@ public abstract class MGroup extends MBaseMT {
 		super.clear(); 
 		drawable.clear();
 		ref_cursor.clear();
-//		for (Entity e : entity_list) e.clear();
-//		entity_list.clear();
+		for (Entity e : entity_list) e.clear();
+		entity_list.clear();
 		return this; }
 	public MGroup toLayerTop() {
 		super.toLayerTop(); 
 		return this;
 	}
-	
-	
-	
 
 	  ArrayList<Entity> entity_list; //contien les objet
 
 	  sInt max_entity; //longueur max de l'array d'objet
-//	  sInt active_entity, adding_entity_nb, adding_step; // add one new object each adding_step turn
-//	  int adding_pile = 0;
-//	  int adding_counter = 0;
-//	  
-//	  sInt pulse_add_delay;
-//	  sBoo auto_add, pulse_add;
-//	  int pulse_add_counter = 0;
+	  sInt active_entity, adding_entity_nb, adding_step; // add one new object each adding_step turn
+	  int adding_pile = 0;
+	  int adding_counter = 0;
+	  
+	  sInt pulse_add_delay;
+	  sBoo auto_add, pulse_add;
+	  int pulse_add_counter = 0;
 
 	  sBoo show_entity;
-//	  sRun srun_add;
-//	  sStr type_value;
+	  sRun srun_add;
+	  sStr type_value;
 	  
-//	  public sInt val_draw_layer;
+	  public sInt val_draw_layer;
 
 	  void init_group() {
 		  
 		  entity_list = new ArrayList<Entity>();
 	    
 	    max_entity = newInt(100, "max_entity", "max_entity");
-//	    active_entity = newInt(0, "active_entity ", "active_pop");
-//	    adding_entity_nb = newInt(0, "adding_entity_nb ", "add nb");
-//	    adding_step = newInt(0, "adding_step ", "add stp");
+	    active_entity = newInt(0, "active_entity ", "active_pop");
+	    adding_entity_nb = newInt(1, "adding_entity_nb ", "add nb");
+	    adding_step = newInt(0, "adding_step ", "add stp");
 	    show_entity = newBoo(true, "show_entity ", "show");
-//	    auto_add = newBoo(false, "auto_add ", "auto_add");
-//	    pulse_add = newBoo(false, "pulse_add ", "pulse");
-//	    pulse_add_delay = newInt(100, "pulse_add_delay ", "pulseT");
+	    auto_add = newBoo(true, "auto_add ", "auto_add");
+	    pulse_add = newBoo(false, "pulse_add ", "pulse");
+	    pulse_add_delay = newInt(100, "pulse_add_delay ", "pulseT");
 	    
-//	    val_draw_layer = menuIntIncr(0, 1, "val_draw_layer");
+	    val_draw_layer = menuIntIncr(0, 1, "val_draw_layer");
 
-//	    srun_add = newRun("add_entity", "add_pop", new nRunnable() { 
-//	      public void run() { 
-//	        adding_pile += adding_entity_nb.get();
-//	      }
-//	    }
-//	    );
+	    srun_add = newRun("add_entity", "add_pop", new nRunnable() { 
+	      public void run() { 
+	        adding_pile += adding_entity_nb.get(); } } );
 	    
 	    reset();
 	  }
@@ -191,12 +184,14 @@ public abstract class MGroup extends MBaseMT {
 		entity_list.clear();
 	    for (int i = 0; i < max_entity.get(); i++)
 	    		entity_list.add(build());
+	    for (int i = 0; i < max_entity.get(); i++)
+    			entity_list.get(i).id = i;
 	  }
 
 	  void reset() { //deactivate all then create starting situation from parameters
 	    this.destroy_All();
 	    if (max_entity.get() != entity_list.size()) init_array();
-//	    if (auto_add.get()) adding_pile += adding_entity_nb.get();
+	    if (auto_add.get()) adding_pile += adding_entity_nb.get();
 	    custom_reset();
 	  }
 
@@ -206,17 +201,17 @@ public abstract class MGroup extends MBaseMT {
 	  }
 
 	  void tick() {
-//	    if (auto_add.get() && pulse_add.get()) {
-//	      pulse_add_counter++;
-//	      if (pulse_add_counter > pulse_add_delay.get()) { pulse_add_counter = 0; srun_add.run(); }
-//	    }
-//	    if (auto_add.get() && adding_counter > 0) adding_counter--;
-//	    while (auto_add.get() && adding_counter == 0 && adding_pile > 0) {
-//	      adding_counter += adding_step.get();
-//	      adding_pile--;
-//	      addEntity();
-//	    }
-//	    active_entity.set(active_Entity_Nb());
+	    if (auto_add.get() && pulse_add.get()) {
+	      pulse_add_counter++;
+	      if (pulse_add_counter > pulse_add_delay.get()) { pulse_add_counter = 0; srun_add.run(); }
+	    }
+	    if (auto_add.get() && adding_counter > 0) adding_counter--;
+	    while (auto_add.get() && adding_counter == 0 && adding_pile > 0) {
+	      adding_counter += adding_step.get();
+	      adding_pile--;
+	      addEntity();
+	    }
+	    active_entity.set(active_Entity_Nb());
 	    custom_pre_tick();
 	    for (Entity e : entity_list) if (e.active) e.tick();
 //	    for (Entity e : list) if (e.active) e.age++;
@@ -250,6 +245,7 @@ abstract class Entity {
 	MGroup com;
 	Rapp app;
     boolean active = false;
+    int id = 0;
     Entity(MGroup c) { 
     		com = c; 
     }
