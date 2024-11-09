@@ -308,8 +308,8 @@ public class MSolidGroup extends MGroup {
 	    val_sqspeed_min = menuFltFact(10.0F, 2.0F, "val_sqspeed_min");
 	    val_sqspeed_max = menuFltFact(100.0F, 2.0F, "val_sqspeed_max");
 
-	    show_addpoint = newBoo(true, "show_addpoint");
-	    reset_add = newBoo(true, "reset_add");
+	    show_addpoint = newBoo(false, "show_addpoint");
+	    reset_add = newBoo(false, "reset_add");
 	    add_posx = newFlt(0.0F, "add_posx");
 		if (!loading_from_bloc) add_posx.set_limit(-1.0F, 1.0F);
 	    add_posy = newFlt(0.0F, "add_posy");

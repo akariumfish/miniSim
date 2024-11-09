@@ -1,7 +1,11 @@
 0:- :setup
 0:  :setup end
-3:- :setup_load from start.sdata
-177:- :exit
+4:- :setup_load from start.sdata
+373:- :setup_load from gravity.sdata
+628:- :setup_load from orbital.sdata
+822:- :setup_load from solid_draw_molds.sdata
+1496:- :setup_load from vines.sdata
+1635:- :exit
 null
 null
 null

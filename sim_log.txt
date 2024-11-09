@@ -1,9 +1,10 @@
 0:- :setup
 0:  :setup end
 4:- :setup_load from start.sdata
-242:- :setup_load from orbital.sdata
-48116:- :full_data_save to orbital.sdata
-48517:- :exit
+153:- :setup_load from empty.sdata
+535:- :full_data_save to start.sdata
+1241:- :full_data_save to start.sdata
+1325:- :exit
 null
 null
 null
