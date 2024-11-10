@@ -36,7 +36,7 @@ Q: Okay but roughly, what can i do whit it?
 A: there is three simulation systeme : growers makes vines and flowers, flocs are a shitty boids implementation, and solids do physics like friction, gravity, colision...
 flocs and solid can interact with canvas and draw on it.
 each of this system got a tons of param to finetune them.
-secondly there is a set of block to access, display, modify or react to thoses params. you can automate things, build your creation environment the way you want, change param that should not be change and crash everything, or make a nice little video to show your friend. who know? just remember that probably half of it will be bugged beyond repair when the next stable version will come.
+secondly there is a set of block to access, display, modify or react to thoses params. by connecting blocks together you can automate things, build your creation environment the way you want, change param that should not be change and crash everything, or make a nice little video to show your friend. who know? just remember that probably half of it will be bugged beyond repair when the next stable version will come.
 
 Learn to let go my friend. This. Is. Spaghetti.
 
