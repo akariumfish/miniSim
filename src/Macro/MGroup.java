@@ -13,7 +13,7 @@ import sData.*;
 
 public abstract class MGroup extends MBaseMT { 
 
-	abstract void comPanelBuild(nFrontPanel front);
+	  abstract void comPanelBuild(nFrontPanel front);
 	  
 	  public void build_custom_menu(nFrontPanel sheet_front) {
 	    nFrontTab tab = sheet_front.addTab("Community");

@@ -9,11 +9,11 @@ import UI.nWidget;
 import processing.core.PVector;
 import sData.*;
 
-public class MCurve extends MBaseMT {
+public class MEnvelope extends MBaseMT {
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("curve", "Curve", "Change output along a curve", "Work"); 
+		Builder(Macro_Main m) { super("envelope", "Envelope", "Change output along a curve", "Work"); 
 		first_start_show(m); }
-		MCurve build(Macro_Sheet s, sValueBloc b) { MCurve m = new MCurve(s, b); return m; }
+		MEnvelope build(Macro_Sheet s, sValueBloc b) { MEnvelope m = new MEnvelope(s, b); return m; }
 	}
 
 	nWidget graph;
@@ -24,8 +24,8 @@ public class MCurve extends MBaseMT {
 	
 	ArrayList<CurveSection> sections;
 
-	MCurve(Macro_Sheet _sheet, sValueBloc _bloc) { 
-		super(_sheet, "curve", _bloc); 
+	MEnvelope(Macro_Sheet _sheet, sValueBloc _bloc) { 
+		super(_sheet, "envelope", _bloc); 
 	}
 	
 	void init() {
@@ -80,11 +80,11 @@ public class MCurve extends MBaseMT {
 		addSelectToInt(0, sec_number);
 	}
 	
-	public MCurve clear() {
+	public MEnvelope clear() {
 		super.clear(); 
 		return this; 
 	}
-	public MCurve toLayerTop() {
+	public MEnvelope toLayerTop() {
 		super.toLayerTop(); 
 		return this;
 	}
@@ -137,12 +137,12 @@ public class MCurve extends MBaseMT {
 	}
 
 	class CurveSection {
-		MCurve curv;
+		MEnvelope curv;
 		int sec_num;
 		sFlt val_cible;
 		sInt val_length;
 		
-		CurveSection(MCurve _c, int _sec_num) {
+		CurveSection(MEnvelope _c, int _sec_num) {
 			curv = _c;
 			sec_num = _sec_num;
 			val_cible = curv.newFlt(1.0F, "curv_sec_cible"+sec_num);
