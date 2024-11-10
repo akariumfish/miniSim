@@ -33,8 +33,10 @@ public class nSlide extends nWidget {
 	  public nSlide(nGUI g, float _scale_width, float _scale_height) { super(g); 
 	    scale_height = _scale_height; scale_width = _scale_width;
 	    bar = new nWidget(gui, 0, scale_height * 3 / 8, _scale_width, scale_height * 1 / 4).setParent(this);
-	    curs = new nWidget(gui, 0, -scale_height * 3 / 8, scale_height * 1 / 4, scale_height)
+	    bar.setStandbyColor(gui.app.color(120));
+	    curs = new nWidget(gui, 0, -scale_height * 3 / 8, scale_height * 1 / 2, scale_height)
 	      .setParent(bar)
+	      .setText("|")
 	      .setStandbyColor(gui.app.color(200))
 	      .setGrabbable().setConstrainY(true)
 	      .addEventDrag(new nRunnable() { public void run() {

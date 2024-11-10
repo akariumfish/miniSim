@@ -1393,6 +1393,7 @@ class MValue extends MBasic {
   sValue cible; sValueBloc bloc_cible;
   sStr val_cible, val_bloc, val_depth, var_type; 
   sBoo setup_send, panel_open;
+  sBoo show_view, show_ctrl, show_in, show_out;
   Macro_Connexion in, out;
   Macro_Connexion link_access;
   nWidget val_widget, blockpick_widget, blockdepth_widget;
@@ -1416,12 +1417,20 @@ class MValue extends MBasic {
 	  var_type = newStr("type", "type", "");
 	  setup_send = newBoo("stp_snd", "stp_snd", false);
 	  panel_open = newBoo("pan_opn", "pan_opn", false);
+	  show_view = newBoo(true, "show_view");
+	  show_ctrl = newBoo(true, "show_ctrl");
+	  show_in = newBoo(true, "show_in");
+	  show_out = newBoo(true, "show_out");
 	  
 	  link_access = null;
 	  bloc_from_link = false;
 	  bloc_cible = null;
   }
   void build_param() { 
+	  addLinkedSSwitch(0, show_ctrl).setText("ctrl");
+	  addLinkedSSwitch(1, show_view).setText("view");
+	  addSelectS(2, show_in, show_out, "in", "out");
+	  
 	nDrawer d = addEmptyS(0);
 	blockpick_widget = d.addCtrlModel("MC_Element_SButton", "pick")
 	.setRunnable(new nRunnable() { public void run() {
@@ -1520,37 +1529,56 @@ class MValue extends MBasic {
     if (link_access == null) build_link_access();
     else addEmpty(2);
     
-    addEmptyS(0).addCtrlModel("MC_Element_SButton", "pick")
-	.setRunnable(new nRunnable() { public void run() {
-		if (bloc_cible != null ) {
-		    new nValuePicker(mmain().screen_gui, mmain().inter.taskpanel, val_cible, bloc_cible, true)
-		    .addEventChoose(new nRunnable() { public void run() { setValue(); } } );
-		}
-    } });
-    
-    addEmptyL(1).addWatcherModel("MC_Element_Field")
-    	.setLinkedValue(val_cible).setInfo("selected value ref");
-    
-	addEmptyS(1).addCtrlModel("MC_Element_SButton", "Get")
-    .setRunnable(new nRunnable() { public void run() {
-    	if (cible != null) out.send(cible.asPacket()); } })
-    .getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
-		.setLinkedValue(setup_send); 
-	out = addOutput(2, "out");
-    in = addInput(0, "in", new nRunnable() { public void run() {
-        if (in.lastPack() != null && in.lastPack().isBang() && 
-        			cible != null && !cible.type.equals("run")) 
-        		out.send(cible.asPacket());
-      } });
-
-    addEmpty(1); 
-    addEmptyS(2).addCtrlModel("MC_Element_SButton", "Set")
-    .setRunnable(new nRunnable() { public void run() {
-      if (cible != null) cible.pop_panel(mmain().screen_gui, mmain().inter.taskpanel)
-		.addEventClose(new nRunnable() { public void run() { panel_open.set(false); } } );
-    } }); 
-    val_elem = addEmptyS(0);
-
+    if (show_ctrl.get()) {
+	    addEmptyS(0).addCtrlModel("MC_Element_SButton", "pick")
+		.setRunnable(new nRunnable() { public void run() {
+			if (bloc_cible != null ) {
+			    new nValuePicker(mmain().screen_gui, mmain().inter.taskpanel, val_cible, bloc_cible, true)
+			    .addEventChoose(new nRunnable() { public void run() { setValue(); } } );
+			}
+	    } });
+	    
+	    addEmptyL(1).addWatcherModel("MC_Element_Field")
+	    	.setLinkedValue(val_cible).setInfo("selected value ref");
+	    
+		addEmptyS(1).addCtrlModel("MC_Element_SButton", "Get")
+	    .setRunnable(new nRunnable() { public void run() {
+	    	if (cible != null && out != null) out.send(cible.asPacket()); } })
+	    .getDrawer().addLinkedModel("MC_Element_MiniButton", "st")
+			.setLinkedValue(setup_send); 
+		if (show_out.get()) out = addOutput(2, "out");
+	    else out = null;
+	    if (show_in.get()) 
+	    		in = addInput(0, "in", new nRunnable() { public void run() {
+		        if (in.lastPack() != null && in.lastPack().isBang() && 
+		        			cible != null && !cible.type.equals("run")) 
+		        		if (out != null) out.send(cible.asPacket());
+	    		} });
+	    else in = null;
+    } else {
+	    addEmptyL(1).addWatcherModel("MC_Element_Field")
+	    	.setLinkedValue(val_cible).setInfo("selected value ref");
+	    if (show_out.get()) out = addOutput(2, "out");
+	    else out = null;
+	    if (show_in.get()) 
+	    		in = addInput(0, "in", new nRunnable() { public void run() {
+		        if (in.lastPack() != null && in.lastPack().isBang() && 
+		        			cible != null && !cible.type.equals("run")) 
+		        		if (out != null) out.send(cible.asPacket());
+	    		} });
+	    else in = null;
+    }
+    if (show_view.get()) {
+	    addEmpty(1); 
+	    addEmptyS(2).addCtrlModel("MC_Element_SButton", "Set")
+	    .setRunnable(new nRunnable() { public void run() {
+	      if (cible != null) cible.pop_panel(mmain().screen_gui, mmain().inter.taskpanel)
+			.addEventClose(new nRunnable() { public void run() { panel_open.set(false); } } );
+	    } }); 
+	    val_elem = addEmptyS(0);
+    } else {
+    		val_elem = null;
+    }
     
     mmain().inter.addEventNextFrame(new nRunnable() { public void run() {
     	setValue(); } } );
@@ -1573,7 +1601,7 @@ class MValue extends MBasic {
 	  if (bloc_cible != null) {
 		  if (cible != null && val_run != null) cible.removeEventChange(val_run);
 		  if (cible != null && val_run != null) cible.removeEventAllChange(val_run);
-		  if (in_run != null) in.removeEventReceive(in_run);
+		  if (in_run != null && in != null) in.removeEventReceive(in_run);
 		  in_run = null;
 		  val_run = null;
 		  if (val_widget != null) val_widget.clear();
@@ -1586,7 +1614,7 @@ class MValue extends MBasic {
 	  val_cible.set("");
 	  if (cible != null && val_run != null) cible.removeEventChange(val_run);
 	  if (cible != null && val_run != null) cible.removeEventAllChange(val_run);
-    if (in_run != null) in.removeEventReceive(in_run);
+    if (in_run != null && in != null) in.removeEventReceive(in_run);
     in_run = null;
     cible = null;
     val_run = null;
@@ -1598,7 +1626,7 @@ class MValue extends MBasic {
     		clearValue();
 	    val_cible.set(v.ref);
 	    cible = v; 
-	    val_widget = addLinkedLWidget(val_elem, v);
+	    if (val_elem != null) val_widget = addLinkedLWidget(val_elem, v);
 	    if (grabber.isHided()) val_widget.hide();
 	    if      (cible.type.equals("flt")) setValue((sFlt)cible);
 	    else if (cible.type.equals("int")) setValue((sInt)cible);
@@ -1618,95 +1646,109 @@ class MValue extends MBasic {
     rval = v;
     val_run = new nRunnable() { public void run() { 
 //    		if (last_send_framenb + 1 < gui.app.global_frame_count)
-    			out.send(Macro_Packet.newPacketBang()); 
+    			if (out != null) out.send(Macro_Packet.newPacketBang()); 
 //    		last_send_framenb = gui.app.global_frame_count; 
     		}};
-    in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isBang()) { 
-        rval.run(); 
-      }
-    } };
-    v.addEventAllChange(val_run);
-    in.addEventReceive(in_run);
+    	v.addEventAllChange(val_run);
+    	if (in != null) {
+	    in_run = new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isBang()) { 
+	        rval.run(); 
+	      }
+	    } };
+	    in.addEventReceive(in_run); }
   }
   void setValue(sObj v) {
-	    oval = v;
-	    val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketBang()); }};
-	    in_run = new nRunnable() { public void run() { 
-	      if (in.lastPack() != null && in.lastPack().isBang()) 
-	    	  	out.send(Macro_Packet.newPacketBang()); 
-	      if (in.lastPack() != null && in.lastPack().isObj()) 
-	    	  	oval.set(in.lastPack().asObj());
-	    } };
-	    v.addEventChange(val_run);
-	    in.addEventReceive(in_run);
+//	    oval = v;
+//	    val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketBang()); }};
+//	    in_run = new nRunnable() { public void run() { 
+//	      if (in.lastPack() != null && in.lastPack().isBang()) 
+//	    	  	out.send(Macro_Packet.newPacketBang()); 
+//	      if (in.lastPack() != null && in.lastPack().isObj()) 
+//	    	  	oval.set(in.lastPack().asObj());
+//	    } };
+//	    v.addEventChange(val_run);
+//	    in.addEventReceive(in_run);
 //	    in.set_link();
 //	    out.set_link();
 }
   void setValue(sFlt v) {
     fval = v;
     ftmp = v.get();
-    val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketFloat(fval.get())); }};
-    in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isFloat() 
-//    		  && ftmp != in.lastPack().asFloat()
-    		  ) { 
-//        ftmp = in.lastPack().asFloat();
-        fval.set(in.lastPack().asFloat()); }
-      if (in.lastPack() != null && in.lastPack().isInt() 
-//    		  && ftmp != in.lastPack().asInt()
-    		  ) { 
-//        ftmp = in.lastPack().asInt();
-        fval.set(in.lastPack().asInt()); }
-    } };
+    val_run = new nRunnable() { public void run() { 
+    		if (out != null) out.send(Macro_Packet.newPacketFloat(fval.get())); }};
     v.addEventChange(val_run);
-    in.addEventReceive(in_run);
+	if (in != null) {
+	    in_run = new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isFloat() 
+	//    		  && ftmp != in.lastPack().asFloat()
+	    		  ) { 
+	//        ftmp = in.lastPack().asFloat();
+	        fval.set(in.lastPack().asFloat()); }
+	      if (in.lastPack() != null && in.lastPack().isInt() 
+	//    		  && ftmp != in.lastPack().asInt()
+	    		  ) { 
+	//        ftmp = in.lastPack().asInt();
+	        fval.set(in.lastPack().asInt()); }
+	    } };
+	    in.addEventReceive(in_run);
+	}
   }
   void setValue(sInt v) {
     ival = v;
     itmp = v.get();
-    val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketInt(ival.get())); }};
-    in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isInt()
-//    		  && itmp != in.lastPack().asInt()
-    		  ) { 
-//        itmp = in.lastPack().asInt();
-        ival.set(in.lastPack().asInt()); }
-      if (in.lastPack() != null && in.lastPack().isFloat()
-//    		  && itmp != in.lastPack().asInt()
-    		  ) { 
-//        itmp = in.lastPack().asInt();
-        ival.set(in.lastPack().asFloat()); }
-    } };
+    val_run = new nRunnable() { public void run() { 
+    		if (out != null) out.send(Macro_Packet.newPacketInt(ival.get())); }};
     v.addEventChange(val_run);
-    in.addEventReceive(in_run);
+    
+	if (in != null) {
+	    in_run = new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isInt()
+	//    		  && itmp != in.lastPack().asInt()
+	    		  ) { 
+	//        itmp = in.lastPack().asInt();
+	        ival.set(in.lastPack().asInt()); }
+	      if (in.lastPack() != null && in.lastPack().isFloat()
+	//    		  && itmp != in.lastPack().asInt()
+	    		  ) { 
+	//        itmp = in.lastPack().asInt();
+	        ival.set(in.lastPack().asFloat()); }
+	    } };
+	    in.addEventReceive(in_run);
+	}
   }
   void setValue(sBoo v) {
     bval = v;
     btmp = v.get();
-    val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketBool(bval.get())); }};
-    in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isBool() && !(btmp == in.lastPack().asBool())) { 
-        btmp = in.lastPack().asBool();
-        bval.set(in.lastPack().asBool()); }
-      if (in.lastPack() != null && in.lastPack().isBang()) { 
-        btmp = !btmp;
-        bval.set(!bval.get()); }
-    } };
+    val_run = new nRunnable() { public void run() { 
+    		if (out != null) out.send(Macro_Packet.newPacketBool(bval.get())); }};
     v.addEventChange(val_run);
-    in.addEventReceive(in_run);
+	if (in != null) {
+	    in_run = new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isBool() && !(btmp == in.lastPack().asBool())) { 
+	        btmp = in.lastPack().asBool();
+	        bval.set(in.lastPack().asBool()); }
+	      if (in.lastPack() != null && in.lastPack().isBang()) { 
+	        btmp = !btmp;
+	        bval.set(!bval.get()); }
+	    } };
+	    in.addEventReceive(in_run);
+	}
   }
   void setValue(sStr v) {
     sval = v;
     stmp = RConst.copy(v.get());
-    val_run = new nRunnable() { public void run() { out.send(Macro_Packet.newPacketStr(sval.get())); }};
-    in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isStr() && !stmp.equals(in.lastPack().asStr())) { 
-        stmp = RConst.copy(in.lastPack().asStr());
-        sval.set(in.lastPack().asStr()); }
-    } };
+    val_run = new nRunnable() { public void run() { 
+    		if (out != null) out.send(Macro_Packet.newPacketStr(sval.get())); }};
     v.addEventChange(val_run);
-    in.addEventReceive(in_run);
+	if (in != null) {
+	    in_run = new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isStr() && !stmp.equals(in.lastPack().asStr())) { 
+	        stmp = RConst.copy(in.lastPack().asStr());
+	        sval.set(in.lastPack().asStr()); }
+	    } };
+	    in.addEventReceive(in_run);
+	}
   }
 
   void setValue(sVec v) {
@@ -1714,16 +1756,18 @@ class MValue extends MBasic {
     vtmp.set(v.get());
     val_run = new nRunnable() { public void run() { 
       mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-      out.send(Macro_Packet.newPacketVec(vval.get())); }}); 
+    	  if (out != null) out.send(Macro_Packet.newPacketVec(vval.get())); }}); 
       }};
-    in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isVec() && !in.lastPack().equalsVec(vtmp)) { 
-        vtmp.set(in.lastPack().asVec());
-        vval.set(in.lastPack().asVec()); 
-      }
-    } };
     v.addEventChange(val_run);
-    in.addEventReceive(in_run);
+  	if (in != null) {
+	    in_run = new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isVec() && !in.lastPack().equalsVec(vtmp)) { 
+	        vtmp.set(in.lastPack().asVec());
+	        vval.set(in.lastPack().asVec()); 
+	      }
+	    } };
+	    in.addEventReceive(in_run);
+	}
     vmod = newRowVec("mov_fact");
     tmod = addInput(0, "modif", new nRunnable() { public void run() {
 		if (tmod.lastPack() != null && tmod.lastPack().isBang() 
@@ -1740,16 +1784,18 @@ class MValue extends MBasic {
     ctmp = v.get();
     val_run = new nRunnable() { public void run() { 
       mmain().inter.addEventNextFrame(new nRunnable() { public void run() { 
-      out.send(Macro_Packet.newPacketCol(cval.get()));}}); 
+    	  if (out != null) out.send(Macro_Packet.newPacketCol(cval.get()));}}); 
       }};
-    in_run = new nRunnable() { public void run() { 
-      if (in.lastPack() != null && in.lastPack().isCol() && !in.lastPack().equalsCol(ctmp)) { 
-        ctmp = in.lastPack().asCol();
-        cval.set(in.lastPack().asCol()); 
-      }
-    } };
     v.addEventChange(val_run);
-    in.addEventReceive(in_run);
+  	if (in != null) {
+	    in_run = new nRunnable() { public void run() { 
+	      if (in.lastPack() != null && in.lastPack().isCol() && !in.lastPack().equalsCol(ctmp)) { 
+	        ctmp = in.lastPack().asCol();
+	        cval.set(in.lastPack().asCol()); 
+	      }
+	    } };
+	    in.addEventReceive(in_run);
+	}
   }
   public MValue clear() {
 	    if (val_run != null && cible != null) cible.removeEventChange(val_run);

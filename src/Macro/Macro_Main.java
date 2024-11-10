@@ -1219,6 +1219,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MEnvelope.Builder(this));
       add_bloc_builders(new MSet.Builder(this));
       add_bloc_builders(new MSetModel.Builder(this));
+      add_bloc_builders(new MCurve.Builder(this));
 
       add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());

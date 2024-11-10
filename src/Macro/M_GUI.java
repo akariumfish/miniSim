@@ -122,7 +122,7 @@ class MQuickFloat extends MBasic {
 
 class MSlide extends MBasic {
 	  static class MSlide_Builder extends MAbstract_Builder {
-		  MSlide_Builder() { super("slide", "slide", "", "GUI"); }
+		  MSlide_Builder() { super("slide", "Slide", "", "GUI"); }
 		  MSlide build(Macro_Sheet s, sValueBloc b) { MSlide m = new MSlide(s, b); return m; }
 	  }
   nSlide slide;
@@ -133,21 +133,20 @@ class MSlide extends MBasic {
   public void init() {
 	  val_min = newFlt(0, "val_min", "val_min");
 	  val_max = newFlt(1, "val_max", "val_max");
-	  val_flt = newFlt(0, "val_flt", "val_flt");
+	  val_flt = newFlt(0.5F, "val_flt", "val_flt");
   }
   public void build_normal() {
-    addEmpty(2);
-    addEmpty(1);
-    nDrawer dr = addEmptyXL(0);
-    
-    slide = (nSlide)(dr.addWidget(new nSlide(gui, ref_size * 6, ref_size * 0.75F)));
+    addEmptyS(1);
+    Macro_Connexion out = addValueChangeToOutput(2, val_flt);
+    Macro_Connexion in = addInputToValue(0, val_flt);
+    slide = (nSlide)(in.elem.addWidget(new nSlide(gui, ref_size * 5, ref_size * 0.75F)));
     slide.setPosition(ref_size * 2 / 16, ref_size * 2 / 16);
     sld_fct = (val_flt.get() - val_min.get()) / (val_max.get() - val_min.get());
     slide.setValue(sld_fct);
-    
-    newRowValue(val_flt);
-    newRowValue(val_min);
-    newRowValue(val_max);
+    slide.curs.setStandbyColor(gui.app.color(15, 60, 120));
+    nLinkedWidget w = out.elem.addLinkedModel("MC_Element_SField")
+    		.setLinkedValue(val_flt);
+	  w.setInfo(val_flt.ref).setPX(ref_size*12 / 16);
     
     slide.addEventSlide(new nRunnable(this) { public void run(float c) { 
     		sld_fct = c;
@@ -167,8 +166,11 @@ class MSlide extends MBasic {
     slide = (nSlide)(dr.addWidget(new nSlide(gui, ref_size * 6, ref_size * 0.75F)));
     slide.setPosition(ref_size * 2 / 16, ref_size * 2 / 16);
     slide.setValue((val_flt.get() - val_min.get()) / (val_max.get() - val_min.get()));
+    slide.curs.setStandbyColor(gui.app.color(15, 60, 120));
 
-    newRowValue_Pan(val_flt);
+    newRowValue(val_flt);
+    newRowValue(val_min);
+    newRowValue(val_max);
 
     slide.addEventSlide(new nRunnable(this) { public void run(float c) { 
     		sld_fct = c;

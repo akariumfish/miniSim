@@ -1,8 +1,8 @@
 0:- :setup
 0:  :setup end
 4:- :setup_load from start.sdata
-2734:- :full_data_save to start.sdata
-2824:- :exit
+524:- :setup_load from slide_n_curves.sdata
+996:- :exit
 null
 null
 null
