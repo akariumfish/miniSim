@@ -20,8 +20,7 @@ import sData.sVec;
 
 public class MShape extends MBaseMenu { 
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("shape", "Shape", "Basic shapes", "Work"); 
-		first_start_show(m); }
+		Builder(Macro_Main m) { super("shape", "Shape", "Basic shapes", "Work"); }
 		MShape build(Macro_Sheet s, sValueBloc b) { MShape m = new MShape(s, b); return m; }
 	}
 	public sVec[] list_vertices;

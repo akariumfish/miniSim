@@ -269,7 +269,7 @@ class MChan extends MBasic {
 	    in_chan = addInput(0, "chan").addEventReceive(new nRunnable() { public void run() { 
 	        if (in.lastPack() != null && in.lastPack().isStr()) val_cible.set(in.lastPack().asStr());
 	      } });
-	    in_chan.elem.back.copy(gui.theme.getModel("MC_Element_Double"));
+//	    in_chan.elem.back.copy(gui.theme.getModel("MC_Element_Double"));
 	    ref_field = in_chan.elem.addLinkedModel("MC_Element_Field").setLinkedValue(val_cible);
 	    in = addInput(0, "in").addEventReceive(new nRunnable() { public void run() { 
 	      if (in.lastPack() != null) receive(in.lastPack());

@@ -94,10 +94,12 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	  String descr;
 	  sObj val_self;
 	  nRunnable spot_select_run;
+	  String back_model;
 	  Macro_Element(Macro_Bloc _bloc, String _ref, String _model, String _info, int co_side, int sco_side, boolean sheet_view) {
 	    super(_bloc.getShelf(), _bloc.ref_size*2.25F, _bloc.ref_size*1.125F);
 	    bloc = _bloc; sheet_viewable = sheet_view; was_viewable = sheet_view; 
 	    back = addModel(_model).setText(_ref).setPassif(); 
+	    back_model = new String(_model);
 	    spot_select_run = new nRunnable(this) { public void run() { 
 	          bloc.sheet.selecting_element((Macro_Element)builder); } };
 	    back.addEventTrigger(spot_select_run);
@@ -132,7 +134,7 @@ public class Macro_Element extends nDrawer implements Macro_Interf {
 	    if (spot != null) spot.setText("");//.clear();
 	    back.clearParent(); back.setParent(ref); 
 //	    if (spot != null) bloc.sheet.remove_spot(descr);
-	    spot = null; back.setLook("MC_Element").setPassif(); 
+	    spot = null; back.setLook(back_model).setPassif(); 
 	    sheet_viewable = was_viewable; //if (sheet_connect != null) sheet_connect.hide(); 
 	  }
 	    

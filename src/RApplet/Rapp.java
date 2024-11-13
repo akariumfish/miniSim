@@ -286,6 +286,10 @@ public class Rapp extends PApplet implements RConst {
 		}
 		//for (String s : PFont.list()) println(s); // liste toute les police de text qui existe
 		
+		public void drawcross(float x, float y, float s) {
+			line(x-s, y, x+s, y);
+			line(x, y-s, x, y+s);
+		}
 		
 	    //#######################################################################
 		//##                             LOGGING                               ##

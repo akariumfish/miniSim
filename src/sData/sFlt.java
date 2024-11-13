@@ -3,6 +3,8 @@ package sData;
 import RApplet.RConst;
 
 public class sFlt extends sValue implements RConst {
+	public void set_resolution(int r) { resolution = r; apply_rez(); }
+	int resolution = 0;
 	  public float asFlt() { return val; }
 	float min, max;
 	  public sFlt set_limit(float mi, float ma) { 
@@ -34,8 +36,18 @@ public class sFlt extends sValue implements RConst {
 	  public void set(float v) { 
 		  run_events_allset(); 
 	    if (limited_max && v > max) v = max; if (limited_min && v < min) v = min;
-	    if (v != val) { if (log) bloc.data.app.logln(ref+"issetto"+v); val = v; doChange(); } }
-	  
+	    if (v != val) { 
+	    		if (log) bloc.data.app.logln(ref+"issetto"+v); 
+	    		val = v; 
+	    		apply_rez();
+	    		doChange(); 
+	    	}
+	  }
+	  public void apply_rez() {
+  		if (resolution != 0 && 
+  				val > -Math.pow(10, resolution - 1) && 
+  				val < Math.pow(10, resolution - 1)) val = 0;
+	  }
 	  public void add(float v) { set(get()+v); }
 	  public void add(double v) { add((float)v); }
 	  public void mult(float v) { set(get()*v); }

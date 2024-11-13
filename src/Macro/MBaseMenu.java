@@ -9,35 +9,47 @@ import UI.nFrontTab;
 import UI.nSlide;
 import UI.nWidget;
 import processing.core.PConstants;
-import sData.Save_Bloc;
-import sData.nRunnable;
-import sData.sBoo;
-import sData.sCol;
-import sData.sFlt;
-import sData.sInt;
-import sData.sRun;
-import sData.sStr;
-import sData.sValue;
-import sData.sValueBloc;
+import sData.*;
 
 public class MBaseMenu extends MBasic { 
-	//	static class MAlive_Builder extends MAbstract_Builder {
-	//	MAlive_Builder() { super("alive", "live blocs"); show_in_buildtool = true; }
-	//	MAlive build(Macro_Sheet s, sValueBloc b) { MAlive m = new MAlive(s, b); return m; }
-	//}
-	//
-	//MAlive(Macro_Sheet _sheet, sValueBloc _bloc) { super(_sheet, "alive", _bloc); }
+	
+	MBaseMenu addEventsBuildMenu(nRunnable r) { eventsBuildMenu.add(r); return this; }
+	ArrayList<nRunnable> eventsBuildMenu;
+	nFrontTab custom_tab;
+	nFrontPanel bloc_front;  
+	nExplorer bloc_viewer, preset_explorer;
+	sStr new_preset_name; sBoo menu_open, menu_reduc;
+	sVec menu_pos; sInt menu_tab;
+	nRunnable grab_run, reduc_run, close_run, tab_run;
+	nWidget match_flag;
+	nRunnable menu_run;
 	
 	MBaseMenu(Macro_Sheet _sheet, String n, sValueBloc _bloc) { super(_sheet, n, _bloc); }
+	MBaseMenu(Macro_Sheet _sheet, String n, sValueBloc _bloc, String spe) { 
+		super(_sheet, n, _bloc, spe); }
 	void init() {
 		eventsBuildMenu = new ArrayList<nRunnable>();
-		menu_run = new nRunnable() { public void run() { build_bloc_menu(); }};
+		menu_run = new nRunnable() { public void run() { 
+			menu(); grab_run.run(); tab_run.run(); reduc_run.run(); }};
 		new_preset_name = newStr("preset_name", "pname", "new"); 
-		menu_open_val = newBoo("menu_open_val", "menuop", false); 
+		menu_open = newBoo("menu_open", "menuop", false); 
+		menu_pos = newVec("menu_pos"); 
+	    menu_reduc = newBoo(false, "menu_reduc");
+	    menu_tab = newInt(0, "menu_tab");
+	    grab_run = new nRunnable() { public void run() { if (bloc_front != null) 
+	        menu_pos.set(bloc_front.grabber.getLocalX(), 
+	        				bloc_front.grabber.getLocalY()); } };
+	    reduc_run = new nRunnable() { public void run() {
+	    		if (bloc_front != null) menu_reduc.set(bloc_front.collapsed); } };
+	    tab_run = new nRunnable() { public void run() {
+	    		if (bloc_front != null) menu_tab.set(bloc_front.current_tab_id); } };
+	    close_run = new nRunnable() { public void run() { 
+	    		menu_open.set(false); } };
 	}
 	void init_end() {
 		super.init_end();
-		if (menu_open_val.get()) build_bloc_menu();
+	    if (menu_open.get()) mmain().inter.addEventTwoFrame(new nRunnable() { public void run() {
+    		menu(); } });
 	}
 	void build_param() {
 		addInputBang(0, "menu", menu_run);
@@ -48,28 +60,36 @@ public class MBaseMenu extends MBasic {
 		addTrigS(1, "menu", menu_run);
 	}
 	public MBaseMenu clear() {
-		super.clear(); 
 		if (bloc_front != null) bloc_front.clear();
+		super.clear(); 
 		return this; }
 	public MBaseMenu toLayerTop() {
 		super.toLayerTop(); 
 		return this;
 	}
-	
-	MBaseMenu addEventsBuildMenu(nRunnable r) { eventsBuildMenu.add(r); return this; }
-	ArrayList<nRunnable> eventsBuildMenu;
-	nFrontTab custom_tab;
-	nFrontPanel bloc_front;  
-	nExplorer bloc_viewer, preset_explorer;
-	sStr new_preset_name; sBoo menu_open_val;
-	nWidget match_flag;
-	nRunnable menu_run;
-	
+	void menu() {
+	    menu_open.set(true);
+	    build_bloc_menu();
+	    if (bloc_front != null) { 
+		    if (menu_pos.get().x == 0 && menu_pos.get().y == 0) grab_run.run();
+		    if (menu_open.get()) {
+				if (!(menu_pos.get().x == 0 && menu_pos.get().y == 0)) 
+					bloc_front.grabber.setPosition(menu_pos.get());
+				if (menu_reduc.get()) bloc_front.collapse(); else bloc_front.popUp();
+				bloc_front.setTab(menu_tab.get());
+		    }
+//			setup_send.set(true);
+		    bloc_front.grabber.addEventDrag(grab_run); 
+		    bloc_front.addEventTab(tab_run)
+			.addEventCollapse(reduc_run).addEventClose(close_run);  
+	    }
+		grab_run.run(); tab_run.run(); reduc_run.run(); 
+	}
 	public void build_custom_menu(nFrontPanel sheet_front) {}
 	
 	public void build_bloc_menu() {
 		if (bloc_front == null) {
-				menu_open_val.set(true);	
+		  menu_open.set(true);	
 		  bloc_front = new nFrontPanel(mmain().screen_gui, mmain().inter.taskpanel, val_title.get());
 		  
 		  bloc_front.addTab("View").getShelf()
@@ -150,7 +170,7 @@ public class MBaseMenu extends MBasic {
 		  bloc_front.addEventClose(new nRunnable(this) { public void run() { 
 		    if (preset_explorer != null) mmain().presets_explorers.remove(preset_explorer);
 		    bloc_front = null;
-		    menu_open_val.set(false); }});
+		    menu_open.set(false); }});
 		} else {
 		  bloc_front.popUp();
 		}
@@ -172,6 +192,121 @@ public class MBaseMenu extends MBasic {
 	}
   
 
+	public sRun newGlobalRun(String ref, boolean param_shown, nRunnable rn) {
+		sRun srun = newRun(ref, rn);
+		sBoo sacc = newBoo(false, "access_"+ref);
+		
+		addToInitend(new nRunnable() { public void run() {
+			sacc.addEventChange(run_rebuild); }});
+		addToBuildNorm(new nRunnable() { public void run() {
+			if (sacc.get()) newRowValue(srun); }});
+		addToBuildParam(new nRunnable() { public void run() {
+			if (param_shown || sacc.get()) newRowValue(srun); }});
+		
+	    addEventsBuildMenu(new nRunnable() { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawer(10, 1)
+	        .addCtrlModel("Auto_Button-S3-P1", srun.ref).setLinkedValue(srun)
+	        		.setSX(ref_size * 8.375F).setPX(ref_size * 0.5F).getDrawer()
+	        .addLinkedModel("Button_Check_AutoMacro-SS1-P9").setLinkedValue(sacc)
+	        .getShelf()
+	        .addSeparator(0.125);
+	    } });
+	    return srun;
+	}
+	public void globalBin(sValue val1, boolean param_shown) {
+		if (val1.type.equals("run") || val1.type.equals("boo")) {
+			sBoo sacc1 = newBoo(false, "access_"+val1.ref);
+			
+			addToInitend(new nRunnable() { public void run() {
+				sacc1.addEventChange(run_rebuild); }});
+			addToBuildNorm(new nRunnable() { public void run() {
+				if (sacc1.get()) newRowValue(val1); }});
+			addToBuildParam(new nRunnable() { public void run() {
+				if (param_shown || sacc1.get()) newRowValue(val1); }});
+			
+		    addEventsBuildMenu(new nRunnable() { public void run() { 
+		      if (custom_tab != null) custom_tab.getShelf()
+		        .addDrawer(10, 1)
+		        .addLinkedModel("Auto_Button-S3-P1", val1.ref).setLinkedValue(val1)
+		        		.setSX(ref_size * 8.375F).setPX(ref_size * 0.5F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P9").setLinkedValue(sacc1)
+		        	.getShelf()
+		        .addSeparator(0.125);
+		    } });
+		}
+	}
+	public void globalBin(sValue val1, sValue val2, boolean param_shown) {
+		if ( (val1.type.equals("run") || val1.type.equals("boo")) &&
+			 (val2.type.equals("run") || val2.type.equals("boo")) ) {
+			sBoo sacc1 = newBoo(false, "access_"+val1.ref);
+			sBoo sacc2 = newBoo(false, "access_"+val2.ref);
+			
+			addToInitend(new nRunnable() { public void run() {
+				sacc1.addEventChange(run_rebuild); 
+				sacc2.addEventChange(run_rebuild); }});
+			addToBuildNorm(new nRunnable() { public void run() {
+				if (sacc1.get()) newRowValue(val1); 
+				if (sacc2.get()) newRowValue(val2); }});
+			addToBuildParam(new nRunnable() { public void run() {
+				if (param_shown || sacc1.get()) newRowValue(val1); 
+				if (param_shown || sacc2.get()) newRowValue(val2); }});
+			
+		    addEventsBuildMenu(new nRunnable() { public void run() { 
+		      if (custom_tab != null) custom_tab.getShelf()
+		        .addDrawer(10, 1)
+		        .addLinkedModel("Auto_Button-S2-P1", val1.ref).setLinkedValue(val1)
+		        		.setSX(ref_size * 3.5F).setPX(ref_size * 0.5F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P5").setLinkedValue(sacc1)
+		        		.setPX(ref_size * 4.375F).getDrawer()
+		        .addLinkedModel("Auto_Button-S2-P3", val2.ref).setLinkedValue(val2)
+		        		.setSX(ref_size * 3.375F).setPX(ref_size * 5.5F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P9").setLinkedValue(sacc2)
+		        .getShelf()
+		        .addSeparator(0.125);
+		    } });
+		}
+	}
+	public void globalBin(sValue val1, sValue val2, sValue val3, boolean param_shown) {
+		if ( (val1.type.equals("run") || val1.type.equals("boo")) &&
+			 (val2.type.equals("run") || val2.type.equals("boo")) &&
+			 (val3.type.equals("run") || val3.type.equals("boo")) ) {
+			sBoo sacc1 = newBoo(false, "access_"+val1.ref);
+			sBoo sacc2 = newBoo(false, "access_"+val2.ref);
+			sBoo sacc3 = newBoo(false, "access_"+val3.ref);
+			
+			addToInitend(new nRunnable() { public void run() {
+				sacc1.addEventChange(run_rebuild); 
+				sacc2.addEventChange(run_rebuild); 
+				sacc3.addEventChange(run_rebuild); }});
+			addToBuildNorm(new nRunnable() { public void run() {
+				if (sacc1.get()) newRowValue(val1); 
+				if (sacc2.get()) newRowValue(val2); 
+				if (sacc3.get()) newRowValue(val3); }});
+			addToBuildParam(new nRunnable() { public void run() {
+				if (param_shown || sacc1.get()) newRowValue(val1); 
+				if (param_shown || sacc2.get()) newRowValue(val2); 
+				if (param_shown || sacc3.get()) newRowValue(val3); }});
+			
+		    addEventsBuildMenu(new nRunnable() { public void run() { 
+		      if (custom_tab != null) custom_tab.getShelf()
+		        .addDrawer(10, 1)
+		        .addLinkedModel("Auto_Button-S2-P1", val1.ref).setLinkedValue(val1)
+		        		.setSX(ref_size * 2.0F).setPX(ref_size * 0.25F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P1").setLinkedValue(sacc1)
+		        		.setPX(ref_size * 2.5F).getDrawer()
+		        .addLinkedModel("Auto_Button-S2-P1", val2.ref).setLinkedValue(val2)
+		        		.setSX(ref_size * 2.0F).setPX(ref_size * 3.5F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P5").setLinkedValue(sacc2)
+		        		.setPX(ref_size * 5.75F).getDrawer()
+		        .addLinkedModel("Auto_Button-S2-P3", val3.ref).setLinkedValue(val3)
+		        		.setSX(ref_size * 2.0F).setPX(ref_size * 6.75F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P9")
+		        		.setLinkedValue(sacc3).setPX(ref_size * 9.0F).getShelf()
+		        .addSeparator(0.125);
+		    } });
+		}
+	}
 	
 	protected sValue menuWatch(sValue f) {
 		addEventsBuildMenu(new nRunnable(f) { public void run() { 
@@ -292,7 +427,7 @@ public class MBaseMenu extends MBasic {
 	    addEventsBuildMenu(new nRunnable(f) { public void run() { 
 	      if (custom_tab != null) custom_tab.getShelf()
 	        .addDrawer(10, 1)
-	        .addLinkedModel("Auto_Button-S2-P2", f.ref).setLinkedValue(f).getShelf()
+	        .addLinkedModel("Auto_Button-S3-P1", f.ref).setLinkedValue(f).getShelf()
 	        .addSeparator(0.125);
 	    } });
 	    return f;
@@ -325,6 +460,52 @@ public class MBaseMenu extends MBasic {
 		} });
 		return f;
 	}
+	public void globalFltIncr(sFlt f, float _f, boolean param_shown) {
+		sBoo sacc1 = newBoo(false, "access_"+f.ref);
+		
+		addToInitend(new nRunnable() { public void run() {
+			sacc1.addEventChange(run_rebuild); }});
+		addToBuildNorm(new nRunnable() { public void run() {
+			if (sacc1.get()) newRowValue(f); }});
+		addToBuildParam(new nRunnable() { public void run() {
+			if (param_shown || sacc1.get()) newRowValue(f); }});
+
+		nObject obj = new nObject();
+		obj.obj = _f;
+	    addEventsBuildMenu(new nRunnable() { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawerActIncrValue(sacc1, f, (Float)obj.obj, 10, 1, true)
+	        .addSeparator(0.125);
+	    } });
+	}
+	public void globalFltFact(sFlt f, float _f, boolean param_shown) {
+		sBoo sacc1 = newBoo(false, "access_"+f.ref);
+		
+		addToInitend(new nRunnable() { public void run() {
+			sacc1.addEventChange(run_rebuild); }});
+		addToBuildNorm(new nRunnable() { public void run() {
+			if (sacc1.get()) newRowValue(f); }});
+		addToBuildParam(new nRunnable() { public void run() {
+			if (param_shown || sacc1.get()) newRowValue(f); }});
+
+		nObject obj = new nObject();
+		obj.obj = _f;
+	    addEventsBuildMenu(new nRunnable() { public void run() { 
+	      if (custom_tab != null) custom_tab.getShelf()
+	        .addDrawerActFactValue("", sacc1, f, _f, 10, 1, true)
+	        .addSeparator(0.125);
+	    } });
+	}
+	sFlt menuFltIncr(sFlt f, float _f) {
+		nObject obj = new nObject();
+		obj.obj = _f;
+		addEventsBuildMenu(new nRunnable() { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerIncrValue(f, (Float)obj.obj, 10, 1)
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
 	sFlt menuFltIncr(float v, float _f, String r) {
 		sFlt f = newFlt(v, r, r);
 		f.ctrl_factor = _f;
@@ -335,12 +516,31 @@ public class MBaseMenu extends MBasic {
 		} });
 		return f;
 	}
+	public void menuFltFact(sFlt f, float _f) {
+		f.ctrl_factor = _f;
+		addEventsBuildMenu(new nRunnable(f) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerFactValue(((sFlt)builder), ((sFlt)builder).ctrl_factor, 10, 1)
+		  .addSeparator(0.125);
+		} });
+	}
 	public sFlt menuFltFact(float v, float _f, String r) {
 		sFlt f = newFlt(v, r, r);
 		f.ctrl_factor = _f;
 		addEventsBuildMenu(new nRunnable(f) { public void run() { 
 		  if (custom_tab != null) custom_tab.getShelf()
 		  .addDrawerFactValue(((sFlt)builder), ((sFlt)builder).ctrl_factor, 10, 1)
+		  .addSeparator(0.125);
+		} });
+		return f;
+	}
+	public sInt menuIntIncr(sInt f, float _f) {
+//		f.ctrl_factor = _f;
+		nObject obj = new nObject();
+		obj.obj = _f;
+		addEventsBuildMenu(new nRunnable(obj) { public void run() { 
+		  if (custom_tab != null) custom_tab.getShelf()
+		  .addDrawerIncrValue(f, (float)((nObject)builder).obj, 10, 1)
 		  .addSeparator(0.125);
 		} });
 		return f;

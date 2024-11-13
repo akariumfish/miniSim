@@ -1216,10 +1216,16 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MGrowerGroup.Builder(this));
       add_bloc_builders(new MCanvas.Builder(this));
       // in developement
+      add_bloc_builders(new MCurve.Builder(this));
       add_bloc_builders(new MEnvelope.Builder(this));
       add_bloc_builders(new MSet.Builder(this));
-      add_bloc_builders(new MSetModel.Builder(this));
-      add_bloc_builders(new MCurve.Builder(this));
+      add_bloc_builders(new MSetCreator.Builder(this));
+      add_bloc_builders(new MSLawSpace.Builder(this));
+      add_bloc_builders(new MSRunFloc.Builder(this));
+      add_bloc_builders(new MSRunAuto.Builder(this));
+      add_bloc_builders(new MSRunStatic.Builder(this));
+      add_bloc_builders(new MSModBase.Builder(this));
+      add_bloc_builders(new MSModArrow.Builder(this));
 
       add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());
@@ -1459,10 +1465,10 @@ public Macro_Main(sInterface _int) {
 	  int run_rst_cnt = 0, met_rst_cnt = 0;
 
 	void init_tick() {
-		
-		addEventSetupLoad(new nRunnable() { 
-	      public void run() { mmain().inter.addEventNextFrame(new nRunnable() { 
-	    	  	public void run() { reset(); } } );   } } );
+		//                             MAYBE NEEDED ? double msetcreat adding at loading 
+//		addEventSetupLoad(new nRunnable() { 
+//	      public void run() { mmain().inter.addEventTwoFrame(new nRunnable() { 
+//	    	  	public void run() { reset(); } } );   } } );
 		
 	    tick_counter = newInt(0, "tick_counter", "tick");
 	    tick_by_frame = newFlt(2, "tick by frame", "tck/frm");
@@ -1929,8 +1935,7 @@ public Macro_Main(sInterface _int) {
 	    .setSize(ref_size*2.25, ref_size*1.125)
 	    );
 	  theme.addModel("MC_Element_Empty", theme.newWidget("MC_Element")
-			    .setStandbyColor(theme.app.color(0, 0, 0, 0))
-			    .setOutlineColor(theme.app.color(0, 0, 0, 0))
+			    .setStandbyColor(theme.app.color(0, 0, 0, 1))
 			    .setOutline(false)
 	    .setSize(ref_size*2.25, ref_size*1.125)
 	    );

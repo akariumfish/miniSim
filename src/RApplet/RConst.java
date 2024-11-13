@@ -89,9 +89,12 @@ public interface RConst {
 	    float w2 = (-1 * pa.y - w1 * ab.y) / ac.y;
 	    return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
 	}
-	
+
 	static float distancePointToPoint(float xa, float ya, float xb, float yb) {
 	  return (float) Math.sqrt( Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2) );
+	}
+	static float distSqPointPoint(float xa, float ya, float xb, float yb) {
+	  return (float)(Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2));
 	}
 	
 //#######################################################################

@@ -21,12 +21,12 @@ public class nLinkedWidget extends nWidget {
 	    clearEventSwitchOn();
 	    clearEventSwitchOff();
 	    clearEventFieldChange();
-	    if (b.type.equals("flt")) setLinkedValue((sFlt)b);
-	    if (b.type.equals("int")) setLinkedValue((sInt)b);
-	    if (b.type.equals("boo")) setLinkedValue((sBoo)b);
-	    if (b.type.equals("str")) setLinkedValue((sStr)b);
-	    if (b.type.equals("run")) setLinkedValue((sRun)b);
-	    if (b.type.equals("vec")) setLinkedValue((sVec)b);
+	    if      (b.type.equals("flt")) setLinkedValue((sFlt)b);
+	    else if (b.type.equals("int")) setLinkedValue((sInt)b);
+	    else if (b.type.equals("boo")) setLinkedValue((sBoo)b);
+	    else if (b.type.equals("str")) setLinkedValue((sStr)b);
+	    else if (b.type.equals("run")) setLinkedValue((sRun)b);
+	    else if (b.type.equals("vec")) setLinkedValue((sVec)b);
 	    return this; }
 	  nRunnable val_run;
 	  sValue val;

@@ -12,255 +12,9 @@ import sData.*;
 
 public class M_Sheet {}
 
-
-class MBasic extends Macro_Bloc { 
-  static class Builder extends MAbstract_Builder {
-	  Builder(Macro_Main m) { super("base", "Base", "Base Bloc", "Sheet"); 
-	  first_start_show(m); }
-	  MBasic build(Macro_Sheet s, sValueBloc b) { MBasic m = new MBasic(s); return m; }
-    }
-  sStr bloc_type;
-  nWidget bloc_field;
-  boolean builder_mode = false;
-  MBasic(Macro_Sheet _sheet) { super(_sheet, "base", "base", null); init_creator(); }
-  MBasic(Macro_Sheet _sheet, PVector pos) {  // for adding at mouse position
-	  super(_sheet, "base", "base", null); 
-	  setPosition(	pos.x-sheet.grab_pos.get().x-ref_size*2.25F, 
-			  		pos.y-sheet.grab_pos.get().y-ref_size*1.0F);
-	  init_creator(); 
-	  if (mmain().active_construct != null) mmain().active_construct.clear();
-	  mmain().active_construct = this; }
-  void init_creator() {
-	  hide_ctrl = true;
-	  title.hide(); reduc.hide();
-      prio_sub.hide(); prio_add.hide(); prio_view.hide(); 
-	  bloc_type = newStr("val", "val", "");
-	  addEmpty(1);
-	  bloc_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(bloc_type);
-	  bloc_field.setPosition(ref_size*0.125, ref_size*0.0625)
-	  	.setSize(ref_size*4.25, ref_size*1);
-	  bloc_type.addEventChange(new nRunnable() { public void run() { 
-		  for (MAbstract_Builder mb : mmain().bloc_builders) if (mb.type.equals(bloc_type.get())) {
-			  Macro_Abstract m = mb.build(sheet, null);//((MAbstract_Builder)builder)
-			  m.setPosition(grab_pos.get().x, grab_pos.get().y);
-			  mmain().inter.addEventNextFrame(new nRunnable(m) { public void run() {
-				  clear();
-				  m.szone_select();
-			  }});
-		  }
-	  } } );
-	  bloc_field.addEventFieldUnselect(new nRunnable() { public void run() { clear(); } } );
-	  mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() {
-		  szone_unselect();
-		  mmain().selected_macro.remove((MBasic)builder);
-		  mmain().update_select_bound();
-		  bloc_field.field_select();
-	  }});
-  }
-
-  public MBasic clear() {
-    super.clear(); 
-    if (mmain().active_construct == this) mmain().active_construct = null;
-    return this; }
-  
-  Macro_Element elem_com;
-  
-  sBoo param_view, mirror_view;
-  sStr links_save;
-  
-  nCtrlWidget param_ctrl;
-  nRunnable pview_run, link_change_run;
-  
-  boolean rebuilding = false;
-  MBasic(Macro_Sheet _sheet, String t, sValueBloc _bloc) { 
-    super(_sheet, t, t, _bloc);
-    builder_mode = true;
-    links_save = newStr("links_save", "links_save", "");
-    link_change_run = new nRunnable() {public void run() {
-		  save_co_links(); } };
-    param_view = newBoo("com_param_view", "com_param_view", false);
-	mirror_view = newBoo("mirror_view", "mirror_view", false);
-//	param_view.addEventChange(new nRunnable() { public void run() { 
-//	}});
-//	mirror_view.addEventChange(new nRunnable() { public void run() { 
-//		save_co_links();
-//		for (Macro_Element m : elements)
-//			  m.mirror(mirror_view.get());
-//	}});
-    if (!param_view.get()) get_mirror().setRunnable(new nRunnable() { public void run() { 
-    		mirror_view.set(!mirror_view.get());
-//    		save_co_links();
-    		for (Macro_Element m : elements)
-    			  m.mirror(mirror_view.get());
-//          rebuild();
-    } });
-	param_ctrl = get_param_openner().setRunnable(new nRunnable() { public void run() { 
-        param_view.set(!param_view.get());
-//        if (param_view.get()) param_ctrl.setText("N").setInfo("hide param");
-//        else param_ctrl.setText("P").setInfo("show param");
-        rebuild();
-    } });
-    if (param_view.get()) param_ctrl.setText("N").setInfo("hide param");
-    else param_ctrl.setText("P").setInfo("show param");
-    init();
-    if (param_view.get()) build_param();
-    else build_normal();
-  }
-  void init() { ; }
-  void build_param() { }//addEmptyS(0); addEmptyS(1); }
-  void build_normal() { }//addEmptyS(0); addEmptyS(1); }
-  
-  void init_end() {
-	  super.init_end();
-	  if (builder_mode) {
-		  for (Macro_Element m : elements) {
-			  if (!param_view.get()) m.mirror(mirror_view.get());
-			  if (m.connect != null) m.connect.addEventChangeLink(link_change_run);
-			  if (m.sheet_connect != null) 
-				  m.sheet_connect.addEventChangeLink(link_change_run);
-		  }
-		  load_co_links();
-	  }
-  }
-  void load_co_links() {
-	  for (Macro_Element m : elements) {
-		  if (m.connect != null) m.connect.removeEventChangeLink(link_change_run);
-		  if (m.sheet_connect != null) 
-			  m.sheet_connect.removeEventChangeLink(link_change_run);
-	  }
-      for (Macro_Element e : elements) {
-    	      if (e.connect != null) {
-  	  		  load_co_links(e.connect);
-  		  	  if (e.sheet_connect != null) load_co_links(e.sheet_connect);
-    	      }
-      }
-      for (Macro_Element m : elements) {
-		  if (m.connect != null) m.connect.addEventChangeLink(link_change_run);
-		  if (m.sheet_connect != null) 
-			  m.sheet_connect.addEventChangeLink(link_change_run);
-	  }
-      link_change_run.run();
-  }
-  void load_co_links(Macro_Connexion co) {
-	  String[] co_type = PApplet.splitTokens(links_save.get(), OBJ_TOKEN);
-	  for (String s : co_type) {
-		  String[] co_links = PApplet.splitTokens(s, GROUP_TOKEN);
-		  if (co_links.length > 1 && co.base_info.equals(co_links[0])) {
-			  co_links = PApplet.splitTokens(co_links[1], INFO_TOKEN);
-			  for (String d : co_links) {
-				  String[] e = PApplet.splitTokens(d, LINK_TOKEN);
-				  for (Macro_Connexion c : co.sheet.child_connect) 
-					  if (e.length > 1 && c.elem.descr.equals(e[1]) &&
-						  c.elem.bloc.value_bloc.ref.equals(e[0])) {
-					  co.connect_to(c);
-				  }
-			  }
-		  }
-	  }
-  }
-  void save_co_links() {
-	  links_save.set("");
-      for (Macro_Element e : elements) {
-  	  	if (e.connect != null) {
-  	  		save_co_links(e.connect);
-  		  	if (e.sheet_connect != null) save_co_links(e.sheet_connect);
-  	  	}
-      }
-  }
-  void save_co_links(Macro_Connexion co) {
-	ArrayList<Macro_Connexion> co_list = null;
-	if (co.type == INPUT) co_list = co.connected_outputs;
-	else if (co.type == OUTPUT) co_list = co.connected_inputs;
-	if (co_list != null && co_list.size() > 0) {
-		links_save.add(co.base_info + GROUP_TOKEN);
-		for (Macro_Connexion c : co_list) {
-			links_save.add(c.elem.bloc.value_bloc.ref + LINK_TOKEN + c.elem.descr + INFO_TOKEN);
-		}
-		links_save.add(OBJ_TOKEN);
-	}
-  }
-  void rebuild() {
-    if (!rebuilding) {
-    	  unclearable = false; 
-      rebuilding = true;
-      
-      save_co_links();
-      
-      boolean was_select = mmain().selected_macro.contains(this);
-      
-      ArrayList<Macro_Abstract> prev_selected = new ArrayList<Macro_Abstract>();
-      for(Macro_Abstract m : mmain().selected_macro) if (m != this) prev_selected.add(m);
-      
-      sValueBloc _bloc = mmain().inter.data.copy_bloc(value_bloc, mmain().inter.data);
-      clear();
-      sValueBloc v_bloc = mmain().inter.data.copy_bloc(_bloc, sheet.value_bloc);
-      Macro_Abstract mv = sheet.addByValueBloc(v_bloc); 
-      mv.init_end();
-      mmain().szone_clear_select();
-      for(Macro_Abstract m : prev_selected) m.szone_select();
-      if (was_select) mv.szone_select();
-    }
-  }
-  public MBasic toLayerTop() {
-    super.toLayerTop(); 
-    return this; }
-}
-
-
-
-
-class MBaseTick extends MBasic { 
-	sBoo global_tick;
-	MBaseTick(Macro_Sheet _sheet, String t, sValueBloc _bloc) { super(_sheet, t, _bloc); }
-	void init() { 
-		super.init(); 
-		global_tick = newBoo(true, "global_tick");
-		mmain().baseticked_list.add(this); }
-	void build_param() { super.build_param(); }
-	void build_normal() { super.build_normal(); }
-	void init_end() { super.init_end(); }
-	void rebuild() { super.rebuild(); }
-	void tick() { ; }
-	void receive_tick() { if (global_tick.get()) tick(); }
-	public MBaseTick toLayerTop() { super.toLayerTop(); return this; }
-	public MBaseTick clear() { super.clear(); mmain().baseticked_list.remove(this); return this; }
-}
-
-abstract class MBaseMT extends MBaseMenu { 
-	sBoo global_tick;
-	MBaseMT(Macro_Sheet _sheet, String t, sValueBloc _bloc) { super(_sheet, t, _bloc); }
-	void init() { 
-		super.init(); 
-		global_tick = newBoo(true, "global_tick");
-		mmain().baseMticked_list.add(this); }
-	void build_param() { super.build_param(); }
-	void build_normal() { super.build_normal(); }
-	void init_end() { super.init_end(); }
-	void rebuild() { super.rebuild(); }
-	void tick_strt() {}
-	abstract void tick();
-	void tick_end() {}
-	void receive_tick_strt() { if (global_tick.get()) tick_strt(); }
-	void receive_tick() { if (global_tick.get()) tick(); }
-	void receive_tick_end() { if (global_tick.get()) tick_end(); }
-	abstract void reset();
-	void receive_reset() { if (global_tick.get()) reset(); }
-	public MBaseMT toLayerTop() { super.toLayerTop(); return this; }
-	public MBaseMT clear() { super.clear(); mmain().baseMticked_list.remove(this); return this; }
-}
-
-
-
-
-
-
-
-
-
 class MZone extends MBasic { 
   static class Builder extends MAbstract_Builder {
-    Builder(Macro_Main m) { super("zone", "Zone", "--", "Sheet"); 
-	  first_start_show(m); }
+    Builder(Macro_Main m) { super("zone", "Zone", "--", "Sheet"); }
     MZone build(Macro_Sheet s, sValueBloc b) { MZone m = new MZone(s, b); return m; }
   }
   sVec corner_pos;
@@ -873,11 +627,6 @@ class MNode extends MBasic {
 
 
 class MSheetBloc extends MBasic { 
-	static class MSheetMain_Builder extends MAbstract_Builder {
-		MSheetMain_Builder() { 
-			super("sheetmain", "Old - SheetBloc", "sheet tools", "Old"); }
-		MSheetBloc build(Macro_Sheet s, sValueBloc b) { MSheetBloc m = new MSheetBloc(s, b); return m; }
-	}
 	static class Builder extends MAbstract_Builder {
 		Builder(Macro_Main m) { 
 		super("sheetbloc", "SheetBloc", "sheet tools", "Sheet"); 
@@ -992,9 +741,12 @@ class MSheetBloc extends MBasic {
 	}
 	void build_normal() {
 	    if (show2.get() || show3.get() || show4.get()) addEmptyS(2);
-	    menu_elem = addEmptyS(0);
-	    menu_elem.addTrigS("menu", new nRunnable() { public void run() {
-	    	menu(); grab_run.run(); tab_run.run(); reduc_run.run(); } })
+	    
+	    nRunnable menu_run = new nRunnable() { public void run() {
+	    	menu(); grab_run.run(); tab_run.run(); reduc_run.run(); } };
+	    menu_elem = addInput(0, "menu").setFilterBang()
+	    		.addEventReceiveBang(menu_run).elem;
+	    menu_elem.addTrigS("menu", menu_run)
 		    .setInfo("open sheet general menu");
 
 	    out_sheet = addOutput(1, "sheet link");
@@ -1010,8 +762,8 @@ class MSheetBloc extends MBasic {
 		nRunnable hide_curs_run = new nRunnable() { public void run() {
 			for (nCursor c : sheet.sheet_cursors_list) c.show.set(false); } };
 
-	    addTrigS(0, "show", "show all sheet cursor", show_curs_run);
-	    addTrigS(1, "hide", "hide all sheet cursor", hide_curs_run);
+//	    addTrigS(0, "show", "show all sheet cursor", show_curs_run);
+//	    addTrigS(1, "hide", "hide all sheet cursor", hide_curs_run);
 	    
 	    if (show1.get()) {
 		    addTrigS(1, "view", goto_run).setInfo("view full sheet");
@@ -1053,11 +805,13 @@ class MSheetBloc extends MBasic {
 		grab_run.run(); tab_run.run(); reduc_run.run(); 
 	}
 	public MSheetBloc clear() {
-	    if (sheet.sheet_front != null) sheet.sheet_front.grabber.removeEventDrag(grab_run);
-	    if (sheet.sheet_front != null) sheet.sheet_front.removeEventCollapse(reduc_run); 
-	    if (sheet.sheet_front != null) sheet.sheet_front.removeEventClose(close_run); 
-	    if (sheet.sheet_front != null) sheet.sheet_front.clear();
-	    if (mmain().main_sheetbloc == this) mmain().main_sheetbloc = null; 
+		if (mmain().main_sheetbloc != this) {
+		    if (sheet.sheet_front != null) sheet.sheet_front.grabber.removeEventDrag(grab_run);
+		    if (sheet.sheet_front != null) sheet.sheet_front.removeEventCollapse(reduc_run); 
+		    if (sheet.sheet_front != null) sheet.sheet_front.removeEventClose(close_run); 
+		    if (sheet.sheet_front != null) sheet.sheet_front.clear();
+		    if (mmain().main_sheetbloc == this) mmain().main_sheetbloc = null; 
+		}
 		super.clear(); 
 		return this; }
 	public MSheetBloc toLayerTop() {

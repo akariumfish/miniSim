@@ -1,5 +1,6 @@
 package Macro;
 
+import Macro.MSet.SetObj;
 import RApplet.RConst;
 import RApplet.Rapp;
 import RApplet.sInterface;
@@ -330,6 +331,11 @@ public class MCanvas extends MBaseMT {
 		    if (solidg != null) { 
 		    		for (ESolid s : solidg.solid_list) s.draw_halo(this);
 		    }
+		    
+			if (c.elem.bloc.val_type.get().equals("set")) {
+				MSet set = (MSet)c.elem.bloc;
+				for (SetObj o : set.objects) o.draw_halo(this);
+			} 
 		}
 		if (active_can == 0) rain(can2);
 		else if (active_can == 1) rain(can1);
@@ -380,18 +386,6 @@ public class MCanvas extends MBaseMT {
 	  }
 	  
 	void drawCanvas() {
-	    if (val_show_bound.get()) {
-
-		    	gui.app.stroke(val_col_bound.get());
-		    	gui.app.strokeWeight(val_bound_thick.get() * ref_size / (10 * mmain().gui.scale) );
-		    	gui.app.noFill();
-		    	if (val_centered.get())
-		    		gui.app.rect(val_pos.get().x - val_w.get() * getscale() / 2, 
-		    				 val_pos.get().y - val_h.get() * getscale() / 2, 
-		    				 val_w.get() * getscale(), val_h.get() * getscale());
-		    	else gui.app.rect(val_pos.get().x, val_pos.get().y, 
-	    				 val_w.get() * getscale(), val_h.get() * getscale());
-	    }
 
   	    if (val_show_back.get()) draw(back, false);
 	    if (val_show.get()) {
@@ -415,6 +409,19 @@ public class MCanvas extends MBaseMT {
 			
 	  	  	mask_image.endDraw();
 	    }
+
+    	    if (val_show_bound.get()) {
+
+    		    	gui.app.stroke(val_col_bound.get());
+    		    	gui.app.strokeWeight(val_bound_thick.get() * ref_size / (10 * mmain().gui.scale) );
+    		    	gui.app.noFill();
+    		    	if (val_centered.get())
+    		    		gui.app.rect(val_pos.get().x - val_w.get() * getscale() / 2, 
+    		    				 val_pos.get().y - val_h.get() * getscale() / 2, 
+    		    				 val_w.get() * getscale(), val_h.get() * getscale());
+    		    	else gui.app.rect(val_pos.get().x, val_pos.get().y, 
+    	    				 val_w.get() * getscale(), val_h.get() * getscale());
+    	    }
 	  }
 
 	  void draw(PImage canvas, boolean shadering) {
@@ -457,6 +464,9 @@ public class MCanvas extends MBaseMT {
 	  }
 	  public void draw_line_halo(PVector p1, PVector p2, 
 			  					float halo_size, float halo_density, int c, boolean fracture) {
+
+//			app.logln("drhalo-"+p1.x+"-"+p1.y+"-"+p2.x+"-"+p2.y);
+		  app.drawcross(p1.x, p1.y, 10);
 		  float xmin = PApplet.min(p1.x, p2.x);
 		  float xmax = PApplet.max(p1.x, p2.x);
 		  float ymin = PApplet.min(p1.y, p2.y);
@@ -470,7 +480,6 @@ public class MCanvas extends MBaseMT {
 //			        float d2 = RConst.distancePointToPoint(px, py, p2.x, p2.y);
 //			        float l = RConst.distancePointToPoint(p1.x, p1.y, p2.x, p2.y);
 		        if (d < halo_size && (d1 > halo_size || !fracture)
-		        		//&& (l < halo_size || !fracture)
 		        		) { 
 		          float a = (halo_density) * RConst.soothedcurve(1.0F, d / halo_size);
 		          if (active_can == 0) addpix(can2, px, py, gui.app.color(gui.app.red(c)*a, 

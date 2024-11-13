@@ -12,8 +12,8 @@ import sData.sValueBloc;
 
 public class MCam extends MBaseMenu { 
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("cam", "Camera", "camera drawing point", "Work"); 
-		first_start_show(m); }
+		Builder(Macro_Main m) { super("cam", "Camera", 
+				"camera drawing point", "Work"); }
 		MCam build(Macro_Sheet s, sValueBloc b) { MCam m = new MCam(s, b); return m; }
 	}
 	Drawable drawable;

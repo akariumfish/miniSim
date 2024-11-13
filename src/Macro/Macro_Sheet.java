@@ -319,7 +319,7 @@ public class Macro_Sheet extends Macro_Abstract {
 		  }
 		  for (Macro_Element m : child_elements) {
 			  if (m.sheet_viewable) {
-				  m.back.setTrigger().setLook("MC_Element_For_Spot"); 
+				  m.back.setTrigger().setLook(m.back_model); 
 				  /*event in init de l'element*/ 
 				  for (nWidget w : m.elem_widgets) if (w != m.back) w.tempPassif(true);
 			  } 
@@ -352,7 +352,7 @@ public class Macro_Sheet extends Macro_Abstract {
     for (Macro_Element m : child_elements) {
 		for (nWidget w : m.elem_widgets) w.tempPassif(false);
 		m.back.setPassif(); 
-		if (m.sheet_viewable) m.back.setLook("MC_Element"); 
+		if (m.sheet_viewable) m.back.setLook(m.back_model); 
 		if (m.spot != null) m.spot.setBackground(); 
     }
     mmain().inter.removeEventFrame(new_spot_run);
@@ -788,13 +788,13 @@ public  Macro_Sheet(Macro_Sheet p, String n, sValueBloc _bloc) {
       else if (openning.get() == DEPLOY) { openning.set(OPEN); deploy(); }
 	  if (!loading_from_bloc) { 
 		deploy();
-		if (!specialize.get().equals("sheet"))
-		mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { 
-			MSheetBloc m = new MSheetBloc(((Macro_Sheet)builder), null);
-			m.init_end();
-			m.grabber.setPosition(ref_size*8, 0);
-			updateBack();
-		}});
+		if (this != mmain()) //!specialize.get().equals("sheet")
+			mmain().inter.addEventNextFrame(new nRunnable(this) { public void run() { 
+				MSheetBloc m = new MSheetBloc(((Macro_Sheet)builder), null);
+				m.init_end();
+				m.grabber.setPosition(ref_size*8, 0);
+				updateBack();
+			}});
 		sheet.select();
 		find_place(back);
 		if (sheetCursor != null) sheetCursor.pval.set(grabber.getLocalX(), grabber.getLocalY());

@@ -89,6 +89,13 @@ public class nConstructor {
       .setOutlineWeight(ref_size / 8)
       .setOutline(true)
       );
+    theme.addModel("Button_Check_AutoMacro", theme.newWidget("ref")
+      .setStandbyColor(app.color(10, 20, 80))
+      .setClickedColor(app.color(20, 40, 160))
+      .setOutlineColor(app.color(255, 120))
+      .setOutlineWeight(ref_size / 8)
+      .setOutline(true)
+      );
     theme.addModel("Field", theme.newWidget("ref")
       .setStandbyColor(app.color(20))
       .setOutlineColor(app.color(255, 120))
@@ -157,6 +164,7 @@ public class nConstructor {
     make("Label_Back");
     make("Auto_Watch_Label");
     make("Button_Check");
+    make("Button_Check_AutoMacro");
     make("Field");
     make("Cursor");
   }

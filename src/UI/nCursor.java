@@ -274,9 +274,9 @@ public class nCursor extends nWidget implements Macro_Interf {
 	      screen_widget.hide();
 	      screenpoint_widget.hide();
 	      if (show != null && show.get()) { 
+		    thiswidget.show();
 	        if (show_dir) pointwidget.show();
 	        else pointwidget.hide(); 
-	        thiswidget.show();
 	        toLayerTop();
 	      } else {
 	        pointwidget.hide(); 

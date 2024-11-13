@@ -169,8 +169,8 @@ public class M_Works {}
 class MStructure extends MBaseMenu { 
 
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("struct", "Structure", "structure of shapes", "Work"); 
-		first_start_show(m); }
+		Builder(Macro_Main m) { super("struct", "Structure", 
+				"structure of shapes", "Work"); }
 		MStructure build(Macro_Sheet s, sValueBloc b) { MStructure m = new MStructure(s, b); return m; }
 	}
 	

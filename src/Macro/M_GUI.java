@@ -366,8 +366,7 @@ class MMButton extends MBasic {
 
 class MText extends MBasic { 
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("text", "Text", "", "GUI"); 
-		first_start_show(m); }
+		Builder(Macro_Main m) { super("text", "Text", "", "GUI"); }
 		MText build(Macro_Sheet s, sValueBloc b) { MText m = new MText(s, b); return m; }
 	}
 
@@ -1611,8 +1610,7 @@ class MPanel extends Macro_Bloc {
 
 class MButton extends MBasic {
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("button", "Button", "", "GUI"); 
-		first_start_show(m); }
+		Builder(Macro_Main m) { super("button", "Button", "", "GUI"); }
 		MButton build(Macro_Sheet s, sValueBloc b) { MButton m = new MButton(s, b); return m; }
 	}
 	sBoo mode;
