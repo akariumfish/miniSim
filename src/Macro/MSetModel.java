@@ -13,11 +13,20 @@ import sData.*;
 public abstract class MSetModel extends MBaseMenu {
 
 	  public void build_custom_menu(nFrontPanel sheet_front) {
-//	    nFrontTab tab = sheet_front.addTab("Control");
-//	    tab.getShelf()
-//      	  .addDrawerButton(add_run, 10.25F, 1)
-//      	  .addSeparator(0.125)
-//	      ;
+	    nFrontTab tab = sheet_front.addTab("Halo");
+	    tab.getShelf()
+    	  	  .addSeparator(0.125)
+      	  .addDrawerColor(val_halo_col, 10.25F, 1, inter.taskpanel)
+      	  .addSeparator(0.125)
+	      .addDrawerFltSlide(val_halo_size)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(val_halo_size, 10, 10, 1)
+	      .addSeparator(0.125)
+	      .addDrawerFltSlide(val_halo_dens)
+	      .addSeparator(0.125)
+	      .addDrawerIncrValue(val_halo_dens, 1, 10, 1)
+	      .addSeparator(0.125)
+	      ;
 	      
 	    if (sheet_front.collapsed) {
 	    		sheet_front.popUp();
@@ -50,11 +59,11 @@ public abstract class MSetModel extends MBaseMenu {
 		ref_size = inter.ref_size;
 		init_access();
 
-		val_halo_size = menuFltSlide(20, 10, 200, "val_halo_size");
-		menuFltFact(val_halo_size, 2);
-		val_halo_dens = menuFltSlide(1.2F, 0.1F, 4, "val_halo_dens");
-		menuFltFact(val_halo_dens, 2);
-		val_halo_col = menuColor(app.color(255,120,0),"val_halo_col");
+		val_halo_size = newFlt(20, "val_halo_size");
+		if (!loading_from_bloc) val_halo_size.set_limit(2, 100);
+		val_halo_dens = newFlt(1.2F, "val_halo_dens");
+		if (!loading_from_bloc) val_halo_dens.set_limit(0, 5);
+		val_halo_col = newCol(app.color(255,120,0),"val_halo_col");
 
 		val_radius = menuFltSlide(20, 5, 100, "val_radius");
 		menuFltFact(val_radius, 2);

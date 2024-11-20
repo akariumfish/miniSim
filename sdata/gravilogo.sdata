@@ -1009,7 +1009,7 @@ int
 shr
 objects_count
 val
-8
+6
 min
 0
 max
@@ -3141,7 +3141,7 @@ boo
 shr
 val_doradius
 val
-1
+0
 0
 0
 menu_pos
@@ -3175,7 +3175,7 @@ int
 shr
 menu_tab
 val
-2
+3
 min
 0
 max
@@ -4859,7 +4859,7 @@ boo
 shr
 do_reset_add
 val
-1
+0
 0
 0
 access_show_add_cursor
@@ -4979,7 +4979,7 @@ boo
 shr
 addtyp_rng
 val
-1
+0
 0
 0
 access_add_imovy
@@ -5011,7 +5011,7 @@ boo
 shr
 do_reset_empty
 val
-1
+0
 0
 0
 add_pos_x
@@ -5027,7 +5027,7 @@ flt
 shr
 add_pos_x
 val
--282.82666
+0.0
 min
 0.0
 max
@@ -5065,7 +5065,7 @@ int
 shr
 addtyp_rng_count
 val
-2
+1
 min
 0
 max
@@ -5089,7 +5089,7 @@ flt
 shr
 addtyp_grid_space
 val
-200.0
+50.0
 min
 0.0
 max
@@ -5225,9 +5225,9 @@ vec
 shr
 val_pos
 x
--282.82666
+0.0
 y
-70.70715
+0.0
 0
 0
 links_save
@@ -5349,7 +5349,7 @@ int
 shr
 addtyp_grid_w
 val
-2
+1
 min
 1
 max
@@ -5373,7 +5373,7 @@ flt
 shr
 add_pos_y
 val
-70.70715
+0.0
 min
 0.0
 max
@@ -12577,7 +12577,7 @@ boo
 shr
 val_doradius
 val
-1
+0
 0
 0
 menu_pos
@@ -12611,7 +12611,7 @@ int
 shr
 menu_tab
 val
-2
+3
 min
 0
 max
@@ -14859,7 +14859,7 @@ flt
 shr
 tls
 val
-4.760416
+4.610417
 min
 0.0
 max
@@ -14963,7 +14963,7 @@ flt
 shr
 tps
 val
-210.06566
+216.90013
 min
 0.0
 max
@@ -15067,9 +15067,9 @@ vec
 shr
 pos
 x
-307.64618
+119.006294
 y
--108.63369
+-76.78801
 0
 0
 copy_run
@@ -15171,9 +15171,9 @@ vec
 shr
 1_screator_pos
 x
--282.82666
+0.0
 y
-70.70715
+0.0
 0
 0
 vid_run
@@ -15229,7 +15229,7 @@ int
 shr
 frsr
 val
-213
+448
 min
 0
 max
@@ -15285,7 +15285,7 @@ flt
 shr
 fdur
 val
-45.0
+40.0
 min
 0.0
 max
@@ -15309,7 +15309,7 @@ int
 shr
 tick
 val
-1704
+3584
 min
 0
 max
@@ -15397,7 +15397,7 @@ flt
 shr
 mfr
 val
-26.258207
+27.112516
 min
 0.0
 max
@@ -15421,7 +15421,7 @@ flt
 shr
 scale
 val
-0.24042973
+0.32001188
 min
 0.005
 max
@@ -15677,7 +15677,7 @@ flt
 shr
 cfr
 val
-0.045
+0.04
 min
 0.0
 max
@@ -15761,7 +15761,7 @@ int
 shr
 SEED
 val
-410021472
+554098816
 min
 0
 max
@@ -15993,7 +15993,7 @@ int
 shr
 sec
 val
-8
+16
 min
 0
 max
@@ -20825,7 +20825,7 @@ str
 shr
 spath
 val
-start.sdata
+gravilogo.sdata
 0
 0
 log_ext_save

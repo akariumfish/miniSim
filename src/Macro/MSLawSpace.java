@@ -25,9 +25,9 @@ public class MSLawSpace extends MSetLaw {
 	}
 	public void init() {
 		super.init();
-		grav_const = newFlt(0.1F, "grav_const");
-		frictn_const = newFlt(0.005F, "frictn_const");
-		solid_const = newFlt(0.01F, "solid_const");
+		grav_const = newFlt(0.6F, "grav_const");
+		frictn_const = newFlt(0.00015F, "frictn_const");
+		solid_const = newFlt(0.04F, "solid_const");
 	    globalFltFact(grav_const, 2, false);
 	    globalFltFact(frictn_const, 2, false);
 	    globalFltFact(solid_const, 2, false);

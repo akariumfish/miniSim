@@ -32,7 +32,7 @@ public abstract class MSetRunner extends MBaseMenu {
   	float ref_size;
   
   	Macro_Connexion link_out;
-  	MSetCreator creator;
+  	MSubSet sset;
   	boolean use_cursordir;
   	nRunnable use_cursdir_run;
   	sFlt dir_cursdir_cible;
@@ -52,12 +52,12 @@ public abstract class MSetRunner extends MBaseMenu {
 		
 		init_access();
 		
-		creator = null;
+		sset = null;
 		use_cursordir = false;
 		dir_cursdir_cible = null;
 		use_cursdir_run = new nRunnable() { public void run() {
-			if (dir_cursdir_cible != null && creator != null)
-				dir_cursdir_cible.set(creator.add_ref_cursor.dir().heading());
+			if (dir_cursdir_cible != null && sset != null && sset.creator != null)
+				dir_cursdir_cible.set(sset.creator.add_ref_cursor.dir().heading());
 		}};
 		
 		do_max_age = newBoo(false, "do_max_age");
@@ -74,10 +74,10 @@ public abstract class MSetRunner extends MBaseMenu {
 		link_out = addOutput(2, "Link_out").set_link();
 		link_out.addEventChangeLink(new nRunnable() { public void run() { 
 			deconnect(); 
-			creator = null;
+			sset = null;
 		  	for (Macro_Connexion c : link_out.connected_inputs) {
 		  		if (c.elem.bloc.val_type.get().equals("setcreator")) {
-		  			creator = (MSetCreator)c.elem.bloc;
+		  			sset = (MSubSet)c.elem.bloc;
 		  			break; }
 		  	}
 		    reconnect(); 
@@ -94,24 +94,24 @@ public abstract class MSetRunner extends MBaseMenu {
 		deconnect();
 		return this; }
 	void deconnect() {
-		if (use_cursordir && creator != null) {
-			creator.add_ref_cursor.dval.removeEventChange(use_cursdir_run);
-			creator.add_ref_cursor.show_dir = false;
-			creator.add_ref_cursor.update_view();
+		if (use_cursordir && sset != null && sset.creator != null) {
+			sset.creator.add_ref_cursor.dval.removeEventChange(use_cursdir_run);
+			sset.creator.add_ref_cursor.show_dir = false;
+			sset.creator.add_ref_cursor.update_view();
 		}
 	}
 	void reconnect() { 
-		if (use_cursordir && creator != null) {
-			creator.add_ref_cursor.dval.addEventChange(use_cursdir_run);
-			creator.add_ref_cursor.show_dir = true;
-			creator.add_ref_cursor.update_view();
+		if (use_cursordir && sset != null && sset.creator != null) {
+			sset.creator.add_ref_cursor.dval.addEventChange(use_cursdir_run);
+			sset.creator.add_ref_cursor.show_dir = true;
+			sset.creator.add_ref_cursor.update_view();
 		}
 	}
 
 	void reset() { ; }
 	void tick() { 
-		if (do_max_age.get()) for (int i = creator.objects.size() - 1 ; i >= 0 ; i--) {
-			SetObj o = creator.objects.get(i);
+		if (do_max_age.get()) for (int i = sset.objects.size() - 1 ; i >= 0 ; i--) {
+			SetObj o = sset.objects.get(i);
 			if (o.age >= max_age.get()) o.clear();
 		}
 	}

@@ -1,6 +1,7 @@
 package Macro;
 
 import RApplet.RConst;
+import UI.nFrontPanel;
 import processing.core.PVector;
 import sData.sBoo;
 import sData.sFlt;
@@ -14,6 +15,7 @@ public class MSModArrow extends MSetModel {
 		first_start_show(m); }
 		MSModArrow build(Macro_Sheet s, sValueBloc b) { MSModArrow m = new MSModArrow(s, b); return m; }
 	}
+	
 	
 	sFlt val_strokeweight;
 	sBoo val_doradius, val_doarrow;

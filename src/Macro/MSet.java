@@ -37,12 +37,14 @@ public class MSet extends MBaseMT {
     float ref_size;
     Drawable drawable;
 
-    Macro_Connexion link_creat, link_law, link_canvas;
-	ArrayList<MSetCreator> creators;
+    Macro_Connexion link_subset, link_law, link_canvas;
+	ArrayList<MSubSet> creators;
 	ArrayList<MSetLaw> laws;
 	ArrayList<SetObj> objects;
 	
 	sInt objects_count;
+	
+	sBoo do_ticks, do_draws;
     
     MSet(Macro_Sheet _sheet, sValueBloc _bloc) { 
 		super(_sheet, "set", _bloc); 
@@ -53,7 +55,7 @@ public class MSet extends MBaseMT {
 		cam_gui = inter.cam_gui;
 		ref_size = inter.ref_size;
 
-		creators = new ArrayList<MSetCreator>();
+		creators = new ArrayList<MSubSet>();
 		laws = new ArrayList<MSetLaw>();
 		objects = new ArrayList<SetObj>();
 		
@@ -68,6 +70,10 @@ public class MSet extends MBaseMT {
 	    objects_count = newInt(0, "objects_count");
 	    objects_count.set(0);
 	    menuWatch(objects_count);
+
+	    do_ticks = newBoo(true, "do_ticks");
+	    do_draws = newBoo(true, "do_draws");
+	    globalBin(do_ticks, do_draws, true);
 	}
 	void build_param() { 
 		super.build_param(); 
@@ -75,12 +81,12 @@ public class MSet extends MBaseMT {
 	}
 	void build_normal() { 
 	  super.build_normal(); 
-	  link_creat = addInput(0, "link_creat").set_link();
-	  link_creat.addEventChangeLink(new nRunnable() { public void run() { 
+	  link_subset = addInput(0, "link_subset").set_link();
+	  link_subset.addEventChangeLink(new nRunnable() { public void run() { 
 		  creators.clear();
-		  for (Macro_Connexion c : link_creat.connected_outputs) {
-			  if (c.elem.bloc.bloc_specialization.equals("setcreator"))
-				  creators.add((MSetCreator)c.elem.bloc);
+		  for (Macro_Connexion c : link_subset.connected_outputs) {
+			  if (c.elem.bloc.bloc_specialization.equals("subset"))
+				  creators.add((MSubSet)c.elem.bloc);
 		  }
 	  }});
 	  link_law = addInput(0, "link_law").set_link();
@@ -109,7 +115,7 @@ public class MSet extends MBaseMT {
 		return this;
 	}
 	
-	SetObj addObject(MSetCreator m) {
+	SetObj addObject(MSubSet m) {
 		SetObj o = new SetObj(m);
 		return o;
 	}
@@ -122,22 +128,27 @@ public class MSet extends MBaseMT {
 	}
 	void reset() {
 		for (SetObj o : objects) o.reset();
-		for (MSetCreator c : creators) c.reset();
+		for (MSubSet c : creators) c.reset();
 	}
 	void tick() {
-		for (MSetCreator c : creators) c.tick();
-		for (SetObj o : objects) o.creator.tick(o);
-		for (MSetLaw c : laws) for (SetObj o : objects) c.tick_obj(o);
-		for (int i = 0 ; i < objects.size() ; i++)
-			for (int j = i+1 ; j < objects.size() ; j++) 
-				for (MSetLaw c : laws) { 
-					c.pair_obj(objects.get(i), objects.get(j));
-				}
-		for (SetObj o : objects) o.tick();
+		if (do_ticks.get()) {
+			for (MSubSet c : creators) c.tick();
+			for (SetObj o : objects) o.subset.tick(o);
+			for (MSetLaw c : laws) for (SetObj o : objects) c.tick_obj(o);
+			for (int i = 0 ; i < objects.size() ; i++)
+				for (int j = i+1 ; j < objects.size() ; j++) 
+					for (MSetLaw c : laws) { 
+						c.pair_obj(objects.get(i), objects.get(j));
+					}
+			for (SetObj o : objects) o.tick();
+		}
 	}
 	void draw_Cam() {
-		for (SetObj o : objects) o.creator.draw(o);
-//		for (MSetCreator c : creators) c.draw();
+		if (do_draws.get()) {
+			for (SetObj o : objects) o.subset.draw(o);
+		}
+		//debug
+//		for 	(MSetCreator c : creators) c.draw();
 	}
 	
 	class SetObj {
@@ -162,10 +173,10 @@ public class MSet extends MBaseMT {
 		PVector mov_chng = new PVector(0, 0);
 	    float radius_strt, mass_strt, density_strt;
 	    
-	    MSetCreator creator;
+	    MSubSet subset;
 	    
-		SetObj(MSetCreator r) {
-			creator = r;
+		SetObj(MSubSet r) {
+			subset = r;
 			objects.add(this);
 			r.objects.add(this);
 			objects_count.add(1);
@@ -186,7 +197,7 @@ public class MSet extends MBaseMT {
 		}
 		void clear() {
 			objects.remove(this);
-			creator.objects.remove(this);
+			subset.objects.remove(this);
 			objects_count.add(-1);
 		}
 		void reset() {

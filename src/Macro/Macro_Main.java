@@ -1219,8 +1219,9 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MCurve.Builder(this));
       add_bloc_builders(new MEnvelope.Builder(this));
       add_bloc_builders(new MSet.Builder(this));
-      add_bloc_builders(new MSetCreator.Builder(this));
+      add_bloc_builders(new MSubSet.Builder(this));
       add_bloc_builders(new MSLawSpace.Builder(this));
+      add_bloc_builders(new MSetCreator.Builder(this));
       add_bloc_builders(new MSRunFloc.Builder(this));
       add_bloc_builders(new MSRunAuto.Builder(this));
       add_bloc_builders(new MSRunStatic.Builder(this));

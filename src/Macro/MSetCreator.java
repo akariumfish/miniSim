@@ -11,10 +11,10 @@ import UI.nFrontTab;
 import UI.nGUI;
 import sData.*;
 
-public class MSetCreator extends MBaseMenu {
+public class MSetCreator  extends MBaseMenu {
 	
 	static class Builder extends MAbstract_Builder {
-		Builder(Macro_Main m) { super("setcreator", "SCreator", 
+		Builder(Macro_Main m) { super("screator", "SetCreator", 
 				"Set objects creator", "Set Tool"); 
 		first_start_show(m); }
 		MSetCreator build(Macro_Sheet s, sValueBloc b) { MSetCreator m = new MSetCreator(s, b); return m; }
@@ -59,13 +59,11 @@ public class MSetCreator extends MBaseMenu {
   	nGUI cam_gui;
   	float ref_size;
   
-  	Macro_Connexion link_model,link_runner,link_out;
-  	MSet set;
-  	MSetModel model;
-  	MSetRunner runner;
+  	Macro_Connexion link_out;
+  	MSubSet sset;
 	ArrayList<SetObj> objects;
 
-  	sRun add_run,rst_run,emp_run;
+  	sRun add_run;
 
   	nCursor add_ref_cursor;
   	sVec add_pos_vec;
@@ -74,10 +72,10 @@ public class MSetCreator extends MBaseMenu {
 	
 	sBoo do_reset_add, do_reset_empty, addtyp_grid, addtyp_rng;
 	sInt addtyp_grid_w, addtyp_grid_h, addtyp_rng_count;//, add_duration;
-	sFlt addtyp_grid_space, addtyp_rng_zone;
+	sFlt addtyp_grid_space, addtyp_rng_zone, add_initmovx, add_initmovy;
 	
 	MSetCreator(Macro_Sheet _sheet, sValueBloc _bloc) { 
-		super(_sheet, "setcreator", _bloc, "setcreator"); 
+		super(_sheet, "screator", _bloc, "screator"); 
 	}
 	public void init() {
 		super.init();
@@ -86,9 +84,9 @@ public class MSetCreator extends MBaseMenu {
 		cam_gui = inter.cam_gui;
 		ref_size = inter.ref_size;
 		init_access();
-		set = null; model = null; runner = null;
+		sset = null; 
 		objects = new ArrayList<SetObj>();
-		
+
 		addtyp_grid = newBoo(true, "addtyp_grid");
 		addtyp_grid_w = newInt(1, "addtyp_grid_w");
 		addtyp_grid_h = newInt(1, "addtyp_grid_h");
@@ -109,11 +107,15 @@ public class MSetCreator extends MBaseMenu {
 //	    menuBoo(addtyp_grid, addtyp_rng);
 //		menuIntIncr(add_duration, 1000);
 //		menuIntIncr(add_duration, 10);
-		
+
+		add_initmovx = newFlt(0, "add_imovx");
+		add_initmovy = newFlt(0, "add_imovy");
 	    add_pos_vec = newVec("val_pos");
 	    show_add_cursor = newBoo(true, "show_add_cursor");
 	    add_pos_x = newFlt(0, "add_pos_x");
 	    add_pos_y = newFlt(0, "add_pos_y");
+	    globalFltIncr(add_initmovx, 0.1F, false);
+	    globalFltIncr(add_initmovy, 0.1F, false);
 	    globalFltIncr(add_pos_y, 10, false);
 	    menuFltIncr(add_pos_y, 1000);
 	    globalFltIncr(add_pos_x, 10, false);
@@ -141,12 +143,6 @@ public class MSetCreator extends MBaseMenu {
 
 		add_run = newGlobalRun("add_run", false, new nRunnable(this) { public void run() { 
 			add(); }});
-		emp_run = newRun("emp_run", new nRunnable(this) { public void run() { 
-			empty(); }});
-		rst_run = newRun("rst_run", new nRunnable(this) { public void run() { 
-			for (SetObj o : objects) o.reset();
-			reset(); }});
-		globalBin(rst_run, emp_run, false);
 		do_reset_add = newBoo(false, "do_reset_add");
 		do_reset_empty = newBoo(false, "do_reset_empty");
 		globalBin(do_reset_add, do_reset_empty, false);
@@ -156,46 +152,27 @@ public class MSetCreator extends MBaseMenu {
 		build_normal();
 	}
 	void build_normal() { 
-	    super.build_normal(); 
-		link_out = addOutput(1, "Link_out").set_link();
+		link_out = addOutput(2, "Link_out").set_link();
 		link_out.addEventChangeLink(new nRunnable() { public void run() { 
-			MSet prev_set = set;
-			set = null;
+			MSubSet prev_set = sset;
+			sset = null;
 		  	for (Macro_Connexion c : link_out.connected_inputs) {
-		  		if (c.elem.bloc.val_type.get().equals("set"))
-		  			set = (MSet)c.elem.bloc;
+		  		if (c.elem.bloc.val_type.get().equals("subset"))
+		  			sset = (MSubSet)c.elem.bloc;
 		  	}
-		  	if (set != prev_set) reconnect();
+		  	if (sset != prev_set) reconnect();
 		}});
-		link_model = addInput(0, "Link_Model").set_link();
-		link_model.addEventChangeLink(new nRunnable() { public void run() { 
-			model = null;
-			for (Macro_Connexion c : link_model.connected_outputs) {
-				if (c.elem.bloc.bloc_specialization.equals("setmodel"))
-					model = (MSetModel)c.elem.bloc;
-			}
-		  }});
-		link_runner = addInput(0, "Link_Runner").set_link();
-		link_runner.addEventChangeLink(new nRunnable() { public void run() { 
-			runner = null;
-			for (Macro_Connexion c : link_runner.connected_outputs) {
-				if (c.elem.bloc.bloc_specialization.equals("setrunner"))
-					runner = (MSetRunner)c.elem.bloc;
-			}
-		  }});
-		addEmpty(1);
-		addEmpty(2); addEmpty(2); addEmpty(2);
+	    super.build_normal(); 
 	}
 	void init_end() {  super.init_end();  }
 	void rebuild() {  super.rebuild(); 
 		if (rebuilding = true) for (MSet.SetObj o : objects) {
 			((MSetCreator)rebuild_as).objects.add(o);
-			o.creator = (MSetCreator)rebuild_as;
 		}
 	}
 	public MSetCreator clear() {
 		super.clear(); 
-		if (set != null) set.creators.remove(this);
+		if (sset != null) sset.objects.remove(this);
 		return this; }
 
 	void reconnect() { }
@@ -246,21 +223,18 @@ public class MSetCreator extends MBaseMenu {
 		}
 	}
 	void add_at(float x, float y) {
-		if (set != null) {
-			SetObj o = set.addObject(this);
-			o.pos.set(x, y);
-			if (model != null) model.init_obj(o);
-			if (runner != null) runner.init_obj(o);
-			set.end_addObject(o);
+		if (sset != null) {
+			SetObj o = sset.addObject(x, y);
+			if (o != null) o.mov.set(add_initmovx.get(), add_initmovy.get());
+			if (o != null) objects.add(o);
 		}
 	}
 	void empty() {
 		for (int i = objects.size() - 1 ; i >= 0 ; i--) objects.get(i).clear();
+		objects.clear();
 	}
 	void reset() {
 		if (do_reset_empty.get()) empty();
-		if (model != null) model.reset();
-		if (runner != null) runner.reset();
 		if (do_reset_add.get()) inter.addEventTwoFrame(add_run.get());
 	}
 	//debug
@@ -272,18 +246,12 @@ public class MSetCreator extends MBaseMenu {
 //		app.drawcross(add_pos_x.get(), add_pos_y.get(), 30);
 //	}
 	void tick() {
-//		add_tick();
-		if (runner != null) runner.tick();
-		for (int i = 0 ; i < objects.size() ; i++)
-		for (int j = i+1 ; j < objects.size() ; j++) {
-			runner.pair_obj(objects.get(i), objects.get(j));
-		}
+		
 	}
 	void tick(SetObj o) {
-		if (runner != null) runner.tick_obj(o);
+		
 	}
 	void draw(SetObj o) {
-		if (model != null) model.draw_canvas(o);
-		if (model != null) model.draw_obj(o);
+		
 	}
 }

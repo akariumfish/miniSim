@@ -143,8 +143,8 @@ public class MCanvas extends MBaseMT {
 	
 	void init_canvas() {
 	    int def_pix_size = 5;
-	    int def_size_w = app.width / def_pix_size;
-	    int def_size_h = app.height / def_pix_size;
+	    int def_size_w = (int) (app.width * 2.5F / def_pix_size);
+	    int def_size_h = (int) (app.height * 2.5F / def_pix_size);
 	    def_size_w -= def_size_w % 10;
 	    def_size_h -= def_size_h % 10;
 	    val_pos = newVec("val_pos", "val_pos");
@@ -160,7 +160,7 @@ public class MCanvas extends MBaseMT {
 	    val_show = newBoo(true, "val_show", "show_canvas");
 	    val_show_back = newBoo(false, "val_show_back", "val_show_back");
 	    val_show_bound = newBoo(true, "val_show_bound", "show_bound");
-	    val_show_grab = newBoo(true, "val_show_grab", "show_grab");
+	    val_show_grab = newBoo(false, "val_show_grab", "show_grab");
 	    val_centered = newBoo(true, "val_centered", "val_centered");
 	    val_col_back = menuColor(gui.app.color(0), "background");
 	    val_col_back.addEventChange(new nRunnable() { public void run() { reset(); } });
