@@ -83,6 +83,8 @@ class EGrower extends Entity {
 	    dir = new PVector();
 	    dir = grows;
 	    grows = PVector.add(pos, grows);
+	    
+	    width = com().MAX_LINE_WIDTH.get();
 	    return this;
 	  }
 	  void addWidth() { addWidth(0); }

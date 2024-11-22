@@ -1,9 +1,10 @@
 0:- :setup
 0:  :setup end
 4:- :setup_load from start.sdata
-3170:  :full_data_save to start.sdata
-6423:  :full_data_save to start.sdata
-6527:  :exit
+1470:- :full_data_save to start.sdata
+1527:- :setup_load from start.sdata
+10841:- :full_data_save to bloom.sdata
+10910:- :exit
 null
 null
 null

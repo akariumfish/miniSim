@@ -33,7 +33,7 @@ public class MSound extends MBaseMT {
 //    ArrayList<Macro_Connexion> out_cos;
     
     sRun run_play, run_stop, run_restart;
-    sBoo val_play;
+    sBoo val_play, val_mute;
     sInt position_val;
     
     sInt val_band, val_larg, val_thresh;
@@ -54,6 +54,7 @@ public class MSound extends MBaseMT {
 		
 		position_val = newInt(0, "position_val");
 	    val_play = newBoo(false, "val_play");
+	    val_mute = newBoo(false, "val_mute");
 	    val_band = newInt(40, "val_band");
 	    val_larg = newInt(40, "val_larg");
 	    val_thresh = newInt(100, "val_thresh");
@@ -67,6 +68,10 @@ public class MSound extends MBaseMT {
 		if (val_play.get()) sound_player.play();
 //		out_rezo = 128;
 //		out_nb = fft.specSize() / out_rezo;
+		if (val_mute.get()) sound_player.mute();
+		val_mute.addEventChange(new nRunnable() { public void run() { 
+			if (val_mute.get()) sound_player.mute();
+			else sound_player.unmute(); }});
 		
 		run_play = newRun("play", new nRunnable() { public void run() { 
 					val_play.set(true); sound_player.play(); }});
@@ -99,6 +104,7 @@ public class MSound extends MBaseMT {
 	}
 	public MSound clear() {
 		super.clear(); 
+		sound_player.pause();
 		return this; }
 	
 	void frame() {
@@ -181,6 +187,8 @@ public class MSound extends MBaseMT {
 		  	  	.addDrawerIncrValue(val_larg, 20, 10, 1)
 		  	  	.addSeparator(0.125)
 		  	  	.addDrawerIncrValue(val_thresh, 20, 10, 1)
+		  	  	.addSeparator(0.125)
+		  	  	.addDrawerButton(val_mute, 10, 1)
 		  	  	.addSeparator(0.125)
 				;
 

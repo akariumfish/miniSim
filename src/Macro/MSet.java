@@ -159,6 +159,7 @@ public class MSet extends MBaseMT {
 	void draw_Cam() {
 		if (do_draws.get()) {
 			for (SetObj o : objects) o.subset.draw(o);
+			for (MSetLaw c : laws) c.draw();
 		}
 	}
 	

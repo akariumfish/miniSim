@@ -70,7 +70,7 @@ public class MEnvelope extends MBaseMT {
 			int curv_counter = run_counter;
 			if (current_sec.prev_sec != null) 
 					curv_counter = (int) (run_counter - current_sec.prev_sec.tot_length.get());
-			float curv_fact = curv_counter / current_sec.val_length.get();
+			float curv_fact = curv_counter / (current_sec.val_length.get() +1);
 			float prev_cible = end_value.get();
 			if (current_sec.prev_sec != null) 
 					prev_cible = current_sec.prev_sec.val_cible.get();

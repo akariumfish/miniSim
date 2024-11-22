@@ -50,6 +50,7 @@ public abstract class MSetLaw extends MBaseMenu {
 
 	abstract void tick_obj(MSet.SetObj o);
 	abstract void pair_obj(MSet.SetObj o1, MSet.SetObj o2);
+	void draw() {}
 }
 
 
@@ -64,6 +65,9 @@ class MSLawSpace extends MSetLaw {
 	
 	sFlt grav_const, frictn_const, solid_const;
 	sBoo do_grav, do_frictn, do_solid;
+	
+	sFlt zone_size;
+	sBoo show_zone;
 	
 	MSLawSpace(Macro_Sheet _sheet, sValueBloc _bloc) { 
 		super(_sheet, "slawspace", _bloc); 
@@ -80,11 +84,40 @@ class MSLawSpace extends MSetLaw {
 		do_frictn = newBoo(true, "do_frictn");
 		do_solid = newBoo(true, "do_solid");
 	    globalBin(do_grav, do_frictn, do_solid, false);
+	    
+	    
+	    show_zone = newBoo(true, "show_zone");
+	    zone_size = newFlt(1000, "zone_size");
+	    globalBin(show_zone, false);
+	    globalFltFact(zone_size, 2, false);
+	    
 	}
+	
+	
+	void draw() {
+		if (show_zone.get()) {
+			app.noFill();
+			app.stroke(255);
+			app.strokeWeight(5);
+			app.ellipse(-zone_size.get(), -zone_size.get(), 
+					zone_size.get() * 2, zone_size.get() * 2);
+		}
+	}
+	
 
 	void tick_obj(SetObj o) { 
 		if (do_frictn.get())
 			o.mov.mult(PApplet.max(0, 1.0F - (frictn_const.get())) );
+		
+		
+		if (o.pos.mag() > zone_size.get()) {
+			PVector m = new PVector(o.pos.x, o.pos.y);
+			m.setMag(4);
+			m.mult(-1);
+			o.mov.set(m.x, m.y);
+		}
+		
+		
 	}
 	void pair_obj(SetObj s1, SetObj s2) {
 		float d = 0;

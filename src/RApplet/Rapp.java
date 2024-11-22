@@ -48,6 +48,7 @@ public class Rapp extends PApplet implements RConst {
 	
 	boolean START_AS_WINDOW = true;
 	public boolean USE_SHADERS = true;
+	public boolean USE_SOUND = false;
 	
 	sInterface interf;
 	
@@ -233,14 +234,16 @@ public class Rapp extends PApplet implements RConst {
 	public Minim minim;
 	public AudioPlayer sound_player;
 	public FFT         fft;
-	public String sound_file = "son\\test.mp3";
+	public String sound_file = "son\\ratatat.mp3";
 
 	void media_setup() {
-		minim = new Minim(this);
-		sound_player = minim.loadFile(sound_file);
-		sound_player.loop();
-		sound_player.pause();
-		fft = new FFT( sound_player.bufferSize(), sound_player.sampleRate() );
+		if (USE_SOUND) {
+			minim = new Minim(this);
+			sound_player = minim.loadFile(sound_file);
+			sound_player.loop();
+			sound_player.pause();
+			fft = new FFT( sound_player.bufferSize(), sound_player.sampleRate() );
+		}
 		videoExport = new VideoExport(this);
 		videoExport.setFfmpegPath(sketchPath() + "\\" + "ffmpeg.exe");
 	}

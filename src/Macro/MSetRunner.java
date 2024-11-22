@@ -163,8 +163,8 @@ class MSRunBoids extends MSetRunner {
 	public void init() {
 		super.init();
 
-		vision_dist = newFlt(200, "vision_dist");
-		close_dist = newFlt(30, "close_dist");
+		vision_dist = newFlt(1600, "vision_dist");
+		close_dist = newFlt(120, "close_dist");
 		track_fact = newFlt(0.00024F, "track_fact");
 		avoid_fact = newFlt(0.0005F, "avoid_fact");
 		follow_fact = newFlt(0.00009F, "follow_fact");
