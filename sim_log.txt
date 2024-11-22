@@ -1,15 +1,7 @@
 0:- :setup
 0:  :setup end
 4:- :setup_load from start.sdata
-5792:- :full_data_save to start.sdata
-5911:- :full_data_save to gravilogo.sdata
-11798:- :full_data_save to gravilogo.sdata
-11818:- :setup_load from gravilogo.sdata
-14636:- :full_data_save to start.sdata
-14721:- :setup_load from gravilogo.sdata
-15171:- :full_data_save to gravilogo.sdata
-15276:- :setup_load from start.sdata
-17019:- :exit
+6291:- :exit
 null
 null
 null

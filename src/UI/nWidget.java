@@ -41,6 +41,9 @@ public class nWidget {
   public  nDrawer getDrawer() { return ndrawer; }
   public  nShelf getShelf() { return ndrawer.shelf; }
   public  nShelfPanel getShelfPanel() { return ndrawer.shelf.shelfPanel; }
+
+  public  nWidget addEventTopLayer(nRunnable r)      { eventTopLayer.add(r); return this; }
+  public  nWidget removeEventTopLayer(nRunnable r)      { eventTopLayer.remove(r); return this; }
   
   public  nWidget addEventPositionChange(nRunnable r)   { eventPositionChange.add(r); return this; }
   public  nWidget addEventShapeChange(nRunnable r)      { eventShapeChange.add(r); return this; }
@@ -111,6 +114,7 @@ public class nWidget {
   public nWidget toLayerTop() {
     if (drawer != null) drawer.toLayerTop();
     if (hover != null) hover.toLayerTop();
+    nRunnable.runEvents(eventTopLayer); 
     return this;
   }
   
@@ -490,7 +494,7 @@ public class nWidget {
     setSize(w, h);
   }
   
-  protected nGUI gui;
+  nGUI gui;
   Drawable drawer;
   private Hoverable hover;
   private Rect globalrect, localrect, phantomrect;
@@ -539,6 +543,7 @@ boolean constantOutlineWeight = false;
   ArrayList<nRunnable> eventPositionChange = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventShapeChange = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventLayerChange = new ArrayList<nRunnable>();
+  ArrayList<nRunnable> eventTopLayer = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventVisibilityChange = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventClear = new ArrayList<nRunnable>();
   ArrayList<nRunnable> eventFrameRun = new ArrayList<nRunnable>();

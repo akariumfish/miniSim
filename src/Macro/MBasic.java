@@ -260,7 +260,12 @@ abstract class MBaseTick extends MBasic {
 
 abstract class MBaseMT extends MBaseMenu { 
 	sBoo global_tick;
-	MBaseMT(Macro_Sheet _sheet, String t, sValueBloc _bloc) { super(_sheet, t, _bloc); }
+	MBaseMT(Macro_Sheet _sheet, String t, sValueBloc _bloc) { 
+		super(_sheet, t, _bloc); }
+	MBaseMT(Macro_Sheet _sheet, String t, sValueBloc _bloc, String bloc_spe) { 
+		super(_sheet, t, _bloc); 
+		bloc_specialization = bloc_spe; 
+	}
 	void init() { 
 		super.init(); 
 		global_tick = newBoo(true, "global_tick");

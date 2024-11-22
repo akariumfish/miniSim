@@ -1118,6 +1118,7 @@ class MPanGrph extends MPanTool {
   nWatcherWidget pan_label;
   nWidget graph;
   Drawable g_draw;
+  
   void build_front_panel(nWindowPanel front_panel) {
     if (front_panel != null) {
       
@@ -1166,7 +1167,7 @@ class MPanGrph extends MPanTool {
       front_panel.toLayerTop();
     }
   }
-  Macro_Connexion in_val, in_tick;
+  Macro_Connexion in_val, in_tick, out_end;
   
   sStr val_txt, val_label;
   nLinkedWidget txt_field; float flt;
@@ -1185,7 +1186,7 @@ class MPanGrph extends MPanTool {
       val_label.set(val_txt.get() + " " + RConst.trimFlt(flt)); } });
     txt_field = addEmptyL(0).addLinkedModel("MC_Element_Field").setLinkedValue(val_txt);
     txt_field.setInfo("description");
-    
+    out_end = addOutput(1, "end");
     in_val = addInput(0, "val").addEventReceive(new nRunnable(this) { public void run() { 
       if (in_val.lastPack() != null && in_val.lastPack().isFloat()) {
         flt = in_val.lastPack().asFloat();
@@ -1209,7 +1210,7 @@ class MPanGrph extends MPanTool {
         graph_data[gc] = g;
       
         if (gc < larg-1) gc++; 
-        else gc = 0;
+        else { gc = 0; out_end.sendBang(); }
       }
     } });
   }

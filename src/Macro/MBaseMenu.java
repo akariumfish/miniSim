@@ -167,6 +167,15 @@ public class MBaseMenu extends MBasic {
 		  
 		  build_custom_menu(bloc_front);
 		  
+		  if (bloc_front.collapsed) {
+			  bloc_front.popUp();
+			  bloc_front.collapse();
+		  } else {
+			  bloc_front.collapse();
+			  bloc_front.popUp();
+		  }
+		  bloc_front.toLayerTop();
+		  
 		  bloc_front.addEventClose(new nRunnable(this) { public void run() { 
 		    if (preset_explorer != null) mmain().presets_explorers.remove(preset_explorer);
 		    bloc_front = null;

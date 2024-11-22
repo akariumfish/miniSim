@@ -11,13 +11,13 @@ import UI.nFrontTab;
 import UI.nGUI;
 import sData.*;
 
-public class MSubSet extends MBaseMenu {
+public class MSetSubset extends MBaseMenu {
 	
 	static class Builder extends MAbstract_Builder {
 		Builder(Macro_Main m) { super("subset", "SubSet", 
 				"Set objects group", "Set Tool"); 
 		first_start_show(m); }
-		MSubSet build(Macro_Sheet s, sValueBloc b) { MSubSet m = new MSubSet(s, b); return m; }
+		MSetSubset build(Macro_Sheet s, sValueBloc b) { MSetSubset m = new MSetSubset(s, b); return m; }
 	}
 
 	public void build_custom_menu(nFrontPanel sheet_front) {
@@ -44,13 +44,15 @@ public class MSubSet extends MBaseMenu {
   	Macro_Connexion link_model,link_runner,link_creator,link_out;
   	MSet set;
   	MSetModel model;
-  	MSetRunner runner;
+	ArrayList<MSetRunner> runners;
   	MSetCreator creator;
 	ArrayList<SetObj> objects;
 
-  	sRun rst_run,emp_run;
+  	sRun add_run,rst_run,emp_run;
 
-	MSubSet(Macro_Sheet _sheet, sValueBloc _bloc) { 
+	sBoo do_reset_add, do_reset_empty;
+	
+	MSetSubset(Macro_Sheet _sheet, sValueBloc _bloc) { 
 		super(_sheet, "subset", _bloc, "subset"); 
 	}
 	public void init() {
@@ -60,15 +62,21 @@ public class MSubSet extends MBaseMenu {
 		cam_gui = inter.cam_gui;
 		ref_size = inter.ref_size;
 		init_access();
-		set = null; model = null; runner = null; creator = null;
+		set = null; model = null; creator = null;
 		objects = new ArrayList<SetObj>();
+		runners = new ArrayList<MSetRunner>();
 		
 		emp_run = newRun("emp_run", new nRunnable(this) { public void run() { 
 			empty(); }});
 		rst_run = newRun("rst_run", new nRunnable(this) { public void run() { 
 			for (SetObj o : objects) o.reset();
 			reset(); }});
-		globalBin(rst_run, emp_run, false);
+		add_run = newRun("add_run", new nRunnable(this) { public void run() { 
+			if (creator != null) creator.add(); }});
+		globalBin(add_run, rst_run, emp_run, false);
+		do_reset_add = newBoo(true, "do_reset_add");
+		do_reset_empty = newBoo(true, "do_reset_empty");
+		globalBin(do_reset_add, do_reset_empty, false);
 	}
 	void build_param() { 
 		super.build_param(); 
@@ -104,10 +112,10 @@ public class MSubSet extends MBaseMenu {
 		  }});
 		link_runner = addInput(0, "Link_Runner").set_link();
 		link_runner.addEventChangeLink(new nRunnable() { public void run() { 
-			runner = null;
+			runners.clear();
 			for (Macro_Connexion c : link_runner.connected_outputs) {
 				if (c.elem.bloc.bloc_specialization.equals("setrunner"))
-					runner = (MSetRunner)c.elem.bloc;
+					runners.add((MSetRunner)c.elem.bloc);
 			}
 		  }});
 		addEmpty(1); addEmpty(1);
@@ -116,26 +124,24 @@ public class MSubSet extends MBaseMenu {
 	void init_end() {  super.init_end();  }
 	void rebuild() {  super.rebuild(); 
 		if (rebuilding = true) {
-			for (MSet.SetObj o : objects) {
-				((MSubSet)rebuild_as).objects.add(o);
-				o.subset = (MSubSet)rebuild_as;
-			}
+			inter.addEventNextFrame(new nRunnable() { public void run() { 
+				((MSetSubset)rebuild_as).reset(); }});
 		}
 	}
-	public MSubSet clear() {
+	public MSetSubset clear() {
 		super.clear(); 
 		empty();
-		if (set != null) set.creators.remove(this);
+		if (set != null) set.subset.remove(this);
 		return this; }
 
-	void reconnect() { }
+	void reconnect() { empty(); }
 	
 	SetObj addObject(float x, float y) {
 		if (set != null) {
 			SetObj o = set.addObject(this);
 			o.pos.set(x, y);
 			if (model != null) model.init_obj(o);
-			if (runner != null) runner.init_obj(o);
+			for (MSetRunner r : runners) r.init_obj(o);
 			set.end_addObject(o);
 			return o;
 		}
@@ -143,33 +149,19 @@ public class MSubSet extends MBaseMenu {
 	}
 	void empty() {
 		for (int i = objects.size() - 1 ; i >= 0 ; i--) objects.get(i).clear();
+		objects.clear();
 	}
 	void reset() {
 		if (creator != null) creator.reset();
 		if (model != null) model.reset();
-		if (runner != null) runner.reset();
+		for (MSetRunner r : runners) r.reset();
+		if (do_reset_empty.get()) empty();
+		if (do_reset_add.get()) inter.addEventTwoFrame(add_run.get());
 	}
-	//debug
-//	void draw() {
-//		app.stroke(app.color(255,0,0));
-////		if (add_ref_cursor != null && add_ref_cursor.pval != null) 
-////			app.drawcross(add_ref_cursor.pval.x(), add_ref_cursor.pval.y(), 30);
-////		app.drawcross(add_pos_vec.x(), add_pos_vec.y(), 30);
-//		app.drawcross(add_pos_x.get(), add_pos_y.get(), 30);
-//	}
 	void tick() {
-//		add_tick();
-		if (runner != null) {
-			runner.tick();
-			for (int i = 0 ; i < objects.size() ; i++)
-			for (int j = i+1 ; j < objects.size() ; j++) {
-					runner.pair_obj(objects.get(i), objects.get(j));
-		}
-		}
+		
 	}
-	void tick(SetObj o) {
-		if (runner != null) runner.tick_obj(o);
-	}
+	void tick(SetObj o) { }
 	void draw(SetObj o) {
 		if (model != null) model.draw_canvas(o);
 		if (model != null) model.draw_obj(o);

@@ -2,6 +2,7 @@ package Macro;
 
 import java.util.ArrayList;
 
+import RApplet.RConst;
 import RApplet.sInterface;
 import UI.Drawable;
 import UI.nFrontPanel;
@@ -38,9 +39,10 @@ public class MSet extends MBaseMT {
     Drawable drawable;
 
     Macro_Connexion link_subset, link_law, link_canvas;
-	ArrayList<MSubSet> creators;
+	ArrayList<MSetSubset> subset;
 	ArrayList<MSetLaw> laws;
 	ArrayList<SetObj> objects;
+	MCanvas canvas;
 	
 	sInt objects_count;
 	
@@ -55,7 +57,7 @@ public class MSet extends MBaseMT {
 		cam_gui = inter.cam_gui;
 		ref_size = inter.ref_size;
 
-		creators = new ArrayList<MSubSet>();
+		subset = new ArrayList<MSetSubset>();
 		laws = new ArrayList<MSetLaw>();
 		objects = new ArrayList<SetObj>();
 		
@@ -83,10 +85,10 @@ public class MSet extends MBaseMT {
 	  super.build_normal(); 
 	  link_subset = addInput(0, "link_subset").set_link();
 	  link_subset.addEventChangeLink(new nRunnable() { public void run() { 
-		  creators.clear();
+		  subset.clear();
 		  for (Macro_Connexion c : link_subset.connected_outputs) {
 			  if (c.elem.bloc.bloc_specialization.equals("subset"))
-				  creators.add((MSubSet)c.elem.bloc);
+				  subset.add((MSetSubset)c.elem.bloc);
 		  }
 	  }});
 	  link_law = addInput(0, "link_law").set_link();
@@ -98,6 +100,13 @@ public class MSet extends MBaseMT {
 		  }
 	  }});
 	  link_canvas = addOutput(1, "link_canvas").set_link();
+	  link_canvas.addEventChangeLink(new nRunnable() { public void run() { 
+		  canvas = null;
+		  for (Macro_Connexion c : link_law.connected_outputs) {
+			  if (c.elem.bloc.val_type.get().equals("mcanvas"))
+				  canvas = (MCanvas)c.elem.bloc;
+		  }
+	  }});
 	}
 	void init_end() { 
 		super.init_end(); 
@@ -115,7 +124,7 @@ public class MSet extends MBaseMT {
 		return this;
 	}
 	
-	SetObj addObject(MSubSet m) {
+	SetObj addObject(MSetSubset m) {
 		SetObj o = new SetObj(m);
 		return o;
 	}
@@ -128,12 +137,11 @@ public class MSet extends MBaseMT {
 	}
 	void reset() {
 		for (SetObj o : objects) o.reset();
-		for (MSubSet c : creators) c.reset();
+		for (MSetSubset c : subset) c.reset();
 	}
 	void tick() {
 		if (do_ticks.get()) {
-			for (MSubSet c : creators) c.tick();
-			for (SetObj o : objects) o.subset.tick(o);
+			for (MSetSubset c : subset) c.tick();
 			for (MSetLaw c : laws) for (SetObj o : objects) c.tick_obj(o);
 			for (int i = 0 ; i < objects.size() ; i++)
 				for (int j = i+1 ; j < objects.size() ; j++) 
@@ -143,12 +151,15 @@ public class MSet extends MBaseMT {
 			for (SetObj o : objects) o.tick();
 		}
 	}
+	void tick_strt() {
+		if (do_ticks.get()) {
+			for (SetObj o : objects) o.tick_strt();
+		}
+	}
 	void draw_Cam() {
 		if (do_draws.get()) {
 			for (SetObj o : objects) o.subset.draw(o);
 		}
-		//debug
-//		for 	(MSetCreator c : creators) c.draw();
 	}
 	
 	class SetObj {
@@ -160,9 +171,11 @@ public class MSet extends MBaseMT {
 	  	PVector accel = new PVector(0, 0); 
 	    float radius, mass, density;
 
+	    boolean do_halo = false;
 	    float halo_size = 0;
 	    float halo_density = 0;
-	    int halo_col = 0;
+	    int halo_col_int = 0, halo_col_ext_min = 0, halo_col_ext_max = 0; 
+	    float halo_col_intfct = 0, halo_col_speedmin = 0, halo_col_speedmax = 0;
 
 	    // 			inside data :
 		PVector pos_strt = new PVector(0, 0);
@@ -172,10 +185,15 @@ public class MSet extends MBaseMT {
 		PVector mov_prev = new PVector(0, 0);
 		PVector mov_chng = new PVector(0, 0);
 	    float radius_strt, mass_strt, density_strt;
+	    //neighbours (for boids)
+		PVector neigh_posavg = new PVector(0, 0);
+		PVector neigh_movavg = new PVector(0, 0);
+		PVector avoid_posavg = new PVector(0, 0);
+		int neigh_number = 0, avoid_number;
 	    
-	    MSubSet subset;
+	    MSetSubset subset;
 	    
-		SetObj(MSubSet r) {
+		SetObj(MSetSubset r) {
 			subset = r;
 			objects.add(this);
 			r.objects.add(this);
@@ -210,11 +228,11 @@ public class MSet extends MBaseMT {
 		}
 		void tick() {
 			age++;
-			
 			mov.add(accel);
 			pos.add(mov);
 			accel.set(0, 0);
-
+		}
+		void tick_strt() {
 			pos_chng.set(pos.x - pos_prev.x, pos.y - pos_prev.y);
 			pos_prev.set(pos);
 			mov_chng.set(mov.x - mov_prev.x, mov.y - mov_prev.y);
@@ -222,7 +240,19 @@ public class MSet extends MBaseMT {
 		}
 		
 		void draw_halo(MCanvas canvas) {
-			if (canvas != null) canvas.draw_halo(pos, halo_size, halo_density, halo_col);
+			if (do_halo && canvas != null) {
+				float speed = pos_chng.mag();
+				float spfact = 
+						(speed - halo_col_speedmin) / (halo_col_speedmax - halo_col_speedmin);
+				spfact = 1 - RConst.limit(spfact, 0, 1);
+				int ce = RConst.merge_color(halo_col_ext_min, halo_col_ext_max, 
+								spfact, gui.app);
+				if (pos.x != pos_prev.x || pos.y != pos_prev.y)
+					canvas.draw_line_halo(pos, pos_prev, halo_size, halo_density, 
+						halo_col_int, ce, halo_col_intfct);
+				else canvas.draw_halo(pos, halo_size, halo_density, 
+						halo_col_int, ce, halo_col_intfct);
+			}
 		}
 	}
 }

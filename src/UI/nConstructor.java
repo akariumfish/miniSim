@@ -120,6 +120,16 @@ public class nConstructor {
       .setOutline(true)
       .setOutlineConstant(true)
       );
+    theme.addModel("EnvelopeCursor", theme.newWidget("ref")
+      .setStandbyColor(app.color(80, 80, 80))
+      .setHoveredColor(app.color(50, 50, 50))
+      .setClickedColor(app.color(140, 140, 140))
+      .setOutlineColor(app.color(200, 200, 200))
+      .setOutlineWeight(ref_size / 14)
+      .setOutline(true)
+      .setOutlineConstant(true)
+      .setSize(ref_size * 1 / 2, ref_size * 1 / 2)
+      );
     theme.addModel("List_Entry", theme.newWidget("ref")
       .setStandbyColor(app.color(10, 80, 90))
       .setHoveredColor(app.color(20, 90, 130))

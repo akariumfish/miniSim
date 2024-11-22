@@ -683,6 +683,7 @@ public class sInterface {
   
   boolean is_starting = true;
   public boolean show_info = false, show_frmrt = true;
+	public boolean screenshot_with_menu = false;
   void frame() {
 	  if (breakp) { app.breakpnt(); breakp = false; }
 	  
@@ -719,14 +720,18 @@ public class sInterface {
     
     if (show_frmrt) app.text(framerate.get(), 15, app.window_head + 24 );
     if (show_info) {
-      app.text("Scr " + RConst.trimFlt(input.mouse.x) + 
+      app.text("Screen " + RConst.trimFlt(input.mouse.x) + 
     	        "," + RConst.trimFlt(input.mouse.y - app.window_head), 50, app.window_head + 24 );
-      app.text("Cam " + RConst.trimFlt(cam.mouse.x) + 
-    		  	"," + RConst.trimFlt(cam.mouse.y), 200, app.window_head + 24 );
-      app.text("Zoom " + RConst.trimFlt(cam.cam_scale.get()), 375, app.window_head + 24 );
+      app.text("Cam    " + RConst.trimFlt(cam.mouse.x) + 
+    		  	"," + RConst.trimFlt(cam.mouse.y), 50, app.window_head + 44 );
+      app.text("Zoom " + RConst.trimFlt(cam.cam_scale.get()), 240, app.window_head + 24 );
     }
     
-    if (screenDraw_run != null) screenDraw_run.run();
+    if (screenDraw_run != null) screenDraw_run.run();  
+    if (screenshot_with_menu) {
+    		screenshot_with_menu = false;
+    		input.app.saveFrame("image/shot-########.png");
+    }
     
     data.frame(); // reset flags
     input.frame_end(); // reset flags

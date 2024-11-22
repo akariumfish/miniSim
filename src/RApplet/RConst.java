@@ -67,8 +67,48 @@ public interface RConst {
 	  return val * val * val;
 	}
 	
+	static float limit(float val, float min, float max) {
+		if (val < min) return min;
+		if (val > max) return max;
+		return val;
+	}
+	
+	static int merge_color(int c1, int c2, float fact, Rapp app) {
+		return app.color(app.red(c1)*fact + 	app.red(c2)*(1-fact), 
+					app.green(c1)*fact + 	app.green(c2)*(1-fact), 
+					app.blue(c1)*fact + 		app.blue(c2)*(1-fact), 
+					app.alpha(c1)*fact + 	app.alpha(c2)*(1-fact) );
+	}
+	
+	static int add_color(int oc, int nc, int type, Rapp app) {
+		if (type == 0) 
+			return app.color(PApplet.min(255, PApplet.max(app.red(oc), app.red(nc))), 
+					PApplet.min(255, PApplet.max(app.green(oc), app.green(nc))), 
+					PApplet.min(255, PApplet.max(app.blue(oc), app.blue(nc))),
+					PApplet.min(255, PApplet.max(app.alpha(oc), app.alpha(nc))));
+//		else if (type == 1) 
+//			return app.color(PApplet.min(255, PApplet.max(app.red(oc), app.red(nc))), 
+//					PApplet.min(255, PApplet.max(app.green(oc), app.green(nc))), 
+//					PApplet.min(255, PApplet.max(app.blue(oc), app.blue(nc))),
+//					PApplet.min(255, PApplet.max(0, app.alpha(nc))));
+		else return app.color(app.red(oc) + app.red(nc) / 2.0F,
+							app.green(oc) + app.green(nc) / 2.0F,
+							app.blue(oc) + app.blue(nc) / 2.0F,
+							app.alpha(oc) + app.alpha(nc) / 2.0F);
+
+	}
+
+	static float distancePointToPoint(float xa, float ya, float xb, float yb) {
+	  return (float) Math.sqrt( Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2) );
+	}
+	static float dist(float xa, float ya, float xb, float yb) {
+		  return (float) Math.sqrt( Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2) );
+		}
+	static float distSqPointPoint(float xa, float ya, float xb, float yb) {
+	  return (float)(Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2));
+	}
 	static float distancePointToLine(float x, float y, float x1, float y1, float x2, float y2) {
-	  float r =  (float) (( ((x-x1)*(x2-x1)) + ((y-y1)*(y2-y1)) ) / Math.pow(distancePointToPoint(x1, y1, x2, y2), 2));
+	  float r =  (float) (( ((x-x1)*(x2-x1)) + ((y-y1)*(y2-y1)) ) / PApplet.pow(distancePointToPoint(x1, y1, x2, y2), 2));
 	  if (r <= 0) {return distancePointToPoint(x1, y1, x, y);}
 	  if (r >= 1) {return distancePointToPoint(x, y, x2, y2);}
 	  float px = x1 + (r * (x2-x1));
@@ -90,12 +130,6 @@ public interface RConst {
 	    return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
 	}
 
-	static float distancePointToPoint(float xa, float ya, float xb, float yb) {
-	  return (float) Math.sqrt( Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2) );
-	}
-	static float distSqPointPoint(float xa, float ya, float xb, float yb) {
-	  return (float)(Math.pow((xb-xa), 2) + Math.pow((yb-ya), 2));
-	}
 	
 //#######################################################################
 //##          ROTATING TO ANGLE CIBLE BY SHORTEST DIRECTION            ##

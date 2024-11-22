@@ -177,7 +177,22 @@ nExplorer sheet_explorer;
     macro_tool = new nToolPanel(screen_gui, ref_size, 0.0F, true, true);
     
     float ht = 0.875F;
-    nDrawer last_drawer = macro_tool.addShelf().addDrawer(4.5F, ht)
+    nDrawer last_drawer = macro_tool.addShelf().addDrawer(2.0F, ht)
+    	    .addCtrlModel("Menu_Bar_Downlight_Outline", "SCREEN")
+    		  .setRunnable(new nRunnable() { public void run() { 
+    			  inter.screenshot_with_menu = true; }})
+	    	  .setSX(ref_size*2.0F).setSY(ref_size*0.75F)
+	    	  .setPX(ref_size*0).setPY(ref_size*0.0625F)
+	    	  .setStandbyColor(gui.app.color(70,130,130))
+	    	  .setInfo("Screenshot with menus")
+	  .getShelfPanel().addShelf().addDrawer(2.0F, ht)
+	    .addCtrlModel("Menu_Bar_Downlight_Outline", "IMPR")
+		  .setRunnable(scrnsht_run.get())
+	  	  .setSX(ref_size*2.0F).setSY(ref_size*0.75F)
+	  	  .setPX(ref_size*0).setPY(ref_size*0.0625F)
+	  	  .setStandbyColor(gui.app.color(130,130,70))
+	  	  .setInfo("Camera Screenshot - p")
+  	  .getShelfPanel().addShelf().addDrawer(4.5F, ht)
     		.addLinkedModel("Menu_Bar_Small_Outline-Mm-P1", "M")
   		  .setLinkedValue(show_macro)
   		  .setInfo("show/hide macros").setFont((int)(ref_size/1.9)).getDrawer()
@@ -202,7 +217,8 @@ nExplorer sheet_explorer;
       .addShelf().addDrawer(9.9F, ht)
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P1", "Era")
           .setRunnable(new nRunnable() { public void run() { del_selected(); }})
-          .setInfo("Erase selected bloc  -  e").setFont((int)(ref_size/1.9)).getDrawer()
+          .setInfo("Erase selected bloc  -  e").setFont((int)(ref_size/1.9))
+    	  	  .setStandbyColor(gui.app.color(130,80,80)).getDrawer()
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P2", "X")
           .setRunnable(new nRunnable() { public void run() { cut_run.run(); }})
           .setInfo("Cut selected blocs  -  x").setFont((int)(ref_size/1.9)).getDrawer()
@@ -223,19 +239,22 @@ nExplorer sheet_explorer;
           .setInfo("Switch selected blocs openning  -  n").setFont((int)(ref_size/2.5)).getDrawer()
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P8", "QS")
           .setRunnable(new nRunnable() { public void run() { inter.full_data_save(); }})
-          .setInfo("Quick Save").setFont((int)(ref_size/2.5)).getDrawer()
+          .setInfo("Quick Save").setFont((int)(ref_size/2.5))
+          .setStandbyColor(gui.app.color(80,110,130)).getDrawer()
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P9", "QL")
           .setRunnable(new nRunnable() { public void run() { inter.setup_load(); }})
-          .setInfo("Quick Load").setFont((int)(ref_size/2.5)).getDrawer() 
+          .setInfo("Quick Load").setFont((int)(ref_size/2.5))
+    	  	  .setStandbyColor(gui.app.color(80,110,130)).getDrawer() 
           .getShelfPanel()
       .addShelf().addDrawer(0.0F, ht).getShelfPanel() 
       .addShelf().addDrawer(2.0F, ht)
-	    .addCtrlModel("Menu_Bar", "MAIN")
+	    .addCtrlModel("Menu_Bar_Downlight_Outline", "MAIN")
 	    	  .setRunnable(new nRunnable() { public void run() { 
 	    	    if (main_sheetbloc != null) main_sheetbloc.menu();
 	    	    else build_sheet_menu(); }})
 	    	  .setSX(ref_size*2.0F).setSY(ref_size*0.75F)
 	    	  .setPX(ref_size*0).setPY(ref_size*0.0625F)
+	    	  .setStandbyColor(gui.app.color(80,130,90))
 	    	  .setInfo("Main Menu")
 	      .getShelfPanel()
       .addShelf().addDrawer(0.0F, ht).getShelfPanel()
@@ -251,7 +270,8 @@ nExplorer sheet_explorer;
           .setInfo("Open").setFont((int)(ref_size/1.9)).getDrawer()
         .addCtrlModel("Menu_Bar_Downlight_Outline-M-P4", "FS")
           .setRunnable(new nRunnable() { public void run() { inter.full_screen_run.run(); }})
-          .setInfo("Switch Fullscreen").setFont((int)(ref_size/1.9)).getDrawer();
+          .setInfo("Switch Fullscreen").setFont((int)(ref_size/1.9))
+    	      .setStandbyColor(gui.app.color(130,130,130)).getDrawer();
 //    
     close_bp = last_drawer.addCtrlModel("Menu_Bar_Downlight_Outline-M-P5", "X")
           .setRunnable(new nRunnable() { public void run() { gui.app.exit(); }})
@@ -1024,7 +1044,8 @@ nExplorer sheet_explorer;
   //, show_sheet_tool
   sBoo show_info, show_frmrt, show_gui, show_macro, show_link, link_volatil, show_build_tool, show_macro_tool, do_packet;
   sStr new_temp_name, database_path, shown_builder, shown_spe, shown_templ; 
-  sRun del_select_run, copy_run, paste_run, duplic_run, cut_run, selall_run, reduc_run, construct_run;
+  sRun scrnsht_run, del_select_run, copy_run, paste_run, duplic_run, 
+  		cut_run, selall_run, reduc_run, construct_run;
   public sInterface inter;
   Rapp app;
   public sValueBloc saved_template;
@@ -1141,7 +1162,10 @@ public Macro_Main(sInterface _int) {
     show_frmrt.addEventChange(new nRunnable(this) { public void run() { 
 		inter.show_frmrt = show_frmrt.get(); }});
     do_packet = newBoo(true, "do_packet", "do_packet");
-    
+
+    scrnsht_run = newRun("scrnsht_run", "impr", 'p',
+    		new nRunnable() { public void run() { mmain().inter.cam.screenshot = true; }});
+
     del_select_run = newRun("del_select_run", "del", 'e',
     		new nRunnable() { public void run() { del_selected(); }});
 
@@ -1211,22 +1235,28 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MTransform.Builder());
       add_bloc_builders(new MFilter.Builder());
       add_bloc_builders(new MVecLerp.Builder());
-      add_bloc_builders(new MSolidGroup.Builder(this));
-      add_bloc_builders(new MFlocGroup.Builder(this));
+//      add_bloc_builders(new MSolidGroup.Builder(this));
+//      add_bloc_builders(new MFlocGroup.Builder(this));
       add_bloc_builders(new MGrowerGroup.Builder(this));
       add_bloc_builders(new MCanvas.Builder(this));
       // in developement
       add_bloc_builders(new MCurve.Builder(this));
       add_bloc_builders(new MEnvelope.Builder(this));
       add_bloc_builders(new MSet.Builder(this));
-      add_bloc_builders(new MSubSet.Builder(this));
+      add_bloc_builders(new MSetSubset.Builder(this));
       add_bloc_builders(new MSLawSpace.Builder(this));
-      add_bloc_builders(new MSetCreator.Builder(this));
-      add_bloc_builders(new MSRunFloc.Builder(this));
+      add_bloc_builders(new MSCreatGrid.Builder(this));
+      add_bloc_builders(new MSCreatSpiral.Builder(this));
+      add_bloc_builders(new MSCreatRng.Builder(this));
+      add_bloc_builders(new MSRunBoids.Builder(this));
       add_bloc_builders(new MSRunAuto.Builder(this));
       add_bloc_builders(new MSRunStatic.Builder(this));
       add_bloc_builders(new MSModBase.Builder(this));
       add_bloc_builders(new MSModArrow.Builder(this));
+      add_bloc_builders(new MCanDecay.Builder(this));
+      add_bloc_builders(new MCanBrush.Builder(this));
+      add_bloc_builders(new MCanRain.Builder(this));
+      add_bloc_builders(new MCanBack.Builder(this));
 
       add_bloc_builders(new MButton.Builder(this));
       add_bloc_builders(new MColRGB.MColRGB_Builder());
@@ -1494,7 +1524,7 @@ public Macro_Main(sInterface _int) {
 	    srun_nxtf = newRun("sim_next_frame", "nxt frm", new nRunnable() { 
 	      public void run() { force_next_tick.set((int)(tick_by_frame.get())); } } );
 	    srun_scrsht = newRun("screen_shot", "impr", new nRunnable() { 
-	      public void run() { mmain().inter.cam.screenshot = true; } } );
+	      public void run() { mmain().inter.cam.screenshot = true; } } );  
 	}
 	    
 	
