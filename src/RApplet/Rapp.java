@@ -9,8 +9,9 @@ import com.hamoid.VideoExport;
 import UI.nWidget;
 import processing.core.*;
 import processing.event.MouseEvent;
+import ddf.minim.*;
+import ddf.minim.analysis.FFT;
 import sData.nRunnable;
-import z_old_specialise.*;
 
 
 // Library : The MidiBus 8 Severin Smith http://smallbutdigital.com/projects/themidibus/
@@ -44,7 +45,7 @@ public class Rapp extends PApplet implements RConst {
 //	public static void main(String[] args) {
 //		PApplet.main("RApplet.Rapp");
 //	}
-
+	
 	boolean START_AS_WINDOW = true;
 	public boolean USE_SHADERS = true;
 	
@@ -120,7 +121,7 @@ public class Rapp extends PApplet implements RConst {
 		      interf.addEventTwoFrame(new nRunnable() { 
 		        public void run() { exit(); } } ); } } );
 		  
-		  video_setup();
+		  media_setup();
 		  
 		  logln("setup end");
 	}
@@ -229,8 +230,17 @@ public class Rapp extends PApplet implements RConst {
 	
 
 	public VideoExport videoExport;
-	
-	void video_setup() {
+	public Minim minim;
+	public AudioPlayer sound_player;
+	public FFT         fft;
+	public String sound_file = "son\\test.mp3";
+
+	void media_setup() {
+		minim = new Minim(this);
+		sound_player = minim.loadFile(sound_file);
+		sound_player.loop();
+		sound_player.pause();
+		fft = new FFT( sound_player.bufferSize(), sound_player.sampleRate() );
 		videoExport = new VideoExport(this);
 		videoExport.setFfmpegPath(sketchPath() + "\\" + "ffmpeg.exe");
 	}

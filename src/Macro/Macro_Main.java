@@ -1241,6 +1241,7 @@ public Macro_Main(sInterface _int) {
       add_bloc_builders(new MCanvas.Builder(this));
       // in developement
       add_bloc_builders(new MCurve.Builder(this));
+      add_bloc_builders(new MSound.Builder(this));
       add_bloc_builders(new MEnvelope.Builder(this));
       add_bloc_builders(new MSet.Builder(this));
       add_bloc_builders(new MSetSubset.Builder(this));

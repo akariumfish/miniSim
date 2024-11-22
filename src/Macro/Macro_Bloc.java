@@ -393,7 +393,15 @@ public class Macro_Bloc extends Macro_Abstract {
 	
 	
 	
-	
+	Macro_Bloc newDRowValue(sValue v) {
+		  Macro_Connexion in = addInputToValue(0, v);
+		  addLinkedSWidget(1, v);
+		  if (!v.type.equals("run")) {
+			  Macro_Connexion out = addValueChangeToOutput(2, v);
+			  in.addBangGet(v, out); }
+//		  else addEmpty(2);
+		  return this;
+		}
 	Macro_Bloc newRowValue(sValue v) {
 	  Macro_Connexion in = addInputToValue(0, v);
 	  addLinkedSWidget(1, v);

@@ -257,7 +257,7 @@ int
 shr
 position_val
 val
-236191
+260990
 min
 0
 max
@@ -405,7 +405,7 @@ flt
 shr
 val_band_med
 val
-18.0
+5.0
 min
 0.0
 max
@@ -2087,7 +2087,7 @@ flt
 shr
 tls
 val
-8.608334
+8.466665
 min
 0.0
 max
@@ -2191,7 +2191,7 @@ flt
 shr
 tps
 val
-116.166504
+118.110245
 min
 0.0
 max
@@ -2259,9 +2259,9 @@ vec
 shr
 pos
 x
--173.87662
+-89.87656
 y
-97.41777
+-46.582058
 0
 0
 copy_run
@@ -2403,7 +2403,7 @@ int
 shr
 frsr
 val
-4733
+6188
 min
 0
 max
@@ -2459,7 +2459,7 @@ flt
 shr
 fdur
 val
-16.0
+17.0
 min
 0.0
 max
@@ -2497,7 +2497,7 @@ int
 shr
 tick
 val
-457322
+460232
 min
 0
 max
@@ -2567,7 +2567,7 @@ flt
 shr
 mfr
 val
-58.083252
+59.055122
 min
 0.0
 max
@@ -2829,7 +2829,7 @@ flt
 shr
 cfr
 val
-0.016
+0.017
 min
 0.0
 max
@@ -3095,7 +3095,7 @@ int
 shr
 sec
 val
-89
+114
 min
 0
 max
@@ -7911,7 +7911,7 @@ str
 shr
 spath
 val
-start.sdata
+soundFFT.sdata
 0
 0
 log_ext_save

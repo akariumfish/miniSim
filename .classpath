@@ -9,6 +9,12 @@
 	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/VideoExport/library/jna.jar"/>
 	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/VideoExport/library/jna-platform.jar"/>
 	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/VideoExport/library/VideoExport.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/jl1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/jsminim.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/minim.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/mp3spi1.9.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/tritonus_aos.jar"/>
+	<classpathentry kind="lib" path="C:/Users/user/Desktop/code/java/miniSim/thirdparties/tritonus_share.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

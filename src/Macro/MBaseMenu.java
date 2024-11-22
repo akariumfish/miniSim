@@ -316,7 +316,46 @@ public class MBaseMenu extends MBasic {
 		    } });
 		}
 	}
-	
+	public void globalSBin(sValue val1, sValue val2, sValue val3, boolean param_shown) {
+		if ( (val1.type.equals("run") || val1.type.equals("boo")) &&
+			 (val2.type.equals("run") || val2.type.equals("boo")) &&
+			 (val3.type.equals("run") || val3.type.equals("boo")) ) {
+			sBoo sacc1 = newBoo(false, "access_"+val1.ref);
+			sBoo sacc2 = newBoo(false, "access_"+val2.ref);
+			sBoo sacc3 = newBoo(false, "access_"+val3.ref);
+			
+			addToInitend(new nRunnable() { public void run() {
+				sacc1.addEventChange(run_rebuild); 
+				sacc2.addEventChange(run_rebuild); 
+				sacc3.addEventChange(run_rebuild); }});
+			addToBuildNorm(new nRunnable() { public void run() {
+				if (sacc1.get()) newDRowValue(val1); 
+				if (sacc2.get()) newDRowValue(val2); 
+				if (sacc3.get()) newDRowValue(val3); }});
+			addToBuildParam(new nRunnable() { public void run() {
+				if (param_shown || sacc1.get()) newDRowValue(val1); 
+				if (param_shown || sacc2.get()) newDRowValue(val2); 
+				if (param_shown || sacc3.get()) newDRowValue(val3); }});
+			
+		    addEventsBuildMenu(new nRunnable() { public void run() { 
+		      if (custom_tab != null) custom_tab.getShelf()
+		        .addDrawer(10, 1)
+		        .addLinkedModel("Auto_Button-S2-P1", val1.ref).setLinkedValue(val1)
+		        		.setSX(ref_size * 2.0F).setPX(ref_size * 0.25F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P1").setLinkedValue(sacc1)
+		        		.setPX(ref_size * 2.5F).getDrawer()
+		        .addLinkedModel("Auto_Button-S2-P1", val2.ref).setLinkedValue(val2)
+		        		.setSX(ref_size * 2.0F).setPX(ref_size * 3.5F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P5").setLinkedValue(sacc2)
+		        		.setPX(ref_size * 5.75F).getDrawer()
+		        .addLinkedModel("Auto_Button-S2-P3", val3.ref).setLinkedValue(val3)
+		        		.setSX(ref_size * 2.0F).setPX(ref_size * 6.75F).getDrawer()
+		        .addLinkedModel("Button_Check_AutoMacro-SS1-P9")
+		        		.setLinkedValue(sacc3).setPX(ref_size * 9.0F).getShelf()
+		        .addSeparator(0.125);
+		    } });
+		}
+	}
 	protected sValue menuWatch(sValue f) {
 		addEventsBuildMenu(new nRunnable(f) { public void run() { 
 			if (custom_tab != null) custom_tab.getShelf()
